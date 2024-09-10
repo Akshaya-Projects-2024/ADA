@@ -89,7 +89,8 @@ const Strings = {
     comments:'Comments*',
     enterYourCommentHere:'Enter your comments here',
     reply:'Reply',
-    edit:'Edit'
+    edit:'Edit',
+    appointments:"Appointments"
 }
 
 export default Strings
