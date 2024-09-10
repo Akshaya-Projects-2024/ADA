@@ -128,6 +128,8 @@ const MyAccount = props => {
                   THEMES.colors.sandyBeach,
                   <BottomOpenCheck stroke={THEMES.colors.california} />,
                   Strings.markHoliday,
+                  '',
+                  "markHoliday"
                 )}
                 {renderItem(
                   THEMES.colors.hawkesBlue,

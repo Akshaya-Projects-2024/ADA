@@ -1,18 +1,17 @@
-import {StatusBar} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-import {navigationRef} from './rootNavigationRef';
-import BottomTabNavigation from './BottomTabNavigation';
-import MyProfile from '../pages/Account/myProfile';
-import MediaLink from '../pages/Account/mediaLink';
-import ContactDetails from '../pages/Account/contactDetails';
-import UploadImagesDocs from '../pages/Account/uploadImagesDocs';
-import AppointmentsScreen from '../pages/Home/appointments';
-import SessionDetail from '../pages/Account/sessionDetail';
-import PaymentsSubscription from '../pages/Payment/paymentsSubscription';
-import PaymentDetails from '../pages/Payment/paymentDetails';
-import SubscriptionSuccess from '../pages/Payment/subscriptionSuccess';
-import ClientReview from '../pages/ClientReviews/clientReview';
+import { StatusBar } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { navigationRef } from "./rootNavigationRef";
+import BottomTabNavigation from "./BottomTabNavigation";
+import MyProfile from "../pages/Account/myProfile";
+import MediaLink from "../pages/Account/mediaLink";
+import ContactDetails from "../pages/Account/contactDetails";
+import UploadImagesDocs from "../pages/Account/uploadImagesDocs";
+import SessionDetail from "../pages/Account/sessionDetail";
+import PaymentsSubscription from "../pages/Payment/paymentsSubscription";
+import PaymentDetails from "../pages/Payment/paymentDetails";
+import ClientReview from "../pages/ClientReviews/clientReview";
+import MarkHoliday from "../pages/Account/markHoliday";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
@@ -22,10 +21,10 @@ const navOptionHandler = () => ({
   gestureEnabled: false,
 });
 
-export default Routes = props => {
+export default Routes = (props) => {
   const App = () => {
     return (
-      <AppStack.Navigator initialRouteName={'home'}>
+      <AppStack.Navigator initialRouteName={"home"}>
         <AppStack.Screen
           name="home"
           component={BottomTabNavigation}
@@ -77,6 +76,12 @@ export default Routes = props => {
           component={ClientReview}
           options={navOptionHandler}
         />
+
+        <AppStack.Screen
+          name="markHoliday"
+          component={MarkHoliday}
+          options={navOptionHandler}
+        />
       </AppStack.Navigator>
     );
   };
@@ -86,12 +91,14 @@ export default Routes = props => {
       ref={navigationRef}
       screenOptions={{
         animationEnabled: false,
-      }}>
-      <StatusBar backgroundColor={'#fff'} />
+      }}
+    >
+      <StatusBar backgroundColor={"#fff"} />
       <Stack.Navigator
         screenOptions={{
           animationEnabled: false,
-        }}>
+        }}
+      >
         <Stack.Screen name="app" component={App} options={navOptionHandler} />
       </Stack.Navigator>
     </NavigationContainer>
