@@ -123,6 +123,8 @@ const MyAccount = props => {
                   THEMES.colors.sandyBeach,
                   <BottomOpenCheck stroke={THEMES.colors.california} />,
                   Strings.myBookings,
+                  '',
+                  'myBookings'
                 )}
                 {renderItem(
                   THEMES.colors.sandyBeach,
@@ -147,6 +149,7 @@ const MyAccount = props => {
                   <Users />,
                   Strings.registerAsParent,
                   'addBottom',
+                  'rescheduleAppointment'
                 )}
               </View>
             </View>

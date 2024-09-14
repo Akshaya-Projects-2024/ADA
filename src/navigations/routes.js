@@ -12,6 +12,9 @@ import PaymentsSubscription from "../pages/Payment/paymentsSubscription";
 import PaymentDetails from "../pages/Payment/paymentDetails";
 import ClientReview from "../pages/ClientReviews/clientReview";
 import MarkHoliday from "../pages/Account/markHoliday";
+import CancelAppointment from "../pages/Appointment/cancelAppointment";
+import RescheduleAppointment from "../pages/Appointment/rescheduleAppointment";
+import MyBookings from "../pages/Account/myBookings";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
@@ -80,6 +83,22 @@ export default Routes = (props) => {
         <AppStack.Screen
           name="markHoliday"
           component={MarkHoliday}
+          options={navOptionHandler}
+        />
+        <AppStack.Screen
+          name="cancelAppointment"
+          component={CancelAppointment}
+          options={navOptionHandler}
+        />
+        <AppStack.Screen
+          name="rescheduleAppointment"
+          component={RescheduleAppointment}
+          options={navOptionHandler}
+        />
+
+        <AppStack.Screen
+          name="myBookings"
+          component={MyBookings}
           options={navOptionHandler}
         />
       </AppStack.Navigator>

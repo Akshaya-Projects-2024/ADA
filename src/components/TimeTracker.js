@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import {
   View,
   TouchableOpacity,
@@ -6,22 +6,24 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
-} from 'react-native';
-import moment from 'moment';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import {moderateScale} from 'react-native-size-matters';
-import {THEMES} from '../assets/theme/themes';
-import SwitchOn from '../assets/svg/switchOn.svg';
-import SwitchOff from '../assets/svg/switchOff.svg';
-import Strings from '../utils/strings';
+} from "react-native";
+import moment from "moment";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { moderateScale } from "react-native-size-matters";
+import { THEMES } from "../assets/theme/themes";
+import SwitchOn from "../assets/svg/switchOn.svg";
+import SwitchOff from "../assets/svg/switchOff.svg";
+import Strings from "../utils/strings";
+import RadioSelected from "../assets/svg/radioSelected.svg";
+import Radio from "../assets/svg/radio.svg";
 
-const days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+const days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
 const TimeTracker = () => {
   const [selectedDays, setSelectedDays] = useState([]);
 
-  const [selectedShiftType, setSelectedShiftType] = useState('full');
+  const [selectedShiftType, setSelectedShiftType] = useState("full");
   const [selectedForAll, setSelectedForAll] = useState(true);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [pickerMode, setPickerMode] = useState(null);
@@ -32,11 +34,11 @@ const TimeTracker = () => {
   const [times, setTimes] = useState(
     days.reduce((acc, day) => {
       acc[day] = {
-        shift1: {start: '', end: ''},
-        shift2: {start: '', end: ''},
+        shift1: { start: "", end: "" },
+        shift2: { start: "", end: "" },
       };
       return acc;
-    }, {}),
+    }, {})
   );
 
   const showDatePicker = (day, shift, type) => {
@@ -51,27 +53,27 @@ const TimeTracker = () => {
     setDatePickerVisibility(false);
   };
 
-  const handleConfirm = date => {
-    const formattedTime = moment(date).format('HH:mm A');
+  const handleConfirm = (date) => {
+    const formattedTime = moment(date).format("HH:mm A");
     handleTimeChange(pickerDay, pickerShift, pickerType, formattedTime);
     hideDatePicker();
   };
 
-  const toggleDay = day => {
-    setSelectedDays(prevSelectedDays => {
+  const toggleDay = (day) => {
+    setSelectedDays((prevSelectedDays) => {
       const updatedDays = prevSelectedDays.includes(day)
-        ? prevSelectedDays.filter(d => d !== day)
+        ? prevSelectedDays.filter((d) => d !== day)
         : [...prevSelectedDays, day];
       if (selectedForAll) {
-        setTimes(prevTimes => {
-          const updatedTimes = {...prevTimes};
+        setTimes((prevTimes) => {
+          const updatedTimes = { ...prevTimes };
           const referenceDay = updatedDays[0];
           const timeToCopy = times[referenceDay] || {
-            shift1: {start: '', end: ''},
-            shift2: {start: '', end: ''},
+            shift1: { start: "", end: "" },
+            shift2: { start: "", end: "" },
           };
 
-          updatedDays.forEach(selectedDay => {
+          updatedDays.forEach((selectedDay) => {
             updatedTimes[selectedDay] = timeToCopy;
           });
 
@@ -80,9 +82,12 @@ const TimeTracker = () => {
       }
       // Reset the times for the deselected day
       if (!updatedDays.includes(day)) {
-        setTimes(prevTimes => ({
+        setTimes((prevTimes) => ({
           ...prevTimes,
-          [day]: {shift1: {start: '', end: ''}, shift2: {start: '', end: ''}},
+          [day]: {
+            shift1: { start: "", end: "" },
+            shift2: { start: "", end: "" },
+          },
         }));
       }
 
@@ -91,7 +96,7 @@ const TimeTracker = () => {
   };
 
   const handleTimeChange = (day, shift, type, value) => {
-    setTimes(prevTimes => {
+    setTimes((prevTimes) => {
       const updatedTimes = {
         ...prevTimes,
         [day]: {
@@ -104,7 +109,7 @@ const TimeTracker = () => {
       };
 
       if (selectedForAll) {
-        selectedDays.forEach(selectedDay => {
+        selectedDays.forEach((selectedDay) => {
           if (selectedDay !== day) {
             updatedTimes[selectedDay][shift][type] = value;
           }
@@ -115,22 +120,25 @@ const TimeTracker = () => {
     });
   };
 
-  const RadioButton = ({title, onPress, mode}) => {
+  const RadioButton = ({ title, onPress, mode }) => {
     return (
       <Pressable
         style={styles.radioButtonContainer}
         activeOpacity={0.6}
-        onPress={onPress}>
+        onPress={onPress}
+      >
+        {mode ?  <RadioSelected/>:  <Radio/> }
         <Icon
-          name={mode ? 'radio-button-checked' : 'radio-button-unchecked'}
+          name={mode ?  <RadioSelected/> : <Radio/> }
           size={24}
           color={mode ? THEMES.colors.cyanBlue : THEMES.colors.lightGrey}
         />
         <Text
           style={[
             styles.radioButtonText,
-            {color: mode ? THEMES.colors.black : THEMES.colors.lightGrey},
-          ]}>
+            { color: mode ? THEMES.colors.black : THEMES.colors.lightGrey },
+          ]}
+        >
           {title}
         </Text>
       </Pressable>
@@ -141,12 +149,13 @@ const TimeTracker = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.workingDayText}>{Strings.workingDays}</Text>
       <View style={styles.weekDaysRow}>
-        {days.map(day => (
+        {days.map((day) => (
           <TouchableOpacity
             key={day}
             style={[
               styles.dayButton,
               {
+                borderWidth: 1,
                 backgroundColor: selectedDays.includes(day)
                   ? THEMES.colors.outrageousOrange
                   : THEMES.colors.pearl,
@@ -155,7 +164,8 @@ const TimeTracker = () => {
                   : THEMES.colors.darkGrey,
               },
             ]}
-            onPress={() => toggleDay(day)}>
+            onPress={() => toggleDay(day)}
+          >
             <Text
               style={[
                 styles.dayText,
@@ -164,7 +174,8 @@ const TimeTracker = () => {
                     ? THEMES.colors.white
                     : THEMES.colors.darkGrey,
                 },
-              ]}>
+              ]}
+            >
               {day}
             </Text>
           </TouchableOpacity>
@@ -176,33 +187,35 @@ const TimeTracker = () => {
       <View style={styles.radioButtonsContainer}>
         <View style={styles.radioButton}>
           <RadioButton
-            mode={selectedShiftType === 'full'}
+            mode={selectedShiftType === "full"}
             title={Strings.fullDay}
-            onPress={() => setSelectedShiftType('full')}
+            onPress={() => setSelectedShiftType("full")}
           />
         </View>
         <View style={styles.radioButton}>
           <RadioButton
-            mode={selectedShiftType === 'shifts'}
+            mode={selectedShiftType === "shifts"}
             title={Strings.twoShiftInADay}
-            onPress={() => setSelectedShiftType('shifts')}
+            onPress={() => setSelectedShiftType("shifts")}
           />
         </View>
       </View>
       <View
         style={{
-          flexDirection: 'row',
+          flexDirection: "row",
           paddingTop: moderateScale(32),
-          justifyContent: 'space-between',
+          justifyContent: "space-between",
           paddingBottom:
-            selectedShiftType === 'shifts'
+            selectedShiftType === "shifts"
               ? moderateScale(27)
               : moderateScale(39),
-        }}>
+        }}
+      >
         <Text style={styles.selectTimeText}>{Strings.selectTime}</Text>
         <Pressable
           style={styles.rowSameDay}
-          onPress={() => setSelectedForAll(!selectedForAll)}>
+          onPress={() => setSelectedForAll(!selectedForAll)}
+        >
           <Text style={styles.sameTimeForDayText}>
             {Strings.sameTimeForDay}
           </Text>
@@ -210,7 +223,7 @@ const TimeTracker = () => {
         </Pressable>
       </View>
 
-      {selectedShiftType === 'shifts' && (
+      {selectedShiftType === "shifts" && (
         <View style={styles.sameTimeForDayView}>
           <Text style={styles.firstHalfText}>{Strings.firstHalf}</Text>
           <Text style={styles.firstHalfText}>{Strings.secondHalf}</Text>
@@ -218,7 +231,7 @@ const TimeTracker = () => {
       )}
 
       <View style={styles.daysContainer}>
-        {days.map(day => (
+        {days.map((day) => (
           <View key={day} style={styles.dayContainer}>
             <View style={styles.dayCircle}>
               <Text style={styles.circleText}>{day}</Text>
@@ -232,8 +245,9 @@ const TimeTracker = () => {
                 ]}
                 onPress={() =>
                   selectedDays.includes(day) &&
-                  showDatePicker(day, 'shift1', 'start')
-                }>
+                  showDatePicker(day, "shift1", "start")
+                }
+              >
                 <Text
                   style={[
                     styles.timeText,
@@ -242,7 +256,8 @@ const TimeTracker = () => {
                         ? THEMES.colors.black
                         : THEMES.colors.lightSilver,
                     },
-                  ]}>
+                  ]}
+                >
                   {Strings.start}
                 </Text>
                 <Text
@@ -255,8 +270,9 @@ const TimeTracker = () => {
                         ? THEMES.colors.black
                         : THEMES.colors.lightSilver,
                     },
-                  ]}>
-                  {times[day].shift1.start || '___:___'}
+                  ]}
+                >
+                  {times[day].shift1.start || "___:___"}
                 </Text>
               </TouchableOpacity>
 
@@ -267,8 +283,9 @@ const TimeTracker = () => {
                 ]}
                 onPress={() =>
                   selectedDays.includes(day) &&
-                  showDatePicker(day, 'shift1', 'end')
-                }>
+                  showDatePicker(day, "shift1", "end")
+                }
+              >
                 <Text
                   style={[
                     styles.timeText,
@@ -277,7 +294,8 @@ const TimeTracker = () => {
                         ? THEMES.colors.black
                         : THEMES.colors.lightSilver,
                     },
-                  ]}>
+                  ]}
+                >
                   {Strings.close}
                 </Text>
                 <Text
@@ -290,20 +308,22 @@ const TimeTracker = () => {
                         ? THEMES.colors.black
                         : THEMES.colors.lightSilver,
                     },
-                  ]}>
-                  {times[day].shift1.end || '___:___'}
+                  ]}
+                >
+                  {times[day].shift1.end || "___:___"}
                 </Text>
               </TouchableOpacity>
             </View>
 
-            {selectedShiftType === 'shifts' && (
+            {selectedShiftType === "shifts" && (
               <View style={styles.timeInputContainer}>
                 <TouchableOpacity
                   style={[
                     styles.timeInput1,
                     !selectedDays.includes(day) && styles.disabledInput,
                   ]}
-                  onPress={() => showDatePicker(day, 'shift2', 'start')}>
+                  onPress={() => showDatePicker(day, "shift2", "start")}
+                >
                   <Text
                     style={[
                       styles.timeText,
@@ -312,7 +332,8 @@ const TimeTracker = () => {
                           ? THEMES.colors.black
                           : THEMES.colors.lightSilver,
                       },
-                    ]}>
+                    ]}
+                  >
                     {Strings.start}
                   </Text>
                   <Text
@@ -325,8 +346,9 @@ const TimeTracker = () => {
                           ? THEMES.colors.black
                           : THEMES.colors.lightSilver,
                       },
-                    ]}>
-                    {times[day].shift2.start || '___:___'}
+                    ]}
+                  >
+                    {times[day].shift2.start || "___:___"}
                   </Text>
                 </TouchableOpacity>
 
@@ -335,7 +357,8 @@ const TimeTracker = () => {
                     styles.timeInput,
                     !selectedDays.includes(day) && styles.disabledInput,
                   ]}
-                  onPress={() => showDatePicker(day, 'shift2', 'end')}>
+                  onPress={() => showDatePicker(day, "shift2", "end")}
+                >
                   <Text
                     style={[
                       styles.timeText,
@@ -344,7 +367,8 @@ const TimeTracker = () => {
                           ? THEMES.colors.black
                           : THEMES.colors.lightSilver,
                       },
-                    ]}>
+                    ]}
+                  >
                     {Strings.close}
                   </Text>
                   <Text
@@ -357,8 +381,9 @@ const TimeTracker = () => {
                           ? THEMES.colors.black
                           : THEMES.colors.lightSilver,
                       },
-                    ]}>
-                    {times[day].shift2.end || '___:___'}
+                    ]}
+                  >
+                    {times[day].shift2.end || "___:___"}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -387,26 +412,26 @@ const styles = StyleSheet.create({
   },
 
   weekDaysRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: moderateScale(10),
   },
   radioButtonsContainer: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   radioButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   daysContainer: {
     flex: 1,
   },
   dayContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: moderateScale(40),
   },
 
@@ -415,8 +440,8 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 36 / 2,
     borderWidth: 0.2,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   dayText: {
     color: THEMES.colors.white,
@@ -428,8 +453,8 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 36 / 2,
     backgroundColor: THEMES.colors.outrageousOrange,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: moderateScale(12),
   },
   circleText: {
@@ -439,7 +464,7 @@ const styles = StyleSheet.create({
   },
   timeInputContainer: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   timeInput: {
     flex: 1,
@@ -448,8 +473,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
+    alignItems: "flex-end",
+    justifyContent: "center",
   },
   timeInput1: {
     flex: 1,
@@ -458,8 +483,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
+    alignItems: "flex-start",
+    justifyContent: "center",
   },
   timeText: {
     color: THEMES.colors.darkGrey,
@@ -469,7 +494,7 @@ const styles = StyleSheet.create({
   disabledInput: {
     opacity: 0.7,
   },
-  radioButtonContainer: {flex: 1, alignItems: 'center', flexDirection: 'row'},
+  radioButtonContainer: { flex: 1, alignItems: "center", flexDirection: "row" },
   workingTimeView: {
     paddingTop: moderateScale(32),
     paddingBottom: moderateScale(16),
@@ -485,9 +510,9 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.semiBold,
   },
   rowSameDay: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   sameTimeForDayText: {
     fontFamily: THEMES.fontFamily.semiBold,
@@ -496,7 +521,7 @@ const styles = StyleSheet.create({
     paddingRight: moderateScale(6),
   },
   sameTimeForDayView: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginLeft: moderateScale(50),
     marginVertical: moderateScale(9),
   },

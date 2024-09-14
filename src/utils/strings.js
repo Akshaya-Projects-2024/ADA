@@ -90,7 +90,14 @@ const Strings = {
     enterYourCommentHere:'Enter your comments here',
     reply:'Reply',
     edit:'Edit',
-    appointments:"Appointments"
+    appointments:"Appointments",
+    cancelAppointment:'Cancel appointment',
+    writeAMessage:'Write message to the client for the cancelation reason.',
+    writeAMessageForReschedule:"Write message to the client for the rescheduling reason.",
+    rescheduleAppointment:'Reschedule Appointment',
+    sendRequest:'Send request',
+    to: "To",
+    from:"From"
 }
 
 export default Strings

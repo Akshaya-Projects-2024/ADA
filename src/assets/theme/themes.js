@@ -49,7 +49,8 @@ export const THEMES = {
     lightSilver:"#cccccc",
     wildSand:'#f5f5f5',
     alto:'#dddddd',
-    mercury:'#e2e2e2'
+    mercury:'#e2e2e2',
+    crimsonRed:'#E21E1E'
     
 
   },
