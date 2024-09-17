@@ -97,7 +97,22 @@ const Strings = {
     rescheduleAppointment:'Reschedule Appointment',
     sendRequest:'Send request',
     to: "To",
-    from:"From"
+    from:"From",
+    cancelAppointmentMessage:'Are you sure you want to confirm this appointment?',
+    am:'AM',
+    pm:"PM",
+    hhmm:"HH:MM",
+    ddMMYYYY:"DD/MM/YYYY",
+    selectDate:"Select Date",
+    trendingTopics:"Trending Topics",
+    newTopic:"New Topic",
+    subject:'Subject*',
+    pleaseEnterSubject:"Please enter subject",
+    writeBlog:"Write your blog here*",
+    writeHere:"Write here", 
+    uploadCoverImg:'Upload cover image*',
+     browse:'Browse',
+     selectImg:"Select Image"
 }
 
 export default Strings

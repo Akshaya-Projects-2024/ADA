@@ -50,7 +50,8 @@ export const THEMES = {
     wildSand:'#f5f5f5',
     alto:'#dddddd',
     mercury:'#e2e2e2',
-    crimsonRed:'#E21E1E'
+    crimsonRed:'#E21E1E',
+    persimmon:"#FF6F4D"
     
 
   },

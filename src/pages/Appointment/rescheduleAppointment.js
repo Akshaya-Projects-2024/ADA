@@ -11,7 +11,7 @@ import {
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../utils/strings";
 import Header from "../../components/Header";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, s } from "react-native-size-matters";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import Calendars from "../../assets/svg/calendar.svg";
@@ -83,87 +83,32 @@ const RescheduleAppointment = () => {
         bgColor="transparent"
         fontColor={THEMES.colors.black}
       />
-      <View
-        style={{
-          paddingTop: moderateScale(50),
-          paddingHorizontal: moderateScale(27),
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: THEMES.fontFamily.semiBold,
-              fontSize: THEMES.fonts.font14,
-              color: THEMES.colors.black,
-            }}
-          >
-            Select Date
-          </Text>
+      <View style={styles.mainContent}>
+        <View style={styles.rowContent}>
+          <Text style={styles.selectDateText}>{Strings.selectDate}</Text>
           <View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center ",
-                justifyContent: "center",
-              }}
-            >
+            <View style={styles.flexRow}>
               <View
-                style={{
-                  borderWidth: 0.8,
-                  borderColor: THEMES.colors.darkGrey,
-                  borderRadius: 8,
-                  alignItems: "center ",
-                  justifyContent: "center",
-                  paddingHorizontal: date? moderateScale(15): moderateScale(10),
-                  paddingVertical: moderateScale(10),
-                }}
+                style={[
+                  styles.dateContainer,
+                  {
+                    paddingHorizontal: date
+                      ? moderateScale(15)
+                      : moderateScale(10),
+                  },
+                ]}
               >
-                <Text
-                  style={{
-                    fontFamily: THEMES.fontFamily.medium,
-                    fontSize: THEMES.fonts.font14,
-                    color: THEMES.colors.black,
-                  }}
-                >
-                  {date ? (
-                    <Text
-                      style={{
-                        fontSize: THEMES.fonts.font14,
-                        color: THEMES.colors.black,
-                        fontFamily: THEMES.fontFamily.medium,
-                      }}
-                    >
-                      {date}
-                    </Text>
-                  ) : (
-                    <Text
-                      style={{
-                        fontSize: THEMES.fonts.font14,
-                        color: THEMES.colors.darkGrey,
-                        fontFamily: THEMES.fontFamily.medium,
-                      }}
-                    >
-                      DD/MM/YYYY
-                    </Text>
-                  )}
-                </Text>
+                {date ? (
+                  <Text style={styles.dateValue}>{date}</Text>
+                ) : (
+                  <Text style={styles.datePlaceholderText}>
+                    {Strings.ddMMYYYY}
+                  </Text>
+                )}
               </View>
               <TouchableOpacity
                 onPress={() => setDateVisibility(true)}
-                style={{
-                  borderWidth: 0.8,
-                  borderColor: THEMES.colors.darkGrey,
-                  padding: 10,
-                  borderRadius: 8,
-                  marginLeft: 8,
-                  borderBottomLeftRadius: 0,
-                }}
+                style={styles.calendarIcon}
               >
                 <Calendars />
               </TouchableOpacity>
@@ -171,63 +116,26 @@ const RescheduleAppointment = () => {
           </View>
         </View>
         <View style={{ paddingTop: moderateScale(45) }}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: THEMES.fontFamily.semiBold,
-                fontSize: THEMES.fonts.font14,
-                color: THEMES.colors.black,
-              }}
-            >
-              Select Time
-            </Text>
+          <View style={styles.selectTimeRow}>
+            <Text style={styles.selectTimeText}>{Strings.selectTime}</Text>
             <View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center ",
-                  justifyContent: "center",
-                }}
-              >
+              <View style={styles.rowStyle}>
                 <TouchableOpacity
                   onPress={() => setDatePickerVisibility(true)}
-                  style={{
-                    borderRadius: 8,
-                    alignItems: "center ",
-                    justifyContent: "center",
-                    borderRadius: 8,
-                    height: 40,
-                    borderWidth: 0.8,
-                    paddingHorizontal: time
-                      ? moderateScale(15)
-                      : moderateScale(10),
-                  }}
+                  style={[
+                    styles.timeContainer,
+                    {
+                      paddingHorizontal: time
+                        ? moderateScale(15)
+                        : moderateScale(10),
+                    },
+                  ]}
                 >
                   {time ? (
-                    <Text
-                      style={{
-                        fontSize: THEMES.fonts.font14,
-                        color: THEMES.colors.black,
-                        fontFamily: THEMES.fontFamily.medium,
-                      }}
-                    >
-                      {time}
-                    </Text>
+                    <Text style={styles.timeValueText}>{time}</Text>
                   ) : (
-                    <Text
-                      style={{
-                        fontSize: THEMES.fonts.font12,
-                        color: THEMES.colors.darkGrey,
-                        fontFamily: THEMES.fontFamily.medium,
-                      }}
-                    >
-                      HH:MM
+                    <Text style={styles.hourMinPlaceHolder}>
+                      {Strings.hhmm}
                     </Text>
                   )}
                 </TouchableOpacity>
@@ -238,7 +146,7 @@ const RescheduleAppointment = () => {
                     onPress={() => setIsAM(true)}
                   >
                     <Text style={[styles.text, isAM && styles.activeText]}>
-                      AM
+                      {Strings.am}
                     </Text>
                   </TouchableOpacity>
 
@@ -248,7 +156,7 @@ const RescheduleAppointment = () => {
                     onPress={() => setIsAM(false)}
                   >
                     <Text style={[styles.text, !isAM && styles.activeText]}>
-                      PM
+                      {Strings.pm}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -294,7 +202,7 @@ const styles = StyleSheet.create({
   btncontainer: {
     flexDirection: "row",
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: THEMES.colors.lightSilver,
     borderRadius: 8,
     overflow: "hidden",
     marginLeft: moderateScale(10),
@@ -308,16 +216,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   activeButton: {
-    backgroundColor: "#FF6F4D",
-    borderColor: "#FF6F4D",
+    backgroundColor: THEMES.colors.persimmon,
+    borderColor: THEMES.colors.persimmon,
   },
   text: {
-    color: "#000",
+    color: THEMES.colors.black,
     fontWeight: "bold",
     fontSize: THEMES.fonts.font12,
   },
   activeText: {
-    color: "#fff",
+    color: THEMES.colors.white,
     fontSize: THEMES.fonts.font12,
   },
   submitButton: {
@@ -327,6 +235,84 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginBottom: moderateScale(20),
     paddingHorizontal: moderateScale(27),
+  },
+  mainContent: {
+    paddingTop: moderateScale(50),
+    paddingHorizontal: moderateScale(27),
+  },
+  rowContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  selectDateText: {
+    fontFamily: THEMES.fontFamily.semiBold,
+    fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.black,
+  },
+  flexRow: {
+    flexDirection: "row",
+    alignItems: "center ",
+    justifyContent: "center",
+  },
+  dateValue: {
+    fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.black,
+    fontFamily: THEMES.fontFamily.medium,
+  },
+  datePlaceholderText: {
+    fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.darkGrey,
+    fontFamily: THEMES.fontFamily.medium,
+  },
+  calendarIcon: {
+    borderWidth: 0.8,
+    borderColor: THEMES.colors.darkGrey,
+    padding: 10,
+    borderRadius: 8,
+    marginLeft: 8,
+    borderBottomLeftRadius: 0,
+  },
+  selectTimeRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  selectTimeText: {
+    fontFamily: THEMES.fontFamily.semiBold,
+    fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.black,
+  },
+  hourMinPlaceHolder: {
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.darkGrey,
+    fontFamily: THEMES.fontFamily.medium,
+  },
+  timeValueText: {
+    fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.black,
+    fontFamily: THEMES.fontFamily.medium,
+  },
+  rowStyle: {
+    flexDirection: "row",
+    alignItems: "center ",
+    justifyContent: "center",
+  },
+  dateContainer: {
+    borderWidth: 0.8,
+    borderColor: THEMES.colors.darkGrey,
+    borderRadius: 8,
+    alignItems: "center ",
+    justifyContent: "center",
+    paddingVertical: moderateScale(10),
+  },
+  timeContainer: {
+    borderRadius: 8,
+    alignItems: "center ",
+    justifyContent: "center",
+    borderRadius: 8,
+    height: 40,
+    borderWidth: 0.8,
   },
 });
 

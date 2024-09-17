@@ -17,6 +17,9 @@ import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../utils/strings";
 import Header from "../../components/Header";
 import { moderateScale } from "react-native-size-matters";
+import Checked from "../../assets/svg/checked.svg";
+import UnChecked from "../../assets/svg/unchecked.svg";
+import Button from "../../components/Button";
 
 // Predefined order of days
 const days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
@@ -109,11 +112,8 @@ const MarkHoliday = () => {
         activeOpacity={0.6}
         onPress={onPress}
       >
-        <Icon
-          name={mode ? "check-box" : "check-box-outline-blank"}
-          size={24}
-          color={mode ? THEMES.colors.cyanBlue : THEMES.colors.lightGrey}
-        />
+        {mode ? <Checked></Checked> : <UnChecked />}
+
         <Text style={styles.radioButtonText}>{title}</Text>
       </Pressable>
     );
@@ -122,162 +122,179 @@ const MarkHoliday = () => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header showBack bgColor="transparent" />
+      <Header
+        title={Strings.markHoliday}
+        showBack
+        bgColor="transparent"
+        fontColor={THEMES.colors.black}
+      />
       <View style={styles.mainView}>
-        <Text style={styles.workingDayText}>Mark Holiday</Text>
-        <View style={styles.radioButtonsContainer}>
-          <SingleSelectCheckBox
-            mode={holidayType === "oneDay"}
-            title={"One Day"}
-            onPress={() => setHolidayType("oneDay")}
-          />
-          <SingleSelectCheckBox
-            mode={holidayType === "everyWeek"}
-            title={"Every Week"}
-            onPress={() => setHolidayType("everyWeek")}
-          />
-        </View>
-        <Text style={styles.workingDayText}>Select day</Text>
-        <View style={styles.weekDaysRow}>
-          {days.map((day) => (
-            <TouchableOpacity
-              key={day}
-              style={[
-                styles.dayButton,
-                {
-                  backgroundColor: holidayDays.includes(day)
-                    ? THEMES.colors.pearl
-                    : THEMES.colors.outrageousOrange,
-                  borderColor: holidayDays.includes(day)
-                    ? THEMES.colors.darkGrey
-                    : THEMES.colors.outrageousOrange,
-                },
-              ]}
-              onPress={() => toggleDay(day)}
-            >
-              <Text
+        <ScrollView
+          style={styles.daysContainer}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          bounces={false}
+        >
+          <View style={styles.radioButtonsContainer}>
+            <SingleSelectCheckBox
+              mode={holidayType === "oneDay"}
+              title={"One Day"}
+              onPress={() => setHolidayType("oneDay")}
+            />
+            <SingleSelectCheckBox
+              mode={holidayType === "everyWeek"}
+              title={"Every Week"}
+              onPress={() => setHolidayType("everyWeek")}
+            />
+          </View>
+          <Text style={styles.workingDayText}>Select day</Text>
+          <View style={styles.weekDaysRow}>
+            {days.map((day) => (
+              <TouchableOpacity
+                key={day}
                 style={[
-                  styles.dayText,
+                  styles.dayButton,
                   {
-                    color: holidayDays.includes(day)
+                    backgroundColor: holidayDays.includes(day)
+                      ? THEMES.colors.pearl
+                      : THEMES.colors.outrageousOrange,
+                    borderColor: holidayDays.includes(day)
                       ? THEMES.colors.darkGrey
-                      : THEMES.colors.white,
+                      : THEMES.colors.outrageousOrange,
                   },
                 ]}
+                onPress={() => toggleDay(day)}
               >
-                {day}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            paddingTop: moderateScale(32),
-            justifyContent: "space-between",
-            paddingBottom:
-              holidayType === "everyWeek"
-                ? moderateScale(27)
-                : moderateScale(39),
-          }}
-        >
-          <Text style={styles.selectTimeText}>{Strings.selectTime}</Text>
-          <Pressable style={styles.rowSameDay} onPress={handleToggleAllDay}>
-            <Text style={styles.sameTimeForDayText}>All Day</Text>
-            {applyForAllDays ? <SwitchOn /> : <SwitchOff />}
-          </Pressable>
-        </View>
-        <View style={{ flex: 1 }}>
-          {holidayDays.length > 0 && (
-            <ScrollView style={styles.daysContainer}>
-              {holidayDays.map((day) => (
-                <View key={day} style={styles.dayContainer}>
-                  <View style={styles.dayCircle}>
-                    <Text style={styles.circleText}>{day}</Text>
-                  </View>
-                  <View style={styles.timeInputContainer}>
-                    <TouchableOpacity
-                      style={[
-                        styles.timeInput1,
-                        !holidayDays.includes(day) && styles.disabledInput,
-                      ]}
-                      onPress={() =>
-                        holidayDays.includes(day) &&
-                        showDatePicker(day, "start")
-                      }
-                      disabled={applyForAllDays}
-                    >
-                      <Text
+                <Text
+                  style={[
+                    styles.dayText,
+                    {
+                      color: holidayDays.includes(day)
+                        ? THEMES.colors.darkGrey
+                        : THEMES.colors.white,
+                    },
+                  ]}
+                >
+                  {day}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View
+            style={{
+              flexDirection: "row",
+              paddingTop: moderateScale(32),
+              justifyContent: "space-between",
+              paddingBottom:
+                holidayType === "everyWeek"
+                  ? moderateScale(27)
+                  : moderateScale(39),
+            }}
+          >
+            <Text style={styles.selectTimeText}>{Strings.selectTime}</Text>
+            <Pressable style={styles.rowSameDay} onPress={handleToggleAllDay}>
+              <Text style={styles.sameTimeForDayText}>All Day</Text>
+              {applyForAllDays ? <SwitchOn /> : <SwitchOff />}
+            </Pressable>
+          </View>
+          <View style={{ flex: 1 }}>
+            {holidayDays.length > 0 && (
+              <>
+                {holidayDays.map((day) => (
+                  <View key={day} style={styles.dayContainer}>
+                    <View style={styles.dayCircle}>
+                      <Text style={styles.circleText}>{day}</Text>
+                    </View>
+                    <View style={styles.timeInputContainer}>
+                      <TouchableOpacity
                         style={[
-                          styles.timeText,
-                          {
-                            color: holidayDays.includes(day)
-                              ? THEMES.colors.black
-                              : THEMES.colors.lightSilver,
-                          },
+                          styles.timeInput1,
+                          !holidayDays.includes(day) && styles.disabledInput,
                         ]}
+                        onPress={() =>
+                          holidayDays.includes(day) &&
+                          showDatePicker(day, "start")
+                        }
+                        disabled={applyForAllDays}
                       >
-                        {Strings.from}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.timeText,
-                          {
-                            fontSize: THEMES.fonts.font12,
-                            fontFamily: THEMES.fontFamily.semiBold,
-                            color: holidayDays.includes(day)
-                              ? THEMES.colors.black
-                              : THEMES.colors.lightSilver,
-                          },
-                        ]}
-                      >
-                        {times[day].start || "___:___"}
-                      </Text>
-                    </TouchableOpacity>
+                        <Text
+                          style={[
+                            styles.timeText,
+                            {
+                              color: holidayDays.includes(day)
+                                ? THEMES.colors.black
+                                : THEMES.colors.lightSilver,
+                            },
+                          ]}
+                        >
+                          {Strings.from}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.timeText,
+                            {
+                              fontSize: THEMES.fonts.font12,
+                              fontFamily: THEMES.fontFamily.semiBold,
+                              color: holidayDays.includes(day)
+                                ? THEMES.colors.black
+                                : THEMES.colors.lightSilver,
+                            },
+                          ]}
+                        >
+                          {times[day].start || "___:___"}
+                        </Text>
+                      </TouchableOpacity>
 
-                    <TouchableOpacity
-                      style={[
-                        styles.timeInput,
-                        !holidayDays.includes(day) && styles.disabledInput,
-                      ]}
-                      onPress={() =>
-                        holidayDays.includes(day) && showDatePicker(day, "end")
-                      }
-                      disabled={applyForAllDays}
-                    >
-                      <Text
+                      <TouchableOpacity
                         style={[
-                          styles.timeText,
-                          {
-                            color: holidayDays.includes(day)
-                              ? THEMES.colors.black
-                              : THEMES.colors.lightSilver,
-                          },
+                          styles.timeInput,
+                          !holidayDays.includes(day) && styles.disabledInput,
                         ]}
+                        onPress={() =>
+                          holidayDays.includes(day) &&
+                          showDatePicker(day, "end")
+                        }
+                        disabled={applyForAllDays}
                       >
-                        {Strings.to}
-                      </Text>
-                      <Text
-                        style={[
-                          styles.timeText,
-                          {
-                            fontSize: THEMES.fonts.font12,
-                            fontFamily: THEMES.fontFamily.semiBold,
-                            color: holidayDays.includes(day)
-                              ? THEMES.colors.black
-                              : THEMES.colors.lightSilver,
-                          },
-                        ]}
-                      >
-                        {times[day].end || "___:___"}
-                      </Text>
-                    </TouchableOpacity>
+                        <Text
+                          style={[
+                            styles.timeText,
+                            {
+                              color: holidayDays.includes(day)
+                                ? THEMES.colors.black
+                                : THEMES.colors.lightSilver,
+                            },
+                          ]}
+                        >
+                          {Strings.to}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.timeText,
+                            {
+                              fontSize: THEMES.fonts.font12,
+                              fontFamily: THEMES.fontFamily.semiBold,
+                              color: holidayDays.includes(day)
+                                ? THEMES.colors.black
+                                : THEMES.colors.lightSilver,
+                            },
+                          ]}
+                        >
+                          {times[day].end || "___:___"}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-              ))}
-            </ScrollView>
-          )}
-        </View>
+                ))}
+              </>
+            )}
+            {holidayDays.length > 0 && (
+              <View style={styles.submitButton}>
+                <Button title={Strings.submit} />
+              </View>
+            )}
+          </View>
+        </ScrollView>
       </View>
 
       <DateTimePickerModal
@@ -320,10 +337,11 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.semiBold,
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
+    paddingTop: moderateScale(34),
   },
   mainView: {
     flex: 1,
-    paddingTop: moderateScale(30),
+    paddingTop: moderateScale(20),
     paddingHorizontal: moderateScale(20),
   },
   radioButtonContainer: {
@@ -423,6 +441,11 @@ const styles = StyleSheet.create({
     color: THEMES.colors.darkGrey,
     fontSize: THEMES.fonts.font8,
     fontFamily: THEMES.fontFamily.medium,
+  },
+  submitButton: {
+    width: "100%",
+    alignSelf: "center",
+    marginBottom: moderateScale(20),
   },
 });
 

@@ -15,6 +15,8 @@ import MarkHoliday from "../pages/Account/markHoliday";
 import CancelAppointment from "../pages/Appointment/cancelAppointment";
 import RescheduleAppointment from "../pages/Appointment/rescheduleAppointment";
 import MyBookings from "../pages/Account/myBookings";
+import NewTopic from "../pages/TrendingTopics/newTopic";
+import TrendDetail from "../pages/TrendingTopics/trendDetail";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
@@ -101,6 +103,20 @@ export default Routes = (props) => {
           component={MyBookings}
           options={navOptionHandler}
         />
+
+        <AppStack.Screen
+          name="newTopic"
+          component={NewTopic}
+          options={navOptionHandler}
+        />
+        
+        <AppStack.Screen
+          name="trendDetail"
+          component={TrendDetail}
+          options={navOptionHandler}
+        />
+        
+
       </AppStack.Navigator>
     );
   };
