@@ -127,12 +127,8 @@ const TimeTracker = () => {
         activeOpacity={0.6}
         onPress={onPress}
       >
-        {mode ?  <RadioSelected/>:  <Radio/> }
-        <Icon
-          name={mode ?  <RadioSelected/> : <Radio/> }
-          size={24}
-          color={mode ? THEMES.colors.cyanBlue : THEMES.colors.lightGrey}
-        />
+        {mode ? <RadioSelected /> : <Radio />}
+
         <Text
           style={[
             styles.radioButtonText,

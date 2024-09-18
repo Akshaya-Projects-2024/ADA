@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     fontSize: THEMES.fonts.font14,
-    fontFamily: THEMES.fontFamily.bold,
+    fontFamily: THEMES.fontFamily.medium,
     lineHeight: moderateScale(24),
   },
 });

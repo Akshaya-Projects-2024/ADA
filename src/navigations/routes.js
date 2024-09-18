@@ -17,6 +17,9 @@ import RescheduleAppointment from "../pages/Appointment/rescheduleAppointment";
 import MyBookings from "../pages/Account/myBookings";
 import NewTopic from "../pages/TrendingTopics/newTopic";
 import TrendDetail from "../pages/TrendingTopics/trendDetail";
+import SignIn from "../pages/Authentication/signIn";
+import OtpScreen from "../pages/Authentication/otpScreen";
+import RoleSelection from "../pages/Authentication/roleSelection";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
@@ -29,7 +32,25 @@ const navOptionHandler = () => ({
 export default Routes = (props) => {
   const App = () => {
     return (
-      <AppStack.Navigator initialRouteName={"home"}>
+      <AppStack.Navigator initialRouteName={"signIn"}>
+        <AppStack.Screen
+          name="signIn"
+          component={SignIn}
+          options={navOptionHandler}
+        />
+
+        <AppStack.Screen
+          name="otpScreen"
+          component={OtpScreen}
+          options={navOptionHandler}
+        />
+
+        <AppStack.Screen
+          name="roleSelection"
+          component={RoleSelection}
+          options={navOptionHandler}
+        />
+
         <AppStack.Screen
           name="home"
           component={BottomTabNavigation}
@@ -109,14 +130,12 @@ export default Routes = (props) => {
           component={NewTopic}
           options={navOptionHandler}
         />
-        
+
         <AppStack.Screen
           name="trendDetail"
           component={TrendDetail}
           options={navOptionHandler}
         />
-        
-
       </AppStack.Navigator>
     );
   };

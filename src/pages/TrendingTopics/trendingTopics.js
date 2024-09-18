@@ -81,7 +81,7 @@ const TrendingTopics = (props) => {
               fontSize: THEMES.fonts.font12,
               paddingHorizontal: moderateScale(10),
               paddingVertical: moderateScale(8),
-              lineHeight: 18,
+          
             }}
           >
             Home Remedies for Tick Removal
@@ -95,7 +95,7 @@ const TrendingTopics = (props) => {
               paddingHorizontal: moderateScale(10),
               paddingTop: moderateScale(3),
               paddingBottom: moderateScale(5),
-              lineHeight: 18,
+
             }}
           >
             Kartik Kumar
@@ -171,8 +171,6 @@ const TrendingTopics = (props) => {
                 color: THEMES.colors.darkGrey,
                 fontFamily: THEMES.fontFamily.regular,
                 fontSize: THEMES.fonts.font14,
-
-                lineHeight: 24,
               }}
             >
               Soni Kapoor
@@ -182,8 +180,6 @@ const TrendingTopics = (props) => {
                 color: THEMES.colors.darkGrey,
                 fontFamily: THEMES.fontFamily.regular,
                 fontSize: THEMES.fonts.font14,
-
-                lineHeight: 24,
               }}
             >
               1d
@@ -296,7 +292,7 @@ const TrendingTopics = (props) => {
                   style={{
                     fontFamily: THEMES.fontFamily.semiBold,
                     fontSize: THEMES.fonts.font14,
-                    colors: THEMES.colors.black,
+                    color: THEMES.colors.black,
                   }}
                 >
                   Explore More Topis

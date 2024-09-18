@@ -112,7 +112,12 @@ const Strings = {
     writeHere:"Write here", 
     uploadCoverImg:'Upload cover image*',
      browse:'Browse',
-     selectImg:"Select Image"
+     selectImg:"Select Image",
+     mobileNoEmail:'Mobile number/Email ID',
+     entermobileEmail:"Enter your Mobile Number / Email ID",
+     signIn:"Sign in",
+     signWithOtp:'Sign in with OTP',
+     skip:'Skip'
 }
 
 export default Strings

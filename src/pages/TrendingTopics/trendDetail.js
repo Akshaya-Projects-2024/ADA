@@ -8,6 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Keyboard,
+  Dimensions,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import { moderateScale, s } from "react-native-size-matters";
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
   },
   imgStyle: {
     width: "100%",
-    height: 282,
+    height:  Dimensions.get('window').height * 0.3,
   },
   headerView: {
     position: "absolute",
@@ -108,7 +109,6 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontFamily: THEMES.fontFamily.bold,
-    lineHeight: 24,
     fontSize: THEMES.fonts.font16,
     color: THEMES.colors.black,
   },
@@ -132,7 +132,8 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.regular,
     color: THEMES.colors.black,
     fontSize: THEMES.fonts.font14,
-    lineHeight: 24,
+    lineHeight: 27,
+
   },
 });
 
