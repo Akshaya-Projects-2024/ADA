@@ -161,6 +161,27 @@ const MyAccount = props => {
                   <Refresh />,
                   Strings.refundCancellationPolicy,
                 )}
+                 {renderItem(
+                  THEMES.colors.gallery,
+                  <Refresh />,
+                  "Lost Dog Alert",
+                  "",
+                  "lostDogAlert"
+                )}
+                 {renderItem(
+                  THEMES.colors.gallery,
+                  <Refresh />,
+                  "Rescue Alert",
+                  "",
+                  "rescueAlert"
+                )}
+                  {renderItem(
+                  THEMES.colors.gallery,
+                  <Refresh />,
+                  "Medical Alert",
+                  "",
+                  "medicalAlert"
+                )}
                 {renderItem(
                   THEMES.colors.zanah,
                   <Document />,

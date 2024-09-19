@@ -66,7 +66,9 @@ const SignIn = (props) => {
 
       {!isKeyboardVisible && (
         <View style={styles.skipBtn}>
-          <Button title={Strings.skip} onlyBorder />
+          <Button onPress={() =>
+            props.navigation.navigate("home")
+          } title={Strings.skip} onlyBorder />
         </View>
       )}
     </View>

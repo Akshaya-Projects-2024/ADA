@@ -200,12 +200,12 @@ const MyBookings = (props) => {
     }, 500);
   };
 
-  const onReschedule = () =>{
+  const onReschedule = () => {
     setVisible(false);
     setTimeout(() => {
       props.navigation.navigate("rescheduleAppointment");
     }, 500);
-  }
+  };
 
   const renderItem = ({ item }) => {
     let itemBackgroundColor = THEMES.colors.white;
@@ -226,7 +226,10 @@ const MyBookings = (props) => {
     }
     return (
       <Pressable
-        onPress={() => setSelectedItemId(item.id)}
+        onPress={() => {
+          setSelectedItemId(item.id);
+          props.navigation.navigate("appointmentDetail");
+        }}
         style={[styles.flatlistView, { backgroundColor: itemBackgroundColor }]}
       >
         {!item.isSeduled && !item.isCanceled && !item.isConfirmed ? (
@@ -453,20 +456,37 @@ const MyBookings = (props) => {
         backdropOpacity={0.5}
         style={{
           margin: 0,
+          borderRadius: 16,
           flex: 1,
-          justifyContent: "flex-end",
-          width: "100%",
-          bottom: 0,
         }}
       >
-        <View style={styles.content}>
+        <View
+          style={{
+            backgroundColor: THEMES.colors.bgColor,
+            paddingVertical: moderateScale(24),
+            paddingHorizontal: moderateScale(24),
+            borderRadius: 16,
+            marginHorizontal: moderateScale(36),
+          }}
+        >
           <View
             style={{
-              justifyContent: "flex-end",
-              alignItems: "flex-end",
-              paddingBottom: moderateScale(20),
+              justifyContent: "space-between",
+              flexDirection: "row",
             }}
           >
+            <Text
+              numberOfLines={2}
+              style={{
+                color: THEMES.colors.black,
+                fontFamily: THEMES.fontFamily.bold,
+                fontSize: THEMES.fonts.font16,
+                width:'70%',
+                lineHeight: moderateScale(24)
+              }}
+            >
+              Need to Change Your Plans?
+            </Text>
             <TouchableOpacity
               hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
               onPress={() => setVisible(false)}
@@ -475,35 +495,39 @@ const MyBookings = (props) => {
             </TouchableOpacity>
           </View>
           <Text
-            style={{
-              color: THEMES.colors.black,
-              fontFamily: THEMES.fontFamily.bold,
-              fontSize: THEMES.fonts.font14,
-              textAlign: "center",
-            }}
-          >
-            Do you want to cancel or reschedule the appointment?
-          </Text>
-          <View
+              style={{
+                color: THEMES.colors.black,
+                fontFamily: THEMES.fontFamily.regular,
+                fontSize: THEMES.fonts.font14,
+                paddingTop:moderateScale(16),
+                lineHeight: moderateScale(20)
+              }}
+            >
+             Do you want to cancel the appointment, or would you like to reschedule it instead?
+            </Text>
+            <View
             style={{
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
-              paddingTop: moderateScale(50),
+              paddingTop: moderateScale(31),
             }}
           >
             <View style={{ width: "45%" }}>
               <Button
+                onlyBorder
                 title="Cancel"
-                bgColor="#E21E1E"
                 onPress={() => onCancel()}
               />
             </View>
             <View style={{ width: "45%" }}>
-              <Button title="Reschedule" bgColor="#fd9f01"
-              onPress={() => onReschedule()} />
+              <Button
+                title="Reschedule"
+                
+                onPress={() => onReschedule()}
+              />
             </View>
-          </View>
+            </View>
         </View>
       </Modal>
     </View>

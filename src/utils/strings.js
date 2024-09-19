@@ -117,7 +117,8 @@ const Strings = {
      entermobileEmail:"Enter your Mobile Number / Email ID",
      signIn:"Sign in",
      signWithOtp:'Sign in with OTP',
-     skip:'Skip'
+     skip:'Skip',
+     petAdoption:'Pet Adoption'
 }
 
 export default Strings

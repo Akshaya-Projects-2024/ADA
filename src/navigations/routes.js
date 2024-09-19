@@ -20,6 +20,11 @@ import TrendDetail from "../pages/TrendingTopics/trendDetail";
 import SignIn from "../pages/Authentication/signIn";
 import OtpScreen from "../pages/Authentication/otpScreen";
 import RoleSelection from "../pages/Authentication/roleSelection";
+import AdoptionDetail from "../pages/PetAdoption/adoptionDetail";
+import LostDogAlert from "../pages/Notification/lostDogAlert";
+import RescueAlert from "../pages/Notification/rescueAlert";
+import MedicalAlert from "../pages/Notification/medicalAlert";
+import AppointmentDetail from "../pages/Appointment/appointmentDetail";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
@@ -134,6 +139,36 @@ export default Routes = (props) => {
         <AppStack.Screen
           name="trendDetail"
           component={TrendDetail}
+          options={navOptionHandler}
+        />
+
+        <AppStack.Screen
+          name="adoptionDetail"
+          component={AdoptionDetail}
+          options={navOptionHandler}
+        />
+
+        <AppStack.Screen
+          name="lostDogAlert"
+          component={LostDogAlert}
+          options={navOptionHandler}
+        />
+
+        <AppStack.Screen
+          name="rescueAlert"
+          component={RescueAlert}
+          options={navOptionHandler}
+        />
+
+        <AppStack.Screen
+          name="medicalAlert"
+          component={MedicalAlert}
+          options={navOptionHandler}
+        />
+
+        <AppStack.Screen
+          name="appointmentDetail"
+          component={AppointmentDetail}
           options={navOptionHandler}
         />
       </AppStack.Navigator>
