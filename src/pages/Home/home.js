@@ -8,7 +8,7 @@ const Home = () => {
   const {colors, fontFamily, fonts} = THEMES;
   return (
     <View style={{flex:1, backgroundColor:THEMES.colors.bgColor}}>
-      <Header customIcon = {<SwitchIcon/>} title={"Create event"} showSearch />
+      <Header customIcon = {<SwitchIcon/>} title={"Home"} showSearch />
       <Text
         style={{
           fontFamily: fontFamily.bold,

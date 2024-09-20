@@ -1,28 +1,108 @@
 import React, { useState, useRef, useMemo } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  StatusBar,
-  StyleSheet,
-  Image,
-  Pressable,
-  TouchableOpacity,
-} from "react-native";
-import Filter from "../../assets/svg/listFilter.svg";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { View, Text, StatusBar, StyleSheet, ScrollView } from "react-native";
+import Calendar from "../../assets/svg/calendar_event.svg";
+import Time from "../../assets/svg/circle_event.svg";
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../utils/strings";
 import Header from "../../components/Header";
 import FilterModal from "../../components/FilterModal";
 import { moderateScale } from "react-native-size-matters";
+import InputField from "../../components/InputField";
+import ClipboardPaste from "../../assets/svg/clipboardPaste.svg";
+import ArrowDown from "../../assets/svg/arrowDown.svg";
 
 const Chat = () => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header title={Strings.appointments} showBack bgColor="transparent" />
-      <Text>hello</Text>
+      <Header
+        title={"Create Event"}
+        fontColor="#EC559C"
+        showBack
+        bgColor="transparent"
+      />
+      <ScrollView
+        style={{ flex: 1 }}
+        bounces={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.mainView}>
+          <InputField
+            label={"Name of Event/ Offer*"}
+            placeholderText={"Enter Name of Event/ Offer"}
+          />
+          <View style={styles.pt16}>
+            <InputField
+              label={"Description*"}
+              placeholderText={"Enter the offer description"}
+              multiline
+            />
+          </View>
+          <View style={styles.pt16}>
+            <InputField
+              label={"Location"}
+              placeholderText={"Enter location name"}
+            />
+          </View>
+          <View style={styles.dateView}>
+            <Text style={styles.startDate}>Start</Text>
+            <View style={styles.dates}>
+              <View style={{ paddingRight: moderateScale(9) }}>
+                <Text style={styles.selectDateText}>Select Date</Text>
+                <Text style={styles.dateText}>01/12/2024</Text>
+              </View>
+              <Calendar />
+            </View>
+            <View style={styles.timeView}>
+              <View style={{ paddingRight: moderateScale(9) }}>
+                <Text style={styles.timeText}>Time</Text>
+                <Text style={styles.timeValue}>09:56 AM</Text>
+              </View>
+              <Time />
+            </View>
+          </View>
+
+          <View style={styles.endContent}>
+            <Text style={styles.endText}>End</Text>
+            <View style={styles.endValue}>
+              <View style={{ paddingRight: moderateScale(9) }}>
+                <Text style={styles.datePlaceholder}>Select Date</Text>
+                <Text style={styles.value}>01/12/2024</Text>
+              </View>
+              <Calendar />
+            </View>
+            <View style={styles.endValue}>
+              <View style={{ paddingRight: moderateScale(9) }}>
+                <Text style={styles.datePlaceholder}>Time</Text>
+                <Text style={styles.value}>09:56 AM</Text>
+              </View>
+              <Time />
+            </View>
+          </View>
+
+          <View style={styles.pt16}>
+            <InputField
+              label={"Contact Information*"}
+              placeholderText={"Enter Location Name"}
+            />
+          </View>
+          <View style={styles.pt16}>
+            <InputField
+              label={"Registration Link"}
+              placeholderText={"Paste registration link"}
+              rightIcon={<ClipboardPaste stroke={THEMES.colors.silver} />}
+            />
+          </View>
+          <View style={styles.pt16}>
+            <InputField
+              label={"Select whom to send"}
+              placeholderText={"Select"}
+              rightIcon={<ArrowDown stroke={THEMES.colors.darkGrey} />}
+            />
+          </View>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -33,95 +113,99 @@ const styles = StyleSheet.create({
   },
   mainView: {
     flex: 1,
+    paddingHorizontal: moderateScale(20),
     paddingTop: moderateScale(30),
-    paddingHorizontal: moderateScale(20),
+    marginBottom: moderateScale(20),
   },
-  flatlistView: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    shadowColor: "#ddd",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5,
-    overflow: "hidden",
-    borderRadius: 12,
-    marginBottom: moderateScale(10),
-    paddingVertical: moderateScale(2),
+  pt16: {
+    paddingTop: moderateScale(16),
   },
-  flatlistContent: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: moderateScale(10),
-  },
-  flatListRow: {
+  dateView: {
+    paddingTop: moderateScale(16),
     flexDirection: "row",
     alignItems: "center",
-  },
-  flatListImgView: {
-    width: 55,
-    height: 55,
-  },
-  profileImage: {
-    width: 30,
-    height: 30,
-    borderRadius: 30 / 2,
-  },
-  filterModalItem: { color: "black" },
-  flatListNameRow: {
-    flexDirection: "row",
-    width: "88%",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  name: {
-    fontSize: THEMES.fonts.font14,
-    lineHeight: 24,
-    color: THEMES.colors.black,
-    fontFamily: THEMES.fontFamily.semiBold,
-  },
-  profileTypeText: {
-    fontSize: THEMES.fonts.font10,
-    color: "#323232",
-    fontFamily: THEMES.fontFamily.regular,
-  },
-  visitTypeText: {
-    fontSize: THEMES.fonts.font12,
-    color: THEMES.colors.black,
-    fontFamily: THEMES.fontFamily.medium,
-  },
-  statusConfmText: {
-    fontSize: THEMES.fonts.font12,
-    color: THEMES.colors.black,
-    fontFamily: THEMES.fontFamily.medium,
-  },
-  statusCancleText: {
-    fontSize: THEMES.fonts.font12,
-    color: THEMES.colors.black,
-    fontFamily: THEMES.fontFamily.medium,
-  },
-  statusText: {
-    fontSize: THEMES.fonts.font12,
-    fontFamily: THEMES.fontFamily.bold,
-  },
-  filterOption: {
-    paddingHorizontal: moderateScale(20),
-    paddingVertical: moderateScale(10),
     backgroundColor: THEMES.colors.white,
   },
-  selectedFilterOption: {
-    backgroundColor: "#d3d3d3",
-  },
-  filterOptionText: {
+  startDate: {
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
-    fontFamily: THEMES.fontFamily.regular
+    fontFamily: THEMES.fontFamily.medium,
+    width: "15%",
   },
-  selectedFilterText: {
-    fontFamily: THEMES.fontFamily.regular,
+  dates: {
+    paddingHorizontal: moderateScale(15),
+    paddingVertical: moderateScale(8),
+    borderWidth: 1,
+    borderColor: "#CFD3D4",
+    borderRadius: 8,
+    marginLeft: moderateScale(12),
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  selectDateText: {
+    fontSize: THEMES.fonts.font10,
+    color: THEMES.colors.darkGrey,
+    fontFamily: THEMES.fontFamily.medium,
+  },
+  dateText: {
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.black,
+    fontFamily: THEMES.fontFamily.medium,
+    paddingTop: moderateScale(5),
+  },
+  timeView: {
+    paddingHorizontal: moderateScale(15),
+    paddingVertical: moderateScale(8),
+    borderWidth: 1,
+    borderColor: "#CFD3D4",
+    borderRadius: 8,
+    marginLeft: moderateScale(12),
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  timeText: {
+    fontSize: THEMES.fonts.font10,
+    color: THEMES.colors.darkGrey,
+    fontFamily: THEMES.fontFamily.medium,
+  },
+  timeValue: {
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.black,
+    fontFamily: THEMES.fontFamily.medium,
+    paddingTop: moderateScale(5),
+  },
+  endContent: {
+    paddingTop: moderateScale(16),
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: THEMES.colors.white,
+  },
+  endText: {
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
+    fontFamily: THEMES.fontFamily.medium,
+    width: "15%",
+  },
+  endValue: {
+    paddingHorizontal: moderateScale(15),
+    paddingVertical: moderateScale(8),
+    borderWidth: 1,
+    borderColor: "#CFD3D4",
+    borderRadius: 8,
+    marginLeft: moderateScale(12),
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  datePlaceholder: {
+    fontSize: THEMES.fonts.font10,
+    color: THEMES.colors.darkGrey,
+    fontFamily: THEMES.fontFamily.medium,
+  },
+  value: {
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.black,
+    fontFamily: THEMES.fontFamily.medium,
+    paddingTop: moderateScale(5),
   },
 });
 
