@@ -19,6 +19,8 @@ const Header = (props) => {
     bgColor,
     customIcon,
     right,
+    onBackPress,
+    arrowColor
   } = props;
   return (
     <View
@@ -31,9 +33,9 @@ const Header = (props) => {
     >
       <TouchableOpacity
         hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-        onPress={() => goBack()}
+        onPress={() => (onBackPress ? onBackPress() : goBack())}
       >
-        {showBack ? <Back /> : showFullArrow ? <ArrowLeft /> : customIcon}
+        {showBack ? <Back stroke={arrowColor ? arrowColor : "#000"} /> : showFullArrow ? <ArrowLeft stroke={arrowColor ? arrowColor : "#000"}  /> : customIcon}
       </TouchableOpacity>
       <View>
         <Text

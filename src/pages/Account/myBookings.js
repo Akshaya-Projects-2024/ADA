@@ -466,7 +466,7 @@ const MyBookings = (props) => {
             paddingVertical: moderateScale(24),
             paddingHorizontal: moderateScale(24),
             borderRadius: 16,
-            marginHorizontal: moderateScale(36),
+            marginHorizontal: moderateScale(30),
           }}
         >
           <View

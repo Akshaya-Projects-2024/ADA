@@ -10,100 +10,11 @@ import { moderateScale } from "react-native-size-matters";
 import InputField from "../../components/InputField";
 import ClipboardPaste from "../../assets/svg/clipboardPaste.svg";
 import ArrowDown from "../../assets/svg/arrowDown.svg";
+import CreateEvent from "../Events/createEvent";
 
 const Chat = () => {
   return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header
-        title={"Create Event"}
-        fontColor="#EC559C"
-        showBack
-        bgColor="transparent"
-      />
-      <ScrollView
-        style={{ flex: 1 }}
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.mainView}>
-          <InputField
-            label={"Name of Event/ Offer*"}
-            placeholderText={"Enter Name of Event/ Offer"}
-          />
-          <View style={styles.pt16}>
-            <InputField
-              label={"Description*"}
-              placeholderText={"Enter the offer description"}
-              multiline
-            />
-          </View>
-          <View style={styles.pt16}>
-            <InputField
-              label={"Location"}
-              placeholderText={"Enter location name"}
-            />
-          </View>
-          <View style={styles.dateView}>
-            <Text style={styles.startDate}>Start</Text>
-            <View style={styles.dates}>
-              <View style={{ paddingRight: moderateScale(9) }}>
-                <Text style={styles.selectDateText}>Select Date</Text>
-                <Text style={styles.dateText}>01/12/2024</Text>
-              </View>
-              <Calendar />
-            </View>
-            <View style={styles.timeView}>
-              <View style={{ paddingRight: moderateScale(9) }}>
-                <Text style={styles.timeText}>Time</Text>
-                <Text style={styles.timeValue}>09:56 AM</Text>
-              </View>
-              <Time />
-            </View>
-          </View>
-
-          <View style={styles.endContent}>
-            <Text style={styles.endText}>End</Text>
-            <View style={styles.endValue}>
-              <View style={{ paddingRight: moderateScale(9) }}>
-                <Text style={styles.datePlaceholder}>Select Date</Text>
-                <Text style={styles.value}>01/12/2024</Text>
-              </View>
-              <Calendar />
-            </View>
-            <View style={styles.endValue}>
-              <View style={{ paddingRight: moderateScale(9) }}>
-                <Text style={styles.datePlaceholder}>Time</Text>
-                <Text style={styles.value}>09:56 AM</Text>
-              </View>
-              <Time />
-            </View>
-          </View>
-
-          <View style={styles.pt16}>
-            <InputField
-              label={"Contact Information*"}
-              placeholderText={"Enter Location Name"}
-            />
-          </View>
-          <View style={styles.pt16}>
-            <InputField
-              label={"Registration Link"}
-              placeholderText={"Paste registration link"}
-              rightIcon={<ClipboardPaste stroke={THEMES.colors.silver} />}
-            />
-          </View>
-          <View style={styles.pt16}>
-            <InputField
-              label={"Select whom to send"}
-              placeholderText={"Select"}
-              rightIcon={<ArrowDown stroke={THEMES.colors.darkGrey} />}
-            />
-          </View>
-        </View>
-      </ScrollView>
-    </View>
+    <Text>hleo</Text>
   );
 };
 const styles = StyleSheet.create({

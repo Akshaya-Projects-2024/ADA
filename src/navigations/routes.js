@@ -25,6 +25,9 @@ import LostDogAlert from "../pages/Notification/lostDogAlert";
 import RescueAlert from "../pages/Notification/rescueAlert";
 import MedicalAlert from "../pages/Notification/medicalAlert";
 import AppointmentDetail from "../pages/Appointment/appointmentDetail";
+import CreateEvent from "../pages/Events/createEvent";
+import CalendarScreen from "../pages/Events/calendarScreen";
+import Search from "../pages/TrendingTopics/search";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
@@ -169,6 +172,22 @@ export default Routes = (props) => {
         <AppStack.Screen
           name="appointmentDetail"
           component={AppointmentDetail}
+          options={navOptionHandler}
+        />
+
+        <AppStack.Screen
+          name="createEvent"
+          component={CreateEvent}
+          options={navOptionHandler}
+        />
+        <AppStack.Screen
+          name="calendarScreen"
+          component={CalendarScreen}
+          options={navOptionHandler}
+        />
+         <AppStack.Screen
+          name="search"
+          component={Search}
           options={navOptionHandler}
         />
       </AppStack.Navigator>
