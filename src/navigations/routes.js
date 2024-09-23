@@ -12,6 +12,8 @@ import PaymentsSubscription from "../pages/Payment/paymentsSubscription";
 import PaymentDetails from "../pages/Payment/paymentDetails";
 import ClientReview from "../pages/ClientReviews/clientReview";
 import MarkHoliday from "../pages/Account/markHoliday";
+import Search from "../pages/TrendingTopics/search";
+import SelectDate from "../pages/Account/selectDate";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
@@ -80,6 +82,16 @@ export default Routes = (props) => {
         <AppStack.Screen
           name="markHoliday"
           component={MarkHoliday}
+          options={navOptionHandler}
+        />
+        <AppStack.Screen
+          name="search"
+          component={Search}
+          options={navOptionHandler}
+        />
+        <AppStack.Screen
+          name="selectDate"
+          component={SelectDate}
           options={navOptionHandler}
         />
       </AppStack.Navigator>

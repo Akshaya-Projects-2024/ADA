@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
 import { THEMES } from "../assets/theme/themes";
 import Back from "../assets/svg/back.svg";
 import ArrowLeft from "../assets/svg/arrowLeft.svg";
@@ -19,6 +25,7 @@ const Header = (props) => {
     bgColor,
     customIcon,
     right,
+    onSearchPress,
   } = props;
   return (
     <View
@@ -48,7 +55,13 @@ const Header = (props) => {
         </Text>
       </View>
       <View>
-        {showFilter ? <Filter /> : showSearch ? <Search /> : null}
+        {showFilter ? (
+          <Filter />
+        ) : showSearch ? (
+          <Pressable onPress={onSearchPress}>
+            <Search />
+          </Pressable>
+        ) : null}
         {right}
       </View>
     </View>

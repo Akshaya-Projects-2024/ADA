@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -7,35 +7,35 @@ import {
   StatusBar,
   StyleSheet,
   TouchableOpacity,
-} from 'react-native';
-import {THEMES} from '../../assets/theme/themes';
-import LinearGradient from 'react-native-linear-gradient';
-import Header from '../../components/Header';
-import SwitchIcon from '../../assets/svg/switch.svg';
-import BadgeCheck from '../../assets/svg/badge.svg';
-import ProfileImg from '../../assets/svg/profile.svg';
-import RightArrow from '../../assets/svg/rightArrow.svg';
-import Badge from '../../assets/svg/badgeCheck.svg';
-import BottomOpenCheck from '../../assets/svg/bookings.svg';
-import Star from '../../assets/svg/star.svg';
-import Users from '../../assets/svg/users.svg';
-import Refresh from '../../assets/svg/refresh.svg';
-import Document from '../../assets/svg/document.svg';
-import Delete from '../../assets/svg/delete.svg';
-import Logout from '../../assets/svg/logout.svg';
-import ContactUs from '../../assets/svg/contactUs.svg';
-import AboutUs from '../../assets/svg/aboutUs.svg';
-import Strings from '../../utils/strings';
-import {moderateScale, s} from 'react-native-size-matters';
+} from "react-native";
+import { THEMES } from "../../assets/theme/themes";
+import LinearGradient from "react-native-linear-gradient";
+import Header from "../../components/Header";
+import SwitchIcon from "../../assets/svg/switch.svg";
+import BadgeCheck from "../../assets/svg/badge.svg";
+import ProfileImg from "../../assets/svg/profile.svg";
+import RightArrow from "../../assets/svg/rightArrow.svg";
+import Badge from "../../assets/svg/badgeCheck.svg";
+import BottomOpenCheck from "../../assets/svg/bookings.svg";
+import Star from "../../assets/svg/star.svg";
+import Users from "../../assets/svg/users.svg";
+import Refresh from "../../assets/svg/refresh.svg";
+import Document from "../../assets/svg/document.svg";
+import Delete from "../../assets/svg/delete.svg";
+import Logout from "../../assets/svg/logout.svg";
+import ContactUs from "../../assets/svg/contactUs.svg";
+import AboutUs from "../../assets/svg/aboutUs.svg";
+import Strings from "../../utils/strings";
+import { moderateScale, s } from "react-native-size-matters";
 
-const MyAccount = props => {
+const MyAccount = (props) => {
   const renderItem = (
     bgColor,
     icon,
     title,
     addBottom,
     route,
-    showPending = false,
+    showPending = false
   ) => {
     const Icon = icon;
     return (
@@ -47,14 +47,15 @@ const MyAccount = props => {
           {
             paddingBottom: addBottom && moderateScale(16),
           },
-        ]}>
+        ]}
+      >
         <View style={styles.rowCenter}>
-          <View style={[styles.iconStyle, {backgroundColor: bgColor}]}>
+          <View style={[styles.iconStyle, { backgroundColor: bgColor }]}>
             {Icon}
           </View>
           <Text style={styles.titleText}>{title}</Text>
         </View>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           {showPending && <Text style={styles.pendingText}>Pending</Text>}
 
           <RightArrow stroke={THEMES.colors.boulder} />
@@ -71,25 +72,28 @@ const MyAccount = props => {
         THEMES.colors.panache,
         THEMES.colors.bgColor,
       ]}
-      style={{flex: 1}}>
+      style={{ flex: 1 }}
+    >
       <StatusBar backgroundColor={THEMES.colors.lightCyan} />
       <Header
         customIcon={<SwitchIcon />}
         title={Strings.myAccount}
         showSearch
         bgColor="transparent"
+        onSearchPress={() => props.navigation.navigate("search")}
       />
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
-        style={{flex: 1}}>
+        style={{ flex: 1 }}
+      >
         <View style={styles.container}>
           <View>
             <View style={styles.profileView}>
               <Image
                 style={styles.profile}
-                source={require('../../assets/images/profileImg.png')}
+                source={require("../../assets/images/profileImg.png")}
               />
             </View>
             <View style={styles.badgeView}>
@@ -108,35 +112,35 @@ const MyAccount = props => {
                   THEMES.colors.lightCyan,
                   <ProfileImg />,
                   Strings.myProfile,
-                  '',
-                  'myProfile',
-                  true,
+                  "",
+                  "myProfile",
+                  true
                 )}
                 {renderItem(
                   THEMES.colors.cornFlowerBlue,
                   <Badge />,
                   Strings.paymentSubScription,
-                  '',
-                  'paymentsSubscription',
+                  "",
+                  "paymentsSubscription"
                 )}
                 {renderItem(
                   THEMES.colors.sandyBeach,
                   <BottomOpenCheck stroke={THEMES.colors.california} />,
-                  Strings.myBookings,
+                  Strings.myBookings
                 )}
                 {renderItem(
                   THEMES.colors.sandyBeach,
                   <BottomOpenCheck stroke={THEMES.colors.california} />,
                   Strings.markHoliday,
-                  '',
+                  "",
                   "markHoliday"
                 )}
                 {renderItem(
                   THEMES.colors.hawkesBlue,
                   <Star />,
                   Strings.clientReviews,
-                  'addBottom',
-                  'clientReview'
+                  "addBottom",
+                  "clientReview"
                 )}
               </View>
             </View>
@@ -146,7 +150,7 @@ const MyAccount = props => {
                   THEMES.colors.cherub,
                   <Users />,
                   Strings.registerAsParent,
-                  'addBottom',
+                  "addBottom"
                 )}
               </View>
             </View>
@@ -156,13 +160,13 @@ const MyAccount = props => {
                 {renderItem(
                   THEMES.colors.gallery,
                   <Refresh />,
-                  Strings.refundCancellationPolicy,
+                  Strings.refundCancellationPolicy
                 )}
                 {renderItem(
                   THEMES.colors.zanah,
                   <Document />,
                   Strings.privacyPolicy,
-                  'addbottom',
+                  "addbottom"
                 )}
               </View>
             </View>
@@ -173,14 +177,14 @@ const MyAccount = props => {
                   THEMES.colors.hawkesBlue,
                   <ContactUs />,
                   Strings.contactUs,
-                  '',
-                  'contactDetails',
+                  "",
+                  "contactDetails"
                 )}
                 {renderItem(
                   THEMES.colors.wispPink,
                   <AboutUs />,
                   Strings.aboutUs,
-                  'addBottom',
+                  "addBottom"
                 )}
               </View>
             </View>
@@ -190,13 +194,13 @@ const MyAccount = props => {
                 {renderItem(
                   THEMES.colors.cosmos,
                   <Delete />,
-                  Strings.deleteAccount,
+                  Strings.deleteAccount
                 )}
                 {renderItem(
                   THEMES.colors.peach,
                   <Logout />,
                   Strings.logout,
-                  'addBottom',
+                  "addBottom"
                 )}
               </View>
             </View>
@@ -212,12 +216,12 @@ const styles = StyleSheet.create({
     marginBottom: moderateScale(20),
   },
   badgeView: {
-    position: 'absolute',
+    position: "absolute",
     width: 100,
     height: 100,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    alignSelf: 'center',
+    justifyContent: "flex-end",
+    alignItems: "center",
+    alignSelf: "center",
     top: moderateScale(8),
   },
   profileView: {
@@ -225,8 +229,8 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 100 / 2,
     borderWidth: 1,
-    borderColor: 'transparent',
-    alignSelf: 'center',
+    borderColor: "transparent",
+    alignSelf: "center",
   },
   profile: {
     width: 100,
@@ -246,11 +250,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(16),
     borderRadius: moderateScale(12),
     shadowColor: THEMES.colors.black,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: THEMES.colors.white,
   },
@@ -272,27 +276,27 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.bold,
   },
   nameView: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingTop: moderateScale(15),
   },
   flexRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingTop: moderateScale(16),
   },
   rowCenter: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   iconStyle: {
     width: 30,
     height: 30,
     borderRadius: 7,
     backgroundColor: THEMES.colors.bgColor,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: moderateScale(12),
   },
   titleText: {
