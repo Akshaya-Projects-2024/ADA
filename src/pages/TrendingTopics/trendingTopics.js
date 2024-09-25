@@ -73,7 +73,8 @@ const TrendingTopics = (props) => {
             backgroundColor: THEMES.colors.white,
           }}
         >
-          <Text
+          <Text 
+        
             numberOfLines={2}
             style={{
               fontFamily: THEMES.fontFamily.semiBold,

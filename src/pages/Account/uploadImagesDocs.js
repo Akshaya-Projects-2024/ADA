@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,16 +8,18 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-} from 'react-native';
-import {THEMES} from '../../assets/theme/themes';
-import Header from '../../components/Header';
-import CrossCircle from '../../assets/svg/crossCircle.svg';
-import {moderateScale, s} from 'react-native-size-matters';
-import UploadImageModal from '../../components/UploadImageModal';
-import Strings from '../../utils/strings';
-import Button from '../../components/Button';
+} from "react-native";
+import { THEMES } from "../../assets/theme/themes";
+import Header from "../../components/Header";
+import CrossCircle from "../../assets/svg/crossCircle.svg";
+import { moderateScale, s } from "react-native-size-matters";
+import UploadImageModal from "../../components/UploadImageModal";
+import Strings from "../../utils/strings";
+import Button from "../../components/Button";
+import Stepper from "../../components/Stepper";
 
-const UploadImagesDocs = () => {
+const UploadImagesDocs = (props) => {
+  const route = props?.route?.params?.route;
   const [visible, setVisible] = useState(false);
   const [photo, setPhoto] = useState();
   const [businessImg, setBusinessImg] = useState([]);
@@ -25,21 +27,23 @@ const UploadImagesDocs = () => {
   const [documentImg, setDocumentImg] = useState([]);
   const [documentVisible, setDocumentVisible] = useState(false);
 
-  const getBase64Obj = url => {
+
+
+  const getBase64Obj = (url) => {
     if (url) {
       return {
-        uri: url.includes('https') ? url : `data:image/jpg;base64,${url}`,
+        uri: url.includes("https") ? url : `data:image/jpg;base64,${url}`,
       };
     }
   };
 
-  const handleBusinessImg = image => {
+  const handleBusinessImg = (image) => {
     var temp = [...businessImg];
     temp.push(image);
     setBusinessImg(temp);
   };
 
-  const handleDocumentImg = image => {
+  const handleDocumentImg = (image) => {
     var data = [...documentImg];
     data.push(image);
     setDocumentImg(data);
@@ -57,11 +61,12 @@ const UploadImagesDocs = () => {
         <TouchableOpacity
           onPress={() => {
             const removeItemById = businessImg.filter(
-              item => item?.fileData !== photo,
+              (item) => item?.fileData !== photo
             );
             setBusinessImg(removeItemById);
           }}
-          style={styles.crossView}>
+          style={styles.crossView}
+        >
           <CrossCircle stroke={THEMES.colors.black} style={styles.crossImg} />
         </TouchableOpacity>
       </View>
@@ -80,11 +85,12 @@ const UploadImagesDocs = () => {
         <TouchableOpacity
           onPress={() => {
             const removeItemById = businessImg.filter(
-              item => item?.fileData !== photo,
+              (item) => item?.fileData !== photo
             );
             setDocumentImg(removeItemById);
           }}
-          style={styles.crossView}>
+          style={styles.crossView}
+        >
           <CrossCircle stroke={THEMES.colors.black} style={styles.crossImg} />
         </TouchableOpacity>
       </View>
@@ -95,20 +101,35 @@ const UploadImagesDocs = () => {
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={Strings.uploadImagesDoc} showBack bgColor="transparent" />
-      <View style={{flex: 1}}>
+      {route !== "myprofile" && (
+      <View
+        style={{
+          borderTopWidth: 1,
+          borderTopColor: "#B8B8B8",
+          borderBottomColor: "#B8B8B8",
+          borderBottomWidth: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <Stepper currentStep={3} totalSteps={5} />
+      </View>
+      )}
+      <View style={{ flex: 1 }}>
         <ScrollView
           bounces={false}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          style={{flex: 1}}>
-          <View style={styles.padding}>
+          style={{ flex: 1 }}
+        >
+          <View style={[styles.padding, { paddingTop: moderateScale(route !== "myprofile" ? 18 : 30) }]}>
             <View style={styles.businessContainer}>
               <Text style={styles.businessLogoText}>
                 {Strings.businessLogo}
               </Text>
               <TouchableOpacity
                 disabled={photo && true}
-                onPress={() => setVisible(true)}>
+                onPress={() => setVisible(true)}
+              >
                 <Text
                   style={[
                     styles.addBtnTextStyle,
@@ -118,7 +139,8 @@ const UploadImagesDocs = () => {
                         : THEMES.colors.cyan,
                       opacity: photo ? 0.5 : 1,
                     },
-                  ]}>
+                  ]}
+                >
                   {Strings.add}
                 </Text>
               </TouchableOpacity>
@@ -135,7 +157,8 @@ const UploadImagesDocs = () => {
                     onPress={() => {
                       setPhoto();
                     }}
-                    style={styles.crossView}>
+                    style={styles.crossView}
+                  >
                     <CrossCircle
                       stroke={THEMES.colors.black}
                       style={styles.crossImg}
@@ -152,7 +175,9 @@ const UploadImagesDocs = () => {
 
           <View style={styles.secondaryView}>
             <View style={styles.secondaryFlex}>
-              <Text style={styles.titleText}>{Strings.businessPlaceImages}</Text>
+              <Text style={styles.titleText}>
+                {Strings.businessPlaceImages}
+              </Text>
               <TouchableOpacity onPress={() => setBusinessVisible(true)}>
                 <Text style={styles.addText}>{Strings.add}</Text>
               </TouchableOpacity>
@@ -162,14 +187,15 @@ const UploadImagesDocs = () => {
                 styles.flatlistView,
                 {
                   alignItems:
-                    businessImg?.length == 0 ? 'center' : 'flex-start',
+                    businessImg?.length == 0 ? "center" : "flex-start",
                 },
-              ]}>
+              ]}
+            >
               <FlatList
                 horizontal={true}
                 contentContainerStyle={{
-                  justifyContent: businessImg?.length ? 'flex-start' : 'center',
-                  alignItems: 'center',
+                  justifyContent: businessImg?.length ? "flex-start" : "center",
+                  alignItems: "center",
                   padding: businessImg?.length
                     ? moderateScale(0)
                     : moderateScale(16),
@@ -204,14 +230,15 @@ const UploadImagesDocs = () => {
                 styles.certificationList,
                 {
                   alignItems:
-                    documentImg?.length == 0 ? 'center' : 'flex-start',
+                    documentImg?.length == 0 ? "center" : "flex-start",
                 },
-              ]}>
+              ]}
+            >
               <FlatList
                 horizontal={true}
                 contentContainerStyle={{
-                  justifyContent: documentImg?.length ? 'flex-start' : 'center',
-                  alignItems: 'center',
+                  justifyContent: documentImg?.length ? "flex-start" : "center",
+                  alignItems: "center",
                   padding: documentImg?.length
                     ? moderateScale(0)
                     : moderateScale(16),
@@ -235,23 +262,26 @@ const UploadImagesDocs = () => {
           <UploadImageModal
             isVisible={visible}
             onClose={() => setVisible(false)}
-            handleSelectedImage={image => setPhoto(image)}
+            handleSelectedImage={(image) => setPhoto(image)}
           />
 
           <UploadImageModal
             isVisible={businessVisible}
             onClose={() => setBusinessVisible(false)}
-            handleSelectedImage={image => handleBusinessImg(image)}
+            handleSelectedImage={(image) => handleBusinessImg(image)}
           />
           <UploadImageModal
             isVisible={documentVisible}
             onClose={() => setDocumentVisible(false)}
-            handleSelectedImage={image => handleDocumentImg(image)}
+            handleSelectedImage={(image) => handleDocumentImg(image)}
           />
         </ScrollView>
       </View>
       <View style={styles.submitButton}>
-        <Button title={Strings.submit} />
+        <Button
+           title={route !== "myprofile" ? Strings.next : Strings.submit}
+          onPress={() => props.navigation.navigate("sessionDetail")}
+        />
       </View>
     </View>
   );
@@ -272,23 +302,22 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.semiBold,
   },
   submitButton: {
-    marginHorizontal: moderateScale(27),
+    marginHorizontal: moderateScale(20),
     marginBottom: moderateScale(22),
   },
   padding: {
-    paddingTop: moderateScale(24),
     paddingHorizontal: moderateScale(24),
   },
   businessContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   businessLogoText: {
     fontSize: THEMES.fonts.font14,
     fontFamily: THEMES.fontFamily.semiBold,
     color: THEMES.colors.black,
-    width: '80%',
+    width: "80%",
   },
   addBtnTextStyle: {
     fontSize: THEMES.fonts.font14,
@@ -307,8 +336,8 @@ const styles = StyleSheet.create({
     borderColor: THEMES.colors.darkGrey,
     borderRadius: 10,
     margin: moderateScale(16),
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   logoImg: {
     width: 60,
@@ -318,11 +347,11 @@ const styles = StyleSheet.create({
     borderColor: THEMES.colors.darkGrey,
   },
   crossView: {
-    position: 'absolute',
+    position: "absolute",
     width: 60,
     height: 60,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-end',
+    justifyContent: "flex-start",
+    alignItems: "flex-end",
     left: 5,
     bottom: 5,
   },
@@ -331,12 +360,12 @@ const styles = StyleSheet.create({
     height: moderateScale(15),
   },
   emptyView: {
-    width: '100%',
+    width: "100%",
     padding: moderateScale(16),
     borderColor: THEMES.colors.darkGrey,
     borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   emptyText: {
     color: THEMES.colors.black,
@@ -348,9 +377,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(24),
   },
   secondaryFlex: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   titleText: {
     fontSize: THEMES.fonts.font14,
@@ -370,8 +399,8 @@ const styles = StyleSheet.create({
     backgroundColor: THEMES.colors.white,
   },
   imgPlaceholder: {
-    width: '100%',
-    textAlign: 'center',
+    width: "100%",
+    textAlign: "center",
     fontFamily: THEMES.fontFamily.medium,
     fontSize: THEMES.fonts.font12,
     color: THEMES.colors.black,
@@ -379,18 +408,18 @@ const styles = StyleSheet.create({
   certificationView: {
     paddingTop: moderateScale(40),
     paddingHorizontal: moderateScale(24),
-    width: '100%',
+    width: "100%",
   },
   certificationFlex: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   certificationText: {
     fontSize: THEMES.fonts.font12,
     fontFamily: THEMES.fontFamily.semiBold,
     color: THEMES.colors.black,
-    width: '80%',
+    width: "80%",
   },
   certificationList: {
     marginTop: moderateScale(5),
@@ -406,8 +435,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginLeft: 16,
     marginRight: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginVertical: moderateScale(16),
   },
   img: {

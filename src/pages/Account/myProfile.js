@@ -16,7 +16,7 @@ const MyProfile = props => {
   const renderItem = (title, addBottom, route, description, showPending) => {
     return (
       <TouchableOpacity
-        onPress={() => props.navigation.navigate(route)}
+        onPress={() => props.navigation.navigate(route, { route: "myprofile" })}
         style={[
           styles.flexRow,
           {
@@ -45,7 +45,7 @@ const MyProfile = props => {
           {renderItem(
             Strings.businessDetails,
             '',
-            'businessDetails',
+            'businessDetail',
             Strings.businessDescription,
           )}
 

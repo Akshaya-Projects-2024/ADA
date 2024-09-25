@@ -28,6 +28,7 @@ import AppointmentDetail from "../pages/Appointment/appointmentDetail";
 import CreateEvent from "../pages/Events/createEvent";
 import CalendarScreen from "../pages/Events/calendarScreen";
 import Search from "../pages/TrendingTopics/search";
+import BusinessDetail from "../pages/Account/businessDetail";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
@@ -62,6 +63,12 @@ export default Routes = (props) => {
         <AppStack.Screen
           name="home"
           component={BottomTabNavigation}
+          options={navOptionHandler}
+        />
+
+        <AppStack.Screen
+          name="businessDetail"
+          component={BusinessDetail}
           options={navOptionHandler}
         />
 
@@ -185,7 +192,7 @@ export default Routes = (props) => {
           component={CalendarScreen}
           options={navOptionHandler}
         />
-         <AppStack.Screen
+        <AppStack.Screen
           name="search"
           component={Search}
           options={navOptionHandler}

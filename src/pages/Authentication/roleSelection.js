@@ -14,9 +14,12 @@ import Header from "../../components/Header";
 import Tick from "../../assets/svg/check-circle.svg";
 import Button from "../../components/Button";
 import Strings from "../../utils/strings";
+import Modal from "react-native-modal";
+import Cross from "../../assets/svg/cross.svg";
 
 const RoleSelection = (props) => {
   const [selected, setSelected] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -185,12 +188,90 @@ const RoleSelection = (props) => {
           </TouchableOpacity>
         </View>
       </View>
-      <View style={{ bottom: 0, paddingHorizontal: moderateScale(24), position:'absolute', bottom:0, width:'100%' }}>
-        <Button
-          onPress={() => props.navigation.navigate("home")}
-          title={Strings.submit}
-        />
+      <View
+        style={{
+          bottom: 0,
+          paddingHorizontal: moderateScale(24),
+          position: "absolute",
+          bottom: 0,
+          width: "100%",
+        }}
+      >
+        <Button onPress={() => setModalVisible(true)} title={Strings.submit} />
       </View>
+      <Modal
+        onBackdropPress={() => setModalVisible(false)}
+        transparent={true}
+        animationType="none"
+        style={{
+          margin: 0,
+        }}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: THEMES.fontFamily.semiBold,
+                  fontSize: THEMES.fonts.font20,
+                  color: THEMES.colors.black,
+                  width: "75%",
+                  lineHeight: moderateScale(28),
+                }}
+              >
+                Unlock a World of Tail-Wagging Fun!
+              </Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Cross />
+              </TouchableOpacity>
+            </View>
+            <View style={{ paddingTop: moderateScale(16) }}>
+              <Text
+                style={{
+                  fontFamily: THEMES.fontFamily.regular,
+                  fontSize: THEMES.fonts.font16,
+                  color: THEMES.colors.black,
+                  lineHeight: moderateScale(28),
+                }}
+              >
+                Would you like to register for purr-sonalized recommendations
+                and pawsome content?
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingTop: moderateScale(31),
+              }}
+            >
+              <View style={{ width: "45%" }}>
+                <Button onlyBorder title="Later" onPress={() => setModalVisible(false)} />
+              </View>
+              <View style={{ width: "45%" }}>
+                <Button
+                  title="Register"
+                  onPress={() => {
+                    setModalVisible(false);
+                    setTimeout(() => {
+                      props.navigation.navigate("businessDetail");
+                    }, 200);
+                  }}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -199,6 +280,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: THEMES.colors.white,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    paddingHorizontal: moderateScale(20),
+  },
+  modalContent: {
+    margin: 0,
+    backgroundColor: "white",
+    borderRadius: 16,
+    padding: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    marginHorizontal: moderateScale(20),
   },
 });
 

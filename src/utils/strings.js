@@ -118,7 +118,9 @@ const Strings = {
      signIn:"Sign in",
      signWithOtp:'Sign in with OTP',
      skip:'Skip',
-     petAdoption:'Pet Adoption'
+     petAdoption:'Pet Adoption',
+     businessDetail:'Business details',
+     next:'Next'
 }
 
 export default Strings

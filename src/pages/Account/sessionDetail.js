@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,19 +6,21 @@ import {
   StatusBar,
   StyleSheet,
   Keyboard,
-} from 'react-native';
-import InputField from '../../components/InputField';
-import {THEMES} from '../../assets/theme/themes';
-import Header from '../../components/Header';
-import Checked from '../../assets/svg/checked.svg';
-import UnChecked from '../../assets/svg/unchecked.svg';
-import Strings from '../../utils/strings';
-import Button from '../../components/Button';
-import {moderateScale} from 'react-native-size-matters';
-import CheckBox from 'react-native-check-box';
-import TimeTracker from '../../components/TimeTracker';
+} from "react-native";
+import InputField from "../../components/InputField";
+import { THEMES } from "../../assets/theme/themes";
+import Header from "../../components/Header";
+import Checked from "../../assets/svg/checked.svg";
+import UnChecked from "../../assets/svg/unchecked.svg";
+import Strings from "../../utils/strings";
+import Button from "../../components/Button";
+import { moderateScale } from "react-native-size-matters";
+import CheckBox from "react-native-check-box";
+import TimeTracker from "../../components/TimeTracker";
+import Stepper from "../../components/Stepper";
 
-const SessionDetail = () => {
+const SessionDetail = (props) => {
+  const route = props?.route?.params?.route;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [homeVisit, setHomeVisit] = useState(false);
   const [centerService, setCenterService] = useState(false);
@@ -29,16 +31,16 @@ const SessionDetail = () => {
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
+      "keyboardDidShow",
       () => {
         setKeyboardVisible(true); // Keyboard is visible
-      },
+      }
     );
     const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
+      "keyboardDidHide",
       () => {
         setKeyboardVisible(false); // Keyboard is hidden
-      },
+      }
     );
 
     return () => {
@@ -51,15 +53,29 @@ const SessionDetail = () => {
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={Strings.sessionDetails} showBack bgColor="transparent" />
-      <View style={{flex: 1, paddingHorizontal: moderateScale(20)}}>
+      {route !== "myprofile" && (
+      <View
+        style={{
+          borderTopWidth: 1,
+          borderTopColor: "#B8B8B8",
+          borderBottomColor: "#B8B8B8",
+          borderBottomWidth: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <Stepper currentStep={4} totalSteps={5} />
+      </View>
+      )}
+      <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
         <ScrollView
-          style={{flex: 1}}
+          style={{ flex: 1 }}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          bounces={false}>
-          <View style={styles.contentView}>
+          bounces={false}
+        >
+          <View style={[styles.contentView, {paddingTop: route !== "myprofile" ? 18 : 30}]}>
             <Text style={styles.availableText}>
-              {Strings.howYouWillBeAvailable}{' '}
+              {Strings.howYouWillBeAvailable}{" "}
             </Text>
           </View>
           <View style={styles.contentValueView}>
@@ -68,21 +84,21 @@ const SessionDetail = () => {
               unCheckedImage={<UnChecked />}
               onClick={() => setHomeVisit(!homeVisit)}
               isChecked={homeVisit}
-              style={{flex: 1}}
+              style={{ flex: 1 }}
               rightTextStyle={{
                 color: THEMES.colors.black,
                 fontSize: THEMES.fonts.font12,
                 fontFamily: THEMES.fontFamily.semiBold,
               }}
-              rightText={'Home Visit'}
+              rightText={"Home Visit"}
             />
             <CheckBox
               checkedImage={<Checked />}
               unCheckedImage={<UnChecked />}
               onClick={() => setCenterService(!centerService)}
               isChecked={centerService}
-              style={{flex: 1}}
-              rightText={'At Center Service'}
+              style={{ flex: 1 }}
+              rightText={"At Center Service"}
               rightTextStyle={{
                 color: THEMES.colors.black,
                 fontSize: THEMES.fonts.font12,
@@ -90,24 +106,24 @@ const SessionDetail = () => {
               }}
             />
           </View>
-          <View style={{paddingTop: moderateScale(25)}}>
+          <View style={{ paddingTop: moderateScale(25) }}>
             <CheckBox
               checkedImage={<Checked />}
               unCheckedImage={<UnChecked />}
               onClick={() => setOnlineConsultation(!onlineConsultation)}
               isChecked={onlineConsultation}
-              style={{flex: 1}}
+              style={{ flex: 1 }}
               rightTextStyle={{
                 color: THEMES.colors.black,
                 fontSize: THEMES.fonts.font12,
                 fontFamily: THEMES.fontFamily.semiBold,
               }}
-              rightText={'Online Consultation'}
+              rightText={"Online Consultation"}
             />
           </View>
           <View style={styles.contentView}>
             <Text style={styles.availableText}>
-              {Strings.howYouWillBeAvailable}{' '}
+              {Strings.howYouWillBeAvailable}{" "}
             </Text>
           </View>
           <View style={styles.contentValueView}>
@@ -116,21 +132,21 @@ const SessionDetail = () => {
               unCheckedImage={<UnChecked />}
               onClick={() => setPerSession(!perSession)}
               isChecked={perSession}
-              style={{flex: 1}}
+              style={{ flex: 1 }}
               rightTextStyle={{
                 color: THEMES.colors.black,
                 fontSize: THEMES.fonts.font12,
                 fontFamily: THEMES.fontFamily.semiBold,
               }}
-              rightText={'Per Session'}
+              rightText={"Per Session"}
             />
             <CheckBox
               checkedImage={<Checked />}
               unCheckedImage={<UnChecked />}
               onClick={() => setPerMonth(!perMonth)}
               isChecked={perMonth}
-              style={{flex: 1}}
-              rightText={'Per Month'}
+              style={{ flex: 1 }}
+              rightText={"Per Month"}
               rightTextStyle={{
                 color: THEMES.colors.black,
                 fontSize: THEMES.fonts.font12,
@@ -142,16 +158,16 @@ const SessionDetail = () => {
             <>
               <View style={styles.contentView}>
                 <Text style={styles.availableText}>
-                  {Strings.perSessionCharges}{' '}
+                  {Strings.perSessionCharges}{" "}
                 </Text>
               </View>
-              <View style={{paddingTop: moderateScale(16)}}>
+              <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
                   label={Strings.chargesPerSession}
                   placeholderText={Strings.enterPrice}
                 />
               </View>
-              <View style={{paddingTop: moderateScale(16)}}>
+              <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
                   label={Strings.perDaySessionInMin}
                   placeholderText={Strings.perDaySession}
@@ -163,16 +179,16 @@ const SessionDetail = () => {
             <>
               <View style={styles.contentView}>
                 <Text style={styles.availableText}>
-                  {Strings.perMonthSession}{' '}
+                  {Strings.perMonthSession}{" "}
                 </Text>
               </View>
-              <View style={{paddingTop: moderateScale(16)}}>
+              <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
                   label={Strings.chargesPerSession}
                   placeholderText={Strings.enterPrice}
                 />
               </View>
-              <View style={{paddingTop: moderateScale(16)}}>
+              <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
                   label={Strings.perDaySessionInMin}
                   placeholderText={Strings.perDaySession}
@@ -185,8 +201,12 @@ const SessionDetail = () => {
           <View
             style={{
               paddingBottom: moderateScale(25),
-            }}>
-            <Button title={'Submit'} />
+            }}
+          >
+            <Button
+              title={route !== "myprofile" ? Strings.next : Strings.submit}
+              onPress={() => props.navigation.navigate("mediaLink")}
+            />
           </View>
         </ScrollView>
       </View>
@@ -209,8 +229,8 @@ const styles = StyleSheet.create({
   },
   contentValueView: {
     paddingTop: moderateScale(16),
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
 

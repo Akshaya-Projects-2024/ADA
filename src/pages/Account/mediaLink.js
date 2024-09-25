@@ -15,10 +15,12 @@ import ClipboardPaste from '../../assets/svg/clipboardPaste.svg';
 import Strings from '../../utils/strings';
 import Button from '../../components/Button';
 import {moderateScale} from 'react-native-size-matters';
+import Stepper from '../../components/Stepper';
 
 
-const MediaLink = () => {
+const MediaLink = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const route = props?.route?.params?.route;
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -44,13 +46,26 @@ const MediaLink = () => {
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={Strings.mediaLinks} showBack bgColor="transparent" />
+      {route !== "myprofile" && (
+      <View
+        style={{
+          borderTopWidth: 1,
+          borderTopColor: "#B8B8B8",
+          borderBottomColor: "#B8B8B8",
+          borderBottomWidth: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <Stepper currentStep={5} totalSteps={5} />
+      </View>
+      )}
       <View style={{flex: 1}}>
         <ScrollView
           style={{flex: 1}}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           bounces={false}>
-          <View style={styles.headerView}>
+          <View style={[styles.headerView,{paddingTop: route !== "myprofile" ? 18 : 30 }]}>
             <Text style={styles.headerText}>{Strings.onlineConsultation}</Text>
           </View>
 
@@ -124,7 +139,7 @@ const MediaLink = () => {
         </ScrollView>
         {!isKeyboardVisible && (
           <View style={styles.submitButton}>
-            <Button title={Strings.submit} />
+            <Button title={Strings.submit} onPress={()=>props.navigation.navigate('home')}/>
           </View>
         )}
       </View>
@@ -139,7 +154,7 @@ const styles = StyleSheet.create({
   },
   headerView: {
     paddingHorizontal: moderateScale(16),
-    paddingTop: moderateScale(20),
+ 
   },
   headerText: {
     color: THEMES.colors.black,
