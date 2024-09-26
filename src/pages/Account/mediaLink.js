@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(14),
   },
   submitButton: {
-    marginHorizontal: moderateScale(27),
+    marginHorizontal: moderateScale(20),
     marginBottom: moderateScale(22),
   },
 });

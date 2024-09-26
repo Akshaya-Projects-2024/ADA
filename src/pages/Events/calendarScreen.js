@@ -71,7 +71,7 @@ const CalendarScreen = (props) => {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{ flex: 1 }}
           style={{ flex: 1 }}
           bounces={false}
           showsVerticalScrollIndicator={false}
@@ -101,6 +101,9 @@ const CalendarScreen = (props) => {
                 arrowColor="#fff"
               />
             </View>
+            <ScrollView style={{flex:1}} bounces={false}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}>
             <View style={styles.contentView}>
               <View style={styles.timeInputContainer}>
                 <View
@@ -206,6 +209,7 @@ const CalendarScreen = (props) => {
                 <Button title={"Confirm Date"} onPress={() => onBack()} />
               </View>
             </View>
+            </ScrollView>
           </ImageBackground>
         </ScrollView>
       </View>

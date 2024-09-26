@@ -29,7 +29,7 @@ const RoleSelection = (props) => {
         style={{
           alignItems: "center",
           justifyContent: "center",
-          paddingTop: moderateScale(127),
+          paddingTop: moderateScale(100),
         }}
       >
         <Text
@@ -195,6 +195,7 @@ const RoleSelection = (props) => {
           position: "absolute",
           bottom: 0,
           width: "100%",
+          marginBottom:moderateScale(20)
         }}
       >
         <Button onPress={() => setModalVisible(true)} title={Strings.submit} />

@@ -31,7 +31,7 @@ const AppointmentDetail = (props) => {
           hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
           onPress={() => props.navigation.goBack()}
         >
-          <Back />
+          <Back stroke="#000"/>
         </TouchableOpacity>
         <View style={styles.contentView}>
           <ScrollView

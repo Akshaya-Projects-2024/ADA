@@ -44,17 +44,17 @@ const ContactDetails = (props) => {
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={Strings.contactDetails} showBack bgColor="transparent" />
       {route !== "myprofile" && (
-        <View
-          style={{
-            borderTopWidth: 1,
-            borderTopColor: "#B8B8B8",
-            borderBottomColor: "#B8B8B8",
-            borderBottomWidth: 1,
-            backgroundColor: "#fff",
-          }}
-        >
-          <Stepper currentStep={2} totalSteps={5} />
-        </View>
+      <View
+        style={{
+          borderTopWidth: 1,
+          borderTopColor: "#B8B8B8",
+          borderBottomColor: "#B8B8B8",
+          borderBottomWidth: 1,
+          backgroundColor: "#fff",
+        }}
+      >
+        <Stepper currentStep={2} totalSteps={5} />
+      </View>
       )}
       <View style={{ flex: 1 }}>
         <ScrollView
@@ -64,11 +64,7 @@ const ContactDetails = (props) => {
           bounces={false}
         >
           <View style={{ paddingHorizontal: moderateScale(20) }}>
-            <View
-              style={{
-                paddingTop: moderateScale(route !== "myprofile" ? 18 : 30),
-              }}
-            >
+            <View style={{ paddingTop: moderateScale(route !== "myprofile" ? 18: 30) }}>
               <InputField
                 label={Strings.mobileNo}
                 placeholderText={Strings.enterMobileNo}
@@ -104,10 +100,8 @@ const ContactDetails = (props) => {
         </ScrollView>
         {!isKeyboardVisible && (
           <View style={styles.submitButton}>
-            <Button
-              title={route !== "myprofile" ? Strings.next : Strings.submit}
-              onPress={() => props.navigation.navigate("uploadImagesDocs")}
-            />
+            <Button  title={route !== "myprofile" ? Strings.next : Strings.submit}
+              onPress={() => props.navigation.navigate("uploadImagesDocs")}/>
           </View>
         )}
       </View>
