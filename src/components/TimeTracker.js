@@ -14,7 +14,7 @@ import { moderateScale } from "react-native-size-matters";
 import { THEMES } from "../assets/theme/themes";
 import SwitchOn from "../assets/svg/switchOn.svg";
 import SwitchOff from "../assets/svg/switchOff.svg";
-import Strings from "../utils/strings";
+import Strings from "../constants/strings";
 import RadioSelected from "../assets/svg/radioSelected.svg";
 import Radio from "../assets/svg/radio.svg";
 

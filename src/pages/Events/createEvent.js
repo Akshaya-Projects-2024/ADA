@@ -6,11 +6,13 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  FlatList,
+  Image,
 } from "react-native";
 import Calendar from "../../assets/svg/calendar_event.svg";
 import Time from "../../assets/svg/circle_event.svg";
 import { THEMES } from "../../assets/theme/themes";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import Header from "../../components/Header";
 import FilterModal from "../../components/FilterModal";
 import { moderateScale } from "react-native-size-matters";
@@ -23,6 +25,8 @@ import CalendarScreen from "./calendarScreen";
 import Button from "../../components/Button";
 import BlackCross from "../../assets/svg/cross.svg";
 import Modal from "react-native-modal";
+import UploadImageModal from "../../components/UploadImageModal";
+import CrossCircle from "../../assets/svg/crossCircle.svg";
 
 const CreateEvent = () => {
   const [isStartTimeModalVisible, setStartTimeModalVisible] = useState(false);
@@ -33,6 +37,8 @@ const CreateEvent = () => {
   const [endTime, setEndTime] = useState();
   const [sDate, setSDate] = useState();
   const [eDate, setEDate] = useState();
+  const [posterVisible, setPosterVisible] = useState(false);
+  const [posterImg, setPosterImg] = useState([]);
 
   const hideStartDatePicker = () => {
     setStartTimeModalVisible(false);
@@ -56,6 +62,44 @@ const CreateEvent = () => {
 
   const onSubmit = () => {};
 
+  const handlePosterImages = (image) => {
+    var temp = [...posterImg];
+    temp.push(image);
+    setPosterImg(temp);
+  };
+
+  const getBase64Obj = (url) => {
+    if (url) {
+      return {
+        uri: url.includes("https") ? url : `data:image/jpg;base64,${url}`,
+      };
+    }
+  };
+
+  const renderItem = (item, index) => {
+    const photo = item?.item.fileData;
+    return (
+      <View style={styles.imgContent}>
+        <Image
+          style={styles.img}
+          resizeMode="contain"
+          source={getBase64Obj(photo)}
+        />
+        <TouchableOpacity
+          onPress={() => {
+            const removeItemById = businessImg.filter(
+              (item) => item?.fileData !== photo
+            );
+            setPosterImg(removeItemById);
+          }}
+          style={styles.crossView}
+        >
+          <CrossCircle stroke={THEMES.colors.black} style={styles.crossImg} />
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
@@ -76,6 +120,48 @@ const CreateEvent = () => {
             label={"Name of Event/ Offer*"}
             placeholderText={"Enter Name of Event/ Offer"}
           />
+          <>
+            <View style={styles.secondaryFlex}>
+              <Text style={styles.titleText}>
+              Event poster/images
+              </Text>
+              <TouchableOpacity onPress={() => setPosterVisible(true)}>
+                <Text style={styles.addText}>{Strings.add}</Text>
+              </TouchableOpacity>
+            </View>
+            <View
+              style={[
+                styles.flatlistView,
+                {
+                  alignItems: posterImg?.length == 0 ? "center" : "flex-start",
+                },
+              ]}
+            >
+              <FlatList
+                horizontal={true}
+                contentContainerStyle={{
+                  justifyContent: posterImg?.length ? "flex-start" : "center",
+                  alignItems: "center",
+                  padding: posterImg?.length
+                    ? moderateScale(0)
+                    : moderateScale(16),
+                  borderColor: THEMES.colors.darkGrey,
+                  borderRadius: 10,
+                }}
+                showsHorizontalScrollIndicator={false}
+                data={posterImg}
+                renderItem={renderItem}
+                ListHeaderComponent={() =>
+                  posterImg?.length == 0 ? (
+                    <Text style={styles.imgPlaceholder}>
+                      {Strings.pleaseAddImg}
+                    </Text>
+                  ) : null
+                }
+              />
+            </View>
+          </>
+
           <View style={styles.pt16}>
             <InputField
               label={"Description*"}
@@ -122,7 +208,10 @@ const CreateEvent = () => {
 
           <View style={styles.endContent}>
             <Text style={styles.endText}>End</Text>
-            <TouchableOpacity  onPress={() => setCalendarModal(true)} style={styles.endValue}>
+            <TouchableOpacity
+              onPress={() => setCalendarModal(true)}
+              style={styles.endValue}
+            >
               <View style={{ paddingRight: moderateScale(9) }}>
                 <Text style={styles.datePlaceholder}>Select Date</Text>
                 <Text style={styles.value}>{eDate ? eDate : "DD/MM/YYYY"}</Text>
@@ -277,6 +366,11 @@ const CreateEvent = () => {
           />
         </Modal>
       )}
+      <UploadImageModal
+        isVisible={posterVisible}
+        onClose={() => setPosterVisible(false)}
+        handleSelectedImage={(image) => handlePosterImages(image)}
+      />
     </View>
   );
 };
@@ -381,6 +475,67 @@ const styles = StyleSheet.create({
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.medium,
     paddingTop: moderateScale(5),
+  },
+  flatlistView: {
+    marginTop: moderateScale(5),
+    borderWidth: 1,
+    borderColor: THEMES.colors.iron,
+    borderRadius: 8,
+    backgroundColor: THEMES.colors.white,
+  },
+  imgPlaceholder: {
+    width: "100%",
+    textAlign: "center",
+    fontFamily: THEMES.fontFamily.medium,
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.black,
+  },
+  secondaryFlex: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop:moderateScale(16)
+  },
+  titleText: {
+    fontSize: THEMES.fonts.font14,
+    fontFamily: THEMES.fontFamily.semiBold,
+    color: THEMES.colors.black,
+  },
+  addText: {
+    fontSize: THEMES.fonts.font14,
+    fontFamily: THEMES.fontFamily.semiBold,
+    color: THEMES.colors.cyan,
+  },
+  imgContent: {
+    width: 60,
+    height: 60,
+    borderColor: THEMES.colors.darkGrey,
+    borderRadius: 10,
+    marginLeft: 16,
+    marginRight: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: moderateScale(16),
+  },
+  img: {
+    width: 60,
+    height: 60,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: THEMES.colors.darkGrey,
+  },
+  crossImg: {
+    width: moderateScale(15),
+    height: moderateScale(15),
+  },
+  crossView: {
+    position: "absolute",
+    width: 60,
+    height: 60,
+    justifyContent: "flex-start",
+    alignItems: "flex-end",
+    left: 5,
+    bottom: 5,
   },
 });
 

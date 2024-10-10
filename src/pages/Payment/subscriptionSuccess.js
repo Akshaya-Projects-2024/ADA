@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {THEMES} from '../../assets/theme/themes';
-import Strings from '../../utils/strings';
+import Strings from '../../constants/strings';
 import Modal from 'react-native-modal';
 import Cross from '../../assets/svg/cross.svg';
 import {moderateScale} from 'react-native-size-matters';

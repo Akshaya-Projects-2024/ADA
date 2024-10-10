@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   inputStyle: {
     padding: 0,
     margin: 0,
-    fontSize: THEMES.fonts.font12,
+    fontSize: THEMES.fonts.font14,
     fontFamily: THEMES.fontFamily.medium,
     color: THEMES.colors.black,
     textAlignVertical: "top",

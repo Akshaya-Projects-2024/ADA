@@ -8,7 +8,7 @@ import {
   FlatList,
 } from 'react-native';
 import {THEMES} from '../../assets/theme/themes';
-import Strings from '../../utils/strings';
+import Strings from '../../constants/strings';
 import Header from '../../components/Header';
 import {moderateScale, s} from 'react-native-size-matters';
 import ReviewComponent from '../../components/ReviewComponent';

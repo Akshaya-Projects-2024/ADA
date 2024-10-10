@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import { moderateScale } from "react-native-size-matters";
 import Search from "../../assets/svg/search.svg";
 

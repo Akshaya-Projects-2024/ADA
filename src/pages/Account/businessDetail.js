@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Keyboard,
 } from "react-native";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import { THEMES } from "../../assets/theme/themes";
 import { moderateScale } from "react-native-size-matters";
 import Header from "../../components/Header";

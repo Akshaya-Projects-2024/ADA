@@ -14,7 +14,7 @@ import Header from "../../components/Header";
 import CrossCircle from "../../assets/svg/crossCircle.svg";
 import { moderateScale, s } from "react-native-size-matters";
 import UploadImageModal from "../../components/UploadImageModal";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import Button from "../../components/Button";
 import Stepper from "../../components/Stepper";
 

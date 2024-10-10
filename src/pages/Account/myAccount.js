@@ -25,7 +25,7 @@ import Delete from "../../assets/svg/delete.svg";
 import Logout from "../../assets/svg/logout.svg";
 import ContactUs from "../../assets/svg/contactUs.svg";
 import AboutUs from "../../assets/svg/aboutUs.svg";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import { moderateScale, s } from "react-native-size-matters";
 
 const MyAccount = (props) => {

@@ -16,7 +16,7 @@ import Cross from "../../assets/svg/redCross.svg";
 import BlackCross from "../../assets/svg/cross.svg";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { THEMES } from "../../assets/theme/themes";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import Header from "../../components/Header";
 import FilterModal from "../../components/FilterModal";
 import Modal from "react-native-modal";
@@ -24,6 +24,8 @@ import { moderateScale } from "react-native-size-matters";
 import CancelAppointment from "../Appointment/cancelAppointment";
 import RescheduleAppointment from "../Appointment/rescheduleAppointment";
 import Button from "../../components/Button";
+import InputField from "../../components/InputField";
+import Toast from "react-native-toast-message";
 
 const Data = [
   {
@@ -123,6 +125,8 @@ const MyBookings = (props) => {
   const [data, setData] = useState(Data);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedAttendedId, setSelectedAttendedId] = useState();
+
   const [menuPosition, setMenuPosition] = useState({
     x: 0,
     y: 0,
@@ -131,6 +135,8 @@ const MyBookings = (props) => {
   });
   const [isVisible, setVisible] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("Daily");
+  const [attendedModal, setAttendedModal] = useState(false);
+  const [otpInput, setOtpInput] = useState();
 
   const filterOptions = ["Daily", "Weekly", "Monthly", "Custom"];
 
@@ -174,6 +180,32 @@ const MyBookings = (props) => {
     setSelectedItemId(id);
   };
 
+  const handleAttended = () => {
+    if (selectedAttendedId && otpInput) {
+      setData((prevData) =>
+        prevData.map((item) =>
+          item.id === selectedAttendedId
+            ? {
+                ...item,
+                isAttended: true,
+                isCanceled: false,
+                isConfirmed: false,
+              }
+            : item
+        )
+      );
+      setSelectedItemId(selectedAttendedId);
+      setAttendedModal(false);
+      setSelectedAttendedId("");
+      setOtpInput("")
+    } else {
+      return Toast.show({
+        type: "error",
+        text1: "Please enter OTP first!",
+      });
+    }
+  };
+
   const confirmAppointment = (id) => {
     handleConfirm(id);
   };
@@ -215,6 +247,8 @@ const MyBookings = (props) => {
       itemBackgroundColor = "#f0ffe6";
     } else if (item.isSeduled) {
       itemBackgroundColor = "#feefd4";
+    } else if (item.isAttended) {
+      itemBackgroundColor = "#d6f2f5";
     }
     let itemtextColor = THEMES.colors.black;
     if (item.isCanceled) {
@@ -223,6 +257,8 @@ const MyBookings = (props) => {
       itemtextColor = "#6DAE43";
     } else if (item.isSeduled) {
       itemtextColor = "#FD9F00";
+    } else if (item.isAttended) {
+      itemtextColor = "#02bac7";
     }
     return (
       <Pressable
@@ -295,7 +331,13 @@ const MyBookings = (props) => {
             >
               <Text style={[styles.name]}>{item.name}</Text>
               <View style={styles.flatListNameRow}>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingVertical: moderateScale(1),
+                  }}
+                >
                   <Text
                     style={[
                       styles.profileTypeText,
@@ -315,39 +357,6 @@ const MyBookings = (props) => {
                     {item.visitType}
                   </Text>
                 </View>
-
-                {item.isCanceled ? (
-                  <Text style={[(styles.statusText, { color: itemtextColor })]}>
-                    Canceled
-                  </Text>
-                ) : item.isConfirmed ? (
-                  <Text style={(styles.statusText, { color: itemtextColor })}>
-                    Confirmed
-                  </Text>
-                ) : item.isSeduled ? (
-                  <Text
-                    style={
-                      (styles.statusText,
-                      {
-                        color: itemtextColor,
-                      })
-                    }
-                  >
-                    Rescheduled
-                  </Text>
-                ) : (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Pressable onPress={() => setVisible(true)}>
-                      <Cross width={24} height={24} />
-                    </Pressable>
-                    <Pressable
-                      style={{ marginLeft: moderateScale(12) }}
-                      onPress={() => handleOnConfirm(item.id)}
-                    >
-                      <Check width={24} height={24} />
-                    </Pressable>
-                  </View>
-                )}
               </View>
               <View style={styles.flatListNameRow}>
                 <View style={{ flexDirection: "row" }}>
@@ -395,6 +404,59 @@ const MyBookings = (props) => {
                 )}
               </View>
             </View>
+          </View>
+          <View>
+            {item.isCanceled ? (
+              <Text style={[(styles.statusText, { color: itemtextColor })]}>
+                Canceled
+              </Text>
+            ) : item.isConfirmed ? (
+              <TouchableOpacity
+                onPress={() => {
+                  setSelectedAttendedId(item.id);
+                  setAttendedModal(true);
+                }}
+                style={{
+                  borderRadius: 8,
+                  borderBottomStartRadius: 0,
+                  borderWidth: 1,
+                  paddingHorizontal: moderateScale(12),
+                  paddingVertical: moderateScale(6),
+                  borderColor: "#6DAE43",
+                }}
+              >
+                <Text style={(styles.statusText, { color: itemtextColor })}>
+                  Confirm
+                </Text>
+              </TouchableOpacity>
+            ) : item.isAttended ? (
+              <Text style={(styles.statusText, { color: itemtextColor })}>
+                Attended
+              </Text>
+            ) : item.isSeduled ? (
+              <Text
+                style={
+                  (styles.statusText,
+                  {
+                    color: itemtextColor,
+                  })
+                }
+              >
+                Rescheduled
+              </Text>
+            ) : (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Pressable onPress={() => setVisible(true)}>
+                  <Cross width={24} height={24} />
+                </Pressable>
+                <Pressable
+                  style={{ marginLeft: moderateScale(12) }}
+                  onPress={() => handleOnConfirm(item.id)}
+                >
+                  <Check width={24} height={24} />
+                </Pressable>
+              </View>
+            )}
           </View>
         </View>
       </Pressable>
@@ -481,8 +543,8 @@ const MyBookings = (props) => {
                 color: THEMES.colors.black,
                 fontFamily: THEMES.fontFamily.bold,
                 fontSize: THEMES.fonts.font16,
-                width:'70%',
-                lineHeight: moderateScale(24)
+                width: "70%",
+                lineHeight: moderateScale(24),
               }}
             >
               Need to Change Your Plans?
@@ -495,17 +557,18 @@ const MyBookings = (props) => {
             </TouchableOpacity>
           </View>
           <Text
-              style={{
-                color: THEMES.colors.black,
-                fontFamily: THEMES.fontFamily.regular,
-                fontSize: THEMES.fonts.font14,
-                paddingTop:moderateScale(16),
-                lineHeight: moderateScale(20)
-              }}
-            >
-             Do you want to cancel the appointment, or would you like to reschedule it instead?
-            </Text>
-            <View
+            style={{
+              color: THEMES.colors.black,
+              fontFamily: THEMES.fontFamily.regular,
+              fontSize: THEMES.fonts.font14,
+              paddingTop: moderateScale(16),
+              lineHeight: moderateScale(20),
+            }}
+          >
+            Do you want to cancel the appointment, or would you like to
+            reschedule it instead?
+          </Text>
+          <View
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -514,20 +577,61 @@ const MyBookings = (props) => {
             }}
           >
             <View style={{ width: "45%" }}>
-              <Button
-                onlyBorder
-                title="Cancel"
-                onPress={() => onCancel()}
-              />
+              <Button onlyBorder title="Cancel" onPress={() => onCancel()} />
             </View>
             <View style={{ width: "45%" }}>
+              <Button title="Reschedule" onPress={() => onReschedule()} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        onBackdropPress={() => setAttendedModal(false)}
+        isVisible={attendedModal}
+        backdropOpacity={0.5}
+        style={{
+          margin: 0,
+          borderRadius: 16,
+          flex: 1,
+          justifyContent: "flex-end",
+        }}
+      >
+        <View
+          style={{
+            borderTopRightRadius: 49,
+            paddingVertical: moderateScale(20),
+            backgroundColor: THEMES.colors.white,
+          }}
+        >
+          <Text
+            style={{
+              color: THEMES.colors.black,
+              paddingHorizontal: moderateScale(31),
+              fontFamily: THEMES.fontFamily.semiBold,
+            }}
+          >
+            Enter OTP to confirm
+          </Text>
+          <View
+            style={{
+              paddingTop: moderateScale(36),
+              marginHorizontal: moderateScale(24),
+            }}
+          >
+            <InputField
+              label={"Enter otp"}
+              placeholderText={"Enter otp"}
+              value={otpInput}
+              onChange={setOtpInput}
+            />
+
+            <View style={{ paddingTop: moderateScale(20) }}>
               <Button
-                title="Reschedule"
-                
-                onPress={() => onReschedule()}
-              />
+                onPress={() => handleAttended()}
+                title="Attended"
+              ></Button>
             </View>
-            </View>
+          </View>
         </View>
       </Modal>
     </View>

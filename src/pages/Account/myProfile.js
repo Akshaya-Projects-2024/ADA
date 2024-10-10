@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {THEMES} from '../../assets/theme/themes';
-import Strings from '../../utils/strings';
+import Strings from '../../constants/strings';
 import Header from '../../components/Header';
 import RightArrow from '../../assets/svg/rightArrow.svg';
 import {moderateScale} from 'react-native-size-matters';

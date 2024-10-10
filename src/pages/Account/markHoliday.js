@@ -14,7 +14,7 @@ import SwitchOn from "../../assets/svg/switchOn.svg";
 import SwitchOff from "../../assets/svg/switchOff.svg";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { THEMES } from "../../assets/theme/themes";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import Header from "../../components/Header";
 import { moderateScale } from "react-native-size-matters";
 import Checked from "../../assets/svg/checked.svg";

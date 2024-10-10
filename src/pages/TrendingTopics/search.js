@@ -13,7 +13,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
 import { moderateScale } from "react-native-size-matters";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import SearchIcon from "../../assets/svg/search.svg";
 
 const Chip = ({ item, onPress, selected }) => {

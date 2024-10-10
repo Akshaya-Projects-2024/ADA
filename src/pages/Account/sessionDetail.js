@@ -12,7 +12,7 @@ import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
 import Checked from "../../assets/svg/checked.svg";
 import UnChecked from "../../assets/svg/unchecked.svg";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import Button from "../../components/Button";
 import { moderateScale } from "react-native-size-matters";
 import CheckBox from "react-native-check-box";

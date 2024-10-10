@@ -222,7 +222,7 @@ const UploadImageModal = props => {
               borderRightColor: '#C7C7C7',
             }}
             onPress={() => checkCameraPermission()}>
-            <Feather name="camera" size={25}/>
+            <Feather name="camera" size={25} color={"#000"}/>
             <Text
               style={{
                 padding: 0,
@@ -243,7 +243,7 @@ const UploadImageModal = props => {
               borderRightColor: '#C7C7C7',
             }}
             onPress={() => checkGalleryPermission()}>
-               <MaterialIcons name="photo" size={25}/>
+               <MaterialIcons name="photo" size={25} color={"#000"}/>
             <Text
               style={{
                 padding: 0,

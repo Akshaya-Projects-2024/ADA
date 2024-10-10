@@ -9,7 +9,7 @@ import {
 import InputField from "../../components/InputField";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import Button from "../../components/Button";
 import { moderateScale } from "react-native-size-matters";
 import Location from "../../assets/svg/location.svg";

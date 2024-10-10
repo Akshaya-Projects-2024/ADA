@@ -13,13 +13,48 @@ import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import Header from "../../components/Header";
 import Tick from "../../assets/svg/check-circle.svg";
 import Button from "../../components/Button";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import Modal from "react-native-modal";
 import Cross from "../../assets/svg/cross.svg";
+import { decryptService } from "../../utils/storageFunc";
+import { getProfile } from "../../redux-store/actions/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { saveRegisterData } from "../../redux-store/actions/registerAction";
 
 const RoleSelection = (props) => {
   const [selected, setSelected] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const dispatch = useDispatch();
+  const {registerData} = useSelector(({register}) => register);
+
+
+  // const checkAllIds = () =>{
+  //   if(Object.keys(registerData).length !== 0){
+  //     return Object.keys(registerData).every(key => {
+  //       const obj = registerData[key];
+  //       if (Array.isArray(obj)) {
+  //         return true;
+  //       }
+  //       return obj.id === 0;
+  //     });
+  //   }
+  // }
+
+  useEffect(() => {
+    initData();
+  }, []);
+
+  const initData = async () => {
+    let obj = {
+      userid: await decryptService("userId"),
+    };
+    try {
+      let response = await getProfile(obj);
+      dispatch(saveRegisterData(response?.data?.data));
+    } catch (error) {
+      console.log("err111", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -77,7 +112,10 @@ const RoleSelection = (props) => {
         >
           <TouchableOpacity
             style={{ alignItems: "center" }}
-            onPress={() => setSelected("parent")}
+            onPress={() => {
+              setSelected("parent");
+              setModalVisible(true);
+            }}
           >
             <Image
               style={{
@@ -131,7 +169,10 @@ const RoleSelection = (props) => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setSelected("service")}
+            onPress={() => {
+              setSelected("service");
+              setModalVisible(true);
+            }}
             style={{ marginLeft: moderateScale(43), alignItems: "center" }}
           >
             <Image
@@ -188,18 +229,18 @@ const RoleSelection = (props) => {
           </TouchableOpacity>
         </View>
       </View>
-      <View
+      {/* <View
         style={{
           bottom: 0,
           paddingHorizontal: moderateScale(24),
           position: "absolute",
           bottom: 0,
           width: "100%",
-          marginBottom:moderateScale(20)
+          marginBottom: moderateScale(20),
         }}
       >
-        <Button onPress={() => setModalVisible(true)} title={Strings.submit} />
-      </View>
+        <Button  title={Strings.submit} />
+      </View> */}
       <Modal
         onBackdropPress={() => setModalVisible(false)}
         transparent={true}
@@ -256,7 +297,11 @@ const RoleSelection = (props) => {
               }}
             >
               <View style={{ width: "45%" }}>
-                <Button onlyBorder title="Later" onPress={() => setModalVisible(false)} />
+                <Button
+                  onlyBorder
+                  title="Later"
+                  onPress={() => setModalVisible(false)}
+                />
               </View>
               <View style={{ width: "45%" }}>
                 <Button

@@ -15,7 +15,7 @@ import {
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
 import { moderateScale } from "react-native-size-matters";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import { Calendar } from "react-native-calendars";
 import Button from "../../components/Button";
 

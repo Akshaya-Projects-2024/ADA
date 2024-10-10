@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StatusBar, StyleSheet, Keyboard } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import Header from "../../components/Header";
 import { moderateScale } from "react-native-size-matters";
 import InputField from "../../components/InputField";

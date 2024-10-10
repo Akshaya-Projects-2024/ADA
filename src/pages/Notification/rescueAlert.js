@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     height: 288,
   },
   contentView: {
-    backgroundColor: THEMES.colors.white,
+    backgroundColor: THEMES.colors.bgColor,
     alignItems: "flex-start",
     alignSelf: "flex-end",
     paddingHorizontal: moderateScale(17),

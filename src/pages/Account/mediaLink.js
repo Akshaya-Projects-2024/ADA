@@ -12,7 +12,7 @@ import InputField from '../../components/InputField';
 import {THEMES} from '../../assets/theme/themes';
 import Header from '../../components/Header';
 import ClipboardPaste from '../../assets/svg/clipboardPaste.svg';
-import Strings from '../../utils/strings';
+import Strings from '../../constants/strings';
 import Button from '../../components/Button';
 import {moderateScale} from 'react-native-size-matters';
 import Stepper from '../../components/Stepper';

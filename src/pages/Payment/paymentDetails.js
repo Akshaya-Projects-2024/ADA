@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text, StatusBar, StyleSheet, FlatList} from 'react-native';
 import {THEMES} from '../../assets/theme/themes';
 import Header from '../../components/Header';
-import Strings from '../../utils/strings';
+import Strings from '../../constants/strings';
 import {moderateScale} from 'react-native-size-matters';
 import Download from '../../assets/svg/download.svg';
 

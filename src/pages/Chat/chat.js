@@ -3,7 +3,7 @@ import { View, Text, StatusBar, StyleSheet, ScrollView } from "react-native";
 import Calendar from "../../assets/svg/calendar_event.svg";
 import Time from "../../assets/svg/circle_event.svg";
 import { THEMES } from "../../assets/theme/themes";
-import Strings from "../../utils/strings";
+import Strings from "../../constants/strings";
 import Header from "../../components/Header";
 import FilterModal from "../../components/FilterModal";
 import { moderateScale } from "react-native-size-matters";

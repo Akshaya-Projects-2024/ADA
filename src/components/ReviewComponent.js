@@ -19,6 +19,7 @@ const ReviewComponent = props => {
                 style={[
                   styles.barFill,
                   {
+                    backgroundColor: review?.bgColor ? review?.bgColor : 'orange',
                     width: `${(review.count / totalReviews) * 100}%`,
                   },
                 ]}
@@ -66,7 +67,7 @@ const styles = StyleSheet.create({
   },
   barFill: {
     height: '100%',
-    backgroundColor: 'orange',
+  
     borderRadius: 4,
   },
   reviewNumber: {
