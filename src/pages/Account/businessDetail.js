@@ -139,7 +139,6 @@ const BusinessDetail = (props) => {
               title={"Select experience"}
               setSelectedValue={setSelectedExperience}
               selectedValue={selectedExperience}
-              multiSelect={true}
             />
           </View>
           <View

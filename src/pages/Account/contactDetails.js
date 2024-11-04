@@ -70,6 +70,7 @@ const ContactDetails = (props) => {
               }}
             >
               <InputField
+                keyboardType="phone-pad"
                 label={Strings.mobileNo}
                 placeholderText={Strings.enterMobileNo}
               />
@@ -96,6 +97,7 @@ const ContactDetails = (props) => {
             </View>
             <View style={{ paddingTop: moderateScale(16) }}>
               <InputField
+                keyboardType="phone-pad"
                 label={Strings.postalCode}
                 placeholderText={Strings.enterPostalCode}
               />

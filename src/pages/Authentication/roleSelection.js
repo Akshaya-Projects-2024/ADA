@@ -58,7 +58,7 @@ const RoleSelection = (props) => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.white} />
-      <Header title={""} showBack bgColor="transparent" />
+      <Header title={""} bgColor="transparent" />
       <View
         style={{
           alignItems: "center",

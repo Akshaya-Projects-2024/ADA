@@ -54,17 +54,17 @@ const SessionDetail = (props) => {
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={Strings.sessionDetails} showBack bgColor="transparent" />
       {route !== "myprofile" && (
-      <View
-        style={{
-          borderTopWidth: 1,
-          borderTopColor: "#B8B8B8",
-          borderBottomColor: "#B8B8B8",
-          borderBottomWidth: 1,
-          backgroundColor: "#fff",
-        }}
-      >
-        <Stepper currentStep={4} totalSteps={5} />
-      </View>
+        <View
+          style={{
+            borderTopWidth: 1,
+            borderTopColor: "#B8B8B8",
+            borderBottomColor: "#B8B8B8",
+            borderBottomWidth: 1,
+            backgroundColor: "#fff",
+          }}
+        >
+          <Stepper currentStep={4} totalSteps={5} />
+        </View>
       )}
       <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
         <ScrollView
@@ -73,7 +73,12 @@ const SessionDetail = (props) => {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          <View style={[styles.contentView, {paddingTop: route !== "myprofile" ? 18 : 30}]}>
+          <View
+            style={[
+              styles.contentView,
+              { paddingTop: route !== "myprofile" ? 18 : 30 },
+            ]}
+          >
             <Text style={styles.availableText}>
               {Strings.howYouWillBeAvailable}{" "}
             </Text>
@@ -163,12 +168,14 @@ const SessionDetail = (props) => {
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
+                  keyboardType="phone-pad"
                   label={Strings.chargesPerSession}
                   placeholderText={Strings.enterPrice}
                 />
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
+                  keyboardType="phone-pad"
                   label={Strings.perDaySessionInMin}
                   placeholderText={Strings.perDaySession}
                 />
@@ -184,12 +191,14 @@ const SessionDetail = (props) => {
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
+                  keyboardType="phone-pad"
                   label={Strings.chargesPerSession}
                   placeholderText={Strings.enterPrice}
                 />
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
+                  keyboardType="phone-pad"
                   label={Strings.perDaySessionInMin}
                   placeholderText={Strings.perDaySession}
                 />
