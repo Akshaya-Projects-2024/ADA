@@ -14,7 +14,9 @@ import CreateEvent from "../Events/createEvent";
 
 const Chat = () => {
   return (
-    <Text>hleo</Text>
+    <View style={{flex:1, backgroundColor: THEMES.colors.bgColor, alignItems:'center', justifyContent:'center'}}>
+      <Text style={{color:"#000", fontFamily: THEMES.fontFamily.bold, fontSize: THEMES.fonts.font16}}>Coming Soon !!!</Text>
+    </View>
   );
 };
 const styles = StyleSheet.create({

@@ -40,7 +40,11 @@ const MyAccount = (props) => {
     const Icon = icon;
     return (
       <TouchableOpacity
-        onPress={() => props.navigation.navigate(route)}
+        onPress={() =>
+          route == "contactDetails"
+            ? props.navigation.navigate(route, { route: "myprofile" })
+            : props.navigation.navigate(route)
+        }
         style={[
           styles.flexRow,
 
@@ -152,7 +156,7 @@ const MyAccount = (props) => {
                   <Users />,
                   Strings.registerAsParent,
                   "addBottom",
-                  "rescheduleAppointment"
+                  "parentDetails"
                 )}
               </View>
             </View>
@@ -162,7 +166,9 @@ const MyAccount = (props) => {
                 {renderItem(
                   THEMES.colors.gallery,
                   <Refresh />,
-                  Strings.refundCancellationPolicy
+                  Strings.refundCancellationPolicy,
+                  "",
+                  "commonScreen"
                 )}
                 {renderItem(
                   THEMES.colors.gallery,
@@ -189,7 +195,8 @@ const MyAccount = (props) => {
                   THEMES.colors.zanah,
                   <Document />,
                   Strings.privacyPolicy,
-                  "addbottom"
+                  "addbottom",
+                  "commonScreen"
                 )}
               </View>
             </View>
@@ -207,7 +214,8 @@ const MyAccount = (props) => {
                   THEMES.colors.wispPink,
                   <AboutUs />,
                   Strings.aboutUs,
-                  "addBottom"
+                  "addBottom",
+                  "commonScreen"
                 )}
               </View>
             </View>
@@ -217,13 +225,16 @@ const MyAccount = (props) => {
                 {renderItem(
                   THEMES.colors.cosmos,
                   <Delete />,
-                  Strings.deleteAccount
+                  Strings.deleteAccount,
+                  "",
+                  "commonScreen"
                 )}
                 {renderItem(
                   THEMES.colors.peach,
                   <Logout />,
                   Strings.logout,
-                  "addBottom"
+                  "addBottom",
+                  "commonScreen"
                 )}
               </View>
             </View>

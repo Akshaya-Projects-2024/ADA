@@ -120,7 +120,8 @@ const Strings = {
      skip:'Skip',
      petAdoption:'Pet Adoption',
      businessDetail:'Business details',
-     next:'Next'
+     next:'Next',
+     myPetProfile:"My Pet Profile"
 }
 
 export default Strings

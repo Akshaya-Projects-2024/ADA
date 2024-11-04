@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  Switch,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
@@ -31,6 +32,13 @@ import Carousel from "react-native-snap-carousel";
 import Modal from "react-native-modal";
 import InputField from "../../components/InputField";
 import ReviewComponent from "../../components/ReviewComponent";
+import SwitchOn from "../../assets/svg/switchOn.svg";
+import SwitchOff from "../../assets/svg/switchOff.svg";
+import SwitchSession from "../../assets/svg/switchSession.svg";
+import DateTimePicker from "react-native-modal-datetime-picker";
+import moment from "moment";
+import Strings from "../../constants/strings";
+import Calendars from "../../assets/svg/calendar.svg";
 
 const colorData = [
   { color: "#4FC3F7" }, // Example of blue
@@ -109,6 +117,42 @@ const appointmentData = [
   },
 ];
 
+const timeSlots = [
+  { time: "09:00", disabled: false, enabled: true },
+  { time: "09:30", disabled: true, enabled: false },
+  { time: "10:00", disabled: false, enabled: true },
+  { time: "10:30", disabled: true, enabled: false },
+  { time: "11:00", disabled: false, enabled: true },
+  { time: "09:00", disabled: false, enabled: true },
+  { time: "09:30", disabled: true, enabled: false },
+  { time: "10:00", disabled: false, enabled: true },
+  { time: "10:30", disabled: true, enabled: false },
+  { time: "11:00", disabled: false, enabled: true },
+];
+
+const afterTimeSlots = [
+  { time: "09:00", disabled: false, enabled: true },
+  { time: "09:30", disabled: true, enabled: false },
+  { time: "10:00", disabled: false, enabled: true },
+  { time: "10:30", disabled: true, enabled: false },
+  { time: "11:00", disabled: false, enabled: true },
+  { time: "12:00", disabled: false, enabled: true },
+  { time: "01:30", disabled: true, enabled: false },
+  { time: "02:00", disabled: false, enabled: true },
+  { time: "03:30", disabled: true, enabled: false },
+  { time: "04:00", disabled: false, enabled: true },
+];
+
+const categories = [
+  "Trainer",
+  "Pet Nutritionist",
+  "Animal Therapist",
+  "Pet Walker",
+  "Animal Communicator",
+  "Groomer",
+];
+
+
 const Home = (props) => {
   const [selectedValue, setSelectedValue] = useState();
   const { colors, fontFamily, fonts } = THEMES;
@@ -127,10 +171,32 @@ const Home = (props) => {
   const [attendedModal, setAttendedModal] = useState(false);
   const [otpInput, setOtpInput] = useState();
   const [data, setData] = useState(appointmentData);
+  const [appointmentVisible, setAppointmentVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [oneSession, setOneSession] = useState(true);
+  const [isDateVisible, setDateVisibility] = useState(false);
+  const [isDateEndVisible, setDateEndVisibility] = useState(false);
+  const [startDate, selectedStartDate] = useState();
+  const [endDate, selectedEndDate] = useState();
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const [selectedAfternonnSlot, setSelectedAfternoonSlot] = useState(null);
+
+  const renderCategory = ({ item }) => {
+    const isSelected = selectedCategory === item;
+    return (
+      <TouchableOpacity
+        style={[styles.categoryButton, isSelected && styles.selectedButton]}
+        onPress={() => setSelectedCategory(item)}
+      >
+        <Text style={[styles.categoryText, isSelected && styles.selectedText]}>
+          {item}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   const renderItem = ({ item }) => {
     let itemBackgroundColor = THEMES.colors.white;
-    console.log("item, ", item);
     if (item.isCanceled) {
       itemBackgroundColor = "#fee9e9";
     } else if (item.isConfirmed) {
@@ -361,7 +427,6 @@ const Home = (props) => {
           : item
       )
     );
-    console.log("id", data);
     setSelectedItemId(id);
   };
 
@@ -415,6 +480,19 @@ const Home = (props) => {
     handleConfirm(id);
   };
 
+ 
+  const selectTimeSlot = (time) => {
+    if (!time.disabled) {
+      setSelectedSlot(time.time);
+    }
+  };
+
+  const selectAfternoonTimeSlot = (time) => {
+    if (!time.disabled) {
+      setSelectedAfternoonSlot(time.time);
+    }
+  };
+
   const handleOnConfirm = (id) => {
     Alert.alert(
       "",
@@ -444,10 +522,30 @@ const Home = (props) => {
     }, 500);
   };
 
+  const hideDatePickerCancel = () => {
+    setDateVisibility(false);
+  };
+
+  const handleDateConfirm = (date) => {
+    const formattedDate = moment(date).format("DD/MM/YYYY");
+    selectedStartDate(formattedDate);
+    hideDatePickerCancel();
+  };
+
+  const hideDateEndPickerCancel = () => {
+    setDateEndVisibility(false);
+  };
+
+  const handleDateEndConfirm = (date) => {
+    const formattedDate = moment(date).format("DD/MM/YYYY");
+    selectedEndDate(formattedDate);
+    hideDateEndPickerCancel();
+  };
+
   return (
     <LinearGradient
       locations={[0, 0.5, 0.6]}
-      colors={["#f6fbf4", "#d0f1f8", "#d0f2f8", "#f0f9f6"]}
+      colors={["#f6fbf4", "#d0f1f8", "#f0f9f6"]}
       style={{ flex: 1 }}
     >
       <View style={{ flex: 1 }}>
@@ -545,7 +643,9 @@ const Home = (props) => {
                   </Text>
                   <Right />
                 </View>
-                <Plus />
+                <TouchableOpacity onPress={() => setAppointmentVisible(true)}>
+                  <Plus stroke={THEMES.colors.cyan} />
+                </TouchableOpacity>
               </View>
               <View style={{ paddingTop: moderateScale(23) }}>
                 <View
@@ -832,6 +932,344 @@ const Home = (props) => {
           </View>
         </View>
       </Modal>
+
+      <Modal
+        onBackdropPress={() => setAppointmentVisible(false)}
+        isVisible={appointmentVisible}
+        backdropOpacity={0.5}
+        style={{
+          margin: 0,
+          marginTop: moderateScale(50),
+          borderTopRightRadius: 49,
+          flex: 1,
+          backgroundColor: THEMES.colors.bgColor,
+          alignItems: "flex-start",
+        }}
+      >
+        <ScrollView
+          style={{ flex: 1 }}
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+        >
+          <View
+            style={{
+              paddingHorizontal: moderateScale(10),
+              paddingTop: moderateScale(20),
+              flex: 1,
+            }}
+          >
+            <Text
+              style={{
+                color: THEMES.colors.black,
+                fontFamily: THEMES.fontFamily.semiBold,
+                fontSize: THEMES.fonts.font14,
+              }}
+            >
+              Add Appointment
+            </Text>
+            <View style={{ paddingTop: moderateScale(10) }}>
+              <InputField
+                label={"Client name *"}
+                placeholderText={"Enter client name"}
+              />
+            </View>
+            <View style={{ paddingTop: moderateScale(10) }}>
+              <InputField
+                label={"Mobile number *"}
+                placeholderText={"Enter mobile number"}
+              />
+            </View>
+            <View style={{ paddingTop: moderateScale(15) }}>
+              <Text
+                style={{
+                  color: THEMES.colors.black,
+                  fontFamily: THEMES.fontFamily.semiBold,
+                  fontSize: THEMES.fonts.font14,
+                  paddingBottom: moderateScale(10),
+                }}
+              >
+                Category
+              </Text>
+              <FlatList
+                data={categories}
+                renderItem={renderCategory}
+                keyExtractor={(item) => item}
+                horizontal={false}
+                contentContainerStyle={styles.categoryList}
+              />
+            </View>
+
+            <View style={styles.container}>
+              <Text
+                style={[
+                  !oneSession
+                    ? styles.unselectedRadioText
+                    : styles.selectedRadioText,
+                  {
+                    width: "40%",
+                  },
+                ]}
+              >
+                One session
+              </Text>
+              <View style={{ width: "10%", alignItems: "center" }}>
+                {!oneSession ? (
+                  <TouchableOpacity onPress={() => setOneSession(!oneSession)}>
+                    <SwitchOff />
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity onPress={() => setOneSession(!oneSession)}>
+                    <SwitchOn />
+                  </TouchableOpacity>
+                )}
+              </View>
+              <Text
+                style={[
+                  !oneSession
+                    ? styles.selectedRadioText
+                    : styles.unselectedRadioText,
+                  {
+                    width: "40%",
+                    textAlign: "right",
+                  },
+                ]}
+              >
+                Daily Session
+              </Text>
+            </View>
+
+            <View
+              style={{
+                paddingTop: moderateScale(10),
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingHorizontal: moderateScale(10),
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => setDateVisibility(true)}
+                style={[
+                  styles.dateContainer,
+                  {
+                    paddingHorizontal: moderateScale(15),
+                    flexDirection: "row",
+                    alignItems: "center",
+                  },
+                ]}
+              >
+                <View style={{ paddingRight: moderateScale(10) }}>
+                  {startDate ? (
+                    <>
+                      <Text
+                        style={[
+                          styles.datePlaceholderText,
+                          {
+                            paddingBottom: moderateScale(1),
+                            fontSize: THEMES.fonts.font10,
+                          },
+                        ]}
+                      >
+                        Start Date
+                      </Text>
+                      <Text style={styles.dateValue}>{startDate}</Text>
+                    </>
+                  ) : (
+                    <>
+                      <Text
+                        style={[
+                          styles.datePlaceholderText,
+                          {
+                            paddingBottom: moderateScale(2),
+                            fontSize: THEMES.fonts.font10,
+                          },
+                        ]}
+                      >
+                        Start Date
+                      </Text>
+                      <Text style={styles.datePlaceholderText}>
+                        {Strings.ddMMYYYY}
+                      </Text>
+                    </>
+                  )}
+                </View>
+                <Calendars />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setDateEndVisibility(true)}
+                style={[
+                  styles.dateContainer,
+                  {
+                    paddingHorizontal: moderateScale(15),
+                    flexDirection: "row",
+                    alignItems: "center",
+                  },
+                ]}
+              >
+                <View style={{ paddingRight: moderateScale(10) }}>
+                  {endDate ? (
+                    <>
+                      <Text
+                        style={[
+                          styles.datePlaceholderText,
+                          {
+                            paddingBottom: moderateScale(2),
+                            fontSize: THEMES.fonts.font10,
+                          },
+                        ]}
+                      >
+                        End Date
+                      </Text>
+                      <Text style={styles.dateValue}>{endDate}</Text>
+                    </>
+                  ) : (
+                    <>
+                      <Text
+                        style={[
+                          styles.datePlaceholderText,
+                          {
+                            paddingBottom: moderateScale(2),
+                            fontSize: THEMES.fonts.font10,
+                          },
+                        ]}
+                      >
+                        End Date
+                      </Text>
+                      <Text style={styles.datePlaceholderText}>
+                        {Strings.ddMMYYYY}
+                      </Text>
+                    </>
+                  )}
+                </View>
+                <Calendars />
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                paddingTop: moderateScale(15),
+              }}
+            >
+              <Text
+                style={{
+                  color: THEMES.colors.black,
+                  fontFamily: THEMES.fontFamily.semiBold,
+                  fontSize: THEMES.fonts.font14,
+                  paddingBottom: moderateScale(5),
+                  paddingHorizontal: moderateScale(5),
+                }}
+              >
+                Morning
+              </Text>
+
+              <View style={styles.timeSlotRow}>
+                {afterTimeSlots.map((slot, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.timeSlot,
+                      slot.disabled && styles.disabledSlot,
+                      selectedSlot === slot.time &&
+                        !slot.disabled &&
+                        styles.selectedSlotStyle,
+                    ]}
+                    onPress={() => selectTimeSlot(slot)}
+                    disabled={slot.disabled} // Disable if the slot is marked as disabled
+                  >
+                    <Text
+                      style={[
+                        slot.disabled && styles.disabledText,
+                        {
+                          color: slot.disabled
+                            ? "#000"
+                            : slot.enabled
+                            ? "#000"
+                            : "#fff",
+                          fontSize: THEMES.fonts.font12,
+                          fontFamily: THEMES.fontFamily.medium,
+                        },
+                      ]}
+                    >
+                      {slot.time}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View
+              style={{
+                paddingTop: moderateScale(15),
+              }}
+            >
+              <Text
+                style={{
+                  color: THEMES.colors.black,
+                  fontFamily: THEMES.fontFamily.semiBold,
+                  fontSize: THEMES.fonts.font14,
+                  paddingBottom: moderateScale(5),
+                  paddingHorizontal: moderateScale(5),
+                }}
+              >
+                Afternoon
+              </Text>
+
+              <View style={styles.timeSlotRow}>
+                {afterTimeSlots.map((slot, index) => (
+                  <TouchableOpacity
+                    key={index}
+                     style={[
+                      styles.timeSlot,
+                      slot.disabled && styles.disabledSlot,
+                      selectedSlot === slot.time &&
+                        !slot.disabled &&
+                        styles.selectedSlotStyle,
+                    ]}
+                    onPress={() => selectTimeSlot(slot)}
+                    disabled={slot.disabled} // Disable if the slot is marked as disabled
+                  >
+                    <Text
+                      style={[
+                        slot.disabled && styles.disabledText,
+                        {
+                          color: slot.disabled
+                            ? "#000"
+                            : slot.enabled
+                            ? "#000"
+                            : "#fff",
+                          fontSize: THEMES.fonts.font12,
+                          fontFamily: THEMES.fontFamily.medium,
+                        },
+                      ]}
+                    >
+                      {slot.time}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+
+            <View style={{paddingVertical:moderateScale(30)}}>
+            <Button title={"Add"}/>
+            </View>
+            
+          </View>
+          <DateTimePicker
+            isVisible={isDateVisible}
+            mode="date"
+            onConfirm={handleDateConfirm}
+            onCancel={hideDatePickerCancel}
+          />
+          <DateTimePicker
+            isVisible={isDateEndVisible}
+            mode="date"
+            onConfirm={handleDateEndConfirm}
+            onCancel={hideDateEndPickerCancel}
+          />
+        </ScrollView>
+      </Modal>
     </LinearGradient>
   );
 };
@@ -873,10 +1311,7 @@ const styles = StyleSheet.create({
     width: 12,
     borderRadius: 2,
   },
-  timeText: {
-    marginTop: 5,
-    color: "gray",
-  },
+
   flatlistView: {
     borderWidth: 1,
     borderColor: "#ddd",
@@ -1016,6 +1451,127 @@ const styles = StyleSheet.create({
   },
   w70: {
     width: "70%",
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  categoryList: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  categoryButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 0.5,
+    borderColor: "#797979",
+    borderEndStartRadius: 0,
+    margin: 4,
+  },
+  selectedButton: {
+    backgroundColor: THEMES.colors.cyan, // Change to the selected color
+    borderColor: "transparent",
+  },
+  categoryText: {
+    color: "#707070",
+    fontFamily: THEMES.fontFamily.medium,
+    fontSize: THEMES.fonts.font13,
+  },
+  selectedText: {
+    color: "#fff",
+    fontFamily: THEMES.fontFamily.medium,
+    fontSize: THEMES.fonts.font13,
+  },
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: THEMES.colors.bgColor,
+    padding: 10,
+    borderRadius: 20,
+    paddingTop: moderateScale(15),
+  },
+  switch: {
+    marginHorizontal: 8,
+  },
+  selectedRadioText: {
+    color: "#000", // Darker color for selected text
+    fontWeight: "bold",
+  },
+  unselectedRadioText: {
+    color: "#a9a9a9", // Lighter color for unselected text
+  },
+  dateContainer: {
+    borderWidth: 0.8,
+    borderColor: THEMES.colors.darkGrey,
+    borderRadius: 8,
+    borderEndStartRadius: 0,
+    alignItems: "center ",
+    justifyContent: "center",
+    paddingVertical: moderateScale(7),
+  },
+  dateValue: {
+    fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.black,
+    fontFamily: THEMES.fontFamily.medium,
+  },
+  datePlaceholderText: {
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.darkGrey,
+    fontFamily: THEMES.fontFamily.medium,
+  },
+  contentContainer: {
+    alignItems: "center",
+  },
+  columnWrapper: {
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  timeSlot: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginHorizontal: 5,
+    minWidth: 70,
+    alignItems: "center",
+  },
+  selectedTimeSlot: {
+    backgroundColor: "#5cc4c4",
+  },
+  unselectedTimeSlot: {
+    backgroundColor: "#e0e0e0",
+  },
+  selectedTimeText: {
+    color: "#ffffff",
+    fontWeight: "bold",
+  },
+  unselectedTimeText: {
+    color: "#000000",
+  },
+  timeSlotRow: {
+    flexDirection: "row",
+    flexWrap: "wrap", // Ensures time slots wrap to the next line
+    justifyContent: "flex-start",
+    width: "100%",
+    alignItems: "center",
+  },
+  timeSlot: {
+    backgroundColor: "#ffffff",
+    borderColor: "#CFD3D4",
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: moderateScale(10),
+    paddingVertical: moderateScale(5),
+    margin: 5,
+  },
+  selectedSlotStyle: {
+    backgroundColor: THEMES.colors.cyan,
+  },
+  disabledSlot: {
+    backgroundColor: "#f0f0f0", // Gray background for disabled slots
+    borderColor: "#d0d0d0",
   },
 });
 

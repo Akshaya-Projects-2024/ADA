@@ -25,8 +25,7 @@ const RoleSelection = (props) => {
   const [selected, setSelected] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
-  const {registerData} = useSelector(({register}) => register);
-
+  const { registerData } = useSelector(({ register }) => register);
 
   // const checkAllIds = () =>{
   //   if(Object.keys(registerData).length !== 0){
@@ -113,8 +112,8 @@ const RoleSelection = (props) => {
           <TouchableOpacity
             style={{ alignItems: "center" }}
             onPress={() => {
-              setSelected("parent");
               setModalVisible(true);
+              setSelected("parent");
             }}
           >
             <Image
@@ -229,18 +228,7 @@ const RoleSelection = (props) => {
           </TouchableOpacity>
         </View>
       </View>
-      {/* <View
-        style={{
-          bottom: 0,
-          paddingHorizontal: moderateScale(24),
-          position: "absolute",
-          bottom: 0,
-          width: "100%",
-          marginBottom: moderateScale(20),
-        }}
-      >
-        <Button  title={Strings.submit} />
-      </View> */}
+ 
       <Modal
         onBackdropPress={() => setModalVisible(false)}
         transparent={true}
@@ -309,7 +297,11 @@ const RoleSelection = (props) => {
                   onPress={() => {
                     setModalVisible(false);
                     setTimeout(() => {
-                      props.navigation.navigate("businessDetail");
+                      if (selected == "service") {
+                        props.navigation.navigate("businessDetail");
+                      } else {
+                        props.navigation.navigate("parentDetails");
+                      }
                     }, 200);
                   }}
                 />

@@ -17,7 +17,7 @@ export const saveRegisterData = (data) => {
     } catch (error) {
       dispatch({
         type: SERVICE_PROVIDER_DATA_ERROR,
-        payload: data,
+        payload: error,
       });
     }
   };

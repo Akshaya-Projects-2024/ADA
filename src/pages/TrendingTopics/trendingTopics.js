@@ -257,7 +257,7 @@ const TrendingTopics = (props) => {
                   borderBottomLeftRadius: moderateScale(0),
                 }}
               >
-                <Plus />
+                <Plus stroke={"#fff"}/>
               </TouchableOpacity>
             </View>
             <View style={{ paddingTop: moderateScale(15) }}>

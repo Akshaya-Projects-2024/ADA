@@ -21,6 +21,7 @@ const DropDown = props => {
           fontSize: THEMES.fonts.font12,
           padding: 0,
           fontFamily: THEMES.fontFamily.medium,
+          color: THEMES.colors.black
         }}
         itemContainerStyle={{padding: 0}}
         containerStyle={{borderRadius: 16, padding: 0}}

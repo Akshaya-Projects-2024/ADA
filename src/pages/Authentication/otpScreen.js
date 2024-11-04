@@ -177,7 +177,6 @@ const OtpScreen = (props) => {
             ))}
           </View>
           <Text
-            onPress={() => props.navigation.navigate("roleSelection")}
             style={{
               color: THEMES.colors.blue,
               fontFamily: THEMES.fontFamily.medium,

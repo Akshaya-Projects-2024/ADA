@@ -5,6 +5,14 @@ import { navigationRef } from "./rootNavigationRef";
 import AuthStack from "./authStack";
 import AppStack from "./appStack";
 import Splash from "../pages/Authentication/splash";
+import PetParentAppStack from "./petParent/petParentAppRoutes";
+import ParentDetails from "../pages/ParentRegister/parentDetails";
+import PetDetail from "../pages/ParentRegister/petDetail";
+import ParentHome from "../pages/Home/parentHome";
+import TrendDetail from "../pages/TrendingTopics/trendDetail";
+import ServiceList from "../pages/Services/serviceList";
+import ServiceDetail from "../pages/Services/serviceDetail";
+import UpcomingEvents from "../pages/Events/upcomingEvents";
 
 const Stack = createStackNavigator();
 
@@ -39,9 +47,58 @@ export default Routes = (props) => {
           component={AuthStack}
           options={navOptionHandler}
         />
+
         <Stack.Screen
           name="app"
           component={AppStack}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="petParentAppStack"
+          component={PetParentAppStack}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="parentDetails"
+          component={ParentDetails}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="petDetail"
+          component={PetDetail}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="parentHome"
+          component={ParentHome}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="trendDetail"
+          component={TrendDetail}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="serviceList"
+          component={ServiceList}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="serviceDetail"
+          component={ServiceDetail}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="upComingEvents"
+          component={UpcomingEvents}
           options={navOptionHandler}
         />
       </Stack.Navigator>

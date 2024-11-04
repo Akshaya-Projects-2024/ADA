@@ -75,5 +75,6 @@ export const THEMES = {
     font22: moderateScale(22),
     font24: moderateScale(24),
     font32: moderateScale(32),
+    font13: moderateScale(13)
   },
 };

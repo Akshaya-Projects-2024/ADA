@@ -171,6 +171,8 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font12,
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.medium,
+    paddingTop:moderateScale(3)
+
 
   },
   modalOverlay: {

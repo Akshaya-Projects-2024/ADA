@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,15 +7,16 @@ import {
   StatusBar,
   StyleSheet,
   Keyboard,
-} from 'react-native';
-import InputField from '../../components/InputField';
-import {THEMES} from '../../assets/theme/themes';
-import Header from '../../components/Header';
-import ClipboardPaste from '../../assets/svg/clipboardPaste.svg';
-import Strings from '../../constants/strings';
-import Button from '../../components/Button';
-import {moderateScale} from 'react-native-size-matters';
-import Stepper from '../../components/Stepper';
+} from "react-native";
+import InputField from "../../components/InputField";
+import { THEMES } from "../../assets/theme/themes";
+import Header from "../../components/Header";
+import ClipboardPaste from "../../assets/svg/clipboardPaste.svg";
+import Strings from "../../constants/strings";
+import Button from "../../components/Button";
+import { moderateScale } from "react-native-size-matters";
+import Stepper from "../../components/Stepper";
+import { NavigationActions, StackActions } from 'react-navigation';
 
 
 const MediaLink = (props) => {
@@ -24,16 +25,16 @@ const MediaLink = (props) => {
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
+      "keyboardDidShow",
       () => {
         setKeyboardVisible(true); // Keyboard is visible
-      },
+      }
     );
     const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
+      "keyboardDidHide",
       () => {
         setKeyboardVisible(false); // Keyboard is hidden
-      },
+      }
     );
 
     return () => {
@@ -47,25 +48,31 @@ const MediaLink = (props) => {
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={Strings.mediaLinks} showBack bgColor="transparent" />
       {route !== "myprofile" && (
-      <View
-        style={{
-          borderTopWidth: 1,
-          borderTopColor: "#B8B8B8",
-          borderBottomColor: "#B8B8B8",
-          borderBottomWidth: 1,
-          backgroundColor: "#fff",
-        }}
-      >
-        <Stepper currentStep={5} totalSteps={5} />
-      </View>
+        <View
+          style={{
+            borderTopWidth: 1,
+            borderTopColor: "#B8B8B8",
+            borderBottomColor: "#B8B8B8",
+            borderBottomWidth: 1,
+            backgroundColor: "#fff",
+          }}
+        >
+          <Stepper currentStep={5} totalSteps={5} />
+        </View>
       )}
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <ScrollView
-          style={{flex: 1}}
+          style={{ flex: 1 }}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          bounces={false}>
-          <View style={[styles.headerView,{paddingTop: route !== "myprofile" ? 18 : 30 }]}>
+          bounces={false}
+        >
+          <View
+            style={[
+              styles.headerView,
+              { paddingTop: route !== "myprofile" ? 18 : 30 },
+            ]}
+          >
             <Text style={styles.headerText}>{Strings.onlineConsultation}</Text>
           </View>
 
@@ -73,7 +80,7 @@ const MediaLink = (props) => {
             <View style={styles.w20}>
               <Image
                 resizeMode="contain"
-                source={require('../../assets/images/addLink.png')}
+                source={require("../../assets/images/addLink.png")}
               />
             </View>
             <View style={styles.w80}>
@@ -93,7 +100,7 @@ const MediaLink = (props) => {
             <View style={styles.w20}>
               <Image
                 resizeMode="contain"
-                source={require('../../assets/images/instagram.png')}
+                source={require("../../assets/images/instagram.png")}
               />
             </View>
             <View style={styles.w80}>
@@ -109,7 +116,7 @@ const MediaLink = (props) => {
             <View style={styles.w20}>
               <Image
                 resizeMode="contain"
-                source={require('../../assets/images/facebook.png')}
+                source={require("../../assets/images/facebook.png")}
               />
             </View>
             <View style={styles.w80}>
@@ -125,7 +132,7 @@ const MediaLink = (props) => {
             <View style={styles.w20}>
               <Image
                 resizeMode="contain"
-                source={require('../../assets/images/websiteLink.png')}
+                source={require("../../assets/images/websiteLink.png")}
               />
             </View>
             <View style={styles.w80}>
@@ -139,7 +146,15 @@ const MediaLink = (props) => {
         </ScrollView>
         {!isKeyboardVisible && (
           <View style={styles.submitButton}>
-            <Button title={Strings.submit} onPress={()=>props.navigation.navigate('home')}/>
+            <Button
+              title={Strings.submit}
+              onPress={() =>
+                props.navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'home' }]
+             })
+              }
+            />
           </View>
         )}
       </View>
@@ -154,7 +169,6 @@ const styles = StyleSheet.create({
   },
   headerView: {
     paddingHorizontal: moderateScale(16),
- 
   },
   headerText: {
     color: THEMES.colors.black,
@@ -163,15 +177,15 @@ const styles = StyleSheet.create({
   },
   contentView: {
     paddingTop: moderateScale(40),
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: moderateScale(14),
   },
   w20: {
-    width: '20%',
+    width: "20%",
   },
   w80: {
-    width: '80%',
+    width: "80%",
   },
   secondContentHeading: {
     paddingHorizontal: moderateScale(16),
@@ -184,14 +198,14 @@ const styles = StyleSheet.create({
   },
   secondImgView: {
     paddingTop: moderateScale(20),
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: moderateScale(14),
   },
   secondaryContentView: {
     paddingTop: moderateScale(16),
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: moderateScale(14),
   },
   submitButton: {

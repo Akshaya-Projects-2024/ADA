@@ -31,7 +31,7 @@ const TrendDetail = (props) => {
             source={require("../../assets/images/trend.png")}
           />
         </View>
-        <View style={styles.headerView}>
+      <View style={styles.headerView}>
           <TouchableOpacity
             hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
             onPress={() => props.navigation.goBack()}

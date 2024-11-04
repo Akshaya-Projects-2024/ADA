@@ -26,6 +26,17 @@ import CalendarScreen from "../pages/Events/calendarScreen";
 import Search from "../pages/TrendingTopics/search";
 import LostDogAlert from "../pages/Notification/rescueAlert";
 import RoleSelection from "../pages/Authentication/roleSelection";
+import CommonScreen from "../pages/Account/commonScreen";
+import ParentDetails from "../pages/ParentRegister/parentDetails";
+import PetDetail from "../pages/ParentRegister/petDetail";
+import Service from "../pages/Services/service";
+import ServiceDetail from "../pages/Services/serviceDetail";
+import SelectAppointment from "../pages/Services/selectAppointment";
+import ServiceList from "../pages/Services/serviceList";
+import EmergencyAlert from "../pages/Alerts/EmergencyAlert";
+import LostPetAlert from "../pages/Alerts/LostPetAlert";
+import MedicalHelp from "../pages/Alerts/MedicalHelp";
+import OtherPet from "../pages/Alerts/OtherPet";
 
 const AuthStacks = createStackNavigator();
 
@@ -36,24 +47,23 @@ const navOptionHandler = () => ({
 
 const AuthStack = () => (
   <AuthStacks.Navigator
-    initialRouteName={"home"}
+    initialRouteName={"roleSelection"}
     screenOptions={{
       headerShown: false,
     }}
   >
-     <AuthStacks.Screen
-      name="home"
-      component={BottomTabNavigation}
-      options={navOptionHandler}
-    />
-
     <AuthStacks.Screen
       name="roleSelection"
       component={RoleSelection}
       options={navOptionHandler}
     />
 
-   
+    <AuthStacks.Screen
+      name="home"
+      component={BottomTabNavigation}
+      options={navOptionHandler}
+    />
+
     <AuthStacks.Screen
       name="businessDetail"
       component={BusinessDetail}
@@ -185,6 +195,63 @@ const AuthStack = () => (
       component={Search}
       options={navOptionHandler}
     />
+    <AuthStacks.Screen
+      name="commonScreen"
+      component={CommonScreen}
+      options={navOptionHandler}
+    />
+
+ 
+
+    <AuthStacks.Screen
+      name="service"
+      component={Service}
+      options={navOptionHandler}
+    />
+
+    <AuthStacks.Screen
+      name="serviceDetail"
+      component={ServiceDetail}
+      options={navOptionHandler}
+    />
+
+    <AuthStacks.Screen
+      name="selectAppointment"
+      component={SelectAppointment}
+      options={navOptionHandler}
+    />
+
+    <AuthStacks.Screen
+      name="serviceList"
+      component={ServiceList}
+      options={navOptionHandler}
+    />
+
+    <AuthStacks.Screen
+      name="emergencyAlert"
+      component={EmergencyAlert}
+      options={navOptionHandler}
+    />
+
+    <AuthStacks.Screen
+      name="lostPetAlert"
+      component={LostPetAlert}
+      options={navOptionHandler}
+    />
+
+    <AuthStacks.Screen
+      name="medicalHelp"
+      component={MedicalHelp}
+      options={navOptionHandler}
+    />
+
+    <AuthStacks.Screen
+      name="otherPet"
+      component={OtherPet}
+      options={navOptionHandler}
+    />
+
+
   </AuthStacks.Navigator>
 );
 

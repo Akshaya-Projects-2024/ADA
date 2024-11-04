@@ -210,7 +210,7 @@ const PetAdoption = (props) => {
                 >
                   <Text
                     style={{
-                      fontFamily: THEMES.fontFamily.medium,
+                      fontFamily: THEMES.fontFamily.semiBold,
                       color: THEMES.colors.black,
                       fontSize: THEMES.fonts.font12,
                     }}

@@ -4,6 +4,11 @@ import { createStackNavigator } from "@react-navigation/stack";
 import SignIn from "../pages/Authentication/signIn";
 import OtpScreen from "../pages/Authentication/otpScreen";
 import RoleSelection from "../pages/Authentication/roleSelection";
+import BusinessDetail from "../pages/Account/businessDetail";
+import MediaLink from "../pages/Account/mediaLink";
+import ContactDetails from "../pages/Account/contactDetails";
+import UploadImagesDocs from "../pages/Account/uploadImagesDocs";
+import SessionDetail from "../pages/Account/sessionDetail";
 
 const AppStacks = createStackNavigator();
 
@@ -31,7 +36,7 @@ const AppStack = () => (
       options={navOptionHandler}
     />
 
-
+   
   </AppStacks.Navigator>
 );
 

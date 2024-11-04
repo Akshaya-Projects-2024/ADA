@@ -21,7 +21,7 @@ import Loader from "../../components/Loader";
 
 const SignIn = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const [inputValue, setInputValue] = useState("akshaya.chikane2018@gmail.com");
+  const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

@@ -18,7 +18,7 @@ const Stepper = ({ currentStep, totalSteps }) => {
       </Text>
 
       {/* Stepper Progress */}
-      <View style={styles.stepContainer}>
+      <View style={[styles.stepContainer,{justifyContent : totalSteps == 5 ? "space-between" : "flex-end"  }]}>
         {steps.map((step) => (
           <View
             key={step}
@@ -50,7 +50,8 @@ const styles = StyleSheet.create({
   },
   stepContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+
+    // justifyContent: "space-between",
     alignItems: "center",
     width: "70%",
   },

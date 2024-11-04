@@ -1,0 +1,342 @@
+import React from "react";
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { THEMES } from "../../assets/theme/themes";
+import LinearGradient from "react-native-linear-gradient";
+import Header from "../../components/Header";
+import SwitchIcon from "../../assets/svg/switch.svg";
+import BadgeCheck from "../../assets/svg/badge.svg";
+import ProfileImg from "../../assets/svg/profile.svg";
+import RightArrow from "../../assets/svg/rightArrow.svg";
+import Badge from "../../assets/svg/badgeCheck.svg";
+import PawPrint from "../../assets/svg/paw-print.svg";
+import BottomOpenCheck from "../../assets/svg/bookings.svg";
+import Star from "../../assets/svg/star.svg";
+import Users from "../../assets/svg/users.svg";
+import Refresh from "../../assets/svg/refresh.svg";
+import Document from "../../assets/svg/document.svg";
+import Delete from "../../assets/svg/delete.svg";
+import Logout from "../../assets/svg/logout.svg";
+import ContactUs from "../../assets/svg/contactUs.svg";
+import AboutUs from "../../assets/svg/aboutUs.svg";
+import Strings from "../../constants/strings";
+import { moderateScale, s } from "react-native-size-matters";
+import Activity from "../../assets/svg/activity.svg";
+
+const ParentAccount = (props) => {
+  const renderItem = (
+    bgColor,
+    icon,
+    title,
+    addBottom,
+    route,
+    showPending = false
+  ) => {
+    const Icon = icon;
+    return (
+      <TouchableOpacity
+        onPress={() =>
+          props.navigation.navigate(route, { route: "parentAccount" })
+        }
+        style={[
+          styles.flexRow,
+
+          {
+            paddingBottom: addBottom && moderateScale(16),
+          },
+        ]}
+      >
+        <View style={styles.rowCenter}>
+          <View style={[styles.iconStyle, { backgroundColor: bgColor }]}>
+            {Icon}
+          </View>
+          <Text style={styles.titleText}>{title}</Text>
+        </View>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          {showPending && <Text style={styles.pendingText}>Pending</Text>}
+
+          <RightArrow stroke={THEMES.colors.boulder} />
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  return (
+    <LinearGradient
+      locations={[0, 0.5, 0.6]}
+      colors={["#f7f2f2", "#f5e0e4", "#fff7f2"]}
+      style={{ flex: 1 }}
+    >
+      <StatusBar backgroundColor={"#f8f4f4"} />
+      <Header
+        customIcon={<SwitchIcon />}
+        title={Strings.myAccount}
+        showSearch
+        bgColor="transparent"
+      />
+      <ScrollView
+        bounces={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        style={{ flex: 1 }}
+      >
+        <View style={styles.container}>
+          <View>
+            <View style={styles.profileView}>
+              <Image
+                style={styles.profile}
+                source={require("../../assets/images/profileImg.png")}
+              />
+            </View>
+            <View style={styles.badgeView}>
+              <BadgeCheck />
+            </View>
+            <View style={styles.nameView}>
+              <Text style={styles.nameText}>Mickey</Text>
+              <Text style={styles.premiumMemberText}>
+                {Strings.premiumMemmber}
+              </Text>
+            </View>
+            <View style={styles.padding14}>
+              <View style={styles.contentView}>
+                {renderItem(
+                  THEMES.colors.lightCyan,
+                  <ProfileImg />,
+                  Strings.myProfile,
+                  "",
+                  "parentDetails",
+                  true
+                )}
+                {renderItem(
+                  "#e8f2e1",
+                  <PawPrint />,
+                  Strings.myPetProfile,
+                  "",
+                  "petDetail",
+                  true
+                )}
+                {renderItem(
+                  "#d6ecfc",
+                  <Activity />,
+                  "Activity tracker",
+                  "addBottom",
+                  "petDetail",
+                  false
+                )}
+                 
+              </View>
+            </View>
+
+            <View style={styles.padding12}>
+              <View style={styles.contentView}>
+                {renderItem(
+                  THEMES.colors.sandyBeach,
+                  <BottomOpenCheck stroke={THEMES.colors.california} />,
+                  Strings.myBookings,
+                  "",
+                  "myBookings"
+                )}
+                {renderItem(
+                  THEMES.colors.hawkesBlue,
+                  <Star />,
+                  "Reviews",
+                  "addBottom",
+                  "clientReview"
+                )}
+              </View>
+            </View>
+
+            <View style={styles.padding12}>
+              <View style={styles.contentView}>
+                {renderItem(
+                  THEMES.colors.cornFlowerBlue,
+                  <Badge />,
+                  Strings.paymentSubScription,
+                  "addBottom",
+                  "paymentsSubscription"
+                )}
+              </View>
+            </View>
+
+            <View style={styles.padding12}>
+              <View style={styles.contentView}>
+                {renderItem(
+                  THEMES.colors.cherub,
+                  <Users />,
+                  "Register as a Service provider",
+                  "addBottom",
+                  "parentDetails"
+                )}
+              </View>
+            </View>
+
+            <View style={styles.padding12}>
+              <View style={styles.contentView}>
+                {renderItem(
+                  THEMES.colors.gallery,
+                  <Refresh />,
+                  Strings.refundCancellationPolicy,
+                  "",
+                  "commonScreen"
+                )}
+                {renderItem(
+                  THEMES.colors.zanah,
+                  <Document />,
+                  Strings.privacyPolicy,
+                  "addbottom",
+                  "commonScreen"
+                )}
+              </View>
+            </View>
+
+            <View style={styles.padding12}>
+              <View style={styles.contentView}>
+                {renderItem(
+                  THEMES.colors.hawkesBlue,
+                  <ContactUs />,
+                  Strings.contactUs,
+                  "",
+                  "contactDetails"
+                )}
+                {renderItem(
+                  THEMES.colors.wispPink,
+                  <AboutUs />,
+                  Strings.aboutUs,
+                  "addBottom",
+                  "commonScreen"
+                )}
+              </View>
+            </View>
+
+            <View style={styles.padding12}>
+              <View style={styles.contentView}>
+                {renderItem(
+                  THEMES.colors.cosmos,
+                  <Delete />,
+                  Strings.deleteAccount,
+                  "",
+                  "commonScreen"
+                )}
+                {renderItem(
+                  THEMES.colors.peach,
+                  <Logout />,
+                  Strings.logout,
+                  "addBottom",
+                  "commonScreen"
+                )}
+              </View>
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+    </LinearGradient>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: moderateScale(20),
+  },
+  badgeView: {
+    position: "absolute",
+    width: 100,
+    height: 100,
+    justifyContent: "flex-end",
+    alignItems: "center",
+    alignSelf: "center",
+    top: moderateScale(8),
+  },
+  profileView: {
+    width: 100,
+    height: 100,
+    borderRadius: 100 / 2,
+    borderWidth: 1,
+    borderColor: "transparent",
+    alignSelf: "center",
+  },
+  profile: {
+    width: 100,
+    height: 100,
+    borderRadius: 100 / 2,
+  },
+  padding14: {
+    paddingTop: moderateScale(14),
+    marginHorizontal: moderateScale(20),
+  },
+  padding12: {
+    paddingTop: moderateScale(12),
+    marginHorizontal: moderateScale(20),
+  },
+  contentView: {
+    backgroundColor: THEMES.colors.white,
+    paddingHorizontal: moderateScale(16),
+    borderRadius: moderateScale(12),
+    shadowColor: THEMES.colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: THEMES.colors.white,
+  },
+  premiumMemberText: {
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.outrageousOrange,
+    fontFamily: THEMES.fontFamily.semiBold,
+    paddingTop: moderateScale(4),
+  },
+  roleText: {
+    fontSize: THEMES.fonts.font16,
+    color: THEMES.colors.black,
+    fontFamily: THEMES.fontFamily.regular,
+    paddingTop: moderateScale(4),
+  },
+  nameText: {
+    fontSize: THEMES.fonts.font16,
+    color: THEMES.colors.black,
+    fontFamily: THEMES.fontFamily.bold,
+  },
+  nameView: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: moderateScale(15),
+  },
+  flexRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: moderateScale(16),
+  },
+  rowCenter: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  iconStyle: {
+    width: 30,
+    height: 30,
+    borderRadius: 7,
+    backgroundColor: THEMES.colors.bgColor,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: moderateScale(12),
+  },
+  titleText: {
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.black,
+    fontFamily: THEMES.fontFamily.semiBold,
+  },
+  pendingText: {
+    color: THEMES.colors.outrageousOrange,
+    fontSize: THEMES.fonts.font12,
+    fontFamily: THEMES.fontFamily.regular,
+  },
+});
+export default ParentAccount;

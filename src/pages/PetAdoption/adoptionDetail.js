@@ -25,7 +25,7 @@ const AdoptionDetail = (props) => {
           hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
           onPress={() => props.navigation.goBack()}
         >
-          <Back />
+          <Back stroke="#000" />
         </TouchableOpacity>
         <View style={styles.contentView}>
           <ScrollView
@@ -71,7 +71,10 @@ const AdoptionDetail = (props) => {
                 </Text>
                 <View style={styles.locationMain}>
                   <Text style={styles.lastSeenText}>Reason for Adoption </Text>
-                  <Text numberOfLines={2} style={[styles.location,{paddingTop:moderateScale(5)}]}>
+                  <Text
+                    numberOfLines={2}
+                    style={[styles.location, { paddingTop: moderateScale(5) }]}
+                  >
                     The current parents are moving out of country and can not
                     take her along with them.
                   </Text>
