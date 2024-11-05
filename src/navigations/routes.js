@@ -13,6 +13,7 @@ import TrendDetail from "../pages/TrendingTopics/trendDetail";
 import ServiceList from "../pages/Services/serviceList";
 import ServiceDetail from "../pages/Services/serviceDetail";
 import UpcomingEvents from "../pages/Events/upcomingEvents";
+import Service from "../pages/Services/service";
 
 const Stack = createStackNavigator();
 
@@ -99,6 +100,11 @@ export default Routes = (props) => {
         <Stack.Screen
           name="upComingEvents"
           component={UpcomingEvents}
+          options={navOptionHandler}
+        />
+        <Stack.Screen
+          name="service"
+          component={Service}
           options={navOptionHandler}
         />
       </Stack.Navigator>

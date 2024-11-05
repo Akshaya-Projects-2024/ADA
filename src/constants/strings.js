@@ -103,7 +103,7 @@ const Strings = {
     pm:"PM",
     hhmm:"HH:MM",
     ddMMYYYY:"DD/MM/YYYY",
-    selectDate:"Select Date",
+    selectDate:"Select Date*",
     trendingTopics:"Trending Topics",
     newTopic:"New Topic",
     subject:'Subject*',

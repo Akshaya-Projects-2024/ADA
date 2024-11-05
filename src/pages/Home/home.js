@@ -152,7 +152,6 @@ const categories = [
   "Groomer",
 ];
 
-
 const Home = (props) => {
   const [selectedValue, setSelectedValue] = useState();
   const { colors, fontFamily, fonts } = THEMES;
@@ -480,7 +479,6 @@ const Home = (props) => {
     handleConfirm(id);
   };
 
- 
   const selectTimeSlot = (time) => {
     if (!time.disabled) {
       setSelectedSlot(time.time);
@@ -569,9 +567,9 @@ const Home = (props) => {
             <View style={{ width: "55%", alignItems: "center" }}>
               <Text
                 style={{
-                  color: "#8696BB",
+                  color: THEMES.colors.darkGrey,
                   fontSize: moderateScale(16),
-                  fontFamily: THEMES.fontFamily.regular,
+                  fontFamily: THEMES.fontFamily.medium,
                 }}
               >
                 Hello,
@@ -603,23 +601,25 @@ const Home = (props) => {
           <View
             style={{
               borderWidth: 1,
-              borderColor: "#77F0F9",
+              // borderColor: "#77F0F9",
               padding: moderateScale(10),
               marginTop: moderateScale(14),
               borderRadius: moderateScale(16),
-              margin: 0,
-              shadowColor: "#ddd",
+              backgroundColor: "#fff",
+              borderColor: "#ddd",
+              shadowColor: THEMES.colors.lightGrey,
               shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.25,
-              shadowRadius: 4,
+              shadowOpacity: 0.8,
+              shadowRadius: 2,
               elevation: 5,
+              overflow: "hidden",
             }}
           >
             <View
               style={{
                 backgroundColor: THEMES.colors.white,
-                paddingHorizontal: moderateScale(12),
-                paddingVertical: moderateScale(10),
+                paddingHorizontal: moderateScale(5),
+                paddingVertical: moderateScale(5),
                 borderRadius: moderateScale(12),
               }}
             >
@@ -643,8 +643,19 @@ const Home = (props) => {
                   </Text>
                   <Right />
                 </View>
-                <TouchableOpacity onPress={() => setAppointmentVisible(true)}>
-                  <Plus stroke={THEMES.colors.cyan} />
+                <TouchableOpacity
+                  hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
+                  onPress={() => setAppointmentVisible(true)}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 15,
+                    backgroundColor: THEMES.colors.cyan,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Plus stroke={THEMES.colors.white} />
                 </TouchableOpacity>
               </View>
               <View style={{ paddingTop: moderateScale(23) }}>
@@ -683,7 +694,7 @@ const Home = (props) => {
                     </Text>
                     <Text
                       style={{
-                        color: THEMES.colors.lightGrey,
+                        color: THEMES.colors.darkGrey,
                         fontFamily: THEMES.fontFamily.medium,
                         fontSize: THEMES.fonts.font8,
                       }}
@@ -695,11 +706,23 @@ const Home = (props) => {
               </View>
             </View>
 
-            <View style={{ paddingTop: moderateScale(12) }}>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View
+              style={{
+                paddingTop: moderateScale(12),
+                borderTopColor: THEMES.colors.lightGrey,
+                borderTopWidth: 1,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
                 {countData.map((item, index) => {
                   return (
-                    <View style={{ paddingRight: moderateScale(16) }}>
+                    <View>
                       <Text
                         style={{
                           color: item.color,
@@ -724,6 +747,7 @@ const Home = (props) => {
                 })}
                 <View style={{ alignItems: "flex-end" }}>
                   <Text
+                    numberOfLines={1}
                     style={{
                       color: "#000",
                       fontFamily: THEMES.fontFamily.semiBold,
@@ -1011,7 +1035,7 @@ const Home = (props) => {
                   },
                 ]}
               >
-                One session
+              Single session
               </Text>
               <View style={{ width: "10%", alignItems: "center" }}>
                 {!oneSession ? (
@@ -1219,7 +1243,7 @@ const Home = (props) => {
                 {afterTimeSlots.map((slot, index) => (
                   <TouchableOpacity
                     key={index}
-                     style={[
+                    style={[
                       styles.timeSlot,
                       slot.disabled && styles.disabledSlot,
                       selectedSlot === slot.time &&
@@ -1250,11 +1274,9 @@ const Home = (props) => {
               </View>
             </View>
 
-
-            <View style={{paddingVertical:moderateScale(30)}}>
-            <Button title={"Add"}/>
+            <View style={{ paddingVertical: moderateScale(30) }}>
+              <Button title={"Add"} />
             </View>
-            
           </View>
           <DateTimePicker
             isVisible={isDateVisible}
@@ -1308,7 +1330,7 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 1,
     height: 25,
-    width: 12,
+    width: 5,
     borderRadius: 2,
   },
 
@@ -1439,8 +1461,8 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font32,
   },
   reviewsText: {
-    fontFamily: THEMES.fontFamily.regular,
-    color: "#b4b4b4",
+    fontFamily: THEMES.fontFamily.medium,
+    color: THEMES.colors.darkGrey,
     fontSize: THEMES.fonts.font12,
   },
   line: {

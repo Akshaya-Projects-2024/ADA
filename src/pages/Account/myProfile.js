@@ -134,8 +134,8 @@ const styles = StyleSheet.create({
   descriptionText: {
     fontSize: THEMES.fonts.font10,
     lineHeight: moderateScale(16),
-    fontFamily: THEMES.fontFamily.regular,
-    color: '#bbbbbb',
+    fontFamily: THEMES.fontFamily.medium,
+    color: THEMES.colors.darkGrey,
   },
   pendingText: {
     color: '#FF6437',

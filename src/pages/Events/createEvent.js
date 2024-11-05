@@ -241,7 +241,7 @@ const CreateEvent = () => {
           <View style={styles.pt16}>
             <InputField
               label={"Contact Information*"}
-              placeholderText={"Enter Location Name"}
+              placeholderText={"Enter Contact Number"}
             />
           </View>
           <View style={styles.pt16}>

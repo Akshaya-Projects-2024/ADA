@@ -19,28 +19,28 @@ import Button from "../../components/Button";
 const TrendDetail = (props) => {
   return (
     <View style={styles.container}>
+      <View style={styles.imgStyle}>
+        <Image
+          style={styles.imgStyle}
+          source={require("../../assets/images/trend.png")}
+        />
+      </View>
+      <View style={styles.headerView}>
+        <TouchableOpacity
+          hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
+          onPress={() => props.navigation.goBack()}
+        >
+          <Back stroke="#000" />
+        </TouchableOpacity>
+
+        <Share />
+      </View> 
       <ScrollView
         style={{ flex: 1 }}
         bounces={false}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.imgStyle}>
-          <Image
-            style={styles.imgStyle}
-            source={require("../../assets/images/trend.png")}
-          />
-        </View>
-      <View style={styles.headerView}>
-          <TouchableOpacity
-            hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-            onPress={() => props.navigation.goBack()}
-          >
-            <Back stroke="#000"/>
-          </TouchableOpacity>
-
-          <Share />
-        </View>
         <View style={styles.contentView}>
           <Text style={styles.timeText}>8 min read</Text>
           <View style={{ paddingTop: moderateScale(4) }}>
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
   imgStyle: {
     width: "100%",
-    height:  Dimensions.get('window').height * 0.3,
+    height: Dimensions.get("window").height * 0.3,
   },
   headerView: {
     position: "absolute",
@@ -133,7 +133,6 @@ const styles = StyleSheet.create({
     color: THEMES.colors.black,
     fontSize: THEMES.fonts.font14,
     lineHeight: 27,
-
   },
 });
 

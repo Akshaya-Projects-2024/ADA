@@ -68,8 +68,8 @@ const NewTopic = () => {
           showsVerticalScrollIndicator={false}
         >
           <InputField
-            label={Strings.subject}
-            placeholderText={Strings.pleaseEnterSubject}
+            label={"Title"}
+            placeholderText={"Enter title"}
           />
           <>
             <View style={styles.logoBoxView}>
@@ -148,8 +148,8 @@ const NewTopic = () => {
           </>
           <View style={{ paddingTop: moderateScale(16) }}>
             <InputField
-              label={Strings.writeBlog}
-              placeholderText={Strings.writeHere}
+              label={"Your blog"}
+              placeholderText={Strings.writeBlog}
               multiline
             />
           </View>
