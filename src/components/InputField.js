@@ -4,8 +4,15 @@ import { THEMES } from "../assets/theme/themes";
 import { moderateScale, verticalScale } from "react-native-size-matters";
 
 const InputField = (props) => {
-  const { label, placeholderText, rightIcon, multiline, value, onChange,keyboardType } =
-    props;
+  const {
+    label,
+    placeholderText,
+    rightIcon,
+    multiline,
+    value,
+    onChange,
+    keyboardType,
+  } = props;
   return (
     <View style={styles.mainView}>
       <View style={styles.flexRow}>
@@ -17,7 +24,6 @@ const InputField = (props) => {
           }}
         >
           {label && <Text style={styles.labelText}>{label}</Text>}
-
           <TextInput
             multiline={multiline || false}
             style={[

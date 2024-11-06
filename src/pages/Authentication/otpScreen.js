@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   TextInput,
@@ -8,29 +8,41 @@ import {
   ScrollView,
   ActivityIndicator,
   Keyboard,
+  PermissionsAndroid,
+  Alert,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import { moderateScale } from "react-native-size-matters";
 import Header from "../../components/Header";
-import Button from "../../components/Button";
-import Strings from "../../constants/strings";
 import { decryptService, encryptService } from "../../utils/storageFunc";
 import { verifyOtp } from "../../redux-store/actions/auth";
 import Toast from "react-native-toast-message";
+import SmsListener from "react-native-android-sms-listener";
 
 const OtpScreen = (props) => {
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const inputs = useRef([]);
   const value = props.route.params.loginValue;
-  const [otp, setOtp] = useState(Array(6).fill(""));
   const [isMobileNumber, setIsMobileNumber] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const phoneRegex = /^[0-9]{10}$/;
-    if (phoneRegex.test(value)) {
-      setIsMobileNumber(true);
-    } else {
-      setIsMobileNumber(false);
-    }
+    // Request SMS permission on Android
+    requestSmsPermission();
+
+    // Start listening for SMS messages
+    const subscription = SmsListener.addListener((message) => {
+      const otpMatch = message.body.match(/\b\d{6}\b/);
+      if (otpMatch) {
+        autoFillOtp(otpMatch[0]);
+      } else {
+        Alert.alert("Error", "OTP not found in the message");
+      }
+    });
+
+    return () => {
+      subscription.remove(); // Clean up listener on unmount
+    };
   }, []);
 
   const showToast = (type, message) => {
@@ -40,63 +52,101 @@ const OtpScreen = (props) => {
     });
   };
 
-  const handleChange = async (text, index) => {
-    if (/^[0-9]$/.test(text) || text === "") {
-      let newOtp = [...otp];
-      newOtp[index] = text;
-      setOtp(newOtp);
-      // Move to next input field automatically
-      if (text && index < 5) {
-        const nextInput = index + 1;
-        inputRefs[nextInput].focus();
-      } else {
-        if (index == 5 && text) {
-          Keyboard.dismiss();
-          try {
-            setLoading(true);
-            const deviceId = await decryptService("deviceId");
-            const postData = {
-              UserId: value,
-              Deviceid: deviceId,
-              Otp: newOtp.join(""),
-              type: "login",
-            };
-
-            const res = await verifyOtp(postData);
-            if (res?.data?.status_code == 200) {
-              await encryptService("accessToken", res?.data?.data?.token);
-              await encryptService("tokenId", res?.data?.data?.tokenId);
-              await encryptService("userId", value);
-              showToast("success", res?.data?.message);
-              setTimeout(() => {
-                props?.navigation.replace("auth");
-                setLoading(false);
-                setOtp(Array(6).fill(""));
-              }, 500);
-            } else {
-              showToast("error", res?.data?.message);
-              setLoading(false);
-              setOtp(Array(6).fill(""));
-            }
-          } catch (error) {
-            showToast("error", "Something went wrong!!!");
-            setLoading(false);
-            setOtp(Array(6).fill(""));
-          }
+  const requestSmsPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.RECEIVE_SMS,
+        {
+          title: "SMS Permission",
+          message:
+            "This app requires access to read SMS messages for OTP auto-fill",
+          buttonPositive: "OK",
         }
+      );
+
+      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+      }
+    } catch (error) {
+      console.warn(error);
+    }
+  };
+
+  const autoFillOtp = (otpString) => {
+    const otpArray = otpString.split(""); // Convert OTP to array
+    setOtp(otpArray); // Set OTP state to fill input boxes
+
+    // Optionally focus the last input to indicate completion
+    if (inputs.current[5]) {
+      inputs.current[5].focus();
+      apiCall(otpArray);
+    }
+  };
+
+  const apiCall = async (otpValue) => {
+    try {
+      Keyboard.dismiss();
+      setLoading(true);
+      const deviceId = await decryptService("deviceId");
+      const postData = {
+        UserId: value,
+        Deviceid: deviceId,
+        Otp: otpValue.join(""),
+        type: "login",
+      };
+
+      const res = await verifyOtp(postData);
+      if (res?.data?.status_code == 200) {
+        await encryptService("accessToken", res?.data?.data?.token);
+        await encryptService("tokenId", res?.data?.data?.tokenId);
+        await encryptService("userId", value);
+        showToast("success", res?.data?.message);
+        setTimeout(() => {
+          props?.navigation.replace("auth");
+          setLoading(false);
+          setOtp(["", "", "", "", "", ""]);
+        }, 500);
+      } else {
+        showToast("error", res?.data?.message);
+        setLoading(false);
+        setOtp(["", "", "", "", "", ""]);
+      }
+    } catch (error) {
+      showToast("error", "Something went wrong!!!");
+      setLoading(false);
+      setOtp(["", "", "", "", "", ""]);
+    }
+  };
+
+  const handleChange = async (text, index) => {
+    if (text.length > 1) {
+      text = text.slice(-1); // Ensure only one digit is entered
+    }
+
+    const newOtp = [...otp];
+    newOtp[index] = text;
+    setOtp(newOtp);
+    e;
+    if (text && index < 5) {
+      inputs.current[index + 1].focus();
+    } else {
+      if (index == 5 && text) {
+        apiCall(newOtp);
       }
     }
   };
 
-  // Refs to focus on the next input
-  const inputRefs = [];
+  const handleKeyPress = (e, index) => {
+    if (e.nativeEvent.key === "Backspace" && !otp[index] && index > 0) {
+      inputs.current[index - 1].focus();
+    }
+  };
 
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.white} />
       <Header title={""} showBack bgColor="transparent" />
       <ScrollView
-       keyboardShouldPersistTaps='handled'
+        keyboardShouldPersistTaps="handled"
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         style={{
@@ -163,18 +213,21 @@ const OtpScreen = (props) => {
           >
             Enter the code here:
           </Text>
+
           <View style={styles.otpContainer}>
-            {otp.map((digit, index) => (
-              <TextInput
-                key={index}
-                style={styles.otpInput}
-                value={digit}
-                onChangeText={(text) => handleChange(text, index)}
-                keyboardType="numeric"
-                maxLength={1}
-                ref={(input) => (inputRefs[index] = input)}
-              />
-            ))}
+            {otp.length &&
+              otp?.map((digit, index) => (
+                <TextInput
+                  onKeyPress={(e) => handleKeyPress(e, index)}
+                  key={index}
+                  style={styles.otpInput}
+                  value={digit}
+                  onChangeText={(text) => handleChange(text, index)}
+                  keyboardType="numeric"
+                  maxLength={1}
+                  ref={(el) => (inputs.current[index] = el)}
+                />
+              ))}
           </View>
           <Text
             style={{

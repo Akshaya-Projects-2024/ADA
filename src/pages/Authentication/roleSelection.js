@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   View,
-  TextInput,
   StyleSheet,
   Text,
   StatusBar,
@@ -9,11 +8,9 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
-import { moderateScale, scale, verticalScale } from "react-native-size-matters";
-import Header from "../../components/Header";
+import { moderateScale } from "react-native-size-matters";
 import Tick from "../../assets/svg/check-circle.svg";
 import Button from "../../components/Button";
-import Strings from "../../constants/strings";
 import Modal from "react-native-modal";
 import Cross from "../../assets/svg/cross.svg";
 import { decryptService } from "../../utils/storageFunc";
@@ -26,18 +23,6 @@ const RoleSelection = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
   const { registerData } = useSelector(({ register }) => register);
-
-  // const checkAllIds = () =>{
-  //   if(Object.keys(registerData).length !== 0){
-  //     return Object.keys(registerData).every(key => {
-  //       const obj = registerData[key];
-  //       if (Array.isArray(obj)) {
-  //         return true;
-  //       }
-  //       return obj.id === 0;
-  //     });
-  //   }
-  // }
 
   useEffect(() => {
     initData();
@@ -58,12 +43,11 @@ const RoleSelection = (props) => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.white} />
-      <Header title={""} bgColor="transparent" />
       <View
         style={{
           alignItems: "center",
           justifyContent: "center",
-          paddingTop: moderateScale(100),
+          flex: 1,
         }}
       >
         <Text
@@ -80,7 +64,7 @@ const RoleSelection = (props) => {
         <Text
           style={{
             color: THEMES.colors.black,
-            fontFamily: THEMES.fontFamily.regular,
+            fontFamily: THEMES.fontFamily.medium,
             fontSize: THEMES.fonts.font16,
             textAlign: "center",
             paddingTop: moderateScale(25),
@@ -92,7 +76,7 @@ const RoleSelection = (props) => {
         <Text
           style={{
             color: THEMES.colors.black,
-            fontFamily: THEMES.fontFamily.regular,
+            fontFamily: THEMES.fontFamily.medium,
             fontSize: THEMES.fonts.font16,
             textAlign: "center",
             paddingTop: moderateScale(2),
@@ -228,7 +212,7 @@ const RoleSelection = (props) => {
           </TouchableOpacity>
         </View>
       </View>
- 
+
       <Modal
         onBackdropPress={() => setModalVisible(false)}
         transparent={true}
@@ -253,7 +237,7 @@ const RoleSelection = (props) => {
                   fontSize: THEMES.fonts.font20,
                   color: THEMES.colors.black,
                   width: "75%",
-                  lineHeight: moderateScale(28),
+                  lineHeight: moderateScale(30),
                 }}
               >
                 Unlock a World of Tail-Wagging Fun!
@@ -268,7 +252,7 @@ const RoleSelection = (props) => {
                   fontFamily: THEMES.fontFamily.regular,
                   fontSize: THEMES.fonts.font16,
                   color: THEMES.colors.black,
-                  lineHeight: moderateScale(28),
+                  lineHeight: moderateScale(20)
                 }}
               >
                 Would you like to register for purr-sonalized recommendations

@@ -103,12 +103,9 @@ const BusinessDetail = (props) => {
           bounces={false}
         >
           <View style={{ paddingTop: route !== "myprofile" ? 18 : 30 }}>
-            <ModalDropdown
-              placeholder="Business name/ Person Name*"
-              data={businessName}
-              title={"Select business name"}
-              setSelectedValue={setBusinessValue}
-              selectedValue={selectedBusinessValue}
+          <InputField
+              label={"Business name/Person name*"}
+              placeholderText={"Enter name"}
             />
           </View>
 

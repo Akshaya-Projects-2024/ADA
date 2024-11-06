@@ -7,7 +7,6 @@ import {
   Keyboard,
   ActivityIndicator,
 } from "react-native";
-
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
 import { getUniqueId } from "react-native-device-info";
@@ -17,32 +16,11 @@ import Button from "../../components/Button";
 import Toast from "react-native-toast-message";
 import { checkLogin } from "../../redux-store/actions/auth";
 import { encryptService } from "../../utils/storageFunc";
-import Loader from "../../components/Loader";
+
 
 const SignIn = (props) => {
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        setKeyboardVisible(true); // Keyboard is visible
-      }
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardDidHide",
-      () => {
-        setKeyboardVisible(false); // Keyboard is hidden
-      }
-    );
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
 
   const showToast = (type, message) => {
     Toast.show({
@@ -64,7 +42,7 @@ const SignIn = (props) => {
           UserId: inputValue,
           Deviceid: deviceId,
         };
-        
+
         const res = await checkLogin(postData);
         if (res?.data?.status_code == 200) {
           showToast("success", res?.data?.message);
@@ -114,16 +92,6 @@ const SignIn = (props) => {
           </View>
         </View>
       )}
-
-      {/* {!isKeyboardVisible && (
-        <View style={styles.skipBtn}>
-          <Button
-            onPress={() => props.navigation.navigate("home")}
-            title={Strings.skip}
-            onlyBorder
-          />
-        </View>
-      )} */}
     </View>
   );
 };
