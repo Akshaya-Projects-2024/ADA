@@ -16,12 +16,19 @@ import Strings from "../../constants/strings";
 import Button from "../../components/Button";
 import { moderateScale } from "react-native-size-matters";
 import Stepper from "../../components/Stepper";
-import { NavigationActions, StackActions } from 'react-navigation';
-
+import { NavigationActions, StackActions } from "react-navigation";
+import Toast from "react-native-toast-message";
+import { saveMediaLinks } from "../../redux-store/actions/auth";
+import { decryptService } from "../../utils/storageFunc";
 
 const MediaLink = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const route = props?.route?.params?.route;
+
+  const [link, setLink] = useState();
+  const [instaLink, setInstaLink] = useState();
+  const [fbLink, setFbLink] = useState();
+  const [weblink, setWebLink] = useState();
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -42,6 +49,40 @@ const MediaLink = (props) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+
+  const showToast = (type, message) => {
+    Toast.show({
+      type: type,
+      text1: message,
+    });
+  };
+
+  const onSubmit = async () => {
+    try {
+      const userId = await decryptService("userId");
+      const postData = {
+        userid: userId,
+        onlinelink: link,
+        instagram: instaLink,
+        facebook: fbLink,
+        website: weblink,
+      };
+      const res = await saveMediaLinks(postData);
+      if (res?.data?.status_code == 200) {
+        showToast("success", "You have been registered successfully!!!");
+        setTimeout(() => {
+          props.navigation.reset({
+            index: 0,
+            routes: [{ name: "home" }],
+          });
+        }, 700);
+      } else {
+        showToast("error", res?.data?.message);
+      }
+    } catch (error) {
+      showToast("error", "Something went wrong!!!");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -88,6 +129,8 @@ const MediaLink = (props) => {
                 label={Strings.addLink}
                 placeholderText={Strings.pasteLink}
                 rightIcon={<ClipboardPaste stroke={THEMES.colors.darkGrey} />}
+                value={link}
+                onChange={setLink}
               />
             </View>
           </View>
@@ -108,6 +151,8 @@ const MediaLink = (props) => {
                 label={Strings.instaLink}
                 placeholderText={Strings.pasteLink}
                 rightIcon={<ClipboardPaste stroke={THEMES.colors.red} />}
+                value={instaLink}
+                onChange={setInstaLink}
               />
             </View>
           </View>
@@ -124,6 +169,8 @@ const MediaLink = (props) => {
                 label={Strings.fbLink}
                 placeholderText={Strings.pasteLink}
                 rightIcon={<ClipboardPaste stroke={THEMES.colors.darkGrey} />}
+                value={fbLink}
+                onChange={setFbLink}
               />
             </View>
           </View>
@@ -140,21 +187,15 @@ const MediaLink = (props) => {
                 label={Strings.websiteLink}
                 placeholderText={Strings.pasteLink}
                 rightIcon={<ClipboardPaste stroke={THEMES.colors.darkGrey} />}
+                value={weblink}
+                onChange={setWebLink}
               />
             </View>
           </View>
         </ScrollView>
         {!isKeyboardVisible && (
           <View style={styles.submitButton}>
-            <Button
-              title={Strings.submit}
-              onPress={() =>
-                props.navigation.reset({
-                  index: 0,
-                  routes: [{ name: 'home' }]
-             })
-              }
-            />
+            <Button title={Strings.submit} onPress={() => onSubmit()} />
           </View>
         )}
       </View>

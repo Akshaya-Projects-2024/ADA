@@ -37,7 +37,7 @@ const Strings = {
     emailId:"Email Id*",
     enterEmailId:"Enter email id",
     address:"Address",
-    enterAddress:'Enter Address',
+    enterAddress:'Enter Address*',
     location:"Location name as per API available",
     enterLocation:"Enter Location",
     postalCode:"Postal code",

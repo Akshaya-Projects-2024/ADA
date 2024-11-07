@@ -12,6 +12,7 @@ const InputField = (props) => {
     value,
     onChange,
     keyboardType,
+    maxLength,
   } = props;
   return (
     <View style={styles.mainView}>
@@ -25,6 +26,7 @@ const InputField = (props) => {
         >
           {label && <Text style={styles.labelText}>{label}</Text>}
           <TextInput
+            maxLength={maxLength}
             multiline={multiline || false}
             style={[
               styles.inputStyle,

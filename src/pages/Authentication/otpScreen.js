@@ -92,6 +92,9 @@ const OtpScreen = (props) => {
         Deviceid: deviceId,
         Otp: otpValue.join(""),
         type: "login",
+        sessionId: "localsession",
+        latitude: "488",
+        longitude: "588",
       };
 
       const res = await verifyOtp(postData);

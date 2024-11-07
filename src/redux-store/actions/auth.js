@@ -43,3 +43,48 @@ export const getProfile = async (obj) => {
     return error;
   }
 };
+
+
+export const saveBusinessDetails = async (obj) => {
+  try {
+    let data = {
+      url: urlList.businessDetail,
+      method: "POST",
+      data: obj,
+    };
+    const res = await authApi(data);
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const saveContactDetails = async (obj) => {
+  try {
+    let data = {
+      url: urlList.contactDetail,
+      method: "POST",
+      data: obj,
+    };
+    const res = await authApi(data);
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const saveMediaLinks = async (obj) => {
+  try {
+    let data = {
+      url: urlList.mediaLink,
+      method: "POST",
+      data: obj,
+    };
+    const res = await authApi(data);
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
+
+

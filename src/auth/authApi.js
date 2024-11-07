@@ -10,7 +10,6 @@ const authApi = axios.create({
   baseURL: `${config.baseUrl}/`, // Replace with your API base URL
   headers: {
     "Content-Type": "application/json",
-
   },
 });
 
@@ -40,34 +39,6 @@ authApi.interceptors.response.use(
       // Try to refresh the token
       const refreshToken = await decryptService("tokenId");
       const deviceId = await decryptService("deviceId");
-      console.log("deviceId", deviceId)
-      try {
-
-        let data = {
-          url: urlList.refreshToken,
-          method: "POST",
-          data: {
-            token: refreshToken,
-            Deviceid: deviceId,
-          },
-        };
-        const res = await api(data);
-        await encryptService(
-          "accessToken",
-          res?.data?.data?.token
-        );
-        await encryptService("tokenId", res?.data?.data?.tokenId);
-
-        // // Update original request with new token
-        originalRequest.headers.AccessToken = `${res?.data?.data?.token}`;
-
-        // // Retry the original request
-        return api(originalRequest);
-      } catch (refreshError) {
-        // Handle refresh token error (e.g., logout user, redirect to login, etc.)
-        console.error("Failed to refresh token", refreshError);
-        return Promise.reject(refreshError);
-      }
     }
 
     return Promise.reject(error?.response);

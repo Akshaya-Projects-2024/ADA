@@ -15,6 +15,9 @@ import ModalDropdown from "../../components/ModalDropdown";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import Stepper from "../../components/Stepper";
+import Toast from "react-native-toast-message";
+import { decryptService } from "../../utils/storageFunc";
+import { saveBusinessDetails } from "../../redux-store/actions/auth";
 
 const businessName = [
   { id: "1", label: "ADV Solutions" },
@@ -51,7 +54,7 @@ const experienceData = [
 const BusinessDetail = (props) => {
   const route = props?.route?.params?.route;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const [selectedBusinessValue, setBusinessValue] = useState();
+  const [businessValue, setBusinessValue] = useState();
   const [selectedServiceProvider, setServiceProviderValue] = useState();
   const [selectedCategory, setSelectedCategory] = useState();
   const [selectedExperience, setSelectedExperience] = useState();
@@ -76,6 +79,47 @@ const BusinessDetail = (props) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+
+  const showToast = (type, message) => {
+    Toast.show({
+      type: type,
+      text1: message,
+    });
+  };
+
+  const onSubmit = async () => {
+    if (!businessValue) {
+      showToast("error", "Please enter Business name or person name");
+    } else if (!selectedServiceProvider) {
+      showToast("error", "Please select service provider role");
+    } else if (!selectedCategory) {
+      showToast("error", "Please select category of services");
+    } else if (!description) {
+      showToast("error", "Please enter description");
+    } else {
+      try {
+        const userId = await decryptService("userId");
+        const postData = {
+          userid: userId,
+          name: businessValue,
+          role: selectedServiceProvider[0],
+          category: selectedCategory[0],
+          experience: JSON.stringify(
+            parseInt(selectedExperience[0].replace("Years", ""), 10)
+          ),
+          description: description,
+        };
+        const res = await saveBusinessDetails(postData);
+        if (res?.data?.status_code == 200) {
+          props.navigation.navigate("contactDetails");
+        } else {
+          showToast("error", res?.data?.message);
+        }
+      } catch (error) {
+        showToast("error", "Something went wrong!!!");
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -102,10 +146,17 @@ const BusinessDetail = (props) => {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          <View style={{ paddingTop: route !== "myprofile" ? 18 : 30 }}>
-          <InputField
+          <View
+            style={{
+              paddingTop: route !== "myprofile" ? 18 : 30,
+              marginHorizontal: moderateScale(20),
+            }}
+          >
+            <InputField
               label={"Business name/Person name*"}
               placeholderText={"Enter name"}
+              value={businessValue}
+              onChange={setBusinessValue}
             />
           </View>
 
@@ -148,6 +199,8 @@ const BusinessDetail = (props) => {
               label={"About Info /Description*"}
               placeholderText={"Write the about info/description"}
               multiline
+              value={description}
+              onChange={setDescription}
             />
           </View>
         </ScrollView>
@@ -155,7 +208,7 @@ const BusinessDetail = (props) => {
           <View style={styles.submitButton}>
             <Button
               title={route !== "myprofile" ? Strings.next : Strings.submit}
-              onPress={() => props.navigation.navigate("contactDetails")}
+              onPress={() => onSubmit()}
             />
           </View>
         )}

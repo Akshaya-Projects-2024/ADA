@@ -14,10 +14,19 @@ import Button from "../../components/Button";
 import { moderateScale } from "react-native-size-matters";
 import Location from "../../assets/svg/location.svg";
 import Stepper from "../../components/Stepper";
+import { saveContactDetails } from "../../redux-store/actions/auth";
+import Toast from "react-native-toast-message";
+import { decryptService } from "../../utils/storageFunc";
 
 const ContactDetails = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const route = props?.route?.params?.route;
+
+  const [mobileNo, setMobileNo] = useState();
+  const [emailId, setEmailId] = useState();
+  const [address, setAddress] = useState();
+  const [postalCode, setPostalCode] = useState();
+  const [location, setLocation] = useState();
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -38,6 +47,43 @@ const ContactDetails = (props) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+
+  const showToast = (type, message) => {
+    Toast.show({
+      type: type,
+      text1: message,
+    });
+  };
+
+  const onSubmit = async () => {
+    if (!mobileNo) {
+      showToast("error", "Please enter mobile number");
+    } else if (!emailId) {
+      showToast("error", "Please enter email Id");
+    } else if (!address) {
+      showToast("error", "Please enter address");
+    } else {
+      try {
+        const userId = await decryptService("userId");
+        const postData = {
+          userid: userId,
+          mobile: mobileNo,
+          email: emailId,
+          address: address,
+          location: location,
+          pin: postalCode,
+        };
+        const res = await saveContactDetails(postData);
+        if (res?.data?.status_code == 200) {
+          props.navigation.navigate("uploadImagesDocs");
+        } else {
+          showToast("error", res?.data?.message);
+        }
+      } catch (error) {
+        showToast("error", "Something went wrong!!!");
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -70,15 +116,20 @@ const ContactDetails = (props) => {
               }}
             >
               <InputField
+                maxLength={10}
                 keyboardType="phone-pad"
                 label={Strings.mobileNo}
                 placeholderText={Strings.enterMobileNo}
+                value={mobileNo}
+                onChange={setMobileNo}
               />
             </View>
             <View style={{ paddingTop: moderateScale(16) }}>
               <InputField
                 label={Strings.emailId}
                 placeholderText={Strings.enterEmailId}
+                value={emailId}
+                onChange={setEmailId}
               />
             </View>
             <View style={{ paddingTop: moderateScale(16) }}>
@@ -86,6 +137,8 @@ const ContactDetails = (props) => {
                 label={Strings.address}
                 placeholderText={Strings.enterAddress}
                 multiline={true}
+                value={address}
+                onChange={setAddress}
               />
             </View>
             <View style={{ paddingTop: moderateScale(16) }}>
@@ -93,13 +146,18 @@ const ContactDetails = (props) => {
                 label={Strings.location}
                 placeholderText={Strings.enterLocation}
                 rightIcon={<Location stroke={THEMES.colors.darkGrey} />}
+                value={location}
+                onChange={setLocation}
               />
             </View>
             <View style={{ paddingTop: moderateScale(16) }}>
               <InputField
+                maxLength={6}
                 keyboardType="phone-pad"
                 label={Strings.postalCode}
                 placeholderText={Strings.enterPostalCode}
+                value={postalCode}
+                onChange={setPostalCode}
               />
             </View>
           </View>
@@ -108,7 +166,7 @@ const ContactDetails = (props) => {
           <View style={styles.submitButton}>
             <Button
               title={route !== "myprofile" ? Strings.next : Strings.submit}
-              onPress={() => props.navigation.navigate("uploadImagesDocs")}
+              onPress={() => onSubmit()}
             />
           </View>
         )}
