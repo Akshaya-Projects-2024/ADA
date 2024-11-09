@@ -4,6 +4,7 @@
 
 # Xcode
 #
+release/
 build/
 *.pbxuser
 !default.pbxuser
@@ -28,7 +29,6 @@ build/
 .gradle
 local.properties
 *.iml
-*.hprof
 
 # node.js
 #
@@ -58,6 +58,9 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
-package-lock.json
+*.lock
+*.jks
+/android/app/google-services.json.old
+/android/app/mycity_prod1
+android/gradlew
 /package-lock.json
-/yarn.lock
