@@ -60,7 +60,4 @@ buck-out/
 /ios/Pods/
 *.lock
 *.jks
-/android/app/google-services.json.old
-/android/app/mycity_prod1
-android/gradlew
 /package-lock.json

@@ -18,6 +18,8 @@ import { decryptService, encryptService } from "../../utils/storageFunc";
 import { verifyOtp } from "../../redux-store/actions/auth";
 import Toast from "react-native-toast-message";
 import SmsListener from "react-native-android-sms-listener";
+import { requestLocationPermission } from "../../utils/permissionUtils";
+import { getCurrentLocation } from "../../utils/geolocationUtils";
 
 const OtpScreen = (props) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -85,6 +87,7 @@ const OtpScreen = (props) => {
   const apiCall = async (otpValue) => {
     try {
       Keyboard.dismiss();
+      const currentPosition = await getCurrentLocation();
       setLoading(true);
       const deviceId = await decryptService("deviceId");
       const postData = {
@@ -93,10 +96,13 @@ const OtpScreen = (props) => {
         Otp: otpValue.join(""),
         type: "login",
         sessionId: "localsession",
-        latitude: "488",
-        longitude: "588",
+        latitude: currentPosition?.coords?.latitude
+          ? currentPosition?.coords?.latitude?.toString()
+          : "0",
+        longitude: currentPosition?.coords?.longitude
+          ? currentPosition?.coords?.longitude?.toString()
+          : "0",
       };
-
       const res = await verifyOtp(postData);
       if (res?.data?.status_code == 200) {
         await encryptService("accessToken", res?.data?.data?.token);
@@ -124,11 +130,9 @@ const OtpScreen = (props) => {
     if (text.length > 1) {
       text = text.slice(-1); // Ensure only one digit is entered
     }
-
     const newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
-    e;
     if (text && index < 5) {
       inputs.current[index + 1].focus();
     } else {
