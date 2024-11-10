@@ -1,19 +1,21 @@
-import { PermissionsAndroid } from "react-native";
+import { Platform } from "react-native";
+import { PERMISSIONS, request, RESULTS } from "react-native-permissions";
 
 const requestLocationPermission = () => {
   return new Promise(async (res) => {
     try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: "Location",
-          message: "We require permission to access your location",
-          buttonNeutral: "Ask Me Later",
-          buttonNegative: "Cancel",
-          buttonPositive: "OK",
-        }
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      const permission =
+        Platform.OS === "ios"
+          ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
+          : PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION;
+      const granted = await request(permission, {
+        title: "Location",
+        message: "We require permission to access your location",
+        buttonNeutral: "Ask Me Later",
+        buttonNegative: "Cancel",
+        buttonPositive: "OK",
+      });
+      if (granted === RESULTS.GRANTED) {
         res(true);
       } else {
         throw new Error("Location permission denied");
