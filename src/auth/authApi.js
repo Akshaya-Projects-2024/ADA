@@ -1,9 +1,8 @@
 import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { config } from "../constants/config";
 import { decryptService, encryptService } from "../utils/storageFunc";
-import api from "./api";
-import { urlList } from "../constants/urlList";
+import { getCurrentLocation } from "../utils/geolocationUtils";
+import { refreshToken } from "../redux-store/actions/auth";
 
 // Create an Axios instance
 const authApi = axios.create({
@@ -25,24 +24,59 @@ authApi.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle token expiration
-authApi.interceptors.response.use(
+authApi?.interceptors?.response?.use(
   (response) => {
+    console.log("🚀 ~ response:", response);
     return response;
   },
   async (error) => {
+    console.log("🚀 ~ error:", error);
     const originalRequest = error.config;
-
-    if (error.status === 403 && !originalRequest._retry) {
+    if (error?.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true;
-
       // Try to refresh the token
-      const refreshToken = await decryptService("tokenId");
+      const token = await decryptService("tokenId");
       const deviceId = await decryptService("deviceId");
+      const currentPosition = await getCurrentLocation();
+      const params = {
+        token: token,
+        Deviceid: deviceId,
+        sessionId: "localsession1", // hard coded value, we have send firebase fcm
+        latitude: currentPosition?.coords?.latitude
+          ? currentPosition?.coords?.latitude?.toString()
+          : "0",
+        longitude: currentPosition?.coords?.longitude
+          ? currentPosition?.coords?.longitude?.toString()
+          : "0",
+      };
+      const res = await refreshToken(params);
+      console.log("🚀 ~ res:", res);
+      if (res?.status === 200) {
+        await encryptService("accessToken", res?.data?.data?.token);
+        await encryptService("tokenId", res?.data?.data?.tokenId);
+      }
     }
-
-    return Promise.reject(error?.response);
+    return Promise.reject(error);
   }
 );
+// Response interceptor to handle token expiration
+// authApi.interceptors.response.use(
+//   (response) => {
+//     console.log("🚀 ~ response:", response);
+//     return response;
+//   },
+//   async (error) => {
+//     console.log("🚀 ~ error:", error);
+//     const originalRequest = error.config;
+//     if (error?.status === 403 && !originalRequest._retry) {
+//       originalRequest._retry = true;
+//       // Try to refresh the token
+//       const refreshToken = await decryptService("tokenId");
+//       const deviceId = await decryptService("deviceId");
+//     }
+
+//     return Promise.reject(error?.response);
+//   }
+// );
 
 export default authApi;

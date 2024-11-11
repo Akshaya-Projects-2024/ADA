@@ -40,10 +40,9 @@ export const getProfile = async (obj) => {
     const res = await authApi(data);
     return res;
   } catch (error) {
-    return error;
+    throw error;
   }
 };
-
 
 export const saveBusinessDetails = async (obj) => {
   try {
@@ -87,4 +86,16 @@ export const saveMediaLinks = async (obj) => {
   }
 };
 
-
+export const refreshToken = async (params) => {
+  try {
+    let data = {
+      url: urlList.refreshToken,
+      method: "POST",
+      data: params,
+    };
+    const res = await api(data);
+    return res;
+  } catch (error) {
+    return error;
+  }
+};
