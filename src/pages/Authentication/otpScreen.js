@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
+import Toast from "react-native-toast-message";
+import SmsListener from "react-native-android-sms-listener";
 import {
   View,
   TextInput,
@@ -11,14 +13,13 @@ import {
   PermissionsAndroid,
   Alert,
 } from "react-native";
-import { THEMES } from "../../assets/theme/themes";
 import { moderateScale } from "react-native-size-matters";
+
 import Header from "../../components/Header";
+import Api from "../../api/Api";
+import { THEMES } from "../../assets/theme/themes";
 import { decryptService, encryptService } from "../../utils/storageFunc";
 import { verifyOtp } from "../../redux-store/actions/auth";
-import Toast from "react-native-toast-message";
-import SmsListener from "react-native-android-sms-listener";
-import { requestLocationPermission } from "../../utils/permissionUtils";
 import { getCurrentLocation } from "../../utils/geolocationUtils";
 
 const OtpScreen = (props) => {
@@ -108,6 +109,10 @@ const OtpScreen = (props) => {
         await encryptService("accessToken", res?.data?.data?.token);
         await encryptService("tokenId", res?.data?.data?.tokenId);
         await encryptService("userId", value);
+        const header = {
+          AccessToken: `${res?.data?.data?.token}`,
+        };
+        Api.defaultHeader(header);
         showToast("success", res?.data?.message);
         setTimeout(() => {
           props?.navigation.replace("auth");

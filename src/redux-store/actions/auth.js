@@ -1,101 +1,128 @@
-import api from "../../auth/api";
-import authApi from "../../auth/authApi";
+import Api from "../../api/Api";
 import { urlList } from "../../constants/urlList";
 
 export const checkLogin = async (obj) => {
   try {
-    let data = {
-      url: urlList.login,
-      method: "POST",
-      data: obj,
-    };
-    const res = await api(data);
-    return res;
+    const res = await Api.POST(urlList.login, obj);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
   } catch (error) {
-    return error;
+    console.log("checkLogin Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
 
 export const verifyOtp = async (obj) => {
   try {
-    let data = {
-      url: urlList.verifyOTP,
-      method: "POST",
-      data: obj,
-    };
-    const res = await api(data);
-    return res;
+    const res = await Api.POST(urlList.verifyOTP, obj);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
   } catch (error) {
-    return error;
+    console.log("verifyOtp Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
 
 export const getProfile = async (obj) => {
   try {
-    let data = {
-      url: urlList.getProfile,
-      method: "POST",
-      data: obj,
-    };
-    const res = await authApi(data);
-    return res;
+    const res = await Api.POST(urlList.getProfile, obj);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
   } catch (error) {
-    throw error;
+    console.log("getProfile Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
 
 export const saveBusinessDetails = async (obj) => {
   try {
-    let data = {
-      url: urlList.businessDetail,
-      method: "POST",
-      data: obj,
-    };
-    const res = await authApi(data);
-    return res;
+    const res = await Api.POST(urlList.businessDetail, obj);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
   } catch (error) {
-    return error;
+    console.log("saveBusinessDetails Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
 
 export const saveContactDetails = async (obj) => {
   try {
-    let data = {
-      url: urlList.contactDetail,
-      method: "POST",
-      data: obj,
-    };
-    const res = await authApi(data);
-    return res;
+    const res = await Api.POST(urlList.contactDetail, obj);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
   } catch (error) {
-    return error;
+    console.log("saveContactDetails Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
 
 export const saveMediaLinks = async (obj) => {
   try {
-    let data = {
-      url: urlList.mediaLink,
-      method: "POST",
-      data: obj,
-    };
-    const res = await authApi(data);
-    return res;
+    const res = await Api.POST(urlList.mediaLink, obj);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
   } catch (error) {
-    return error;
+    console.log("saveMediaLinks Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
 
 export const refreshToken = async (params) => {
   try {
-    let data = {
-      url: urlList.refreshToken,
-      method: "POST",
-      data: params,
-    };
-    const res = await api(data);
-    return res;
+    const res = await Api.POST(urlList.refreshToken, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
   } catch (error) {
-    return error;
+    console.log("refreshToken Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
