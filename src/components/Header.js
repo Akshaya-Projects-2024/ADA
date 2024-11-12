@@ -27,6 +27,7 @@ const Header = (props) => {
       style={[
         styles.headerContent,
         {
+          
           backgroundColor: bgColor ? bgColor : THEMES.colors.bgColor,
         },
       ]}

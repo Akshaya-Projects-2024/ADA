@@ -1,0 +1,114 @@
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Keyboard,
+} from "react-native";
+import InputField from "../../components/InputField";
+import { THEMES } from "../../assets/theme/themes";
+import Header from "../../components/Header";
+import Checked from "../../assets/svg/checked.svg";
+import UnChecked from "../../assets/svg/unchecked.svg";
+import Strings from "../../constants/strings";
+import Button from "../../components/Button";
+import { moderateScale } from "react-native-size-matters";
+import CheckBox from "react-native-check-box";
+import TimeTracker from "../../components/TimeTracker";
+import Stepper from "../../components/Stepper";
+
+const WorkingHours = (props) => {
+  const route = props?.route?.params?.route;
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [homeVisit, setHomeVisit] = useState(false);
+  const [centerService, setCenterService] = useState(false);
+  const [onlineConsultation, setOnlineConsultation] = useState(false);
+
+  const [perSession, setPerSession] = useState(true);
+  const [perMonth, setPerMonth] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setKeyboardVisible(true); // Keyboard is visible
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardVisible(false); // Keyboard is hidden
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <StatusBar backgroundColor={THEMES.colors.bgColor} />
+      <Header title={"Working Days & TIme"} showBack bgColor="transparent" />
+      {route !== "myprofile" && (
+        <View
+          style={{
+            borderTopWidth: 1,
+            borderTopColor: "#B8B8B8",
+            borderBottomColor: "#B8B8B8",
+            borderBottomWidth: 1,
+            backgroundColor: "#fff",
+          }}
+        >
+          <Stepper currentStep={5} totalSteps={6} />
+        </View>
+      )}
+      <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
+        <ScrollView
+          style={{ flex: 1 }}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          <TimeTracker />
+          <View
+            style={{
+              paddingBottom: moderateScale(25),
+              paddingTop: moderateScale(30),
+            }}
+          >
+            <Button
+              title={route !== "myprofile" ? Strings.next : Strings.submit}
+              onPress={() => props.navigation.navigate("mediaLink")}
+            />
+          </View>
+        </ScrollView>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: THEMES.colors.bgColor,
+  },
+  contentView: {
+    paddingTop: moderateScale(27),
+  },
+  availableText: {
+    fontFamily: THEMES.fontFamily.semiBold,
+    fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.black,
+  },
+  contentValueView: {
+    paddingTop: moderateScale(16),
+    flexDirection: "row",
+    alignItems: "center",
+  },
+});
+
+export default WorkingHours;

@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font14,
     fontFamily: THEMES.fontFamily.semiBold,
     color: "#0D0B26",
-    marginRight:moderateScale(20),
+    marginRight:moderateScale(10),
 
   },
   stepContainer: {

@@ -111,7 +111,7 @@ const UploadImagesDocs = (props) => {
           backgroundColor: "#fff",
         }}
       >
-        <Stepper currentStep={3} totalSteps={5} />
+        <Stepper currentStep={3} totalSteps={6} />
       </View>
       )}
       <View style={{ flex: 1 }}>

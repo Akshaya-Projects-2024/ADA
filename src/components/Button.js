@@ -4,7 +4,7 @@ import { moderateScale } from "react-native-size-matters";
 import { THEMES } from "../assets/theme/themes";
 
 const Button = (props) => {
-  const { title, onlyBorder, onPress, bgColor } = props;
+  const { title, onlyBorder, onPress, bgColor, textColor } = props;
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -25,7 +25,12 @@ const Button = (props) => {
         style={[
           styles.textStyle,
           {
-            color: onlyBorder ? THEMES.colors.cyan : THEMES.colors.white,
+            color:
+              onlyBorder && textColor
+                ? THEMES.colors.black
+                : onlyBorder
+                ? THEMES.colors.cyan
+                : THEMES.colors.white,
           },
         ]}
       >

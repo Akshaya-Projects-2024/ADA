@@ -14,6 +14,7 @@ import ServiceList from "../pages/Services/serviceList";
 import ServiceDetail from "../pages/Services/serviceDetail";
 import UpcomingEvents from "../pages/Events/upcomingEvents";
 import Service from "../pages/Services/service";
+import WorkingHours from "../pages/Account/WorkingHours";
 
 const Stack = createStackNavigator();
 
@@ -107,6 +108,7 @@ export default Routes = (props) => {
           component={Service}
           options={navOptionHandler}
         />
+     
       </Stack.Navigator>
     </NavigationContainer>
   );

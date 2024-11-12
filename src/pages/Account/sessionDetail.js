@@ -63,7 +63,7 @@ const SessionDetail = (props) => {
             backgroundColor: "#fff",
           }}
         >
-          <Stepper currentStep={4} totalSteps={5} />
+          <Stepper currentStep={4} totalSteps={6} />
         </View>
       )}
       <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
@@ -169,6 +169,13 @@ const SessionDetail = (props) => {
               <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
                   keyboardType="phone-pad"
+                  label={"Service Name"}
+                  placeholderText={"Enter service name"}
+                />
+              </View>
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <InputField
+                  keyboardType="phone-pad"
                   label={Strings.chargesPerSession}
                   placeholderText={Strings.enterPrice}
                 />
@@ -192,6 +199,13 @@ const SessionDetail = (props) => {
               <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
                   keyboardType="phone-pad"
+                  label={"Service Name"}
+                  placeholderText={"Enter service name"}
+                />
+              </View>
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <InputField
+                  keyboardType="phone-pad"
                   label={Strings.chargesPerSession}
                   placeholderText={Strings.enterPrice}
                 />
@@ -206,15 +220,15 @@ const SessionDetail = (props) => {
             </>
           )}
 
-          <TimeTracker />
           <View
             style={{
               paddingBottom: moderateScale(25),
+              paddingTop: moderateScale(30),
             }}
           >
             <Button
               title={route !== "myprofile" ? Strings.next : Strings.submit}
-              onPress={() => props.navigation.navigate("mediaLink")}
+              onPress={() => props.navigation.navigate("workingHours")}
             />
           </View>
         </ScrollView>

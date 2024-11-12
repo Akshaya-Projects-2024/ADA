@@ -37,6 +37,7 @@ import EmergencyAlert from "../pages/Alerts/EmergencyAlert";
 import LostPetAlert from "../pages/Alerts/LostPetAlert";
 import MedicalHelp from "../pages/Alerts/MedicalHelp";
 import OtherPet from "../pages/Alerts/OtherPet";
+import WorkingHours from "../pages/Account/WorkingHours";
 
 const AuthStacks = createStackNavigator();
 
@@ -98,6 +99,12 @@ const AuthStack = () => (
       component={SessionDetail}
       options={navOptionHandler}
     />
+       <AuthStacks.Screen
+          name="workingHours"
+          component={WorkingHours}
+          options={navOptionHandler}
+        />
+
     <AuthStacks.Screen
       name="paymentsSubscription"
       component={PaymentsSubscription}

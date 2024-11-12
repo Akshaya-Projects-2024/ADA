@@ -135,7 +135,7 @@ const BusinessDetail = (props) => {
             backgroundColor: "#fff",
           }}
         >
-          <Stepper currentStep={1} totalSteps={5} />
+          <Stepper currentStep={1} totalSteps={6} />
         </View>
       )}
 

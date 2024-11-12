@@ -8,6 +8,7 @@ import {
   Text,
   StatusBar,
   ScrollView,
+  ImageBackground,
   ActivityIndicator,
   Keyboard,
   PermissionsAndroid,
@@ -19,7 +20,7 @@ import Header from "../../components/Header";
 import Api from "../../api/Api";
 import { THEMES } from "../../assets/theme/themes";
 import { decryptService, encryptService } from "../../utils/storageFunc";
-import { verifyOtp } from "../../redux-store/actions/auth";
+import { checkLogin, verifyOtp } from "../../redux-store/actions/auth";
 import { getCurrentLocation } from "../../utils/geolocationUtils";
 
 const OtpScreen = (props) => {
@@ -28,11 +29,11 @@ const OtpScreen = (props) => {
   const value = props.route.params.loginValue;
   const [isMobileNumber, setIsMobileNumber] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isRefresh, setIsRefresh] = useState(false);
 
   useEffect(() => {
     // Request SMS permission on Android
     requestSmsPermission();
-
     // Start listening for SMS messages
     const subscription = SmsListener.addListener((message) => {
       const otpMatch = message.body.match(/\b\d{6}\b/);
@@ -42,11 +43,10 @@ const OtpScreen = (props) => {
         Alert.alert("Error", "OTP not found in the message");
       }
     });
-
     return () => {
       subscription.remove(); // Clean up listener on unmount
     };
-  }, []);
+  }, [isRefresh]);
 
   const showToast = (type, message) => {
     Toast.show({
@@ -54,6 +54,29 @@ const OtpScreen = (props) => {
       text1: message,
     });
   };
+
+  useEffect(() => {
+    const phoneRegex = /^[0-9]{10}$/;
+    if (phoneRegex.test(value)) {
+      setIsMobileNumber(true);
+    } else {
+      setIsMobileNumber(false);
+    }
+
+    requestSmsPermission();
+    // Start listening for SMS messages
+    const subscription = SmsListener.addListener((message) => {
+      const otpMatch = message.body.match(/\b\d{6}\b/);
+      if (otpMatch) {
+        autoFillOtp(otpMatch[0]);
+      } else {
+        Alert.alert("Error", "OTP not found in the message");
+      }
+    });
+    return () => {
+      subscription.remove(); // Clean up listener on unmount
+    };
+  }, []);
 
   const requestSmsPermission = async () => {
     try {
@@ -68,9 +91,10 @@ const OtpScreen = (props) => {
       );
 
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+        console.log("not granted")
       }
     } catch (error) {
-      console.warn(error);
+      console.warn("error", error);
     }
   };
 
@@ -86,10 +110,11 @@ const OtpScreen = (props) => {
   };
 
   const apiCall = async (otpValue) => {
+    console.log("napiCall")
     try {
+      setLoading(true);
       Keyboard.dismiss();
       const currentPosition = await getCurrentLocation();
-      setLoading(true);
       const deviceId = await decryptService("deviceId");
       const postData = {
         UserId: value,
@@ -114,11 +139,9 @@ const OtpScreen = (props) => {
         };
         Api.defaultHeader(header);
         showToast("success", res?.data?.message);
-        setTimeout(() => {
-          props?.navigation.replace("auth");
-          setLoading(false);
-          setOtp(["", "", "", "", "", ""]);
-        }, 500);
+        props?.navigation.replace("auth");
+        setLoading(false);
+        setOtp(["", "", "", "", "", ""]);
       } else {
         showToast("error", res?.data?.message);
         setLoading(false);
@@ -153,114 +176,146 @@ const OtpScreen = (props) => {
     }
   };
 
+  const resendOtp = async () => {
+    try {
+      setLoading(true);
+      const deviceId = await decryptService("deviceId", deviceId);
+      const postData = {
+        UserId: value,
+        Deviceid: deviceId,
+      };
+      const res = await checkLogin(postData);
+      if (res?.data?.status_code == 200) {
+        showToast("success", res?.data?.message);
+        setIsRefresh(!isRefresh);
+        setLoading(false);
+      } else {
+        setLoading(false);
+        showToast("error", res?.data?.message);
+      }
+    } catch (error) {
+      showToast("error", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.white} />
-      <Header title={""} showBack bgColor="transparent" />
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        style={{
-          flex: 1,
-        }}
+      <ImageBackground
+        source={require("../../assets/images/bgImage.png")}
+        resizeMode="cover"
+        style={{ flex: 1 }}
       >
+        <StatusBar backgroundColor={THEMES.colors.white} />
+
         <View
           style={{
             flex: 1,
-            paddingHorizontal: moderateScale(30),
-            paddingTop: moderateScale(127),
           }}
         >
-          <Text
+          <Header title={""} showBack bgColor="transparent" />
+        </View>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+        >
+          <View
             style={{
-              color: THEMES.colors.black,
-              fontFamily: THEMES.fontFamily.bold,
-              fontSize: THEMES.fonts.font20,
-              textAlign: "center",
-              paddingHorizontal: moderateScale(50),
+              flex: 1,
+              paddingHorizontal: moderateScale(30),
             }}
           >
-            {isMobileNumber
-              ? "Verify your Mobile number"
-              : "Verify your email address"}
-          </Text>
-          <Text
-            style={{
-              color: THEMES.colors.black,
-              fontFamily: THEMES.fontFamily.regular,
-              fontSize: THEMES.fonts.font14,
-              textAlign: "center",
-              lineHeight: 22,
-              paddingTop: moderateScale(24),
-              paddingHorizontal: moderateScale(10),
-            }}
-          >
-            {`An ${
-              isMobileNumber ? "OTP" : "email"
-            } with a verification code has been sent to`}
-
             <Text
               style={{
                 color: THEMES.colors.black,
-                fontFamily: THEMES.fontFamily.semiBold,
-                fontSize: THEMES.fonts.font14,
+                fontFamily: THEMES.fontFamily.bold,
+                fontSize: THEMES.fonts.font20,
                 textAlign: "center",
-                lineHeight: 30,
-                paddingTop: moderateScale(24),
+                paddingHorizontal: moderateScale(50),
               }}
             >
-              {" "}
-              {isMobileNumber ? value : value}{" "}
+              {isMobileNumber
+                ? "Verify your Mobile number"
+                : "Verify your email address"}
             </Text>
-          </Text>
-          <Text
-            style={{
-              color: THEMES.colors.black,
-              fontFamily: THEMES.fontFamily.regular,
-              fontSize: THEMES.fonts.font14,
-              textAlign: "center",
-              paddingTop: moderateScale(24),
-            }}
-          >
-            Enter the code here:
-          </Text>
+            <Text
+              style={{
+                color: THEMES.colors.black,
+                fontFamily: THEMES.fontFamily.regular,
+                fontSize: THEMES.fonts.font14,
+                textAlign: "center",
+                lineHeight: 22,
+                paddingTop: moderateScale(15),
+                paddingHorizontal: moderateScale(10),
+              }}
+            >
+              {`An ${
+                isMobileNumber ? "OTP" : "email"
+              } with a verification code has been sent to`}
 
-          <View style={styles.otpContainer}>
-            {otp.length &&
-              otp?.map((digit, index) => (
-                <TextInput
-                  onKeyPress={(e) => handleKeyPress(e, index)}
-                  key={index}
-                  style={styles.otpInput}
-                  value={digit}
-                  onChangeText={(text) => handleChange(text, index)}
-                  keyboardType="numeric"
-                  maxLength={1}
-                  ref={(el) => (inputs.current[index] = el)}
-                />
-              ))}
+              <Text
+                style={{
+                  color: THEMES.colors.black,
+                  fontFamily: THEMES.fontFamily.semiBold,
+                  fontSize: THEMES.fonts.font14,
+                  textAlign: "center",
+                  lineHeight: 30,
+                  paddingTop: moderateScale(15),
+                }}
+              >
+                {" "}
+                {isMobileNumber ? value : value}{" "}
+              </Text>
+            </Text>
+            <Text
+              style={{
+                color: THEMES.colors.black,
+                fontFamily: THEMES.fontFamily.regular,
+                fontSize: THEMES.fonts.font14,
+                textAlign: "center",
+                paddingTop: moderateScale(15),
+              }}
+            >
+              Enter the code here:
+            </Text>
+
+            <View style={styles.otpContainer}>
+              {otp.length &&
+                otp?.map((digit, index) => (
+                  <TextInput
+                    onKeyPress={(e) => handleKeyPress(e, index)}
+                    key={index}
+                    style={styles.otpInput}
+                    value={digit}
+                    onChangeText={(text) => handleChange(text, index)}
+                    keyboardType="numeric"
+                    maxLength={1}
+                    ref={(el) => (inputs.current[index] = el)}
+                  />
+                ))}
+            </View>
+            <Text
+              onPress={() => resendOtp()}
+              style={{
+                color: THEMES.colors.blue,
+                fontFamily: THEMES.fontFamily.medium,
+                fontSize: THEMES.fonts.font12,
+                textAlign: "center",
+                paddingTop: moderateScale(15),
+              }}
+            >
+              Didn’t get a verification code?
+            </Text>
           </View>
-          <Text
-            style={{
-              color: THEMES.colors.blue,
-              fontFamily: THEMES.fontFamily.medium,
-              fontSize: THEMES.fonts.font12,
-              textAlign: "center",
-              paddingTop: moderateScale(24),
-            }}
-          >
-            Didn’t get a verification code?
-          </Text>
-        </View>
-      </ScrollView>
-      {loading && (
-        <View style={styles.loadingView}>
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={THEMES.colors.white} />
+        </ScrollView>
+        {loading && (
+          <View style={styles.loadingView}>
+            <View style={styles.loadingBox}>
+              <ActivityIndicator color={THEMES.colors.white} />
+            </View>
           </View>
-        </View>
-      )}
+        )}
+      </ImageBackground>
     </View>
   );
 };
@@ -277,7 +332,7 @@ const styles = StyleSheet.create({
   otpContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingTop: moderateScale(24),
+    paddingTop: moderateScale(20),
   },
   otpInput: {
     borderWidth: 1,

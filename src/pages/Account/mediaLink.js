@@ -98,7 +98,7 @@ const MediaLink = (props) => {
             backgroundColor: "#fff",
           }}
         >
-          <Stepper currentStep={5} totalSteps={5} />
+          <Stepper currentStep={6} totalSteps={6} />
         </View>
       )}
       <View style={{ flex: 1 }}>

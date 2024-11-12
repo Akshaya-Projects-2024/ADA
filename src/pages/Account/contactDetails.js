@@ -99,7 +99,7 @@ const ContactDetails = (props) => {
             backgroundColor: "#fff",
           }}
         >
-          <Stepper currentStep={2} totalSteps={5} />
+          <Stepper currentStep={2} totalSteps={6} />
         </View>
       )}
       <View style={{ flex: 1 }}>
