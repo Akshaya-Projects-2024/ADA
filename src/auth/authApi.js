@@ -26,11 +26,9 @@ authApi.interceptors.request.use(
 
 authApi?.interceptors?.response?.use(
   (response) => {
-    console.log("🚀 ~ response:", response);
     return response;
   },
   async (error) => {
-    console.log("🚀 ~ error:", error);
     const originalRequest = error.config;
     if (error?.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -50,7 +48,6 @@ authApi?.interceptors?.response?.use(
           : "0",
       };
       const res = await refreshToken(params);
-      console.log("🚀 ~ res:", res);
       if (res?.status === 200) {
         await encryptService("accessToken", res?.data?.data?.token);
         await encryptService("tokenId", res?.data?.data?.tokenId);
@@ -59,24 +56,5 @@ authApi?.interceptors?.response?.use(
     return Promise.reject(error);
   }
 );
-// Response interceptor to handle token expiration
-// authApi.interceptors.response.use(
-//   (response) => {
-//     console.log("🚀 ~ response:", response);
-//     return response;
-//   },
-//   async (error) => {
-//     console.log("🚀 ~ error:", error);
-//     const originalRequest = error.config;
-//     if (error?.status === 403 && !originalRequest._retry) {
-//       originalRequest._retry = true;
-//       // Try to refresh the token
-//       const refreshToken = await decryptService("tokenId");
-//       const deviceId = await decryptService("deviceId");
-//     }
-
-//     return Promise.reject(error?.response);
-//   }
-// );
 
 export default authApi;
