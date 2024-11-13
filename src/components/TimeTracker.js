@@ -399,7 +399,7 @@ const TimeTracker = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: moderateScale(32),
+    paddingTop: moderateScale(15),
   },
   workingDayText: {
     fontFamily: THEMES.fontFamily.semiBold,

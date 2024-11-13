@@ -11,6 +11,7 @@ import {
   ScrollView,
   Alert,
   Switch,
+  Dimensions,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
@@ -179,6 +180,7 @@ const Home = (props) => {
   const [endDate, selectedEndDate] = useState();
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedAfternonnSlot, setSelectedAfternoonSlot] = useState(null);
+  const { width: screenWidth } = Dimensions.get('window');
 
   const renderCategory = ({ item }) => {
     const isSelected = selectedCategory === item;
@@ -601,7 +603,6 @@ const Home = (props) => {
           <View
             style={{
               borderWidth: 1,
-              // borderColor: "#77F0F9",
               padding: moderateScale(10),
               marginTop: moderateScale(14),
               borderRadius: moderateScale(16),
@@ -718,6 +719,7 @@ const Home = (props) => {
                   flexDirection: "row",
                   alignItems: "center",
                   justifyContent: "space-between",
+          
                 }}
               >
                 {countData.map((item, index) => {
@@ -781,12 +783,12 @@ const Home = (props) => {
             >
               Next Appointment
             </Text>
-            <View style={{ paddingTop: moderateScale(9) }}>
+            <View style={{ paddingTop: moderateScale(9), alignItems:'center', justifyContent:'center' }}>
               <Carousel
                 data={data}
                 renderItem={renderItem}
-                sliderWidth={340}
-                itemWidth={340}
+                sliderWidth={screenWidth}
+                itemWidth={screenWidth * 0.9}
                 onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
               />
               {paginationDots()}
@@ -968,6 +970,8 @@ const Home = (props) => {
           flex: 1,
           backgroundColor: THEMES.colors.bgColor,
           alignItems: "flex-start",
+          paddingHorizontal:moderateScale(16),
+          paddingTop: moderateScale(10)
         }}
       >
         <ScrollView
@@ -978,7 +982,6 @@ const Home = (props) => {
         >
           <View
             style={{
-              paddingHorizontal: moderateScale(10),
               paddingTop: moderateScale(20),
               flex: 1,
             }}
@@ -992,13 +995,13 @@ const Home = (props) => {
             >
               Add Appointment
             </Text>
-            <View style={{ paddingTop: moderateScale(10) }}>
+            <View style={{ paddingTop: moderateScale(15) }}>
               <InputField
                 label={"Client name *"}
                 placeholderText={"Enter client name"}
               />
             </View>
-            <View style={{ paddingTop: moderateScale(10) }}>
+            <View style={{ paddingTop: moderateScale(15) }}>
               <InputField
                 label={"Mobile number *"}
                 placeholderText={"Enter mobile number"}
@@ -1037,7 +1040,7 @@ const Home = (props) => {
               >
               Single session
               </Text>
-              <View style={{ width: "10%", alignItems: "center" }}>
+              <View style={{ width: "20%", alignItems: "center" }}>
                 {!oneSession ? (
                   <TouchableOpacity onPress={() => setOneSession(!oneSession)}>
                     <SwitchOff />
@@ -1065,11 +1068,11 @@ const Home = (props) => {
 
             <View
               style={{
-                paddingTop: moderateScale(10),
+                paddingTop: moderateScale(15),
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
-                paddingHorizontal: moderateScale(10),
+     
               }}
             >
               <TouchableOpacity
@@ -1511,12 +1514,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: THEMES.colors.bgColor,
-    padding: 10,
     borderRadius: 20,
     paddingTop: moderateScale(15),
   },
   switch: {
-    marginHorizontal: 8,
+    // marginHorizontal: 8,
   },
   selectedRadioText: {
     color: "#000", // Darker color for selected text

@@ -18,6 +18,8 @@ import Stepper from "../../components/Stepper";
 import Toast from "react-native-toast-message";
 import { decryptService } from "../../utils/storageFunc";
 import { saveBusinessDetails } from "../../redux-store/actions/auth";
+import { getServiceProviderRole } from "../../redux-store/actions/registerAction";
+import { useDispatch, useSelector } from "react-redux";
 
 const businessName = [
   { id: "1", label: "ADV Solutions" },
@@ -59,8 +61,18 @@ const BusinessDetail = (props) => {
   const [selectedCategory, setSelectedCategory] = useState();
   const [selectedExperience, setSelectedExperience] = useState();
   const [description, setDescription] = useState();
+  const dispatch = useDispatch();
+  const { serviceProviderRoleData } = useSelector(({ register }) => register);
+  const [serviceProviderRole, setServiceProviderRole] = useState();
 
   useEffect(() => {
+    if (serviceProviderRoleData.length) {
+      setServiceProviderRole(serviceProviderRoleData);
+    }
+  }, [serviceProviderRoleData]);
+
+  useEffect(() => {
+    dispatch(getServiceProviderRole());
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -88,37 +100,50 @@ const BusinessDetail = (props) => {
   };
 
   const onSubmit = async () => {
-    if (!businessValue) {
-      showToast("error", "Please enter Business name or person name");
-    } else if (!selectedServiceProvider) {
-      showToast("error", "Please select service provider role");
-    } else if (!selectedCategory) {
-      showToast("error", "Please select category of services");
-    } else if (!description) {
-      showToast("error", "Please enter description");
-    } else {
-      try {
-        const userId = await decryptService("userId");
-        const postData = {
-          userid: userId,
-          name: businessValue,
-          role: selectedServiceProvider[0],
-          category: selectedCategory[0],
-          experience: JSON.stringify(
-            parseInt(selectedExperience[0].replace("Years", ""), 10)
-          ),
-          description: description,
-        };
-        const res = await saveBusinessDetails(postData);
-        if (res?.data?.status_code == 200) {
-          props.navigation.navigate("contactDetails");
-        } else {
-          showToast("error", res?.data?.message);
-        }
-      } catch (error) {
-        showToast("error", "Something went wrong!!!");
-      }
-    }
+    props.navigation.navigate("contactDetails");
+    // if (!businessValue) {
+    //   showToast("error", "Please enter Business name or person name");
+    // } else if (!selectedServiceProvider) {
+    //   showToast("error", "Please select service provider role");
+    // } else if (!description) {
+    //   showToast("error", "Please enter description");
+    // } else {
+    //   try {
+    //     const userId = await decryptService("userId");
+    //     const postData = {
+    //       userid: userId,
+    //       name: businessValue,
+    //       experience: JSON.stringify(
+    //         parseInt(selectedExperience[0].replace("Years", ""), 10)
+    //       ),
+    //       description: description,
+    //       services: [
+    //         {
+    //           code: "101",
+    //           subservices: [
+    //             {
+    //               subcode: "1",
+    //             },
+    //             {
+    //               subcode: "3",
+    //             },
+    //           ],
+    //         },
+    //         {
+    //           code: "111",
+    //         },
+    //       ],
+    //     };
+    //     const res = await saveBusinessDetails(postData);
+    //     if (res?.data?.status_code == 200) {
+    //       props.navigation.navigate("contactDetails");
+    //     } else {
+    //       showToast("error", res?.data?.message);
+    //     }
+    //   } catch (error) {
+    //     showToast("error", "Something went wrong!!!");
+    //   }
+    // }
   };
 
   return (
@@ -163,14 +188,14 @@ const BusinessDetail = (props) => {
           <View style={{ paddingTop: moderateScale(16) }}>
             <ModalDropdown
               placeholder="Service provider Role*"
-              data={serviceProviderData}
+              data={serviceProviderRole}
               title={"Select service role"}
               setSelectedValue={setServiceProviderValue}
               selectedValue={selectedServiceProvider}
               multiSelect={true}
             />
           </View>
-          <View style={{ paddingTop: moderateScale(16) }}>
+          {/* <View style={{ paddingTop: moderateScale(16) }}>
             <ModalDropdown
               placeholder="Category of Services*"
               data={categoryData}
@@ -179,7 +204,7 @@ const BusinessDetail = (props) => {
               selectedValue={selectedCategory}
               multiSelect={true}
             />
-          </View>
+          </View> */}
           <View style={{ paddingTop: moderateScale(16) }}>
             <ModalDropdown
               placeholder="Years of Experience"

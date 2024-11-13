@@ -24,6 +24,7 @@ import Trainer from "../../assets/svg/trainer.svg";
 import Walker from "../../assets/svg/walker.svg";
 import Behaviourist from "../../assets/svg/behaviour.svg";
 import Groomer from "../../assets/svg/groomer.svg";
+const { width: screenWidth } = Dimensions.get('window');
 
 const appointmentData = [
   {
@@ -166,7 +167,6 @@ const ParentHome = (props) => {
               alignItems: "center",
               justifyContent: "center",
               paddingVertical: moderateScale(15),
-              marginHorizontal: moderateScale(10),
               borderRadius: 12,
               borderBottomLeftRadius: 0,
               backgroundColor: "#fff",
@@ -193,7 +193,7 @@ const ParentHome = (props) => {
               alignItems: "center",
               justifyContent: "center",
               paddingVertical: moderateScale(22),
-              marginHorizontal: moderateScale(10),
+          
               paddingHorizontal: moderateScale(20),
               borderRadius: 12,
               borderBottomLeftRadius: 0,
@@ -419,8 +419,8 @@ const ParentHome = (props) => {
         <Carousel
           data={appointmentData}
           renderItem={renderItem}
-          sliderWidth={380}
-          itemWidth={380}
+          sliderWidth={screenWidth}
+          itemWidth={screenWidth * 0.9}
           onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
         />
         {paginationDots()}

@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 20,
+    marginVertical: moderateScale(20),
     marginHorizontal:moderateScale(20)
   },
   stepLabel: {
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
 
     // justifyContent: "space-between",
     alignItems: "center",
-    width: "70%",
+    width: "75%",
   },
   step: {
     height: 6,

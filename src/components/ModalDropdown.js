@@ -18,6 +18,7 @@ const ModalDropdown = (props) => {
   const {
     data,
     setSelectedValue,
+    setSelectedId,
     selectedValue,
     title,
     placeholder,
@@ -25,19 +26,23 @@ const ModalDropdown = (props) => {
   } = props;
   const [modalVisible, setModalVisible] = useState(false);
 
-  const toggleRoleSelection = (role) => {
+  const toggleRoleSelection = (role, id) => {
+
     if (multiSelect) {
       if (selectedValue?.includes(role)) {
         setSelectedValue(selectedValue?.filter((item) => item !== role)); // Remove if already selected
       } else {
         if (selectedValue) {
           setSelectedValue([...selectedValue, role]); // Add if not selected
+          setSelectedId(id)
         } else {
           setSelectedValue([role]); // Add if not selected
+          setSelectedId(id)
         }
       }
     } else {
       setSelectedValue([role]);
+      setSelectedId(id)
       setModalVisible(false);
     }
 
@@ -51,7 +56,10 @@ const ModalDropdown = (props) => {
         styles.option,
         selectedValue?.includes(item.label) ? styles.selectedOption : null,
       ]}
-      onPress={() => toggleRoleSelection(item.label)}
+      onPress={() => {
+        console.log("item" , item);
+        toggleRoleSelection(item.label, item.id);
+      }}
     >
       <Text numberOfLines={1} style={styles.optionText}>
         {item.label}
@@ -171,9 +179,7 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font12,
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.medium,
-    paddingTop:moderateScale(3)
-
-
+    paddingTop: moderateScale(3),
   },
   modalOverlay: {
     flex: 1,

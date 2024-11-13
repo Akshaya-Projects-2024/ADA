@@ -58,30 +58,34 @@ const MediaLink = (props) => {
   };
 
   const onSubmit = async () => {
-    try {
-      const userId = await decryptService("userId");
-      const postData = {
-        userid: userId,
-        onlinelink: link,
-        instagram: instaLink,
-        facebook: fbLink,
-        website: weblink,
-      };
-      const res = await saveMediaLinks(postData);
-      if (res?.data?.status_code == 200) {
-        showToast("success", "You have been registered successfully!!!");
-        setTimeout(() => {
-          props.navigation.reset({
-            index: 0,
-            routes: [{ name: "home" }],
-          });
-        }, 700);
-      } else {
-        showToast("error", res?.data?.message);
-      }
-    } catch (error) {
-      showToast("error", "Something went wrong!!!");
-    }
+    props.navigation.reset({
+      index: 0,
+      routes: [{ name: "paymentsSubscription" }],
+    });
+    // try {
+    //   const userId = await decryptService("userId");
+    //   const postData = {
+    //     userid: userId,
+    //     onlinelink: link,
+    //     instagram: instaLink,
+    //     facebook: fbLink,
+    //     website: weblink,
+    //   };
+    //   const res = await saveMediaLinks(postData);
+    //   if (res?.data?.status_code == 200) {
+    //     showToast("success", "You have been registered successfully!!!");
+    //     setTimeout(() => {
+    //       props.navigation.reset({
+    //         index: 0,
+    //         routes: [{ name: "home" }],
+    //       });
+    //     }, 700);
+    //   } else {
+    //     showToast("error", res?.data?.message);
+    //   }
+    // } catch (error) {
+    //   showToast("error", "Something went wrong!!!");
+    // }
   };
 
   return (

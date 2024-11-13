@@ -9,4 +9,5 @@ export const urlList = {
   uploadDocument: "register/provider/adddocument",
   deleteDocument: "register/provider/adddocument",
   getProfile: "register/getprofile",
+  getMasterData:'master/getservices'
 };

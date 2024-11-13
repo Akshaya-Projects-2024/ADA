@@ -2,11 +2,15 @@ import {
   SERVICE_PROVIDER_DATA,
   SERVICE_PROVIDER_DATA_SUCCESS,
   SERVICE_PROVIDER_DATA_ERROR,
+  SERVICE_PROVIDER_ROLE,
+  SERVICE_PROVIDER_ROLE_SUCCESS,
+  SERVICE_PROVIDER_ROLE_ERROR,
 } from "../types";
 
 const initialState = {
   registerData: {},
   isFetching: true,
+  serviceProviderRoleData: [],
 };
 
 export const registerReducer = (state = initialState, action) => {
@@ -26,6 +30,22 @@ export const registerReducer = (state = initialState, action) => {
         isFetching: false,
         registerData: [],
       };
+
+    case SERVICE_PROVIDER_ROLE:
+      return { ...state, serviceProviderRoleData: payload };
+    case SERVICE_PROVIDER_ROLE_SUCCESS:
+      return {
+        ...state,
+        serviceProviderRoleData: payload,
+        isFetching: false,
+      };
+    case SERVICE_PROVIDER_ROLE_ERROR:
+      return {
+        ...state,
+        isFetching: false,
+        serviceProviderRoleData: [],
+      };
+
     default:
       return state;
   }

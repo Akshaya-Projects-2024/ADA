@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,30 +7,30 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
-} from 'react-native';
-import {THEMES} from '../../assets/theme/themes';
-import Header from '../../components/Header';
-import Strings from '../../constants/strings';
-import {moderateScale} from 'react-native-size-matters';
-import ArrowRight from '../../assets/svg/arrowRight.svg';
-import Tick from '../../assets/svg/tick.svg';
-import LinearGradient from 'react-native-linear-gradient';
-import Button from '../../components/Button';
-import Modal from 'react-native-modal';
-import SubscriptionSuccess from './subscriptionSuccess';
+} from "react-native";
+import { THEMES } from "../../assets/theme/themes";
+import Header from "../../components/Header";
+import Strings from "../../constants/strings";
+import { moderateScale } from "react-native-size-matters";
+import ArrowRight from "../../assets/svg/arrowRight.svg";
+import Tick from "../../assets/svg/tick.svg";
+import LinearGradient from "react-native-linear-gradient";
+import Button from "../../components/Button";
+import Modal from "react-native-modal";
+import SubscriptionSuccess from "./subscriptionSuccess";
 
 const listItems = [
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit,',
-  'sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-  'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-  'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
-  'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
+  "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+  "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+  "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+  "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
 ];
 
-const PaymentsSubscription = props => {
+const PaymentsSubscription = (props) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [subscriptionModal, setSubscription] = useState(false);
-  const [month, setMonth] = useState('12Month');
+  const [month, setMonth] = useState("12Month");
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -47,14 +47,16 @@ const PaymentsSubscription = props => {
       />
       <View style={styles.mainContent}>
         <ScrollView
-          style={{flex: 1}}
+          style={{ flex: 1 }}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          bounces={false}>
+          bounces={false}
+        >
           <View style={styles.paymentDetailsView}>
             <TouchableOpacity
-              onPress={() => props.navigation.navigate('paymentDetails')}
-              style={styles.paymentDetailsBtn}>
+              onPress={() => props.navigation.navigate("paymentDetails")}
+              style={styles.paymentDetailsBtn}
+            >
               <Text style={styles.paymentDetailsText}>
                 {Strings.paymentDetails}
               </Text>
@@ -66,14 +68,16 @@ const PaymentsSubscription = props => {
           </View>
           <View style={styles.gradientRow}>
             <LinearGradient
-              colors={['#fd3a77', '#fc699f', '#fd9f9f']}
-              style={styles.gradientView}>
+              colors={["#fd3a77", "#fc699f", "#fd9f9f"]}
+              style={styles.gradientView}
+            >
               <Text
                 onPress={() => {
-                  setMonth('12Month');
+                  setMonth("12Month");
                   setSubscription(true);
                 }}
-                style={styles.discountText}>
+                style={styles.discountText}
+              >
                 20% Off
               </Text>
               <Text style={styles.month}>12</Text>
@@ -83,14 +87,16 @@ const PaymentsSubscription = props => {
               </View>
             </LinearGradient>
             <LinearGradient
-              colors={['#f2e2f4', '#f2e2f4', '#f2e2f4']}
-              style={styles.deSelectGradient}>
+              colors={["#f2e2f4", "#f2e2f4", "#f2e2f4"]}
+              style={styles.deSelectGradient}
+            >
               <Text
                 onPress={() => {
-                  setMonth('6Month');
+                  setMonth("6Month");
                   setSubscription(true);
                 }}
-                style={styles.discount2}>
+                style={styles.discount2}
+              >
                 15% Off
               </Text>
               <Text style={styles.month2}>6</Text>
@@ -107,7 +113,7 @@ const PaymentsSubscription = props => {
               <View key={index} style={styles.listItem}>
                 {/* Bullet Point */}
                 <View style={styles.bullet}>
-                  <Text style={styles.bulletText}>{'\u2022'}</Text>
+                  <Text style={styles.bulletText}>{"\u2022"}</Text>
                 </View>
                 {/* List Text */}
                 <Text style={styles.listText}>{item}</Text>
@@ -116,24 +122,33 @@ const PaymentsSubscription = props => {
           </View>
           <View style={styles.subscriptionView}>
             <Text style={styles.subscriptionText}>
-              {Strings.subscriptionCost}:{' '}
+              {Strings.subscriptionCost}:{" "}
               <Text style={styles.subscriptionCost}>₹ 999 </Text>
             </Text>
           </View>
-          <View style={{paddingTop: moderateScale(7)}}>
+          <View style={{ paddingTop: moderateScale(7) }}>
             <Text onPress={toggleModal} style={styles.viewBreakupText}>
               {Strings.viewBreakup}
             </Text>
           </View>
           <View style={styles.btnView}>
-            <Button title={Strings.payNow} />
+            <Button
+              onPress={() =>
+                props.navigation.reset({
+                  index: 0,
+                  routes: [{ name: "home" }],
+                })
+              }
+              title={Strings.payNow}
+            />
           </View>
         </ScrollView>
         <Modal
           isVisible={isModalVisible}
           onBackdropPress={toggleModal}
           style={styles.modal}
-          swipeDirection="down">
+          swipeDirection="down"
+        >
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>{Strings.viewBreakup}</Text>
             <View style={styles.modalSubscription}>
@@ -151,7 +166,9 @@ const PaymentsSubscription = props => {
                 ₹ XXX
               </Text>
             </View>
-            <View style={[styles.dottedLine, {marginTop: moderateScale(21)}]} />
+            <View
+              style={[styles.dottedLine, { marginTop: moderateScale(21) }]}
+            />
 
             <View style={styles.totalRow}>
               <Text style={styles.totalText}>{Strings.total}:</Text>
@@ -159,7 +176,9 @@ const PaymentsSubscription = props => {
                 ₹ XXX
               </Text>
             </View>
-            <View style={[styles.dottedLine, {marginTop: moderateScale(14)}]} />
+            <View
+              style={[styles.dottedLine, { marginTop: moderateScale(14) }]}
+            />
           </View>
         </Modal>
         {subscriptionModal && (
@@ -193,15 +212,15 @@ const styles = StyleSheet.create({
     paddingVertical: moderateScale(16),
     borderRadius: moderateScale(12),
     shadowColor: THEMES.colors.mercury,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: THEMES.colors.mercury,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   paymentDetailsText: {
     fontFamily: THEMES.fontFamily.bold,
@@ -209,13 +228,13 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font12,
   },
   listItem: {
-    flexDirection: 'row', // Align items in a row
-    alignItems: 'flex-start', // Align bullet and text from top
+    flexDirection: "row", // Align items in a row
+    alignItems: "flex-start", // Align bullet and text from top
     marginBottom: moderateScale(5), // Space between list items
   },
   bullet: {
     width: moderateScale(12), // Fixed width for the bullet point
-    justifyContent: 'center', // Center the bullet vertically
+    justifyContent: "center", // Center the bullet vertically
   },
   bulletText: {
     fontSize: moderateScale(16), // Font size for the bullet
@@ -230,7 +249,7 @@ const styles = StyleSheet.create({
   },
 
   modal: {
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
     margin: 0,
   },
   modalContent: {
@@ -242,39 +261,39 @@ const styles = StyleSheet.create({
     paddingBottom: moderateScale(100),
   },
   dottedLine: {
-    width: '100%', // Adjust the width as needed
+    width: "100%", // Adjust the width as needed
     height: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderBottomWidth: 1,
     borderBottomColor: THEMES.colors.black, // Change the color as needed
-    borderStyle: Platform.OS == 'android' ? 'dotted' : '',
-    borderBottomWidth: Platform.OS == 'android' ? 1 : 0.3,
+    borderStyle: Platform.OS == "android" ? "dotted" : "",
+    borderBottomWidth: Platform.OS == "android" ? 1 : 0.3,
     borderBottomColor: THEMES.colors.darkGrey,
   },
   joinTheFunText: {
     fontFamily: THEMES.fontFamily.bold,
     color: THEMES.colors.black,
     fontSize: THEMES.fonts.font14,
-    textAlign: 'center',
+    textAlign: "center",
   },
   gradientRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginHorizontal: moderateScale(20),
     marginTop: moderateScale(27),
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   gradientView: {
     borderRadius: moderateScale(9),
     shadowColor: THEMES.colors.black,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: 'transparent',
-    alignItems: 'center',
+    borderColor: "transparent",
+    alignItems: "center",
   },
   discountText: {
     paddingTop: moderateScale(13),
@@ -300,14 +319,14 @@ const styles = StyleSheet.create({
   deSelectGradient: {
     borderRadius: moderateScale(9),
     shadowColor: THEMES.colors.black,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: THEMES.colors.purple,
-    alignItems: 'center',
+    alignItems: "center",
   },
   discount2: {
     paddingTop: moderateScale(13),
@@ -336,30 +355,30 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.bold,
   },
   descriptionView: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingTop: moderateScale(7),
   },
   subscriptionView: {
     paddingTop: moderateScale(11),
   },
   subscriptionText: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.regular,
   },
   subscriptionCost: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.bold,
   },
   viewBreakupText: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: THEMES.fonts.font10,
     color: THEMES.colors.cyan,
     fontFamily: THEMES.fontFamily.medium,
-    textDecorationLine: 'underline',
+    textDecorationLine: "underline",
   },
   btnView: {
     paddingVertical: moderateScale(25),
@@ -371,61 +390,61 @@ const styles = StyleSheet.create({
     color: THEMES.colors.black,
   },
   modalSubscription: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingTop: moderateScale(44),
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   modalSubscriptionCost: {
     fontFamily: THEMES.fontFamily.regular,
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
-    width: '45%',
+    width: "45%",
   },
   subscriptionPrice: {
     fontFamily: THEMES.fontFamily.regular,
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
-    width: '45%',
-    textAlign: 'right',
+    width: "45%",
+    textAlign: "right",
   },
   TaxView: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingTop: moderateScale(10),
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   TaxText: {
     fontFamily: THEMES.fontFamily.regular,
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
-    width: '45%',
+    width: "45%",
   },
   TaxPrice: {
     fontFamily: THEMES.fontFamily.regular,
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
-    width: '45%',
-    textAlign: 'right',
+    width: "45%",
+    textAlign: "right",
   },
   totalRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingTop: moderateScale(14),
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   totalText: {
     fontFamily: THEMES.fontFamily.bold,
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
-    width: '45%',
+    width: "45%",
   },
   totalPrice: {
     fontFamily: THEMES.fontFamily.bold,
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
-    width: '45%',
-    textAlign: 'right',
+    width: "45%",
+    textAlign: "right",
   },
 });
 

@@ -56,33 +56,34 @@ const ContactDetails = (props) => {
   };
 
   const onSubmit = async () => {
-    if (!mobileNo) {
-      showToast("error", "Please enter mobile number");
-    } else if (!emailId) {
-      showToast("error", "Please enter email Id");
-    } else if (!address) {
-      showToast("error", "Please enter address");
-    } else {
-      try {
-        const userId = await decryptService("userId");
-        const postData = {
-          userid: userId,
-          mobile: mobileNo,
-          email: emailId,
-          address: address,
-          location: location,
-          pin: postalCode,
-        };
-        const res = await saveContactDetails(postData);
-        if (res?.data?.status_code == 200) {
-          props.navigation.navigate("uploadImagesDocs");
-        } else {
-          showToast("error", res?.data?.message);
-        }
-      } catch (error) {
-        showToast("error", "Something went wrong!!!");
-      }
-    }
+    props.navigation.navigate("uploadImagesDocs");
+    // if (!mobileNo) {
+    //   showToast("error", "Please enter mobile number");
+    // } else if (!emailId) {
+    //   showToast("error", "Please enter email Id");
+    // } else if (!address) {
+    //   showToast("error", "Please enter address");
+    // } else {
+    //   try {
+    //     const userId = await decryptService("userId");
+    //     const postData = {
+    //       userid: userId,
+    //       mobile: mobileNo,
+    //       email: emailId,
+    //       address: address,
+    //       location: location,
+    //       pin: postalCode,
+    //     };
+    //     const res = await saveContactDetails(postData);
+    //     if (res?.data?.status_code == 200) {
+    //       props.navigation.navigate("uploadImagesDocs");
+    //     } else {
+    //       showToast("error", res?.data?.message);
+    //     }
+    //   } catch (error) {
+    //     showToast("error", "Something went wrong!!!");
+    //   }
+    // }
   };
 
   return (
