@@ -17,6 +17,10 @@ import UploadImageModal from "../../components/UploadImageModal";
 import Strings from "../../constants/strings";
 import Button from "../../components/Button";
 import Stepper from "../../components/Stepper";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { decryptService } from "../../utils/storageFunc";
+import { uploadDocument } from "../../redux-store/actions/auth";
+import Toast from "react-native-toast-message";
 
 const UploadImagesDocs = (props) => {
   const route = props?.route?.params?.route;
@@ -35,16 +39,35 @@ const UploadImagesDocs = (props) => {
     }
   };
 
-  const handleBusinessImg = (image) => {
+  const handleBusinessImg = async(image) => {
     var temp = [...businessImg];
     temp.push(image);
     setBusinessImg(temp);
+    const extension = image?.uri?.split(".").pop();
+    const userId = await decryptService("userId");
+    let payload = {
+      userid: userId,
+      documenttype: "businessImg",
+      extention: extension,
+      document: image?.fileData,
+    };
+    apiCall(payload);
   };
 
-  const handleDocumentImg = (image) => {
+  const handleDocumentImg = async(image) => {
     var data = [...documentImg];
     data.push(image);
     setDocumentImg(data);
+    const extension = image?.fileName?.split(".").pop();
+    const userId = await decryptService("userId");
+    let payload = {
+      userid: userId,
+      documenttype: "documentImg",
+      extention: extension,
+      document: image,
+    };
+    console.log("payload",payload)
+    apiCall(payload);
   };
 
   const renderItem = (item, index) => {
@@ -56,6 +79,7 @@ const UploadImagesDocs = (props) => {
           resizeMode="contain"
           source={getBase64Obj(photo)}
         />
+
         <TouchableOpacity
           onPress={() => {
             const removeItemById = businessImg.filter(
@@ -72,19 +96,24 @@ const UploadImagesDocs = (props) => {
   };
 
   const renderDocumentItem = (item, index) => {
-    const photo = item?.item.fileData;
+    const file = item?.item.fileName;
     return (
       <View style={styles.imgContent}>
-        <Image
-          style={styles.img}
-          resizeMode="contain"
-          source={getBase64Obj(photo)}
-        />
+        <View
+          style={[
+            styles.img,
+            { alignItems: "center", justifyContent: "center" },
+          ]}
+        >
+          <FontAwesome name="file-text" size={30} color={THEMES.colors.cyan} />
+        </View>
+
         <TouchableOpacity
           onPress={() => {
-            const removeItemById = businessImg.filter(
-              (item) => item?.fileData !== photo
+            const removeItemById = documentImg.filter(
+              (item) => item?.fileName !== file
             );
+            console.log("Re111", removeItemById, item);
             setDocumentImg(removeItemById);
           }}
           style={styles.crossView}
@@ -93,6 +122,37 @@ const UploadImagesDocs = (props) => {
         </TouchableOpacity>
       </View>
     );
+  };
+
+  const handleLogo = async (image) => {
+    setPhoto(image);
+    const extension = image?.uri?.split(".").pop();
+    const userId = await decryptService("userId");
+    let payload = {
+      userid: userId,
+      documenttype: "companylogo",
+      extention: extension,
+      document: image?.fileData,
+    };
+    apiCall(payload);
+  };
+
+  const showToast = (type, message) => {
+    Toast.show({
+      type: type,
+      text1: message,
+    });
+  };
+
+  const apiCall = async (postData) => {
+    try {
+      const res = await uploadDocument(postData);
+      if (res?.status == 200) {
+        showToast("success", "Successfully uploaded the image");
+      }
+    } catch (error) {
+      showToast("error", error);
+    }
   };
 
   return (
@@ -265,7 +325,7 @@ const UploadImagesDocs = (props) => {
           <UploadImageModal
             isVisible={visible}
             onClose={() => setVisible(false)}
-            handleSelectedImage={(image) => setPhoto(image)}
+            handleSelectedImage={(image) => handleLogo(image)}
           />
 
           <UploadImageModal
@@ -274,6 +334,7 @@ const UploadImagesDocs = (props) => {
             handleSelectedImage={(image) => handleBusinessImg(image)}
           />
           <UploadImageModal
+            hasDocument
             isVisible={documentVisible}
             onClose={() => setDocumentVisible(false)}
             handleSelectedImage={(image) => handleDocumentImg(image)}

@@ -55,6 +55,7 @@ export const getProfile = async (obj) => {
   }
 };
 
+
 export const saveBusinessDetails = async (obj) => {
   try {
     const res = await Api.POST(urlList.businessDetail, obj);
@@ -162,3 +163,41 @@ export const refreshToken = async (params) => {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
+
+
+export const uploadDocument = async (params) => {
+  try {
+    const res = await Api.POST(urlList.uploadDocument, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("refreshToken Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const deleteDocument = async (params) => {
+  try {
+    const res = await Api.POST(urlList.uploadDocument, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("refreshToken Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+

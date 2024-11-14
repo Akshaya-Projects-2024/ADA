@@ -100,37 +100,38 @@ const BusinessDetail = (props) => {
   };
 
   const onSubmit = async () => {
-    // if (!businessValue) {
-    //   showToast("error", "Please enter Business name or person name");
-    // } else if (!selectedServiceProvider) {
-    //   showToast("error", "Please select service provider role");
-    // } else if (!selectedCategory) {
-    //   showToast("error", "Please select category of services");
-    // } else if (!description) {
-    //   showToast("error", "Please enter description");
-    // } else {
-    //   try {
-    //     const userId = await decryptService("userId");
-    //     const postData = {
-    //       userid: userId,
-    //       name: businessValue,
-    //       role: selectedServiceProvider[0],
-    //       category: selectedCategory[0],
-    //       experience: JSON.stringify(
-    //         parseInt(selectedExperience[0].replace("Years", ""), 10)
-    //       ),
-    //       description: description,
-    //     };
-    //     const res = await saveBusinessDetails(postData);
-    //     if (res?.data?.status_code == 200) {
-    props.navigation.navigate("contactDetails");
-    //   } else {
-    //     showToast("error", res?.data?.message);
-    //   }
-    // } catch (error) {
-    //   showToast("error", "Something went wrong!!!");
-    // }
-    // }
+    if (!businessValue) {
+      showToast("error", "Please enter Business name or person name");
+    } else if (!selectedServiceProvider) {
+      showToast("error", "Please select service provider role");
+    } else if (!description) {
+      showToast("error", "Please enter description");
+    } else {
+      try {
+        const userId = await decryptService("userId");
+        const formattedYear = selectedExperience[0].label;
+        const formattedServices = selectedServiceProvider.map((service) => ({
+          code: service.id,
+        }));
+        const postData = {
+          userid: userId,
+          name: businessValue,
+          experience: JSON.stringify(
+            parseInt(formattedYear.replace("Years", ""), 10)
+          ),
+          description: description,
+          services: formattedServices,
+        };
+        const res = await saveBusinessDetails(postData);
+        if (res?.data?.status_code == 200) {
+          props.navigation.navigate("contactDetails");
+        } else {
+          showToast("error", res?.data?.message);
+        }
+      } catch (error) {
+        showToast("error", "Something went wrong!!!");
+      }
+    }
   };
 
   return (
@@ -182,16 +183,7 @@ const BusinessDetail = (props) => {
               multiSelect={true}
             />
           </View>
-          {/* <View style={{ paddingTop: moderateScale(16) }}>
-            <ModalDropdown
-              placeholder="Category of Services*"
-              data={categoryData}
-              title={"Select category"}
-              setSelectedValue={setSelectedCategory}
-              selectedValue={selectedCategory}
-              multiSelect={true}
-            />
-          </View> */}
+
           <View style={{ paddingTop: moderateScale(16) }}>
             <ModalDropdown
               placeholder="Years of Experience"

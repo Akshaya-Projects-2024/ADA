@@ -18,7 +18,6 @@ const ModalDropdown = (props) => {
   const {
     data,
     setSelectedValue,
-    setSelectedId,
     selectedValue,
     title,
     placeholder,
@@ -32,28 +31,27 @@ const ModalDropdown = (props) => {
         setSelectedValue(selectedValue?.filter((item) => item !== role)); // Remove if already selected
       } else {
         if (selectedValue) {
-          setSelectedValue([...selectedValue, role]); // Add if not selected
+          setSelectedValue([...selectedValue, { id: id, label: role }]); // Add if not selected  setSelectedValue([...selectedValue, { id: id, label: role }]);
           setSelectedId(id);
         } else {
-          setSelectedValue([role]); // Add if not selected
+          setSelectedValue([{ id: id, label: role }]); // Add if not selected
           setSelectedId(id);
         }
       }
     } else {
-      setSelectedValue([role]);
+      setSelectedValue([{ id: id, label: role }]);
       setSelectedId(id);
       setModalVisible(false);
     }
-
-    // setSelectedValue(role);
-    // setModalVisible(false);
   };
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={[
         styles.option,
-        selectedValue?.includes(item.label) ? styles.selectedOption : null,
+        selectedValue?.some((selected) => selected.id === item.id)
+          ? styles.selectedOption
+          : null,
       ]}
       onPress={() => {
         toggleRoleSelection(item.label, item.id);
@@ -62,7 +60,7 @@ const ModalDropdown = (props) => {
       <Text numberOfLines={1} style={styles.optionText}>
         {item.label}
       </Text>
-      {selectedValue?.includes(item.label) && (
+      {selectedValue?.some((selected) => selected.id === item.id) && (
         <Feather size={20} name="checkcircle" color={THEMES.colors.green} />
       )}
     </TouchableOpacity>
@@ -99,8 +97,11 @@ const ModalDropdown = (props) => {
           >
             {placeholder}
           </Text>
+          {console.log("title", selectedValue)}
           <Text numberOfLines={1} style={styles.dropdownButtonText}>
-            {selectedValue?.length > 0 ? selectedValue?.join(", ") : title}
+            {selectedValue?.length > 0
+              ? selectedValue.map((item) => item.label).join(", ")
+              : title}
           </Text>
         </View>
         <ArrowDown width={25} height={25} />
