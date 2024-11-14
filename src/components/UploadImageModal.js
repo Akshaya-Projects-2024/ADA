@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Alert,
   PermissionsAndroid,
@@ -6,9 +6,9 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
-import ImagePicker from 'react-native-image-crop-picker';
-import Modal from 'react-native-modal';
+} from "react-native";
+import ImagePicker from "react-native-image-crop-picker";
+import Modal from "react-native-modal";
 import {
   check,
   checkMultiple,
@@ -16,15 +16,17 @@ import {
   PERMISSIONS,
   requestMultiple,
   RESULTS,
-} from 'react-native-permissions';
-import {moderateScale} from 'react-native-size-matters';
-import ClipboardPaste from '../assets/svg/clipboardPaste.svg';
-import {THEMES} from '../assets/theme/themes';
-import Feather from 'react-native-vector-icons/Feather'
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+} from "react-native-permissions";
+import { moderateScale } from "react-native-size-matters";
+import ClipboardPaste from "../assets/svg/clipboardPaste.svg";
+import { THEMES } from "../assets/theme/themes";
+import Feather from "react-native-vector-icons/Feather";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import DocumentPicker from "react-native-document-picker";
 
-const UploadImageModal = props => {
-  const {isVisible, onClose, handleSelectedImage, mediaType} = props;
+const UploadImageModal = (props) => {
+  const { isVisible, onClose, handleSelectedImage, mediaType, hasDocument } =
+    props;
   const options = {
     width: 1000,
     height: 1000,
@@ -32,7 +34,7 @@ const UploadImageModal = props => {
     includeBase64: true,
     useFrontCamera: false,
     freeStyleCropEnabled: true,
-    mediaType:'photo',
+    mediaType: "photo",
     showCropGuidelines: false,
     showCropFrame: false,
     compressImageMaxWidth: 500,
@@ -44,7 +46,7 @@ const UploadImageModal = props => {
       ios: PERMISSIONS.IOS.CAMERA,
       android: PERMISSIONS.ANDROID.CAMERA,
     });
-    checkMultiple([permissionGrant]).then(status => {
+    checkMultiple([permissionGrant]).then((status) => {
       if (
         status[permissionGrant] == RESULTS.UNAVAILABLE ||
         status[permissionGrant] == RESULTS.DENIED
@@ -53,34 +55,34 @@ const UploadImageModal = props => {
           selectFromCamera();
         });
       } else if (status[permissionGrant] == RESULTS.BLOCKED) {
-        if (Platform.OS == 'ios') {
+        if (Platform.OS == "ios") {
           Alert.alert(
-            '',
-            'Allow camera and gallery permission',
+            "",
+            "Allow camera and gallery permission",
             [
               {
                 text: "Don't Allow",
               },
-              {text: 'Allow', style: 'cancel', onPress: () => openSettings()},
+              { text: "Allow", style: "cancel", onPress: () => openSettings() },
             ],
-            {cancelable: false},
+            { cancelable: false }
           );
         } else {
           Alert.alert(
             //   "StoriBoard",
-            '',
-            'Allow camera and gallery permission',
+            "",
+            "Allow camera and gallery permission",
             [
               {
                 text: "Don't Allow",
               },
               {
-                text: 'Allow',
-                style: 'cancel',
+                text: "Allow",
+                style: "cancel",
                 onPress: () => openSettings(),
               },
             ],
-            {cancelable: false},
+            { cancelable: false }
           );
         }
         return false;
@@ -90,12 +92,33 @@ const UploadImageModal = props => {
     });
   };
 
+  const selectDocument = async () => {
+    try {
+      const res = await DocumentPicker.pick({
+        type: [DocumentPicker.types.pdf, DocumentPicker.types.docx],
+      });
+      const obj = {
+        uri: res[0].uri,
+        type: res[0].type,
+        fileName: res[0].name,
+      };
+      onClose();
+      handleSelectedImage(obj);
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        Alert.alert("Canceled");
+      } else {
+        console.error(err);
+      }
+    }
+  };
+
   const checkGalleryPermission = async () => {
     const permissionGallery = Platform.select({
       ios: PERMISSIONS.IOS.PHOTO_LIBRARY,
       android: PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
     });
-    checkMultiple([permissionGallery]).then(status => {
+    checkMultiple([permissionGallery]).then((status) => {
       if (
         status[permissionGallery] == RESULTS.UNAVAILABLE ||
         status[permissionGallery] == RESULTS.DENIED
@@ -104,34 +127,34 @@ const UploadImageModal = props => {
           selectFromGallery();
         });
       } else if (status[permissionGallery] == RESULTS.BLOCKED) {
-        if (Platform.OS == 'ios') {
+        if (Platform.OS == "ios") {
           Alert.alert(
-            '',
-            'Allow camera and gallery permission',
+            "",
+            "Allow camera and gallery permission",
             [
               {
                 text: "Don't Allow",
               },
-              {text: 'Allow', style: 'cancel', onPress: () => openSettings()},
+              { text: "Allow", style: "cancel", onPress: () => openSettings() },
             ],
-            {cancelable: false},
+            { cancelable: false }
           );
         } else {
           Alert.alert(
             //   "StoriBoard",
-            '',
-            'Allow camera and gallery permission',
+            "",
+            "Allow camera and gallery permission",
             [
               {
                 text: "Don't Allow",
               },
               {
-                text: 'Allow',
-                style: 'cancel',
+                text: "Allow",
+                style: "cancel",
                 onPress: () => openSettings(),
               },
             ],
-            {cancelable: false},
+            { cancelable: false }
           );
         }
         return false;
@@ -151,12 +174,12 @@ const UploadImageModal = props => {
 
   const selectImageFromCamera = async () => {
     try {
-      ImagePicker.openCamera(options).then(response => {
-        const {path, mime, data} = response;
+      ImagePicker.openCamera(options).then((response) => {
+        const { path, mime, data } = response;
         const obj = {
           uri: path,
           fileData: data,
-          fileName: 'image.png',
+          fileName: "image.png",
           type: mime,
         };
         onClose();
@@ -166,12 +189,12 @@ const UploadImageModal = props => {
   };
 
   const selectImageFromGallery = async () => {
-    ImagePicker.openPicker(options).then(response => {
-      const {path, mime, data} = response;
+    ImagePicker.openPicker(options).then((response) => {
+      const { path, mime, data } = response;
       const obj = {
         uri: path,
         fileData: data,
-        fileName: 'image.png',
+        fileName: "image.png",
         type: mime,
       };
       onClose();
@@ -184,45 +207,50 @@ const UploadImageModal = props => {
       isVisible={isVisible}
       backdropOpacity={0.5}
       onBackdropPress={() => onClose(false)}
-      style={{margin: 0, flex: 1, justifyContent: 'flex-end'}}>
+      style={{ margin: 0, flex: 1, justifyContent: "flex-end" }}
+    >
       <View
         style={{
           elevation: 5,
           borderTopWidth: 1,
-          borderTopColor: 'transparent',
-          width: '100%',
+          borderTopColor: "transparent",
+          width: "100%",
           margin: 0,
           borderTopLeftRadius: 12,
-          backgroundColor: '#fff',
-          shadowColor: '#000',
-          justifyContent: 'flex-end',
-        }}>
+          backgroundColor: "#fff",
+          shadowColor: "#000",
+          justifyContent: "flex-end",
+        }}
+      >
         <Text
           style={{
             paddingTop: moderateScale(30),
             fontSize: moderateScale(12),
-            textAlign: 'center',
+            textAlign: "center",
             fontFamily: THEMES.fontFamily.medium,
             color: THEMES.colors.black,
-          }}>
-          Please upload photo
+          }}
+        >
+          {hasDocument ? "Please upload document" : "Please upload photo"}
         </Text>
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
+            flexDirection: "row",
+            alignItems: "center",
             paddingVertical: moderateScale(40),
-          }}>
+          }}
+        >
           <TouchableOpacity
             style={{
-              width: '50%',
-              alignItems: 'center',
+              width: "50%",
+              alignItems: "center",
               borderRightWidth: 0.3,
-              justifyContent: 'center',
-              borderRightColor: '#C7C7C7',
+              justifyContent: "center",
+              borderRightColor: "#C7C7C7",
             }}
-            onPress={() => checkCameraPermission()}>
-            <Feather name="camera" size={25} color={"#000"}/>
+            onPress={() => checkCameraPermission()}
+          >
+            <Feather name="camera" size={25} color={"#000"} />
             <Text
               style={{
                 padding: 0,
@@ -230,20 +258,22 @@ const UploadImageModal = props => {
                 color: THEMES.colors.black,
                 fontSize: moderateScale(12),
                 paddingTop: moderateScale(10),
-              }}>
+              }}
+            >
               Open Camera
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={{
-              width: '50%',
-              alignItems: 'center',
+              width: "50%",
+              alignItems: "center",
               borderRightWidth: 0.3,
-              justifyContent: 'center',
-              borderRightColor: '#C7C7C7',
+              justifyContent: "center",
+              borderRightColor: "#C7C7C7",
             }}
-            onPress={() => checkGalleryPermission()}>
-               <MaterialIcons name="photo" size={25} color={"#000"}/>
+            onPress={() => hasDocument ? selectDocument() : checkGalleryPermission()}
+          >
+            <MaterialIcons name="photo" size={25} color={"#000"} />
             <Text
               style={{
                 padding: 0,
@@ -251,7 +281,9 @@ const UploadImageModal = props => {
                 color: THEMES.colors.black,
                 fontSize: moderateScale(12),
                 paddingTop: moderateScale(10),
-              }}>
+              }}
+            >
+            
               Open Gallery
             </Text>
           </TouchableOpacity>

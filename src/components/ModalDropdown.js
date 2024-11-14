@@ -18,7 +18,6 @@ const ModalDropdown = (props) => {
   const {
     data,
     setSelectedValue,
-    setSelectedId,
     selectedValue,
     title,
     placeholder,
@@ -27,22 +26,19 @@ const ModalDropdown = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const toggleRoleSelection = (role, id) => {
-
     if (multiSelect) {
       if (selectedValue?.includes(role)) {
         setSelectedValue(selectedValue?.filter((item) => item !== role)); // Remove if already selected
       } else {
         if (selectedValue) {
-          setSelectedValue([...selectedValue, role]); // Add if not selected
-          setSelectedId(id)
+          setSelectedValue([...selectedValue, { id: id, label: role }]); // Add if not selected
         } else {
-          setSelectedValue([role]); // Add if not selected
-          setSelectedId(id)
+          console.log("selected", role);
+          setSelectedValue([{ id: id, label: role }]); // Add if not selected
         }
       }
     } else {
-      setSelectedValue([role]);
-      setSelectedId(id)
+      setSelectedValue([{ id: id, label: role }]);
       setModalVisible(false);
     }
 
@@ -54,17 +50,18 @@ const ModalDropdown = (props) => {
     <TouchableOpacity
       style={[
         styles.option,
-        selectedValue?.includes(item.label) ? styles.selectedOption : null,
+        selectedValue?.some((selected) => selected.id === item.id)
+          ? styles.selectedOption
+          : null,
       ]}
       onPress={() => {
-        console.log("item" , item);
         toggleRoleSelection(item.label, item.id);
       }}
     >
       <Text numberOfLines={1} style={styles.optionText}>
         {item.label}
       </Text>
-      {selectedValue?.includes(item.label) && (
+      {selectedValue?.some((selected) => selected.id === item.id) && (
         <Feather size={20} name="checkcircle" color={THEMES.colors.green} />
       )}
     </TouchableOpacity>
@@ -101,8 +98,13 @@ const ModalDropdown = (props) => {
           >
             {placeholder}
           </Text>
+          {
+            console.log("title",selectedValue)
+          }
           <Text numberOfLines={1} style={styles.dropdownButtonText}>
-            {selectedValue?.length > 0 ? selectedValue?.join(", ") : title}
+            {selectedValue?.length > 0
+              ? selectedValue.map((item) => item.label).join(", ")
+              : title}
           </Text>
         </View>
         <ArrowDown width={25} height={25} />
