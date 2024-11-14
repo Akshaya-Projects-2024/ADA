@@ -109,6 +109,42 @@ export const saveMediaLinks = async (obj) => {
   }
 };
 
+export const saveSession = async (obj) => {
+  try {
+    const res = await Api.POST(urlList.addSession, obj);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("saveSession Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const saveSessionDetails = async (obj) => {
+  try {
+    const res = await Api.POST(urlList.addSessionDetails, obj);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("saveSessionDetails Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
 export const refreshToken = async (params) => {
   try {
     const res = await Api.POST(urlList.refreshToken, params);

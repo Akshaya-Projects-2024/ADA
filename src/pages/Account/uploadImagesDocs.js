@@ -27,8 +27,6 @@ const UploadImagesDocs = (props) => {
   const [documentImg, setDocumentImg] = useState([]);
   const [documentVisible, setDocumentVisible] = useState(false);
 
-
-
   const getBase64Obj = (url) => {
     if (url) {
       return {
@@ -102,17 +100,17 @@ const UploadImagesDocs = (props) => {
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={Strings.uploadImagesDoc} showBack bgColor="transparent" />
       {route !== "myprofile" && (
-      <View
-        style={{
-          borderTopWidth: 1,
-          borderTopColor: "#B8B8B8",
-          borderBottomColor: "#B8B8B8",
-          borderBottomWidth: 1,
-          backgroundColor: "#fff",
-        }}
-      >
-        <Stepper currentStep={3} totalSteps={6} />
-      </View>
+        <View
+          style={{
+            borderTopWidth: 1,
+            borderTopColor: "#B8B8B8",
+            borderBottomColor: "#B8B8B8",
+            borderBottomWidth: 1,
+            backgroundColor: "#fff",
+          }}
+        >
+          <Stepper currentStep={3} totalSteps={6} />
+        </View>
       )}
       <View style={{ flex: 1 }}>
         <ScrollView
@@ -121,7 +119,12 @@ const UploadImagesDocs = (props) => {
           showsVerticalScrollIndicator={false}
           style={{ flex: 1 }}
         >
-          <View style={[styles.padding, { paddingTop: moderateScale(route !== "myprofile" ? 18 : 30) }]}>
+          <View
+            style={[
+              styles.padding,
+              { paddingTop: moderateScale(route !== "myprofile" ? 18 : 30) },
+            ]}
+          >
             <View style={styles.businessContainer}>
               <Text style={styles.businessLogoText}>
                 {Strings.businessLogo}
@@ -279,7 +282,7 @@ const UploadImagesDocs = (props) => {
       </View>
       <View style={styles.submitButton}>
         <Button
-           title={route !== "myprofile" ? Strings.next : Strings.submit}
+          title={route !== "myprofile" ? Strings.next : Strings.submit}
           onPress={() => props.navigation.navigate("sessionDetail")}
         />
       </View>

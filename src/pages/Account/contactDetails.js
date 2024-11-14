@@ -56,7 +56,6 @@ const ContactDetails = (props) => {
   };
 
   const onSubmit = async () => {
-    props.navigation.navigate("uploadImagesDocs");
     // if (!mobileNo) {
     //   showToast("error", "Please enter mobile number");
     // } else if (!emailId) {
@@ -76,7 +75,7 @@ const ContactDetails = (props) => {
     //     };
     //     const res = await saveContactDetails(postData);
     //     if (res?.data?.status_code == 200) {
-    //       props.navigation.navigate("uploadImagesDocs");
+    props.navigation.navigate("uploadImagesDocs");
     //     } else {
     //       showToast("error", res?.data?.message);
     //     }

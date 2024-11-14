@@ -100,11 +100,12 @@ const BusinessDetail = (props) => {
   };
 
   const onSubmit = async () => {
-    props.navigation.navigate("contactDetails");
     // if (!businessValue) {
     //   showToast("error", "Please enter Business name or person name");
     // } else if (!selectedServiceProvider) {
     //   showToast("error", "Please select service provider role");
+    // } else if (!selectedCategory) {
+    //   showToast("error", "Please select category of services");
     // } else if (!description) {
     //   showToast("error", "Please enter description");
     // } else {
@@ -113,36 +114,22 @@ const BusinessDetail = (props) => {
     //     const postData = {
     //       userid: userId,
     //       name: businessValue,
+    //       role: selectedServiceProvider[0],
+    //       category: selectedCategory[0],
     //       experience: JSON.stringify(
     //         parseInt(selectedExperience[0].replace("Years", ""), 10)
     //       ),
     //       description: description,
-    //       services: [
-    //         {
-    //           code: "101",
-    //           subservices: [
-    //             {
-    //               subcode: "1",
-    //             },
-    //             {
-    //               subcode: "3",
-    //             },
-    //           ],
-    //         },
-    //         {
-    //           code: "111",
-    //         },
-    //       ],
     //     };
     //     const res = await saveBusinessDetails(postData);
     //     if (res?.data?.status_code == 200) {
-    //       props.navigation.navigate("contactDetails");
-    //     } else {
-    //       showToast("error", res?.data?.message);
-    //     }
-    //   } catch (error) {
-    //     showToast("error", "Something went wrong!!!");
+    props.navigation.navigate("contactDetails");
+    //   } else {
+    //     showToast("error", res?.data?.message);
     //   }
+    // } catch (error) {
+    //   showToast("error", "Something went wrong!!!");
+    // }
     // }
   };
 

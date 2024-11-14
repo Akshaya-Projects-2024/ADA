@@ -27,22 +27,21 @@ const ModalDropdown = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const toggleRoleSelection = (role, id) => {
-
     if (multiSelect) {
       if (selectedValue?.includes(role)) {
         setSelectedValue(selectedValue?.filter((item) => item !== role)); // Remove if already selected
       } else {
         if (selectedValue) {
           setSelectedValue([...selectedValue, role]); // Add if not selected
-          setSelectedId(id)
+          setSelectedId(id);
         } else {
           setSelectedValue([role]); // Add if not selected
-          setSelectedId(id)
+          setSelectedId(id);
         }
       }
     } else {
       setSelectedValue([role]);
-      setSelectedId(id)
+      setSelectedId(id);
       setModalVisible(false);
     }
 
@@ -57,7 +56,6 @@ const ModalDropdown = (props) => {
         selectedValue?.includes(item.label) ? styles.selectedOption : null,
       ]}
       onPress={() => {
-        console.log("item" , item);
         toggleRoleSelection(item.label, item.id);
       }}
     >

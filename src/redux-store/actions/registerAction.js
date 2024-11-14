@@ -27,7 +27,6 @@ export const saveRegisterData = (data) => {
 };
 
 export const getServiceProviderRole = () => {
-  console.log("inside");
   return async (dispatch) => {
     try {
       let data = {
@@ -37,7 +36,6 @@ export const getServiceProviderRole = () => {
       if (res?.status === 200) {
         if (res?.data?.data?.length) {
           let apiData = res.data.data;
-          console.log(apiData)
           const categoryData = apiData.map((item) => ({
             id: item.code,
             label: item.service,

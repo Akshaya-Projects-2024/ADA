@@ -18,16 +18,31 @@ import { moderateScale } from "react-native-size-matters";
 import CheckBox from "react-native-check-box";
 import TimeTracker from "../../components/TimeTracker";
 import Stepper from "../../components/Stepper";
-
+import {
+  saveSession,
+  saveSessionDetails,
+} from "../../redux-store/actions/auth";
+import { decryptService } from "../../utils/storageFunc";
+import { showToast } from "../../utils/utils";
+const SESSION_AVAILABILITY = {
+  home: "Home Visit",
+  center: "At Center Service",
+  online: "Online Consultation",
+};
 const SessionDetail = (props) => {
   const route = props?.route?.params?.route;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [homeVisit, setHomeVisit] = useState(false);
   const [centerService, setCenterService] = useState(false);
   const [onlineConsultation, setOnlineConsultation] = useState(false);
-
   const [perSession, setPerSession] = useState(true);
   const [perMonth, setPerMonth] = useState(false);
+  const [sessionServiceName, setSessionServiceName] = useState("");
+  const [sessionCharges, setSessionCharges] = useState("");
+  const [sessionTime, setSessionTime] = useState("");
+  const [monthServiceName, setMonthServiceName] = useState("");
+  const [monthCharges, setMonthCharges] = useState("");
+  const [monthTime, setMonthTime] = useState("");
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -48,6 +63,66 @@ const SessionDetail = (props) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+
+  const onSubmit = async () => {
+    try {
+      if (!homeVisit && !centerService && !onlineConsultation) {
+        showToast(
+          "error",
+          "Please select at least one option for availability"
+        );
+      } else if (!perSession && !perMonth) {
+        showToast("error", "Please select at least one option for charges");
+      } else if (perSession) {
+        if (!sessionServiceName) {
+        } else if (!sessionCharges) {
+        } else if (!sessionTime) {
+        } else {
+        }
+      } else if (perMonth) {
+        if (!monthServiceName) {
+        } else if (!monthCharges) {
+        } else if (!monthTime) {
+        } else {
+        }
+      } else {
+        // props.navigation.navigate("workingHours");
+        const userId = await decryptService("userId");
+        const sessionData = {
+          userid: userId,
+          availableat: "As service center",
+          ispersession: 1,
+          ispermonth: 1,
+          isfullday: 1,
+          sessiontime: "30",
+          monthtime: "40",
+        };
+        const res = await saveSession(sessionData);
+        // const sessionDetailData = [
+        //   {
+        //     day: "Mon",
+        //     type: "1st half",
+        //     start: "8:30 AM",
+        //     close: "10:30 AM",
+        //   },
+        //   {
+        //     day: "Mon",
+        //     type: "2nd half",
+        //     start: "02:30 PM",
+        //     close: "3:30 PM",
+        //   },
+        // ];
+        // const res2 = await saveSessionDetails(sessionDetailData);
+        // if (res?.data?.status_code == 200) {
+        //   props.navigation.navigate("mediaLink");
+        // } else {
+        //   showToast("error", res?.data?.message);
+        // }
+      }
+    } catch (error) {
+      showToast("error", "Something went wrong!!!");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -95,7 +170,7 @@ const SessionDetail = (props) => {
                 fontSize: THEMES.fonts.font12,
                 fontFamily: THEMES.fontFamily.semiBold,
               }}
-              rightText={"Home Visit"}
+              rightText={SESSION_AVAILABILITY.home}
             />
             <CheckBox
               checkedImage={<Checked />}
@@ -103,7 +178,7 @@ const SessionDetail = (props) => {
               onClick={() => setCenterService(!centerService)}
               isChecked={centerService}
               style={{ flex: 1 }}
-              rightText={"At Center Service"}
+              rightText={SESSION_AVAILABILITY.center}
               rightTextStyle={{
                 color: THEMES.colors.black,
                 fontSize: THEMES.fonts.font12,
@@ -123,7 +198,7 @@ const SessionDetail = (props) => {
                 fontSize: THEMES.fonts.font12,
                 fontFamily: THEMES.fontFamily.semiBold,
               }}
-              rightText={"Online Consultation"}
+              rightText={SESSION_AVAILABILITY.online}
             />
           </View>
           <View style={styles.contentView}>
@@ -168,9 +243,10 @@ const SessionDetail = (props) => {
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
-                  keyboardType="phone-pad"
                   label={"Service Name"}
                   placeholderText={"Enter service name"}
+                  value={sessionServiceName}
+                  onChange={setSessionServiceName}
                 />
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
@@ -178,6 +254,8 @@ const SessionDetail = (props) => {
                   keyboardType="phone-pad"
                   label={Strings.chargesPerSession}
                   placeholderText={Strings.enterPrice}
+                  value={sessionCharges}
+                  onChange={setSessionCharges}
                 />
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
@@ -185,6 +263,8 @@ const SessionDetail = (props) => {
                   keyboardType="phone-pad"
                   label={Strings.perDaySessionInMin}
                   placeholderText={Strings.perDaySession}
+                  value={sessionTime}
+                  onChange={setSessionTime}
                 />
               </View>
             </>
@@ -198,9 +278,10 @@ const SessionDetail = (props) => {
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
-                  keyboardType="phone-pad"
                   label={"Service Name"}
                   placeholderText={"Enter service name"}
+                  value={monthServiceName}
+                  onChange={setMonthServiceName}
                 />
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
@@ -208,6 +289,8 @@ const SessionDetail = (props) => {
                   keyboardType="phone-pad"
                   label={Strings.chargesPerSession}
                   placeholderText={Strings.enterPrice}
+                  value={monthCharges}
+                  onChange={setMonthCharges}
                 />
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
@@ -215,6 +298,8 @@ const SessionDetail = (props) => {
                   keyboardType="phone-pad"
                   label={Strings.perDaySessionInMin}
                   placeholderText={Strings.perDaySession}
+                  value={monthTime}
+                  onChange={setMonthTime}
                 />
               </View>
             </>
@@ -228,7 +313,7 @@ const SessionDetail = (props) => {
           >
             <Button
               title={route !== "myprofile" ? Strings.next : Strings.submit}
-              onPress={() => props.navigation.navigate("workingHours")}
+              onPress={onSubmit}
             />
           </View>
         </ScrollView>
