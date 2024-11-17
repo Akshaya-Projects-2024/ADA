@@ -1,9 +1,8 @@
 import { combineReducers } from "redux";
-import { CommonReducer } from "./reducer";
-import { registerReducer } from "./reducer";
+import { commonReducer, registerReducer } from "./reducer";
 
 const appReducer = combineReducers({
-  commonReducer: CommonReducer,
+  commonReducer: commonReducer,
   register: registerReducer,
 });
 

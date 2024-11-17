@@ -1,33 +1,37 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  Text,
   ScrollView,
   StatusBar,
   StyleSheet,
   Keyboard,
 } from "react-native";
-import InputField from "../../components/InputField";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
-import Checked from "../../assets/svg/checked.svg";
-import UnChecked from "../../assets/svg/unchecked.svg";
 import Strings from "../../constants/strings";
 import Button from "../../components/Button";
 import { moderateScale } from "react-native-size-matters";
-import CheckBox from "react-native-check-box";
-import TimeTracker from "../../components/TimeTracker";
+import TimeTracker, { DAYS, SHIFTS } from "../../components/TimeTracker";
 import Stepper from "../../components/Stepper";
+import { decryptService } from "../../utils/storageFunc";
+import { showToast } from "../../utils/utils";
 
 const WorkingHours = (props) => {
   const route = props?.route?.params?.route;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const [homeVisit, setHomeVisit] = useState(false);
-  const [centerService, setCenterService] = useState(false);
-  const [onlineConsultation, setOnlineConsultation] = useState(false);
-
-  const [perSession, setPerSession] = useState(true);
-  const [perMonth, setPerMonth] = useState(false);
+  const [selectedShiftType, setSelectedShiftType] = useState(SHIFTS.full);
+  const [selectedForAll, setSelectedForAll] = useState(true);
+  const [times, setTimes] = useState(
+    DAYS.map((it) => {
+      return {
+        label: it,
+        shift1: { start: "", end: "" },
+        shift2: { start: "", end: "" },
+        selected: false,
+        enabled: false,
+      };
+    })
+  );
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -48,6 +52,45 @@ const WorkingHours = (props) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+
+  const processTime = () => {
+    const output = [];
+    for (let index = 0; index < times?.length; index++) {
+      const element = times[index];
+      const outputObj = {};
+      outputObj.day = element.label;
+      // outputObj.type=
+    }
+  };
+
+  const onSubmit = async () => {
+    try {
+      const userId = await decryptService("userId");
+      const pramas = {
+        userid: userId,
+        sessionDetails: [
+          {
+            day: "Mon",
+            type: "1st half", //Full Day if you select fullday as working time
+            start: "8:30 AM",
+            close: "10:30 AM",
+            isfullday: 1,
+          },
+          {
+            day: "Mon",
+            type: "2nd half",
+            start: "02:30 PM",
+            close: "3:30 PM",
+            isfullday: 1,
+          },
+        ],
+      };
+      // props.navigation.navigate("mediaLink");
+    } catch (error) {
+      console.log("🚀 ~ onSubmit ~ error:", error);
+      showToast("error", "Something went wrong!!!");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -73,7 +116,14 @@ const WorkingHours = (props) => {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          <TimeTracker />
+          <TimeTracker
+            times={times}
+            setTimes={setTimes}
+            selectedForAll={selectedForAll}
+            setSelectedForAll={setSelectedForAll}
+            selectedShiftType={selectedShiftType}
+            setSelectedShiftType={setSelectedShiftType}
+          />
           <View
             style={{
               paddingBottom: moderateScale(25),
@@ -82,7 +132,7 @@ const WorkingHours = (props) => {
           >
             <Button
               title={route !== "myprofile" ? Strings.next : Strings.submit}
-              onPress={() => props.navigation.navigate("mediaLink")}
+              onPress={onSubmit}
             />
           </View>
         </ScrollView>

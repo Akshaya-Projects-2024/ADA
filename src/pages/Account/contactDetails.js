@@ -15,13 +15,15 @@ import { moderateScale } from "react-native-size-matters";
 import Location from "../../assets/svg/location.svg";
 import Stepper from "../../components/Stepper";
 import { saveContactDetails } from "../../redux-store/actions/auth";
-import Toast from "react-native-toast-message";
 import { decryptService } from "../../utils/storageFunc";
+import { useSelector } from "react-redux";
+import { showToast } from "../../utils/utils";
 
 const ContactDetails = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const route = props?.route?.params?.route;
-
+  const { providerProfile } = useSelector((state) => state?.commonReducer);
+  const { providerContact } = providerProfile;
   const [mobileNo, setMobileNo] = useState();
   const [emailId, setEmailId] = useState();
   const [address, setAddress] = useState();
@@ -29,6 +31,7 @@ const ContactDetails = (props) => {
   const [location, setLocation] = useState();
 
   useEffect(() => {
+    initData();
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -48,11 +51,22 @@ const ContactDetails = (props) => {
     };
   }, []);
 
-  const showToast = (type, message) => {
-    Toast.show({
-      type: type,
-      text1: message,
-    });
+  const initData = () => {
+    if (providerContact?.address) {
+      setAddress(providerContact?.address);
+    }
+    if (providerContact?.email) {
+      setEmailId(providerContact?.email);
+    }
+    if (providerContact?.location) {
+      setLocation(providerContact?.location);
+    }
+    if (providerContact?.mobile) {
+      setMobileNo(providerContact?.mobile);
+    }
+    if (providerContact?.pin) {
+      setPostalCode(providerContact?.pin);
+    }
   };
 
   const onSubmit = async () => {
@@ -62,6 +76,10 @@ const ContactDetails = (props) => {
       showToast("error", "Please enter email Id");
     } else if (!address) {
       showToast("error", "Please enter address");
+    } else if (!location) {
+      showToast("error", "Please enter your location");
+    } else if (!postalCode) {
+      showToast("error", "Please enter your postal code");
     } else {
       try {
         const userId = await decryptService("userId");

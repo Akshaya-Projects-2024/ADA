@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,24 +12,63 @@ import {
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
 import CrossCircle from "../../assets/svg/crossCircle.svg";
-import { moderateScale, s } from "react-native-size-matters";
+import { moderateScale } from "react-native-size-matters";
 import UploadImageModal from "../../components/UploadImageModal";
 import Strings from "../../constants/strings";
 import Button from "../../components/Button";
 import Stepper from "../../components/Stepper";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { decryptService } from "../../utils/storageFunc";
-import { uploadDocument } from "../../redux-store/actions/auth";
-import Toast from "react-native-toast-message";
+import { deleteDocument, uploadDocument } from "../../redux-store/actions/auth";
+import { useSelector } from "react-redux";
+import { showToast } from "../../utils/utils";
+
+const DOCUMENT_TYPES = {
+  image: "businessImg",
+  document: "documentImg",
+  logo: "companylogo",
+};
 
 const UploadImagesDocs = (props) => {
   const route = props?.route?.params?.route;
   const [visible, setVisible] = useState(false);
-  const [photo, setPhoto] = useState();
+  const [photo, setPhoto] = useState(null);
   const [businessImg, setBusinessImg] = useState([]);
   const [businessVisible, setBusinessVisible] = useState(false);
   const [documentImg, setDocumentImg] = useState([]);
   const [documentVisible, setDocumentVisible] = useState(false);
+  const { providerProfile } = useSelector((state) => state?.commonReducer);
+  const { providerDocument } = providerProfile;
+
+  useEffect(() => {
+    initData();
+  }, []);
+
+  const initData = () => {
+    const images = [];
+    const documents = [];
+    let logo;
+    for (let index = 0; index < providerDocument.length; index++) {
+      const element = providerDocument[index];
+      const obj = {
+        id: element?.id,
+      };
+      switch (element?.documenttype) {
+        case DOCUMENT_TYPES.document:
+          documents.push({ ...obj, fileName: element?.url });
+          break;
+        case DOCUMENT_TYPES.image:
+          images.push({ ...obj, fileData: element?.url });
+          break;
+        case DOCUMENT_TYPES.logo:
+          logo = { ...obj, fileData: element?.url };
+          break;
+      }
+    }
+    setPhoto(logo);
+    setDocumentImg(documents);
+    setBusinessImg(images);
+  };
 
   const getBase64Obj = (url) => {
     if (url) {
@@ -39,53 +78,109 @@ const UploadImagesDocs = (props) => {
     }
   };
 
-  const handleBusinessImg = async(image) => {
-    var temp = [...businessImg];
-    temp.push(image);
-    setBusinessImg(temp);
+  const handleBusinessImg = async (image) => {
     const extension = image?.uri?.split(".").pop();
     const userId = await decryptService("userId");
     let payload = {
       userid: userId,
-      documenttype: "businessImg",
+      documenttype: DOCUMENT_TYPES.image,
       extention: extension,
       document: image?.fileData,
     };
-    apiCall(payload);
+    apiCall(payload, DOCUMENT_TYPES.image, image);
   };
 
-  const handleDocumentImg = async(image) => {
-    var data = [...documentImg];
-    data.push(image);
-    setDocumentImg(data);
+  const handleDocumentImg = async (image) => {
     const extension = image?.fileName?.split(".").pop();
     const userId = await decryptService("userId");
     let payload = {
       userid: userId,
-      documenttype: "documentImg",
+      documenttype: DOCUMENT_TYPES.document,
       extention: extension,
-      document: image,
+      document: image?.fileData,
     };
-    console.log("payload",payload)
-    apiCall(payload);
+    apiCall(payload, DOCUMENT_TYPES.document, image);
   };
 
-  const renderItem = (item, index) => {
-    const photo = item?.item.fileData;
+  const handleLogo = async (image) => {
+    const extension = image?.uri?.split(".").pop();
+    const userId = await decryptService("userId");
+    let payload = {
+      userid: userId,
+      documenttype: DOCUMENT_TYPES.logo,
+      extention: extension,
+      document: image?.fileData,
+    };
+    apiCall(payload, DOCUMENT_TYPES.logo, image);
+  };
+
+  const apiCall = async (postData, type, item) => {
+    try {
+      const res = await uploadDocument(postData);
+      if (res?.status == 200) {
+        if (type === DOCUMENT_TYPES.logo) {
+          setPhoto({ ...item, id: res?.data?.data?.reqId });
+        }
+        if (type === DOCUMENT_TYPES.document) {
+          const data = [...documentImg];
+          data.push({ ...item, id: res?.data?.data?.reqId });
+          setDocumentImg(data);
+        }
+        if (type === DOCUMENT_TYPES.image) {
+          const temp = [...businessImg];
+          temp.push({ ...item, id: res?.data?.data?.reqId });
+          setBusinessImg(temp);
+        }
+        showToast("success", "Successfully uploaded the image");
+      }
+    } catch (error) {
+      showToast("error", error.message);
+    }
+  };
+
+  const onCancel = async (type, doc) => {
+    try {
+      const userId = await decryptService("userId");
+      const postData = {
+        userid: userId,
+        id: doc?.id,
+      };
+      const res = await deleteDocument(postData);
+      if (res?.status == 200) {
+        if (type === DOCUMENT_TYPES.logo) {
+          setPhoto(null);
+        }
+        if (type === DOCUMENT_TYPES.document) {
+          const removeItemById = documentImg.filter(
+            (it) => it?.fileName !== doc?.fileName
+          );
+          setDocumentImg(removeItemById);
+        }
+        if (type === DOCUMENT_TYPES.image) {
+          const removeItemById = businessImg.filter(
+            (it) => it?.fileData !== doc?.fileData
+          );
+          setBusinessImg(removeItemById);
+        }
+        showToast("success", "Successfully deleted the image");
+      }
+    } catch (error) {
+      showToast("error", error.message);
+    }
+  };
+
+  const renderItem = (item) => {
+    const photoItem = item?.item.fileData;
     return (
       <View style={styles.imgContent}>
         <Image
           style={styles.img}
           resizeMode="contain"
-          source={getBase64Obj(photo)}
+          source={getBase64Obj(photoItem)}
         />
-
         <TouchableOpacity
           onPress={() => {
-            const removeItemById = businessImg.filter(
-              (item) => item?.fileData !== photo
-            );
-            setBusinessImg(removeItemById);
+            onCancel(DOCUMENT_TYPES.image, item?.item);
           }}
           style={styles.crossView}
         >
@@ -95,8 +190,7 @@ const UploadImagesDocs = (props) => {
     );
   };
 
-  const renderDocumentItem = (item, index) => {
-    const file = item?.item.fileName;
+  const renderDocumentItem = (item) => {
     return (
       <View style={styles.imgContent}>
         <View
@@ -107,14 +201,9 @@ const UploadImagesDocs = (props) => {
         >
           <FontAwesome name="file-text" size={30} color={THEMES.colors.cyan} />
         </View>
-
         <TouchableOpacity
           onPress={() => {
-            const removeItemById = documentImg.filter(
-              (item) => item?.fileName !== file
-            );
-            console.log("Re111", removeItemById, item);
-            setDocumentImg(removeItemById);
+            onCancel(DOCUMENT_TYPES.document, item?.item);
           }}
           style={styles.crossView}
         >
@@ -122,37 +211,6 @@ const UploadImagesDocs = (props) => {
         </TouchableOpacity>
       </View>
     );
-  };
-
-  const handleLogo = async (image) => {
-    setPhoto(image);
-    const extension = image?.uri?.split(".").pop();
-    const userId = await decryptService("userId");
-    let payload = {
-      userid: userId,
-      documenttype: "companylogo",
-      extention: extension,
-      document: image?.fileData,
-    };
-    apiCall(payload);
-  };
-
-  const showToast = (type, message) => {
-    Toast.show({
-      type: type,
-      text1: message,
-    });
-  };
-
-  const apiCall = async (postData) => {
-    try {
-      const res = await uploadDocument(postData);
-      if (res?.status == 200) {
-        showToast("success", "Successfully uploaded the image");
-      }
-    } catch (error) {
-      showToast("error", error);
-    }
   };
 
   return (
@@ -190,7 +248,7 @@ const UploadImagesDocs = (props) => {
                 {Strings.businessLogo}
               </Text>
               <TouchableOpacity
-                disabled={photo && true}
+                disabled={Boolean(photo)}
                 onPress={() => setVisible(true)}
               >
                 <Text
@@ -218,7 +276,7 @@ const UploadImagesDocs = (props) => {
                   />
                   <TouchableOpacity
                     onPress={() => {
-                      setPhoto();
+                      onCancel(DOCUMENT_TYPES.logo, photo);
                     }}
                     style={styles.crossView}
                   >

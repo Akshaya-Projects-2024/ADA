@@ -23,6 +23,7 @@ import { THEMES } from "../assets/theme/themes";
 import Feather from "react-native-vector-icons/Feather";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import DocumentPicker from "react-native-document-picker";
+import { getBase64Data } from "../utils/documentUtils";
 
 const UploadImageModal = (props) => {
   const { isVisible, onClose, handleSelectedImage, mediaType, hasDocument } =
@@ -95,21 +96,26 @@ const UploadImageModal = (props) => {
   const selectDocument = async () => {
     try {
       const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.pdf, DocumentPicker.types.docx],
+        type: [
+          DocumentPicker.types.pdf,
+          DocumentPicker.types.docx,
+          DocumentPicker.types.images,
+        ],
       });
+      const base64 = await getBase64Data(res[0].uri);
       const obj = {
         uri: res[0].uri,
         type: res[0].type,
         fileName: res[0].name,
+        fileData: base64,
       };
       onClose();
       handleSelectedImage(obj);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         Alert.alert("Canceled");
-      } else {
-        console.error(err);
       }
+      console.error(err);
     }
   };
 
@@ -271,7 +277,9 @@ const UploadImageModal = (props) => {
               justifyContent: "center",
               borderRightColor: "#C7C7C7",
             }}
-            onPress={() => hasDocument ? selectDocument() : checkGalleryPermission()}
+            onPress={() =>
+              hasDocument ? selectDocument() : checkGalleryPermission()
+            }
           >
             <MaterialIcons name="photo" size={25} color={"#000"} />
             <Text
@@ -283,7 +291,6 @@ const UploadImageModal = (props) => {
                 paddingTop: moderateScale(10),
               }}
             >
-            
               Open Gallery
             </Text>
           </TouchableOpacity>

@@ -1,3 +1,2 @@
-export * from './commonReducer';
-export * from './registerReducer';
-
+export * from "./commonReducer";
+export * from "./registerReducer";

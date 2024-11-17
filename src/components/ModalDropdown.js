@@ -24,6 +24,7 @@ const ModalDropdown = (props) => {
     multiSelect = false,
   } = props;
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedId, setSelectedId] = useState(false);
 
   const toggleRoleSelection = (role, id) => {
     if (multiSelect) {
@@ -97,7 +98,6 @@ const ModalDropdown = (props) => {
           >
             {placeholder}
           </Text>
-          {console.log("title", selectedValue)}
           <Text numberOfLines={1} style={styles.dropdownButtonText}>
             {selectedValue?.length > 0
               ? selectedValue.map((item) => item.label).join(", ")

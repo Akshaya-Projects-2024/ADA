@@ -91,7 +91,7 @@ const OtpScreen = (props) => {
       );
 
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        console.log("not granted")
+        console.log("not granted");
       }
     } catch (error) {
       console.warn("error", error);
@@ -110,7 +110,7 @@ const OtpScreen = (props) => {
   };
 
   const apiCall = async (otpValue) => {
-    console.log("napiCall")
+    console.log("napiCall");
     try {
       setLoading(true);
       Keyboard.dismiss();

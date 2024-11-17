@@ -6,6 +6,7 @@ import {
   SERVICE_PROVIDER_ROLE,
   SERVICE_PROVIDER_ROLE_SUCCESS,
   SERVICE_PROVIDER_ROLE_ERROR,
+  PROFILE_DATA,
 } from "../types";
 import authApi from "../../auth/authApi";
 import Api from "../../api/Api";
@@ -23,6 +24,15 @@ export const saveRegisterData = (data) => {
         payload: error,
       });
     }
+  };
+};
+
+export const dispatchUserData = (data) => {
+  return (dispatch) => {
+    dispatch({
+      type: PROFILE_DATA,
+      payload: data,
+    });
   };
 };
 

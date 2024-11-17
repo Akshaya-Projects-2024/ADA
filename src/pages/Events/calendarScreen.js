@@ -22,8 +22,6 @@ import Button from "../../components/Button";
 const CalendarScreen = (props) => {
   const { onBack, setEDate, setSDate, sDate, eDate } = props;
 
-  console.log("eee", sDate, eDate)
-
   const [startDate, setStartDate] = useState(null);
 
   const [endDate, setEndDate] = useState(null);
@@ -101,114 +99,117 @@ const CalendarScreen = (props) => {
                 arrowColor="#fff"
               />
             </View>
-            <ScrollView style={{flex:1}} bounces={false}
-          showsVerticalScrollIndicator={false}
-          showsHorizontalScrollIndicator={false}>
-            <View style={styles.contentView}>
-              <View style={styles.timeInputContainer}>
-                <View
-                  style={styles.timeInput}
-                  // onPress={() => setSelectingStartDate(true)}
-                >
-                  {startDate || sDate ? (
-                    <>
-                      <Text
-                        style={[
-                          styles.timeText,
-                          {
-                            color: "#737373",
-                          },
-                        ]}
-                      >
-                        Start Date
-                      </Text>
-                      <Text
-                        style={[
-                          styles.timeText,
-                          {
-                            fontSize: THEMES.fonts.font12,
-                            fontFamily: THEMES.fontFamily.semiBold,
-                            color: THEMES.colors.black,
-                          },
-                        ]}
-                      >
-                        {sDate ? formatDate(sDate) : formatDate(startDate)}
-                      </Text>
-                    </>
-                  ) : (
-                    <Text style={styles.timeTextTitle}>+ Start Date</Text>
-                  )}
+            <ScrollView
+              style={{ flex: 1 }}
+              bounces={false}
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+            >
+              <View style={styles.contentView}>
+                <View style={styles.timeInputContainer}>
+                  <View
+                    style={styles.timeInput}
+                    // onPress={() => setSelectingStartDate(true)}
+                  >
+                    {startDate || sDate ? (
+                      <>
+                        <Text
+                          style={[
+                            styles.timeText,
+                            {
+                              color: "#737373",
+                            },
+                          ]}
+                        >
+                          Start Date
+                        </Text>
+                        <Text
+                          style={[
+                            styles.timeText,
+                            {
+                              fontSize: THEMES.fonts.font12,
+                              fontFamily: THEMES.fontFamily.semiBold,
+                              color: THEMES.colors.black,
+                            },
+                          ]}
+                        >
+                          {sDate ? formatDate(sDate) : formatDate(startDate)}
+                        </Text>
+                      </>
+                    ) : (
+                      <Text style={styles.timeTextTitle}>+ Start Date</Text>
+                    )}
+                  </View>
+                  <View
+                    style={[styles.timeInput]}
+                    // onPress={() => {
+                    //   if (startDate) {
+                    //     setSelectingStartDate(false);
+                    //   }
+                    // }}
+                  >
+                    {endDate || eDate ? (
+                      <>
+                        <Text
+                          style={[
+                            styles.timeText,
+                            {
+                              color: "#737373",
+                            },
+                          ]}
+                        >
+                          End Date
+                        </Text>
+                        <Text
+                          style={[
+                            styles.timeText,
+                            {
+                              fontSize: THEMES.fonts.font12,
+                              fontFamily: THEMES.fontFamily.semiBold,
+                              color: THEMES.colors.black,
+                            },
+                          ]}
+                        >
+                          {eDate ? formatDate(eDate) : formatDate(endDate)}
+                        </Text>
+                      </>
+                    ) : (
+                      <Text style={styles.timeTextTitle}>+ End Date</Text>
+                    )}
+                  </View>
                 </View>
-                <View
-                  style={[styles.timeInput]}
-                  // onPress={() => {
-                  //   if (startDate) {
-                  //     setSelectingStartDate(false);
-                  //   }
-                  // }}
-                >
-                  {endDate || eDate ? (
-                    <>
-                      <Text
-                        style={[
-                          styles.timeText,
-                          {
-                            color: "#737373",
-                          },
-                        ]}
-                      >
-                        End Date
-                      </Text>
-                      <Text
-                        style={[
-                          styles.timeText,
-                          {
-                            fontSize: THEMES.fonts.font12,
-                            fontFamily: THEMES.fontFamily.semiBold,
-                            color: THEMES.colors.black,
-                          },
-                        ]}
-                      >
-                        {eDate ? formatDate(eDate): formatDate(endDate)}
-                      </Text>
-                    </>
-                  ) : (
-                    <Text style={styles.timeTextTitle}>+ End Date</Text>
-                  )}
+                <Calendar
+                  onDayPress={handleDateSelect}
+                  markedDates={{
+                    [startDate]: {
+                      startingDay: true,
+                      color: "red",
+                      textColor: "green",
+                    },
+                    [endDate]: {
+                      endingDay: true,
+                      color: "red",
+                      textColor: "green",
+                    },
+                    ...(!endDate &&
+                      startDate && {
+                        [startDate]: { color: "red", textColor: "green" },
+                      }),
+                  }}
+                  theme={{
+                    //   calendarBackground: "grey",
+                    textSectionTitleColor: "#b6c1cd",
+                    dayTextColor: "#2d4150",
+                    todayTextColor: "red",
+                    selectedDayTextColor: "white",
+                    selectedDayBackgroundColor: "red",
+                    //   arrowColor: "red",
+                  }}
+                />
+                <View style={{ paddingTop: moderateScale(20) }}>
+                  <Button title={"Confirm Date"} onPress={() => onBack()} />
                 </View>
               </View>
-              <Calendar
-                onDayPress={handleDateSelect}
-                markedDates={{
-                  [startDate]: {
-                    startingDay: true,
-                    color: "red",
-                    textColor: "green",
-                  },
-                  [endDate]: {
-                    endingDay: true,
-                    color: "red",
-                    textColor: "green",
-                  },
-                  ...(!endDate &&
-                    startDate && {
-                      [startDate]: { color: "red", textColor: "green" },
-                    }),
-                }}
-                theme={{
-                  //   calendarBackground: "grey",
-                  textSectionTitleColor: "#b6c1cd",
-                  dayTextColor: "#2d4150",
-                  todayTextColor: "red",
-                  selectedDayTextColor: "white",
-                  selectedDayBackgroundColor: "red",
-                  //   arrowColor: "red",
-                }}
-              />
-              <View style={{ paddingTop: moderateScale(20) }}>
-                <Button title={"Confirm Date"} onPress={() => onBack()} />
-              </View>
-            </View>
             </ScrollView>
           </ImageBackground>
         </ScrollView>

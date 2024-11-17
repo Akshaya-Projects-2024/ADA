@@ -23,23 +23,7 @@ const RoleSelection = (props) => {
   const [selected, setSelected] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
-  const { registerData } = useSelector(({ register }) => register);
-
-  useEffect(() => {
-    initData();
-  }, []);
-
-  const initData = async () => {
-    let obj = {
-      userid: await decryptService("userId"),
-    };
-    try {
-      let response = await getProfile(obj);
-      dispatch(saveRegisterData(response?.data?.data));
-    } catch (error) {
-      console.log("err111", error);
-    }
-  };
+  const { logindetails } = useSelector(({ register }) => register);
 
   return (
     <View style={styles.container}>
