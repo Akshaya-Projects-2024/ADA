@@ -170,27 +170,7 @@ const MyAccount = (props) => {
                   "",
                   "commonScreen"
                 )}
-                {renderItem(
-                  THEMES.colors.gallery,
-                  <Refresh />,
-                  "Lost Dog Alert",
-                  "",
-                  "lostDogAlert"
-                )}
-                {renderItem(
-                  THEMES.colors.gallery,
-                  <Refresh />,
-                  "Rescue Alert",
-                  "",
-                  "rescueAlert"
-                )}
-                {renderItem(
-                  THEMES.colors.gallery,
-                  <Refresh />,
-                  "Medical Alert",
-                  "",
-                  "medicalAlert"
-                )}
+
                 {renderItem(
                   THEMES.colors.zanah,
                   <Document />,
@@ -208,7 +188,7 @@ const MyAccount = (props) => {
                   <ContactUs />,
                   Strings.contactUs,
                   "",
-                  "contactDetails"
+                  "contactPage"
                 )}
                 {renderItem(
                   THEMES.colors.wispPink,

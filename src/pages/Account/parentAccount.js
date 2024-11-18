@@ -203,7 +203,7 @@ const ParentAccount = (props) => {
                   <ContactUs />,
                   Strings.contactUs,
                   "",
-                  "contactDetails"
+                  "contactPage"
                 )}
                 {renderItem(
                   THEMES.colors.wispPink,
