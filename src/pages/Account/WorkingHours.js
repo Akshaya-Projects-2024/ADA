@@ -15,6 +15,8 @@ import TimeTracker, { DAYS, SHIFTS } from "../../components/TimeTracker";
 import Stepper from "../../components/Stepper";
 import { decryptService } from "../../utils/storageFunc";
 import { showToast } from "../../utils/utils";
+import { saveSessionDetails } from "../../redux-store/actions/auth";
+import { useSelector } from "react-redux";
 
 const WorkingHours = (props) => {
   const route = props?.route?.params?.route;
@@ -32,8 +34,11 @@ const WorkingHours = (props) => {
       };
     })
   );
+  const { providerProfile } = useSelector((state) => state?.commonReducer);
+  const { sessionDetails } = providerProfile;
 
   useEffect(() => {
+    initData();
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -53,39 +58,63 @@ const WorkingHours = (props) => {
     };
   }, []);
 
+  const initData = () => {
+    const output = [...times];
+    for (let index = 0; index < sessionDetails.length; index++) {
+      const element = sessionDetails[index];
+      const outputObj = output.find((it) => it?.label === element?.label);
+    }
+  };
+
   const processTime = () => {
     const output = [];
     for (let index = 0; index < times?.length; index++) {
       const element = times[index];
-      const outputObj = {};
-      outputObj.day = element.label;
-      // outputObj.type=
+      if (element.selected) {
+        if (selectedShiftType === SHIFTS.full) {
+          const outputObj = {};
+          outputObj.day = element.label;
+          outputObj.type = "fullday";
+          outputObj.isfullday = 1;
+          outputObj.start = element?.shift1?.start;
+          outputObj.close = element?.shift1?.end;
+          output.push(outputObj);
+        } else {
+          for (let indx = 0; indx < 2; indx++) {
+            const outputObj = {};
+            outputObj.day = element.label;
+            outputObj.isfullday = 0;
+            if (indx === 0) {
+              outputObj.type = "1st half";
+              outputObj.start = element?.shift1?.start;
+              outputObj.close = element?.shift1?.end;
+            } else {
+              outputObj.type = "2nd half";
+              outputObj.start = element?.shift2?.start;
+              outputObj.close = element?.shift2?.end;
+            }
+            output.push(outputObj);
+          }
+        }
+      }
     }
+    return output;
   };
 
   const onSubmit = async () => {
     try {
       const userId = await decryptService("userId");
+      processTime();
       const pramas = {
         userid: userId,
-        sessionDetails: [
-          {
-            day: "Mon",
-            type: "1st half", //Full Day if you select fullday as working time
-            start: "8:30 AM",
-            close: "10:30 AM",
-            isfullday: 1,
-          },
-          {
-            day: "Mon",
-            type: "2nd half",
-            start: "02:30 PM",
-            close: "3:30 PM",
-            isfullday: 1,
-          },
-        ],
+        sessionDetails: processTime(),
       };
-      // props.navigation.navigate("mediaLink");
+      const response = await saveSessionDetails(pramas);
+      if (response?.data?.status_code == 200) {
+        props.navigation.navigate("mediaLink");
+      } else {
+        showToast("error", response?.data?.message);
+      }
     } catch (error) {
       console.log("🚀 ~ onSubmit ~ error:", error);
       showToast("error", "Something went wrong!!!");

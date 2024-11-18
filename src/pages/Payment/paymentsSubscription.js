@@ -47,7 +47,6 @@ const PaymentsSubscription = (props) => {
       />
       <View style={styles.mainContent}>
         <ScrollView
-          style={{ flex: 1 }}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           bounces={false}
@@ -277,6 +276,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   gradientRow: {
+    flex: 1,
     flexDirection: "row",
     marginHorizontal: moderateScale(20),
     marginTop: moderateScale(27),
