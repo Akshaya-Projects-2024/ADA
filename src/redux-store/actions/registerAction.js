@@ -6,6 +6,7 @@ import {
   SERVICE_PROVIDER_ROLE,
   SERVICE_PROVIDER_ROLE_SUCCESS,
   SERVICE_PROVIDER_ROLE_ERROR,
+  PROFILE_DATA,
 } from "../types";
 import authApi from "../../auth/authApi";
 import Api from "../../api/Api";
@@ -26,8 +27,16 @@ export const saveRegisterData = (data) => {
   };
 };
 
+export const dispatchUserData = (data) => {
+  return (dispatch) => {
+    dispatch({
+      type: PROFILE_DATA,
+      payload: data,
+    });
+  };
+};
+
 export const getServiceProviderRole = () => {
-  console.log("inside");
   return async (dispatch) => {
     try {
       let data = {
@@ -37,7 +46,6 @@ export const getServiceProviderRole = () => {
       if (res?.status === 200) {
         if (res?.data?.data?.length) {
           let apiData = res.data.data;
-          console.log(apiData)
           const categoryData = apiData.map((item) => ({
             id: item.code,
             label: item.service,

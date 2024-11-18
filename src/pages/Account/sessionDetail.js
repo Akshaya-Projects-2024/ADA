@@ -16,20 +16,38 @@ import Strings from "../../constants/strings";
 import Button from "../../components/Button";
 import { moderateScale } from "react-native-size-matters";
 import CheckBox from "react-native-check-box";
-import TimeTracker from "../../components/TimeTracker";
 import Stepper from "../../components/Stepper";
-
+import {
+  saveSession,
+  saveSessionCharges,
+} from "../../redux-store/actions/auth";
+import { decryptService } from "../../utils/storageFunc";
+import { showToast, validArray } from "../../utils/utils";
+import { useSelector } from "react-redux";
+const SESSION_AVAILABILITY = {
+  home: "Home Visit",
+  center: "At Center Service",
+  online: "Online Consultation",
+};
 const SessionDetail = (props) => {
   const route = props?.route?.params?.route;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [homeVisit, setHomeVisit] = useState(false);
   const [centerService, setCenterService] = useState(false);
   const [onlineConsultation, setOnlineConsultation] = useState(false);
-
   const [perSession, setPerSession] = useState(true);
   const [perMonth, setPerMonth] = useState(false);
+  const [sessionServiceName, setSessionServiceName] = useState("");
+  const [sessionCharges, setSessionCharges] = useState("");
+  const [sessionTime, setSessionTime] = useState("");
+  const [monthServiceName, setMonthServiceName] = useState("");
+  const [monthCharges, setMonthCharges] = useState("");
+  const [monthTime, setMonthTime] = useState("");
+  const { providerProfile } = useSelector((state) => state?.commonReducer);
+  const { ProviderSession, sessionRateDetails } = providerProfile;
 
   useEffect(() => {
+    initData();
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -48,6 +66,140 @@ const SessionDetail = (props) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+
+  const initData = () => {
+    const sessionRates = sessionRateDetails[0];
+    //TODO remove this once api is working properly
+    if (ProviderSession?.availableat) {
+      setHomeVisit(true);
+    }
+    //TODO Uncomment this once api is working properly
+    // if (validArray(ProviderSession?.availableat)) {
+    //   for (
+    //     let index = 0;
+    //     index < ProviderSession?.availableat.length;
+    //     index++
+    //   ) {
+    //     const element = ProviderSession?.availableat[index];
+    //     if (element ==== SESSION_AVAILABILITY.home) {
+    //       setHomeVisit(true);
+    //     }
+    //     if (element ==== SESSION_AVAILABILITY.center) {
+    //       setCenterService(true);
+    //     }
+    //     if (element ==== SESSION_AVAILABILITY.online) {
+    //       setOnlineConsultation(true);
+    //     }
+    //   }
+    // }
+    if (ProviderSession?.ispermonth) {
+      setPerMonth(true);
+    }
+    if (ProviderSession?.ispersession) {
+      setPerSession(true);
+    }
+    if (ProviderSession?.monthtime) {
+      setMonthTime(ProviderSession?.monthtime);
+    }
+    if (ProviderSession?.sessiontime) {
+      setSessionTime(ProviderSession?.sessiontime);
+    }
+    if (sessionRates?.monthcharges) {
+      setMonthCharges(sessionRates?.monthcharges);
+    }
+    if (sessionRates?.sessioncharges) {
+      setSessionCharges(sessionRates?.sessioncharges);
+    }
+  };
+
+  const getAvailability = () => {
+    //TODO remove this once api is working properly
+    return SESSION_AVAILABILITY.home;
+    //TODO Uncomment this once api is working properly
+    // const output = [];
+    // if (homeVisit) {
+    //   output.push(SESSION_AVAILABILITY.home);
+    // }
+    // if (centerService) {
+    //   output.push(SESSION_AVAILABILITY.center);
+    // }
+    // if (onlineConsultation) {
+    //   output.push(SESSION_AVAILABILITY.online);
+    // }
+    // return output;
+  };
+
+  const onSubmit = async () => {
+    try {
+      const userId = await decryptService("userId");
+      const sessionData = {
+        userid: userId,
+      };
+      const sessionCharge = {
+        userid: userId,
+        // TODO what to do with this service code and subservicecode
+        servicecode: "101",
+        subservicecode: "",
+      };
+      if (!homeVisit && !centerService && !onlineConsultation) {
+        showToast(
+          "error",
+          "Please select at least one option for availability"
+        );
+      } else if (!perSession && !perMonth) {
+        showToast("error", "Please select at least one option for charges");
+      } else {
+        if (perSession) {
+          // TODO pending
+          // if (!sessionServiceName) {
+          // } else
+          if (!sessionCharges) {
+            showToast("error", "Please provide per session charges");
+          } else if (!sessionTime) {
+            showToast("error", "Please provide per session time");
+          } else {
+            sessionData.ispersession = 1;
+            sessionData.sessiontime = sessionTime;
+            sessionCharge.sessioncharges = sessionCharges;
+          }
+        }
+        if (perMonth) {
+          // TODO pending
+          // if (!monthServiceName) {
+          // } else
+          if (!monthCharges) {
+            showToast("error", "Please provide per month charges");
+          } else if (!monthTime) {
+            showToast("error", "Please provide per month time");
+          } else {
+            sessionData.ispermonth = 1;
+            sessionData.monthtime = monthTime;
+            sessionCharge.monthcharges = monthCharges;
+          }
+        }
+        sessionData.availableat = getAvailability();
+        const responses = await Promise.all([
+          saveSession(sessionData),
+          saveSessionCharges(sessionCharge),
+        ]);
+        const sessionRes = responses[0];
+        const sessionChargesRes = responses[1];
+        if (
+          sessionRes?.data?.status_code === 200 &&
+          sessionChargesRes?.data?.status_code === 200
+        ) {
+          props.navigation.navigate("workingHours");
+        } else {
+          showToast(
+            "error",
+            sessionRes?.data?.message || sessionChargesRes?.data?.message
+          );
+        }
+      }
+    } catch (error) {
+      showToast("error", "Something went wrong!!!");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -68,7 +220,7 @@ const SessionDetail = (props) => {
       )}
       <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
         <ScrollView
-          style={{ flex: 1 }}
+          style={styles.flex}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           bounces={false}
@@ -89,21 +241,21 @@ const SessionDetail = (props) => {
               unCheckedImage={<UnChecked />}
               onClick={() => setHomeVisit(!homeVisit)}
               isChecked={homeVisit}
-              style={{ flex: 1 }}
+              style={styles.flex}
               rightTextStyle={{
                 color: THEMES.colors.black,
                 fontSize: THEMES.fonts.font12,
                 fontFamily: THEMES.fontFamily.semiBold,
               }}
-              rightText={"Home Visit"}
+              rightText={SESSION_AVAILABILITY.home}
             />
             <CheckBox
               checkedImage={<Checked />}
               unCheckedImage={<UnChecked />}
               onClick={() => setCenterService(!centerService)}
               isChecked={centerService}
-              style={{ flex: 1 }}
-              rightText={"At Center Service"}
+              style={styles.flex}
+              rightText={SESSION_AVAILABILITY.center}
               rightTextStyle={{
                 color: THEMES.colors.black,
                 fontSize: THEMES.fonts.font12,
@@ -117,13 +269,13 @@ const SessionDetail = (props) => {
               unCheckedImage={<UnChecked />}
               onClick={() => setOnlineConsultation(!onlineConsultation)}
               isChecked={onlineConsultation}
-              style={{ flex: 1 }}
+              style={styles.flex}
               rightTextStyle={{
                 color: THEMES.colors.black,
                 fontSize: THEMES.fonts.font12,
                 fontFamily: THEMES.fontFamily.semiBold,
               }}
-              rightText={"Online Consultation"}
+              rightText={SESSION_AVAILABILITY.online}
             />
           </View>
           <View style={styles.contentView}>
@@ -137,7 +289,7 @@ const SessionDetail = (props) => {
               unCheckedImage={<UnChecked />}
               onClick={() => setPerSession(!perSession)}
               isChecked={perSession}
-              style={{ flex: 1 }}
+              style={styles.flex}
               rightTextStyle={{
                 color: THEMES.colors.black,
                 fontSize: THEMES.fonts.font12,
@@ -150,7 +302,7 @@ const SessionDetail = (props) => {
               unCheckedImage={<UnChecked />}
               onClick={() => setPerMonth(!perMonth)}
               isChecked={perMonth}
-              style={{ flex: 1 }}
+              style={styles.flex}
               rightText={"Per Month"}
               rightTextStyle={{
                 color: THEMES.colors.black,
@@ -168,9 +320,10 @@ const SessionDetail = (props) => {
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
-                  keyboardType="phone-pad"
                   label={"Service Name"}
                   placeholderText={"Enter service name"}
+                  value={sessionServiceName}
+                  onChange={setSessionServiceName}
                 />
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
@@ -178,6 +331,8 @@ const SessionDetail = (props) => {
                   keyboardType="phone-pad"
                   label={Strings.chargesPerSession}
                   placeholderText={Strings.enterPrice}
+                  value={sessionCharges}
+                  onChange={setSessionCharges}
                 />
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
@@ -185,6 +340,8 @@ const SessionDetail = (props) => {
                   keyboardType="phone-pad"
                   label={Strings.perDaySessionInMin}
                   placeholderText={Strings.perDaySession}
+                  value={sessionTime}
+                  onChange={setSessionTime}
                 />
               </View>
             </>
@@ -198,9 +355,10 @@ const SessionDetail = (props) => {
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
-                  keyboardType="phone-pad"
                   label={"Service Name"}
                   placeholderText={"Enter service name"}
+                  value={monthServiceName}
+                  onChange={setMonthServiceName}
                 />
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
@@ -208,6 +366,8 @@ const SessionDetail = (props) => {
                   keyboardType="phone-pad"
                   label={Strings.chargesPerSession}
                   placeholderText={Strings.enterPrice}
+                  value={monthCharges}
+                  onChange={setMonthCharges}
                 />
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
@@ -215,6 +375,8 @@ const SessionDetail = (props) => {
                   keyboardType="phone-pad"
                   label={Strings.perDaySessionInMin}
                   placeholderText={Strings.perDaySession}
+                  value={monthTime}
+                  onChange={setMonthTime}
                 />
               </View>
             </>
@@ -228,7 +390,7 @@ const SessionDetail = (props) => {
           >
             <Button
               title={route !== "myprofile" ? Strings.next : Strings.submit}
-              onPress={() => props.navigation.navigate("workingHours")}
+              onPress={onSubmit}
             />
           </View>
         </ScrollView>
@@ -255,6 +417,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  flex: { flex: 1 },
 });
 
 export default SessionDetail;

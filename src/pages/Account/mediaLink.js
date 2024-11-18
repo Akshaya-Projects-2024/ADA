@@ -20,6 +20,8 @@ import { NavigationActions, StackActions } from "react-navigation";
 import Toast from "react-native-toast-message";
 import { saveMediaLinks } from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
+import { showToast } from "../../utils/utils";
+import { useSelector } from "react-redux";
 
 const MediaLink = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -29,8 +31,11 @@ const MediaLink = (props) => {
   const [instaLink, setInstaLink] = useState();
   const [fbLink, setFbLink] = useState();
   const [weblink, setWebLink] = useState();
+  const { providerProfile } = useSelector((state) => state?.commonReducer);
+  const { MediaLinks } = providerProfile;
 
   useEffect(() => {
+    initData();
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -50,42 +55,44 @@ const MediaLink = (props) => {
     };
   }, []);
 
-  const showToast = (type, message) => {
-    Toast.show({
-      type: type,
-      text1: message,
-    });
+  const initData = () => {
+    if (MediaLinks?.facebook) {
+      setFbLink(MediaLinks?.facebook);
+    }
+    if (MediaLinks?.instagram) {
+      setInstaLink(MediaLinks?.instagram);
+    }
+    if (MediaLinks?.onlinelink) {
+      setWebLink(MediaLinks?.onlinelink);
+    }
+    if (MediaLinks?.website) {
+      setLink(MediaLinks?.website);
+    }
   };
 
   const onSubmit = async () => {
-    props.navigation.reset({
-      index: 0,
-      routes: [{ name: "paymentsSubscription" }],
-    });
-    // try {
-    //   const userId = await decryptService("userId");
-    //   const postData = {
-    //     userid: userId,
-    //     onlinelink: link,
-    //     instagram: instaLink,
-    //     facebook: fbLink,
-    //     website: weblink,
-    //   };
-    //   const res = await saveMediaLinks(postData);
-    //   if (res?.data?.status_code == 200) {
-    //     showToast("success", "You have been registered successfully!!!");
-    //     setTimeout(() => {
-    //       props.navigation.reset({
-    //         index: 0,
-    //         routes: [{ name: "home" }],
-    //       });
-    //     }, 700);
-    //   } else {
-    //     showToast("error", res?.data?.message);
-    //   }
-    // } catch (error) {
-    //   showToast("error", "Something went wrong!!!");
-    // }
+    try {
+      const userId = await decryptService("userId");
+      const postData = {
+        userid: userId,
+        onlinelink: link,
+        instagram: instaLink,
+        facebook: fbLink,
+        website: weblink,
+      };
+      const res = await saveMediaLinks(postData);
+      if (res?.data?.status_code == 200) {
+        showToast("success", "You have been registered successfully!!!");
+        props.navigation.reset({
+          index: 0,
+          routes: [{ name: "paymentsSubscription" }],
+        });
+      } else {
+        showToast("error", res?.data?.message);
+      }
+    } catch (error) {
+      showToast("error", "Something went wrong!!!");
+    }
   };
 
   return (

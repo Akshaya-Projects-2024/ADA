@@ -20,14 +20,13 @@ const Header = (props) => {
     customIcon,
     right,
     onBackPress,
-    arrowColor
+    arrowColor,
   } = props;
   return (
     <View
       style={[
         styles.headerContent,
         {
-          
           backgroundColor: bgColor ? bgColor : THEMES.colors.bgColor,
         },
       ]}
@@ -36,7 +35,13 @@ const Header = (props) => {
         hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
         onPress={() => (onBackPress ? onBackPress() : goBack())}
       >
-        {showBack ? <Back stroke={arrowColor ? arrowColor : "#000"} /> : showFullArrow ? <ArrowLeft stroke={arrowColor ? arrowColor : "#000"}  /> : customIcon}
+        {showBack ? (
+          <Back stroke={arrowColor ? arrowColor : "#000"} />
+        ) : showFullArrow ? (
+          <ArrowLeft stroke={arrowColor ? arrowColor : "#000"} />
+        ) : (
+          customIcon
+        )}
       </TouchableOpacity>
       <View>
         <Text

@@ -1,4 +1,4 @@
-import * as AsyncStorage from '@react-native-async-storage/async-storage';
+import * as AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const encryptService = async (key, value) => {
   await AsyncStorage.default.setItem(key, JSON.stringify(value));
@@ -13,7 +13,7 @@ export const decryptService = async (key) => {
       return false;
     }
   } else {
-    return '';
+    return "";
   }
 };
 

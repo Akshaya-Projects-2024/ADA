@@ -20,6 +20,12 @@ import { decryptService } from "../../utils/storageFunc";
 import { saveBusinessDetails } from "../../redux-store/actions/auth";
 import { getServiceProviderRole } from "../../redux-store/actions/registerAction";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  formatServiceArray,
+  formatServiceExperience,
+  showToast,
+  validArray,
+} from "../../utils/utils";
 
 const businessName = [
   { id: "1", label: "ADV Solutions" },
@@ -63,6 +69,8 @@ const BusinessDetail = (props) => {
   const [description, setDescription] = useState();
   const dispatch = useDispatch();
   const { serviceProviderRoleData } = useSelector(({ register }) => register);
+  const { providerProfile } = useSelector((state) => state?.commonReducer);
+  const { providerBusiness } = providerProfile;
   const [serviceProviderRole, setServiceProviderRole] = useState();
 
   useEffect(() => {
@@ -72,6 +80,7 @@ const BusinessDetail = (props) => {
   }, [serviceProviderRoleData]);
 
   useEffect(() => {
+    initData();
     dispatch(getServiceProviderRole());
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -92,36 +101,47 @@ const BusinessDetail = (props) => {
     };
   }, []);
 
-  const showToast = (type, message) => {
-    Toast.show({
-      type: type,
-      text1: message,
-    });
+  const initData = () => {
+    if (providerBusiness?.name) {
+      setBusinessValue(providerBusiness?.name);
+    }
+    if (validArray(providerBusiness?.services)) {
+      setServiceProviderValue(formatServiceArray(providerBusiness?.services));
+    }
+    if (providerBusiness?.experience) {
+      setSelectedExperience(
+        formatServiceExperience(providerBusiness?.experience)
+      );
+    }
+    if (providerBusiness?.description) {
+      setDescription(providerBusiness?.description);
+    }
   };
 
   const onSubmit = async () => {
-
     if (!businessValue) {
       showToast("error", "Please enter Business name or person name");
     } else if (!selectedServiceProvider) {
       showToast("error", "Please select service provider role");
+    } else if (!selectedExperience) {
+      showToast("error", "Please enter your experience");
     } else if (!description) {
       showToast("error", "Please enter description");
     } else {
       try {
         const userId = await decryptService("userId");
-        const formattedYear = selectedExperience[0].label
+        const formattedYear = selectedExperience[0].label;
         const formattedServices = selectedServiceProvider.map((service) => ({
           code: service.id,
         }));
         const postData = {
-          userid: userId,
-          name: businessValue,
+          description: description,
           experience: JSON.stringify(
             parseInt(formattedYear.replace("Years", ""), 10)
           ),
-          description: description,
+          name: businessValue,
           services: formattedServices,
+          userid: userId,
         };
         const res = await saveBusinessDetails(postData);
         if (res?.data?.status_code == 200) {

@@ -68,7 +68,7 @@ class Api {
           }
         })
         .catch((error) => {
-          console.log("GETV2 error", error);
+          console.log("GET error", error);
           reject({
             error: true,
             message:

@@ -30,7 +30,6 @@ export const registerReducer = (state = initialState, action) => {
         isFetching: false,
         registerData: [],
       };
-
     case SERVICE_PROVIDER_ROLE:
       return { ...state, serviceProviderRoleData: payload };
     case SERVICE_PROVIDER_ROLE_SUCCESS:
@@ -45,7 +44,6 @@ export const registerReducer = (state = initialState, action) => {
         isFetching: false,
         serviceProviderRoleData: [],
       };
-
     default:
       return state;
   }

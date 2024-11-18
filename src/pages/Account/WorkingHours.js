@@ -1,35 +1,44 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  Text,
   ScrollView,
   StatusBar,
   StyleSheet,
   Keyboard,
 } from "react-native";
-import InputField from "../../components/InputField";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
-import Checked from "../../assets/svg/checked.svg";
-import UnChecked from "../../assets/svg/unchecked.svg";
 import Strings from "../../constants/strings";
 import Button from "../../components/Button";
 import { moderateScale } from "react-native-size-matters";
-import CheckBox from "react-native-check-box";
-import TimeTracker from "../../components/TimeTracker";
+import TimeTracker, { DAYS, SHIFTS } from "../../components/TimeTracker";
 import Stepper from "../../components/Stepper";
+import { decryptService } from "../../utils/storageFunc";
+import { showToast } from "../../utils/utils";
+import { saveSessionDetails } from "../../redux-store/actions/auth";
+import { useSelector } from "react-redux";
 
 const WorkingHours = (props) => {
   const route = props?.route?.params?.route;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const [homeVisit, setHomeVisit] = useState(false);
-  const [centerService, setCenterService] = useState(false);
-  const [onlineConsultation, setOnlineConsultation] = useState(false);
-
-  const [perSession, setPerSession] = useState(true);
-  const [perMonth, setPerMonth] = useState(false);
+  const [selectedShiftType, setSelectedShiftType] = useState(SHIFTS.full);
+  const [selectedForAll, setSelectedForAll] = useState(true);
+  const [times, setTimes] = useState(
+    DAYS.map((it) => {
+      return {
+        label: it,
+        shift1: { start: "", end: "" },
+        shift2: { start: "", end: "" },
+        selected: false,
+        enabled: false,
+      };
+    })
+  );
+  const { providerProfile } = useSelector((state) => state?.commonReducer);
+  const { sessionDetails } = providerProfile;
 
   useEffect(() => {
+    initData();
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -48,6 +57,69 @@ const WorkingHours = (props) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+
+  const initData = () => {
+    const output = [...times];
+    for (let index = 0; index < sessionDetails.length; index++) {
+      const element = sessionDetails[index];
+      const outputObj = output.find((it) => it?.label === element?.label);
+    }
+  };
+
+  const processTime = () => {
+    const output = [];
+    for (let index = 0; index < times?.length; index++) {
+      const element = times[index];
+      if (element.selected) {
+        if (selectedShiftType === SHIFTS.full) {
+          const outputObj = {};
+          outputObj.day = element.label;
+          outputObj.type = "fullday";
+          outputObj.isfullday = 1;
+          outputObj.start = element?.shift1?.start;
+          outputObj.close = element?.shift1?.end;
+          output.push(outputObj);
+        } else {
+          for (let indx = 0; indx < 2; indx++) {
+            const outputObj = {};
+            outputObj.day = element.label;
+            outputObj.isfullday = 0;
+            if (indx === 0) {
+              outputObj.type = "1st half";
+              outputObj.start = element?.shift1?.start;
+              outputObj.close = element?.shift1?.end;
+            } else {
+              outputObj.type = "2nd half";
+              outputObj.start = element?.shift2?.start;
+              outputObj.close = element?.shift2?.end;
+            }
+            output.push(outputObj);
+          }
+        }
+      }
+    }
+    return output;
+  };
+
+  const onSubmit = async () => {
+    try {
+      const userId = await decryptService("userId");
+      processTime();
+      const pramas = {
+        userid: userId,
+        sessionDetails: processTime(),
+      };
+      const response = await saveSessionDetails(pramas);
+      if (response?.data?.status_code == 200) {
+        props.navigation.navigate("mediaLink");
+      } else {
+        showToast("error", response?.data?.message);
+      }
+    } catch (error) {
+      console.log("🚀 ~ onSubmit ~ error:", error);
+      showToast("error", "Something went wrong!!!");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -73,7 +145,14 @@ const WorkingHours = (props) => {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          <TimeTracker />
+          <TimeTracker
+            times={times}
+            setTimes={setTimes}
+            selectedForAll={selectedForAll}
+            setSelectedForAll={setSelectedForAll}
+            selectedShiftType={selectedShiftType}
+            setSelectedShiftType={setSelectedShiftType}
+          />
           <View
             style={{
               paddingBottom: moderateScale(25),
@@ -82,7 +161,7 @@ const WorkingHours = (props) => {
           >
             <Button
               title={route !== "myprofile" ? Strings.next : Strings.submit}
-              onPress={() => props.navigation.navigate("mediaLink")}
+              onPress={onSubmit}
             />
           </View>
         </ScrollView>

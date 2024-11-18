@@ -26,12 +26,6 @@ function App() {
     axios.interceptors?.response?.use(
       async (response) => {
         const originalRequest = response.config;
-        console.log(
-          "interceptors",
-          response.config.url,
-          response.status,
-          response.config.headers.AccessToken
-        );
         if (response?.status === 403 && !originalRequest._retry) {
           originalRequest._retry = true;
           // Try to refresh the token
@@ -50,7 +44,6 @@ function App() {
               : "0",
           };
           const res = await refreshToken(params);
-          console.log("refresh", res?.data?.data?.token);
           if (res?.status === 200) {
             await encryptService("accessToken", res?.data?.data?.token);
             await encryptService("tokenId", res?.data?.data?.tokenId);

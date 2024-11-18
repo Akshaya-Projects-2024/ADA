@@ -7,7 +7,9 @@ export const urlList = {
   mediaLink: "register/provider/medialinks",
   addSession: "register/provider/addsession",
   uploadDocument: "register/provider/adddocument",
-  deleteDocument: "register/provider/adddocument",
+  deleteDocument: "register/provider/deletedocument",
   getProfile: "register/getprofile",
-  getMasterData:'master/getservices'
+  getMasterData: "master/getservices",
+  addSessionDetails: "register/provider/addsessiondetails",
+  saveSessionCharged: "register/provider/addsessionrates",
 };

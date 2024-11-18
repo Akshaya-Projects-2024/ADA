@@ -24,6 +24,7 @@ const ModalDropdown = (props) => {
     multiSelect = false,
   } = props;
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedId, setSelectedId] = useState(false);
 
   const toggleRoleSelection = (role, id) => {
     if (multiSelect) {
@@ -31,19 +32,18 @@ const ModalDropdown = (props) => {
         setSelectedValue(selectedValue?.filter((item) => item !== role)); // Remove if already selected
       } else {
         if (selectedValue) {
-          setSelectedValue([...selectedValue, { id: id, label: role }]); // Add if not selected
+          setSelectedValue([...selectedValue, { id: id, label: role }]); // Add if not selected  setSelectedValue([...selectedValue, { id: id, label: role }]);
+          setSelectedId(id);
         } else {
-          console.log("selected", role);
           setSelectedValue([{ id: id, label: role }]); // Add if not selected
+          setSelectedId(id);
         }
       }
     } else {
       setSelectedValue([{ id: id, label: role }]);
+      setSelectedId(id);
       setModalVisible(false);
     }
-
-    // setSelectedValue(role);
-    // setModalVisible(false);
   };
 
   const renderItem = ({ item }) => (
@@ -98,9 +98,6 @@ const ModalDropdown = (props) => {
           >
             {placeholder}
           </Text>
-          {
-            console.log("title",selectedValue)
-          }
           <Text numberOfLines={1} style={styles.dropdownButtonText}>
             {selectedValue?.length > 0
               ? selectedValue.map((item) => item.label).join(", ")

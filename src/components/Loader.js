@@ -5,7 +5,7 @@ import ModalView from "react-native-modal";
 import LoaderGif from "../assets/images/loading.gif";
 
 import { LoadingImage, LoadingView } from "./styles";
-import { ActivityIndicator,Text, Image, View } from "react-native";
+import { ActivityIndicator, Text, Image, View } from "react-native";
 import { THEMES } from "../assets/theme/themes";
 
 const modalStyle = {
@@ -23,12 +23,11 @@ const Loader = (props) => {
         width: "100%",
         height: "100%",
         backgroundColor: "transparent",
-        alignItems:'center',
-        justifyContent:'center',
-
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <ActivityIndicator color={THEMES.colors.cyan}/>
+      <ActivityIndicator color={THEMES.colors.cyan} />
     </View>
     // <ModalView
     //   animationIn="zoomIn"
