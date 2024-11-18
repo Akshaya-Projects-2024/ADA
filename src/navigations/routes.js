@@ -15,6 +15,9 @@ import ServiceDetail from "../pages/Services/serviceDetail";
 import UpcomingEvents from "../pages/Events/upcomingEvents";
 import Service from "../pages/Services/service";
 import WorkingHours from "../pages/Account/WorkingHours";
+import ContactPage from "../pages/CommonPages/contactPage";
+import WriteUs from "../pages/CommonPages/WriteUs";
+import Feedback from "../pages/CommonPages/feedback";
 
 const Stack = createStackNavigator();
 
@@ -108,7 +111,24 @@ export default Routes = (props) => {
           component={Service}
           options={navOptionHandler}
         />
-     
+
+        <Stack.Screen
+          name="contactPage"
+          component={ContactPage}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="writeUs"
+          component={WriteUs}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="feedback"
+          component={Feedback}
+          options={navOptionHandler}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
