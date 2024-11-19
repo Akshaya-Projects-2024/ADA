@@ -60,18 +60,45 @@ const TimeTracker = ({
       ...(day?.selected ? { shift2: { start: "", end: "" } } : {}),
     };
     if (selectedForAll) {
-      let firstEnabled = -1;
-      for (let index = 0; index < temp.length; index++) {
-        const element = temp[index];
-        if (firstEnabled === -1) {
-          if (element?.selected) {
-            firstEnabled = index;
-            element.enabled = true;
+      const firstItem = temp.find(
+        (it) =>
+          it?.shift1?.start ||
+          it?.shift1?.end ||
+          it?.shift2?.start ||
+          it?.shift2?.end
+      );
+      if (firstItem) {
+        const filteredItems = temp.filter(
+          (it) =>
+            (!it?.shift1?.start ||
+              !it?.shift1?.end ||
+              !it?.shift2?.start ||
+              !it?.shift2?.end) &&
+            it?.selected
+        );
+        for (let index = 0; index < filteredItems.length; index++) {
+          const element = filteredItems[index];
+          const indx = temp.findIndex((ite) => ite?.label === element?.label);
+          if (!element?.shift1?.start) {
+            element.shift1 = {
+              ...element.shift1,
+              start: firstItem?.shift1.start,
+            };
           }
-        } else if (index !== firstEnabled) {
-          element.enabled = false;
+          if (!element?.shift1?.end) {
+            element.shift1 = { ...element.shift1, end: firstItem?.shift1.end };
+          }
+          if (!element?.shift2?.start) {
+            element.shift2 = {
+              ...element.shift2,
+              start: firstItem?.shift2.start,
+            };
+          }
+          if (!element?.shift2?.end) {
+            element.shift2 = { ...element.shift2, end: firstItem?.shift2.end };
+          }
+          temp[indx] = element;
         }
-        temp[index] = element;
       }
     }
     setTimes(temp);
@@ -109,29 +136,61 @@ const TimeTracker = ({
 
   const handleAllSelection = () => {
     const temp = [...times];
-    if (selectedForAll) {
-      for (let index = 0; index < temp.length; index++) {
-        const element = temp[index];
-        if (element?.selected) {
-          element.enabled = true;
-        }
-        temp[index] = element;
-      }
-    } else {
-      let firstEnabled = -1;
-      for (let index = 0; index < temp.length; index++) {
-        const element = temp[index];
-        if (firstEnabled === -1) {
-          if (element?.selected) {
-            firstEnabled = index;
-            element.enabled = true;
+    if (!selectedForAll) {
+      const firstItem = temp.find(
+        (it) =>
+          it?.shift1?.start ||
+          it?.shift1?.end ||
+          it?.shift2?.start ||
+          it?.shift2?.end
+      );
+      if (firstItem) {
+        const filteredItems = temp.filter(
+          (it) =>
+            (!it?.shift1?.start ||
+              !it?.shift1?.end ||
+              !it?.shift2?.start ||
+              !it?.shift2?.end) &&
+            it?.selected
+        );
+        for (let index = 0; index < filteredItems.length; index++) {
+          const element = filteredItems[index];
+          const indx = temp.findIndex((ite) => ite?.label === element?.label);
+          if (!element?.shift1?.start) {
+            element.shift1 = {
+              ...element.shift1,
+              start: firstItem?.shift1.start,
+            };
           }
-        } else if (index !== firstEnabled) {
-          element.enabled = false;
+          if (!element?.shift1?.end) {
+            element.shift1 = { ...element.shift1, end: firstItem?.shift1.end };
+          }
+          if (!element?.shift2?.start) {
+            element.shift2 = {
+              ...element.shift2,
+              start: firstItem?.shift2.start,
+            };
+          }
+          if (!element?.shift2?.end) {
+            element.shift2 = { ...element.shift2, end: firstItem?.shift2.end };
+          }
+          temp[indx] = element;
         }
-        temp[index] = element;
       }
     }
+    // const temp = [...times];
+    // if (selectedForAll) {
+    //   for (let index = 0; index < temp.length; index++) {
+    //     const element = temp[index];
+    //     temp[index] = element;
+    //   }
+    // } else {
+    //   for (let index = 0; index < temp.length; index++) {
+    //     const element = temp[index];
+    //     temp[index] = element;
+    //   }
+    // }
+    setTimes(temp);
     setSelectedForAll(!selectedForAll);
   };
 
@@ -143,35 +202,17 @@ const TimeTracker = ({
       [shift]: { ...day[shift], [type]: value },
     };
     if (selectedForAll) {
-      for (let index = 0; index < temp.length; index++) {
-        const element = temp[index];
-        if (element?.selected) {
-          element[shift] = { ...element[shift], [type]: value };
-        }
-        temp[index] = element;
+      const filteredItems = temp.filter(
+        (it) => !it[shift][type] && it?.selected
+      );
+      for (let index = 0; index < filteredItems.length; index++) {
+        const element = filteredItems[index];
+        const indx = temp.findIndex((ite) => ite?.label === element?.label);
+        element[shift] = { ...element[shift], [type]: value };
+        temp[indx] = element;
       }
     }
     setTimes(temp);
-    // setTimes((prevTimes) => {
-    //   const updatedTimes = {
-    //     ...prevTimes,
-    //     [day]: {
-    //       ...prevTimes[day],
-    //       [shift]: {
-    //         ...prevTimes[day][shift],
-    //         [type]: value,
-    //       },
-    //     },
-    //   };
-    //   if (selectedForAll) {
-    //     selectedDays.forEach((selectedDay) => {
-    //       if (selectedDay !== day) {
-    //         updatedTimes[selectedDay][shift][type] = value;
-    //       }
-    //     });
-    //   }
-    //   return updatedTimes;
-    // });
   };
 
   return (
@@ -271,22 +312,19 @@ const TimeTracker = ({
               <TouchableOpacity
                 style={[
                   styles.timeInput1,
-                  (!day?.selected || !day?.enabled) && styles.disabledInput,
+                  !day?.selected && styles.disabledInput,
                 ]}
                 onPress={() =>
-                  day?.selected &&
-                  day?.enabled &&
-                  showDatePicker(day, "shift1", "start")
+                  day?.selected && showDatePicker(day, "shift1", "start")
                 }
               >
                 <Text
                   style={[
                     styles.timeText,
                     {
-                      color:
-                        day?.selected && day?.enabled
-                          ? THEMES.colors.black
-                          : THEMES.colors.lightSilver,
+                      color: day?.selected
+                        ? THEMES.colors.black
+                        : THEMES.colors.lightSilver,
                     },
                   ]}
                 >
@@ -298,10 +336,9 @@ const TimeTracker = ({
                     {
                       fontSize: THEMES.fonts.font12,
                       fontFamily: THEMES.fontFamily.semiBold,
-                      color:
-                        day?.selected && day?.enabled
-                          ? THEMES.colors.black
-                          : THEMES.colors.lightSilver,
+                      color: day?.selected
+                        ? THEMES.colors.black
+                        : THEMES.colors.lightSilver,
                     },
                   ]}
                 >
@@ -312,22 +349,19 @@ const TimeTracker = ({
               <TouchableOpacity
                 style={[
                   styles.timeInput,
-                  (!day?.selected || !day?.enabled) && styles.disabledInput,
+                  !day?.selected && styles.disabledInput,
                 ]}
                 onPress={() =>
-                  day?.selected &&
-                  day?.enabled &&
-                  showDatePicker(day, "shift1", "end")
+                  day?.selected && showDatePicker(day, "shift1", "end")
                 }
               >
                 <Text
                   style={[
                     styles.timeText,
                     {
-                      color:
-                        day?.selected && day?.enabled
-                          ? THEMES.colors.black
-                          : THEMES.colors.lightSilver,
+                      color: day?.selected
+                        ? THEMES.colors.black
+                        : THEMES.colors.lightSilver,
                     },
                   ]}
                 >
@@ -339,10 +373,9 @@ const TimeTracker = ({
                     {
                       fontSize: THEMES.fonts.font12,
                       fontFamily: THEMES.fontFamily.semiBold,
-                      color:
-                        day?.selected && day?.enabled
-                          ? THEMES.colors.black
-                          : THEMES.colors.lightSilver,
+                      color: day?.selected
+                        ? THEMES.colors.black
+                        : THEMES.colors.lightSilver,
                     },
                   ]}
                 >
@@ -356,7 +389,7 @@ const TimeTracker = ({
                 <TouchableOpacity
                   style={[
                     styles.timeInput1,
-                    (!day?.selected || !day?.enabled) && styles.disabledInput,
+                    !day?.selected && styles.disabledInput,
                   ]}
                   onPress={() => showDatePicker(day, "shift2", "start")}
                 >
@@ -364,10 +397,9 @@ const TimeTracker = ({
                     style={[
                       styles.timeText,
                       {
-                        color:
-                          day?.selected && day?.enabled
-                            ? THEMES.colors.black
-                            : THEMES.colors.lightSilver,
+                        color: day?.selected
+                          ? THEMES.colors.black
+                          : THEMES.colors.lightSilver,
                       },
                     ]}
                   >
@@ -379,10 +411,9 @@ const TimeTracker = ({
                       {
                         fontSize: THEMES.fonts.font12,
                         fontFamily: THEMES.fontFamily.semiBold,
-                        color:
-                          day?.selected && day?.enabled
-                            ? THEMES.colors.black
-                            : THEMES.colors.lightSilver,
+                        color: day?.selected
+                          ? THEMES.colors.black
+                          : THEMES.colors.lightSilver,
                       },
                     ]}
                   >
@@ -393,7 +424,7 @@ const TimeTracker = ({
                 <TouchableOpacity
                   style={[
                     styles.timeInput,
-                    (!day?.selected || !day?.enabled) && styles.disabledInput,
+                    !day?.selected && styles.disabledInput,
                   ]}
                   onPress={() => showDatePicker(day, "shift2", "end")}
                 >
@@ -401,10 +432,9 @@ const TimeTracker = ({
                     style={[
                       styles.timeText,
                       {
-                        color:
-                          day?.selected && day?.enabled
-                            ? THEMES.colors.black
-                            : THEMES.colors.lightSilver,
+                        color: day?.selected
+                          ? THEMES.colors.black
+                          : THEMES.colors.lightSilver,
                       },
                     ]}
                   >
@@ -416,10 +446,9 @@ const TimeTracker = ({
                       {
                         fontSize: THEMES.fonts.font12,
                         fontFamily: THEMES.fontFamily.semiBold,
-                        color:
-                          day?.selected && day?.enabled
-                            ? THEMES.colors.black
-                            : THEMES.colors.lightSilver,
+                        color: day?.selected
+                          ? THEMES.colors.black
+                          : THEMES.colors.lightSilver,
                       },
                     ]}
                   >

@@ -30,7 +30,6 @@ const WorkingHours = (props) => {
         shift1: { start: "", end: "" },
         shift2: { start: "", end: "" },
         selected: false,
-        enabled: false,
       };
     })
   );
@@ -62,8 +61,30 @@ const WorkingHours = (props) => {
     const output = [...times];
     for (let index = 0; index < sessionDetails.length; index++) {
       const element = sessionDetails[index];
-      const outputObj = output.find((it) => it?.label === element?.label);
+      if (index === 0) {
+        if (element?.isfullday) {
+          setSelectedShiftType(SHIFTS.full);
+        } else {
+          setSelectedShiftType(SHIFTS.shifts);
+        }
+      }
+      const outputObj = output.find((it) => it?.label === element?.day);
+      outputObj.selected = true;
+      if (!element?.isfullday) {
+        if (element?.type === "1st half") {
+          outputObj.shift1.start = element?.start;
+          outputObj.shift1.end = element?.close;
+        } else {
+          outputObj.shift2.start = element?.start;
+          outputObj.shift2.end = element?.close;
+        }
+      } else {
+        outputObj.shift1.start = element?.start;
+        outputObj.shift1.end = element?.close;
+      }
+      output[index] = outputObj;
     }
+    setTimes(output);
   };
 
   const processTime = () => {
