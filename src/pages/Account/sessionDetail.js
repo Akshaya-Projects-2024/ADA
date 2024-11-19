@@ -24,6 +24,7 @@ import {
 import { decryptService } from "../../utils/storageFunc";
 import { showToast, validArray } from "../../utils/utils";
 import { useSelector } from "react-redux";
+import ModalDropdown from "../../components/ModalDropdown";
 const SESSION_AVAILABILITY = {
   home: "Home Visit",
   center: "At Center Service",
@@ -45,6 +46,11 @@ const SessionDetail = (props) => {
   const [monthTime, setMonthTime] = useState("");
   const { providerProfile } = useSelector((state) => state?.commonReducer);
   const { ProviderSession, sessionRateDetails } = providerProfile;
+  const { serviceProviderRoleData } = useSelector(({ register }) => register);
+  const [serviceProviderRole, setServiceProviderRole] = useState();
+  const [selectedServiceProvider, setServiceProviderValue] = useState();
+  const [selectedServiceMonthProvider, setServiceProviderMonthValue] =
+    useState();
 
   useEffect(() => {
     initData();
@@ -67,80 +73,90 @@ const SessionDetail = (props) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (serviceProviderRoleData.length) {
+      setServiceProviderRole(serviceProviderRoleData);
+    }
+  }, [serviceProviderRoleData]);
+
   const initData = () => {
-    const sessionRates = sessionRateDetails?.[0];
     //TODO remove this once api is working properly
     if (ProviderSession?.availableat) {
       setHomeVisit(true);
     }
     //TODO Uncomment this once api is working properly
-    // if (validArray(ProviderSession?.availableat)) {
-    //   for (
-    //     let index = 0;
-    //     index < ProviderSession?.availableat.length;
-    //     index++
-    //   ) {
-    //     const element = ProviderSession?.availableat[index];
-    //     if (element ==== SESSION_AVAILABILITY.home) {
-    //       setHomeVisit(true);
-    //     }
-    //     if (element ==== SESSION_AVAILABILITY.center) {
-    //       setCenterService(true);
-    //     }
-    //     if (element ==== SESSION_AVAILABILITY.online) {
-    //       setOnlineConsultation(true);
-    //     }
-    //   }
-    // }
-    if (ProviderSession?.ispermonth) {
+    if (validArray(ProviderSession?.availableat)) {
+      for (
+        let index = 0;
+        index < ProviderSession?.availableat.length;
+        index++
+      ) {
+        const element = ProviderSession?.availableat[index];
+        if (element === SESSION_AVAILABILITY.home) {
+          setHomeVisit(true);
+        }
+        if (element === SESSION_AVAILABILITY.center) {
+          setCenterService(true);
+        }
+        if (element === SESSION_AVAILABILITY.online) {
+          setOnlineConsultation(true);
+        }
+      }
+    }
+
+    if (ProviderSession?.ispermonth == 1) {
       setPerMonth(true);
+    } else {
+      setPerMonth(false);
     }
-    if (ProviderSession?.ispersession) {
-      setPerSession(true);
+    if (ProviderSession?.ispersession == 1) {
+      setPerSession(false);
+    } else {
+      setPerSession(false);
     }
+
     if (ProviderSession?.monthtime) {
       setMonthTime(ProviderSession?.monthtime);
     }
     if (ProviderSession?.sessiontime) {
       setSessionTime(ProviderSession?.sessiontime);
     }
-    if (sessionRates?.monthcharges) {
-      setMonthCharges(sessionRates?.monthcharges);
-    }
-    if (sessionRates?.sessioncharges) {
-      setSessionCharges(sessionRates?.sessioncharges);
-    }
+
+   
+
+    // if (sessionRates?.monthcharges) {
+    //   setMonthCharges(sessionRates?.monthcharges);
+    // }
+    // if (sessionRates?.sessioncharges) {
+    //   setSessionCharges(sessionRates?.sessioncharges);
+    // }
   };
 
   const getAvailability = () => {
     //TODO remove this once api is working properly
-    return SESSION_AVAILABILITY.home;
+    // return SESSION_AVAILABILITY.home;
     //TODO Uncomment this once api is working properly
-    // const output = [];
-    // if (homeVisit) {
-    //   output.push(SESSION_AVAILABILITY.home);
-    // }
-    // if (centerService) {
-    //   output.push(SESSION_AVAILABILITY.center);
-    // }
-    // if (onlineConsultation) {
-    //   output.push(SESSION_AVAILABILITY.online);
-    // }
-    // return output;
+    const output = [];
+    if (homeVisit) {
+      output.push(SESSION_AVAILABILITY.home);
+    }
+    if (centerService) {
+      output.push(SESSION_AVAILABILITY.center);
+    }
+    if (onlineConsultation) {
+      output.push(SESSION_AVAILABILITY.online);
+    }
+    return output;
   };
 
   const onSubmit = async () => {
     try {
       const userId = await decryptService("userId");
+      let sessionRateArray = [];
       const sessionData = {
         userid: userId,
       };
-      const sessionCharge = {
-        userid: userId,
-        // TODO what to do with this service code and subservicecode
-        servicecode: "101",
-        subservicecode: "",
-      };
+
       if (!homeVisit && !centerService && !onlineConsultation) {
         showToast(
           "error",
@@ -148,36 +164,52 @@ const SessionDetail = (props) => {
         );
       } else if (!perSession && !perMonth) {
         showToast("error", "Please select at least one option for charges");
+      } else if (perSession && !selectedServiceProvider?.length) {
+        showToast("error", "Please select service name for session");
+      } else if (perSession && !sessionCharges) {
+        showToast("error", "Please enter charges for session");
+      } else if (perSession && !sessionTime) {
+        showToast("error", "Please enter time for session");
+      } else if (perMonth && !selectedServiceMonthProvider?.length) {
+        showToast("error", "Please select service name for per month");
+      } else if (perMonth && !monthCharges) {
+        showToast("error", "Please enter charges for month");
+      } else if (perMonth && !monthTime) {
+        showToast("error", "Please enter time for month");
       } else {
-        if (perSession) {
-          // TODO pending
-          // if (!sessionServiceName) {
-          // } else
-          if (!sessionCharges) {
-            showToast("error", "Please provide per session charges");
-          } else if (!sessionTime) {
-            showToast("error", "Please provide per session time");
-          } else {
-            sessionData.ispersession = 1;
-            sessionData.sessiontime = sessionTime;
-            sessionCharge.sessioncharges = sessionCharges;
-          }
-        }
-        if (perMonth) {
-          // TODO pending
-          // if (!monthServiceName) {
-          // } else
-          if (!monthCharges) {
-            showToast("error", "Please provide per month charges");
-          } else if (!monthTime) {
-            showToast("error", "Please provide per month time");
-          } else {
-            sessionData.ispermonth = 1;
-            sessionData.monthtime = monthTime;
-            sessionCharge.monthcharges = monthCharges;
-          }
-        }
         sessionData.availableat = getAvailability();
+        sessionData.ispermonth = perMonth ? 1 : 0;
+        sessionData.ispersession = perSession ? 1 : 0;
+        sessionData.sessiontime = sessionTime ? sessionTime : "";
+        sessionData.monthtime = monthTime ? monthTime : "";
+
+        if (perSession) {
+          let obj = {
+            servicecode: selectedServiceProvider.length
+              ? selectedServiceProvider?.[0].id
+              : "",
+            sessioncharges: sessionCharges ? sessionCharges : "0",
+            monthcharges: "0",
+          };
+          sessionRateArray.push(obj);
+        }
+
+        if (perMonth) {
+          let obj = {
+            servicecode: selectedServiceMonthProvider.length
+              ? selectedServiceMonthProvider?.[0].id
+              : "",
+            sessioncharges: "0",
+            monthcharges: monthCharges ? monthCharges : "0",
+          };
+          sessionRateArray.push(obj);
+        }
+
+        const sessionCharge = {
+          userid: userId,
+          sessionrate: sessionRateArray,
+        };
+        console.log(sessionData, sessionCharge);
         const responses = await Promise.all([
           saveSession(sessionData),
           saveSessionCharges(sessionCharge),
@@ -197,7 +229,7 @@ const SessionDetail = (props) => {
         }
       }
     } catch (error) {
-      console.log("err11111111122", error)
+      console.log("err11111111122", error);
       showToast("error", "Something went wrong!!!");
     }
   };
@@ -320,11 +352,13 @@ const SessionDetail = (props) => {
                 </Text>
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  label={"Service Name"}
-                  placeholderText={"Enter service name"}
-                  value={sessionServiceName}
-                  onChange={setSessionServiceName}
+                <ModalDropdown
+                  placeholder="Service provider Role*"
+                  data={serviceProviderRole}
+                  title={"Select service role"}
+                  setSelectedValue={setServiceProviderValue}
+                  selectedValue={selectedServiceProvider}
+                  noPadding
                 />
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
@@ -355,11 +389,13 @@ const SessionDetail = (props) => {
                 </Text>
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  label={"Service Name"}
-                  placeholderText={"Enter service name"}
-                  value={monthServiceName}
-                  onChange={setMonthServiceName}
+                <ModalDropdown
+                  placeholder="Service provider Role*"
+                  data={serviceProviderRole}
+                  title={"Select service role"}
+                  setSelectedValue={setServiceProviderMonthValue}
+                  selectedValue={selectedServiceMonthProvider}
+                  noPadding
                 />
               </View>
               <View style={{ paddingTop: moderateScale(16) }}>
