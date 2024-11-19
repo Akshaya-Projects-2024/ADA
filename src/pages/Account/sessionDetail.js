@@ -106,13 +106,9 @@ const SessionDetail = (props) => {
 
     if (ProviderSession?.ispermonth == 1) {
       setPerMonth(true);
-    } else {
-      setPerMonth(false);
     }
     if (ProviderSession?.ispersession == 1) {
-      setPerSession(false);
-    } else {
-      setPerSession(false);
+      setPerSession(true);
     }
 
     if (ProviderSession?.monthtime) {
@@ -122,14 +118,33 @@ const SessionDetail = (props) => {
       setSessionTime(ProviderSession?.sessiontime);
     }
 
-   
 
-    // if (sessionRates?.monthcharges) {
-    //   setMonthCharges(sessionRates?.monthcharges);
-    // }
-    // if (sessionRates?.sessioncharges) {
-    //   setSessionCharges(sessionRates?.sessioncharges);
-    // }
+    if (validArray(sessionRateDetails)) {
+      sessionRateDetails.forEach((rateDetail) => {
+        if (rateDetail.sessioncharges && rateDetail.sessioncharges !== "0.00") {
+         
+          const matchedService = serviceProviderRoleData?.find(
+            (service) => service.id == rateDetail.servicecode
+          );
+          console.log("matchedService",matchedService, rateDetail.servicecode)
+          if (matchedService) {
+            setServiceProviderValue([matchedService]);
+          }
+          setSessionCharges(rateDetail.sessioncharges);
+        }
+        if (rateDetail.monthcharges && rateDetail.monthcharges !== "0.00") {
+          
+          const matchedService = serviceProviderRoleData?.find(
+            (service) => service.id == rateDetail.servicecode
+          );
+ 
+          if (matchedService) {
+            setServiceProviderMonthValue([matchedService]);
+          }
+          setMonthCharges(rateDetail.monthcharges);
+        }
+      });
+    }
   };
 
   const getAvailability = () => {
@@ -229,7 +244,6 @@ const SessionDetail = (props) => {
         }
       }
     } catch (error) {
-      console.log("err11111111122", error);
       showToast("error", "Something went wrong!!!");
     }
   };
