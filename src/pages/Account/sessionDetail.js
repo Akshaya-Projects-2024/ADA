@@ -68,7 +68,7 @@ const SessionDetail = (props) => {
   }, []);
 
   const initData = () => {
-    const sessionRates = sessionRateDetails[0];
+    const sessionRates = sessionRateDetails?.[0];
     //TODO remove this once api is working properly
     if (ProviderSession?.availableat) {
       setHomeVisit(true);
@@ -197,6 +197,7 @@ const SessionDetail = (props) => {
         }
       }
     } catch (error) {
+      console.log("err11111111122", error)
       showToast("error", "Something went wrong!!!");
     }
   };

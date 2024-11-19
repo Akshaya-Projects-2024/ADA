@@ -21,10 +21,27 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import User from "../../assets/svg/user.svg";
 import Pencil from "../../assets/svg/pencil.svg";
 import Location from "../../assets/svg/location.svg";
+import UploadImageModal from "../../components/UploadImageModal";
+import { decryptService } from "../../utils/storageFunc";
+import {
+  saveParentDetails,
+  uploadParentDocument,
+} from "../../redux-store/actions/auth";
+import { showToast } from "../../utils/utils";
 
 const ParentDetails = (props) => {
   const route = props?.route?.params?.route;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [parentImg, setParentImg] = useState([]);
+
+  const [parentName, setParentName] = useState();
+  const [description, setDescription] = useState();
+  const [mobileNumber, setMobileNumber] = useState();
+  const [location, setLocation] = useState();
+  const [address, setAddress] = useState();
+  const [emailId, setEmailId] = useState();
+  const [pinCode, setPincode] = useState();
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -45,6 +62,81 @@ const ParentDetails = (props) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+
+  const handleLogo = async (image) => {
+    setParentImg(image?.fileData);
+    const extension = image?.uri?.split(".").pop();
+    const userId = await decryptService("userId");
+
+    let payload = {
+      userid: userId,
+      usertype: "parent",
+      extention: extension,
+      document: image?.fileData,
+    };
+    apiCall(payload);
+  };
+
+  const apiCall = async (postData, type, item) => {
+    try {
+      const res = await uploadParentDocument(postData);
+      if (res?.status == 200) {
+        showToast("success", "Successfully uploaded the image");
+      }
+    } catch (error) {
+      showToast("error", error.message);
+    }
+  };
+
+  const getBase64Obj = (url) => {
+    if (url) {
+      return {
+        uri: url.includes("https") ? url : `data:image/jpg;base64,${url}`,
+      };
+    }
+  };
+
+  const onSubmit = async () => {
+    if (!parentImg.length) {
+      showToast("error", "Please upload parent profile picture");
+    } else if (!parentName) {
+      showToast("error", "Please enter your parent name");
+    } else if (!description) {
+      showToast("error", "Please enter description");
+    } else if (!mobileNumber) {
+      showToast("error", "Please enter mobile number");
+    } else if (!emailId) {
+      showToast("error", "Please enter email Id");
+    } else if (!address) {
+      showToast("error", "Please enter address");
+    } else if (!pinCode) {
+      showToast("error", "Please enter pincode");
+    } else {
+      try {
+        const userId = await decryptService("userId");
+
+        const postData = {
+          userid: userId,
+          name: parentName,
+          about: description,
+          mobile: mobileNumber,
+          email: emailId,
+          address: address,
+          pin: pinCode,
+          lang: "454545",
+          lat: "45545454",
+        };
+        const res = await saveParentDetails(postData);
+        if (res?.data?.status_code == 200) {
+          props.navigation.navigate("petDetail");
+        } else {
+          showToast("error", res?.data?.message);
+        }
+      } catch (error) {
+        showToast("error", "Something went wrong!!!");
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -82,10 +174,26 @@ const ParentDetails = (props) => {
                 justifyContent: "center",
               }}
             >
-              <User />
+              {parentImg.length ? (
+                <Image
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: 50,
+                    backgroundColor: "#ddd",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  resizeMode="contain"
+                  source={getBase64Obj(parentImg)}
+                />
+              ) : (
+                <User />
+              )}
             </View>
             {/* Edit Icon */}
             <TouchableOpacity
+              onPress={() => setVisible(true)}
               style={{
                 position: "absolute",
                 bottom: 5,
@@ -108,40 +216,46 @@ const ParentDetails = (props) => {
             <InputField
               label={"Parent Name*"}
               placeholderText={"Enter parent name"}
+              value={parentName}
+              onChange={setParentName}
             />
             <View style={{ paddingTop: moderateScale(16) }}>
               <InputField
                 label={"About Parent*"}
                 placeholderText={"Enter description"}
                 multiline
+                value={description}
+                onChange={setDescription}
               />
             </View>
             <View style={{ paddingTop: moderateScale(16) }}>
               <InputField
+                maxLength={10}
+                keyboardType="phone-pad"
                 label={"Mobile number*"}
                 placeholderText={"Enter mobile number"}
+                value={mobileNumber}
+                onChange={setMobileNumber}
               />
             </View>
             <View style={{ paddingTop: moderateScale(16) }}>
               <InputField
                 label={"Email ID*"}
                 placeholderText={"Enter email id"}
+                value={emailId}
+                onChange={setEmailId}
               />
             </View>
             <View style={{ paddingTop: moderateScale(16) }}>
               <InputField
-                label={"Address"}
+                label={"Address*"}
                 placeholderText={"Enter your address"}
                 multiline
+                value={address}
+                onChange={setAddress}
               />
             </View>
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <InputField
-                label={"Address"}
-                placeholderText={"Enter your address"}
-                multiline
-              />
-            </View>
+
             <View style={{ paddingTop: moderateScale(16) }}>
               <InputField
                 label={Strings.location}
@@ -151,8 +265,12 @@ const ParentDetails = (props) => {
             </View>
             <View style={{ paddingTop: moderateScale(16) }}>
               <InputField
-                label={"ZIP/Postal code"}
+                maxLength={6}
+                keyboardType="phone-pad"
+                label={"ZIP/Postal code*"}
                 placeholderText={"Enter zip or postal code"}
+                value={pinCode}
+                onChange={setPincode}
               />
             </View>
             <View
@@ -161,13 +279,15 @@ const ParentDetails = (props) => {
                 paddingBottom: moderateScale(24),
               }}
             >
-              <Button
-                title="Next"
-                onPress={() => props.navigation.navigate("petDetail")}
-              />
+              <Button title="Next" onPress={() => onSubmit()} />
             </View>
           </View>
         </ScrollView>
+        <UploadImageModal
+          isVisible={visible}
+          onClose={() => setVisible(false)}
+          handleSelectedImage={(image) => handleLogo(image)}
+        />
       </View>
     </View>
   );

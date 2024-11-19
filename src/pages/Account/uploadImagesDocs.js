@@ -48,7 +48,7 @@ const UploadImagesDocs = (props) => {
     const images = [];
     const documents = [];
     let logo;
-    for (let index = 0; index < providerDocument.length; index++) {
+    for (let index = 0; index < providerDocument?.length; index++) {
       const element = providerDocument[index];
       const obj = {
         id: element?.id,

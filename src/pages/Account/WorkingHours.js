@@ -138,7 +138,7 @@ const WorkingHours = (props) => {
       }
     } catch (error) {
       console.log("🚀 ~ onSubmit ~ error:", error);
-      showToast("error", "Something went wrong!!!");
+      showToast("error", "Enter all required Fields!!");
     }
   };
 
