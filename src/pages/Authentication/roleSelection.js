@@ -14,16 +14,10 @@ import Tick from "../../assets/svg/check-circle.svg";
 import Button from "../../components/Button";
 import Modal from "react-native-modal";
 import Cross from "../../assets/svg/cross.svg";
-import { decryptService } from "../../utils/storageFunc";
-import { getProfile } from "../../redux-store/actions/auth";
-import { useDispatch, useSelector } from "react-redux";
-import { saveRegisterData } from "../../redux-store/actions/registerAction";
 
 const RoleSelection = (props) => {
   const [selected, setSelected] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
-  const dispatch = useDispatch();
-  const { logindetails } = useSelector(({ register }) => register);
 
   return (
     <View style={styles.container}>

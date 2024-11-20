@@ -23,7 +23,7 @@ import { deleteDocument, uploadDocument } from "../../redux-store/actions/auth";
 import { useSelector } from "react-redux";
 import { showToast } from "../../utils/utils";
 
-const DOCUMENT_TYPES = {
+export const DOCUMENT_TYPES = {
   image: "businessImg",
   document: "documentImg",
   logo: "companylogo",

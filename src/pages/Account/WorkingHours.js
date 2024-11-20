@@ -6,17 +6,18 @@ import {
   StyleSheet,
   Keyboard,
 } from "react-native";
-import { THEMES } from "../../assets/theme/themes";
+import { useSelector } from "react-redux";
+import { moderateScale } from "react-native-size-matters";
+
+import Stepper from "../../components/Stepper";
 import Header from "../../components/Header";
 import Strings from "../../constants/strings";
 import Button from "../../components/Button";
-import { moderateScale } from "react-native-size-matters";
 import TimeTracker, { DAYS, SHIFTS } from "../../components/TimeTracker";
-import Stepper from "../../components/Stepper";
+import { THEMES } from "../../assets/theme/themes";
 import { decryptService } from "../../utils/storageFunc";
 import { showToast } from "../../utils/utils";
 import { saveSessionDetails } from "../../redux-store/actions/auth";
-import { useSelector } from "react-redux";
 
 const WorkingHours = (props) => {
   const route = props?.route?.params?.route;
@@ -122,23 +123,56 @@ const WorkingHours = (props) => {
     return output;
   };
 
+  const validateData = () => {
+    const flag = times.some((it) => it?.selected);
+    if (!flag) {
+      throw new Error("Please Select at least one day");
+    }
+    if (!selectedShiftType) {
+      throw new Error("Please Select Shift");
+    }
+    for (let index = 0; index < times.length; index++) {
+      const element = times[index];
+      if (
+        element?.selected &&
+        selectedShiftType === SHIFTS.full &&
+        (!element?.shift1?.start || !element?.shift1?.end)
+      ) {
+        throw new Error("Please Enter Shift Data");
+      }
+      if (
+        element?.selected &&
+        selectedShiftType === SHIFTS.shifts &&
+        (!element?.shift1?.start ||
+          !element?.shift1?.end ||
+          !element?.shift2?.start ||
+          !element?.shift2?.end)
+      ) {
+        throw new Error("Please Enter Shift Data");
+      }
+    }
+    return true;
+  };
+
   const onSubmit = async () => {
     try {
-      const userId = await decryptService("userId");
-      processTime();
-      const pramas = {
-        userid: userId,
-        sessionDetails: processTime(),
-      };
-      const response = await saveSessionDetails(pramas);
-      if (response?.data?.status_code == 200) {
-        props.navigation.navigate("mediaLink");
-      } else {
-        showToast("error", response?.data?.message);
+      if (validateData()) {
+        const userId = await decryptService("userId");
+        processTime();
+        const pramas = {
+          userid: userId,
+          sessionDetails: processTime(),
+        };
+        const response = await saveSessionDetails(pramas);
+        if (response?.data?.status_code == 200) {
+          props.navigation.navigate("mediaLink");
+        } else {
+          showToast("error", response?.data?.message);
+        }
       }
     } catch (error) {
       console.log("🚀 ~ onSubmit ~ error:", error);
-      showToast("error", "Enter all required Fields!!");
+      showToast("error", error?.message || "Enter all required Fields!!");
     }
   };
 

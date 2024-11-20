@@ -118,26 +118,21 @@ const SessionDetail = (props) => {
       setSessionTime(ProviderSession?.sessiontime);
     }
 
-
     if (validArray(sessionRateDetails)) {
       sessionRateDetails.forEach((rateDetail) => {
         if (rateDetail.sessioncharges && rateDetail.sessioncharges !== "0.00") {
-         
           const matchedService = serviceProviderRoleData?.find(
             (service) => service.id == rateDetail.servicecode
           );
-          console.log("matchedService",matchedService, rateDetail.servicecode)
           if (matchedService) {
             setServiceProviderValue([matchedService]);
           }
           setSessionCharges(rateDetail.sessioncharges);
         }
         if (rateDetail.monthcharges && rateDetail.monthcharges !== "0.00") {
-          
           const matchedService = serviceProviderRoleData?.find(
             (service) => service.id == rateDetail.servicecode
           );
- 
           if (matchedService) {
             setServiceProviderMonthValue([matchedService]);
           }

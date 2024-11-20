@@ -40,6 +40,7 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import moment from "moment";
 import Strings from "../../constants/strings";
 import Calendars from "../../assets/svg/calendar.svg";
+import { showToast } from "../../utils/utils";
 
 const colorData = [
   { color: "#4FC3F7" }, // Example of blue
@@ -180,7 +181,7 @@ const Home = (props) => {
   const [endDate, selectedEndDate] = useState();
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedAfternonnSlot, setSelectedAfternoonSlot] = useState(null);
-  const { width: screenWidth } = Dimensions.get('window');
+  const { width: screenWidth } = Dimensions.get("window");
 
   const renderCategory = ({ item }) => {
     const isSelected = selectedCategory === item;
@@ -470,10 +471,7 @@ const Home = (props) => {
       setSelectedAttendedId("");
       setOtpInput("");
     } else {
-      return Toast.show({
-        type: "error",
-        text1: "Please enter OTP first!",
-      });
+      return showToast("error", "Please enter OTP first!");
     }
   };
 
@@ -719,7 +717,6 @@ const Home = (props) => {
                   flexDirection: "row",
                   alignItems: "center",
                   justifyContent: "space-between",
-          
                 }}
               >
                 {countData.map((item, index) => {
@@ -783,7 +780,13 @@ const Home = (props) => {
             >
               Next Appointment
             </Text>
-            <View style={{ paddingTop: moderateScale(9), alignItems:'center', justifyContent:'center' }}>
+            <View
+              style={{
+                paddingTop: moderateScale(9),
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <Carousel
                 data={data}
                 renderItem={renderItem}
@@ -970,8 +973,8 @@ const Home = (props) => {
           flex: 1,
           backgroundColor: THEMES.colors.bgColor,
           alignItems: "flex-start",
-          paddingHorizontal:moderateScale(16),
-          paddingTop: moderateScale(10)
+          paddingHorizontal: moderateScale(16),
+          paddingTop: moderateScale(10),
         }}
       >
         <ScrollView
@@ -1038,7 +1041,7 @@ const Home = (props) => {
                   },
                 ]}
               >
-              Single session
+                Single session
               </Text>
               <View style={{ width: "20%", alignItems: "center" }}>
                 {!oneSession ? (
@@ -1072,7 +1075,6 @@ const Home = (props) => {
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
-     
               }}
             >
               <TouchableOpacity

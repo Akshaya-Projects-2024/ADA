@@ -16,8 +16,6 @@ import Strings from "../../constants/strings";
 import Button from "../../components/Button";
 import { moderateScale } from "react-native-size-matters";
 import Stepper from "../../components/Stepper";
-import { NavigationActions, StackActions } from "react-navigation";
-import Toast from "react-native-toast-message";
 import { saveMediaLinks } from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
 import { showToast } from "../../utils/utils";
