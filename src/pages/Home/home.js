@@ -197,7 +197,7 @@ const Home = (props) => {
     );
   };
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item, index }) => {
     let itemBackgroundColor = THEMES.colors.white;
     if (item.isCanceled) {
       itemBackgroundColor = "#fee9e9";
@@ -220,6 +220,7 @@ const Home = (props) => {
     }
     return (
       <Pressable
+        key={`${item?.id}_${index}`}
         onPress={() => {
           setSelectedItemId(item.id);
           props.navigation.navigate("appointmentDetail");
@@ -1024,7 +1025,7 @@ const Home = (props) => {
               <FlatList
                 data={categories}
                 renderItem={renderCategory}
-                keyExtractor={(item) => item}
+                keyExtractor={(item, index) => `${item}_${index}`}
                 horizontal={false}
                 contentContainerStyle={styles.categoryList}
               />

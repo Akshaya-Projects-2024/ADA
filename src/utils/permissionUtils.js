@@ -15,12 +15,14 @@ const requestLocationPermission = () => {
         buttonNegative: "Cancel",
         buttonPositive: "OK",
       });
+      console.log("🚀 ~ returnnewPromise ~ granted:", granted);
       if (granted === RESULTS.GRANTED) {
         res(true);
       } else {
         throw new Error("Location permission denied");
       }
     } catch (err) {
+      console.log("requestLocationPermission Error ", err?.message);
       res(false);
     }
   });

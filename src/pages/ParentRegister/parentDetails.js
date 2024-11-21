@@ -28,6 +28,7 @@ import {
   uploadParentDocument,
 } from "../../redux-store/actions/auth";
 import { showToast } from "../../utils/utils";
+import { useSelector } from "react-redux";
 
 const ParentDetails = (props) => {
   const route = props?.route?.params?.route;
@@ -42,8 +43,11 @@ const ParentDetails = (props) => {
   const [address, setAddress] = useState();
   const [emailId, setEmailId] = useState();
   const [pinCode, setPincode] = useState();
+  const { parentProfie } = useSelector((state) => state?.commonReducer);
+  const { parentContact } = parentProfie;
 
   useEffect(() => {
+    initData();
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -63,6 +67,27 @@ const ParentDetails = (props) => {
     };
   }, []);
 
+  const initData = () => {
+    if (parentContact?.about) {
+      setDescription(parentContact?.about);
+    }
+    if (parentContact?.address) {
+      setAddress(parentContact?.address);
+    }
+    if (parentContact?.email) {
+      setEmailId(parentContact?.email);
+    }
+    if (parentContact?.mobile) {
+      setMobileNumber(parentContact?.mobile);
+    }
+    if (parentContact?.name) {
+      setParentName(parentContact?.name);
+    }
+    if (parentContact?.pin) {
+      setPincode(parentContact?.pin);
+    }
+  };
+
   const handleLogo = async (image) => {
     setParentImg(image?.fileData);
     const extension = image?.uri?.split(".").pop();
@@ -80,6 +105,7 @@ const ParentDetails = (props) => {
   const apiCall = async (postData, type, item) => {
     try {
       const res = await uploadParentDocument(postData);
+      console.log("🚀 ~ apiCall ~ res:", res);
       if (res?.status == 200) {
         showToast("success", "Successfully uploaded the image");
       }
@@ -114,7 +140,6 @@ const ParentDetails = (props) => {
     } else {
       try {
         const userId = await decryptService("userId");
-
         const postData = {
           userid: userId,
           name: parentName,
@@ -155,7 +180,6 @@ const ParentDetails = (props) => {
           <Stepper currentStep={1} totalSteps={2} />
         </View>
       )}
-
       <View style={{ flex: 1 }}>
         <ScrollView
           style={{ flex: 1 }}

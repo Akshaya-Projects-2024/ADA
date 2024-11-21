@@ -243,7 +243,6 @@ const RoleSelection = (props) => {
                   and pawsome content?
                 </Text>
               </View>
-
               <View
                 style={{
                   flexDirection: "row",

@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   ScrollView,
   StatusBar,
   Text,
   StyleSheet,
-  Keyboard,
   TouchableOpacity,
   Image,
   FlatList,
@@ -18,14 +17,12 @@ import ModalDropdown from "../../components/ModalDropdown";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import Stepper from "../../components/Stepper";
-import Icon from "react-native-vector-icons/MaterialIcons";
 import Paw from "../../assets/svg/paw.svg";
 import Pencil from "../../assets/svg/pencil.svg";
 import Modal from "react-native-modal";
 import UploadImageModal from "../../components/UploadImageModal";
 import CrossCircle from "../../assets/svg/crossCircle.svg";
 import Cross from "../../assets/svg/cross.svg";
-
 
 const petType = [
   { id: "1", label: "Pet Training" },
@@ -64,6 +61,30 @@ const PetDetail = (props) => {
     }
   };
 
+  const onSubmit = () => {
+    const params = {
+      userid: "8097479830",
+      name: "Luna",
+      type: "cat",
+      age: 2,
+      gender: "female",
+      about:
+        "I've always been a dog person, but my cat, Luna, has completely changed my perspective. She's a beautiful calico with the softest fur and the most expressive eyes. I got her when she was just a kitten, and we've been inseparable ever since.",
+      documents: [
+        {
+          documenttype: "photo",
+          extention: "png",
+          document: "",
+        },
+      ],
+    };
+    setRegisterModal(false);
+    props.navigation.reset({
+      index: 0,
+      routes: [{ name: "petParentAppStack" }],
+    });
+  };
+
   const renderItem = (item, index) => {
     const photo = item?.item.fileData;
     return (
@@ -88,7 +109,7 @@ const PetDetail = (props) => {
     );
   };
 
-  const renderMedicalItem = (item, index) => {
+  const renderMedicalItem = (item) => {
     const photo = item?.item.fileData;
     return (
       <View style={styles.imgContent}>
@@ -463,16 +484,7 @@ const PetDetail = (props) => {
               }}
             >
               <View style={{ width: "40%" }}>
-                <Button
-                  title="Close"
-                  onPress={() => {
-                    setRegisterModal(false);
-                    props.navigation.reset({
-                      index: 0,
-                      routes: [{ name: "petParentAppStack" }],
-                    });
-                  }}
-                />
+                <Button title="Close" onPress={onSubmit} />
               </View>
             </View>
           </View>

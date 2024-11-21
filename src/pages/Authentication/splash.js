@@ -115,7 +115,7 @@ const Splash = (props) => {
   };
 
   const validateServiceProfile = (userData) => {
-    //ProviderSession, sessionRateDetails
+    return { flag: false };
     if (
       !userData?.providerProfile?.providerBusiness?.name ||
       !validArray(userData?.providerProfile?.providerBusiness?.services) ||
@@ -177,17 +177,14 @@ const Splash = (props) => {
 
   const validateParentProfile = (userData) => {
     // ["parentContact", "petDetails", "subscription"]
-    return { flag: true };
+    return { flag: false };
   }; //parentProfie
 
   const checkIfUserExits = useCallback(async () => {
     const data = await decryptService("accessToken");
     if (data) {
       const userData = await initData();
-      console.log(
-        "🚀 ~ checkIfUserExits ~ userData:",
-        Object.keys(userData?.parentProfie)
-      );
+      console.log("🚀 ~ checkIfUserExits ~ userData:", userData?.parentProfie);
 
       const validProfile = validateParentProfile(userData);
       const validProviderProfile = validateServiceProfile(userData);

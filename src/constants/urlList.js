@@ -12,7 +12,6 @@ export const urlList = {
   getMasterData: "master/getservices",
   addSessionDetails: "register/provider/addsessiondetails",
   saveSessionCharged: "register/provider/addsessionrates",
-  parentDetails:"register/parent/contacts",
-  parentUploadPhoto:"register/uploadphoto"
-
+  parentDetails: "register/parent/contacts",
+  parentUploadPhoto: "register/uploadphoto",
 };

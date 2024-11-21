@@ -24,7 +24,7 @@ import Trainer from "../../assets/svg/trainer.svg";
 import Walker from "../../assets/svg/walker.svg";
 import Behaviourist from "../../assets/svg/behaviour.svg";
 import Groomer from "../../assets/svg/groomer.svg";
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get("window");
 
 const appointmentData = [
   {
@@ -157,12 +157,12 @@ const ParentHome = (props) => {
     );
   };
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item, index }) => {
     return (
-      <View>
+      <View key={`${item?.id}_${index}`}>
         {item.type == "Banner" ? (
           <TouchableOpacity
-          onPress={() => props.navigation.navigate("upComingEvents")}
+            onPress={() => props.navigation.navigate("upComingEvents")}
             style={{
               alignItems: "center",
               justifyContent: "center",
@@ -193,7 +193,7 @@ const ParentHome = (props) => {
               alignItems: "center",
               justifyContent: "center",
               paddingVertical: moderateScale(22),
-          
+
               paddingHorizontal: moderateScale(20),
               borderRadius: 12,
               borderBottomLeftRadius: 0,
@@ -497,7 +497,10 @@ const ParentHome = (props) => {
           {services.map((item, index) => {
             const Icon = item.icon;
             return (
-              <TouchableOpacity style={styles.itemContainer}>
+              <TouchableOpacity
+                key={`${item?.id}_${index}`}
+                style={styles.itemContainer}
+              >
                 <View style={styles.iconContainer}>{Icon}</View>
                 <Text style={styles.itemText}>{item.title}</Text>
               </TouchableOpacity>
