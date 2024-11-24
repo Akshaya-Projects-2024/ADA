@@ -165,7 +165,7 @@ const WorkingHours = (props) => {
         };
         const response = await saveSessionDetails(pramas);
         if (response?.data?.status_code == 200) {
-          props.navigation.navigate("mediaLink");
+          props.navigation.navigate("mediaLink", route ? { route: route } : {});
         } else {
           showToast("error", response?.data?.message);
         }

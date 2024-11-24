@@ -14,4 +14,5 @@ export const urlList = {
   saveSessionCharged: "register/provider/addsessionrates",
   parentDetails: "register/parent/contacts",
   parentUploadPhoto: "register/uploadphoto",
+  savePetDetails: "register/pet/details",
 };

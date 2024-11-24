@@ -11,26 +11,10 @@ const getCurrentLocation = () => {
         Geolocation.getCurrentPosition(
           (info) => res(info),
           (err) => {
-            Alert.alert(
-              "Permission Required",
-              err?.message ||
-                "Location permission is required to access your location.",
-              [
-                {
-                  text: "Cancel",
-                  onPress: () => {
-                    res(false);
-                  },
-                },
-                {
-                  text: "Open Settings",
-                  onPress: () => {
-                    res(false);
-                  },
-                },
-              ]
-            );
-          }
+            console.log(err.message);
+            res(false);
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
         );
       } else {
         Alert.alert(

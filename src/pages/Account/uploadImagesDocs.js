@@ -402,7 +402,12 @@ const UploadImagesDocs = (props) => {
       <View style={styles.submitButton}>
         <Button
           title={route !== "myprofile" ? Strings.next : Strings.submit}
-          onPress={() => props.navigation.navigate("sessionDetail")}
+          onPress={() =>
+            props.navigation.navigate(
+              "sessionDetail",
+              route ? { route: route } : {}
+            )
+          }
         />
       </View>
     </View>

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Modal from "react-native-modal";
 import {
   View,
   ScrollView,
@@ -9,9 +10,9 @@ import {
   Image,
   FlatList,
 } from "react-native";
-import Strings from "../../constants/strings";
-import { THEMES } from "../../assets/theme/themes";
 import { moderateScale } from "react-native-size-matters";
+
+import Strings from "../../constants/strings";
 import Header from "../../components/Header";
 import ModalDropdown from "../../components/ModalDropdown";
 import InputField from "../../components/InputField";
@@ -19,36 +20,107 @@ import Button from "../../components/Button";
 import Stepper from "../../components/Stepper";
 import Paw from "../../assets/svg/paw.svg";
 import Pencil from "../../assets/svg/pencil.svg";
-import Modal from "react-native-modal";
 import UploadImageModal from "../../components/UploadImageModal";
 import CrossCircle from "../../assets/svg/crossCircle.svg";
 import Cross from "../../assets/svg/cross.svg";
+import { THEMES } from "../../assets/theme/themes";
+import { decryptService } from "../../utils/storageFunc";
+import { BREEDS } from "../../constants/mockData";
+import { showToast, validArray } from "../../utils/utils";
+import { savePetDetails } from "../../redux-store/actions/auth";
+import { useSelector } from "react-redux";
 
 const petType = [
-  { id: "1", label: "Pet Training" },
-  { id: "2", label: "Grooming" },
-  { id: "3", label: "Pet Boarding" },
+  { id: "1", label: "Cat" },
+  { id: "2", label: "Dog" },
 ];
+
+const GENDER = { male: "Male", female: "Female" };
+
+export const IMAGE_TYPE = { photo: "photo", certificate: "certificate" };
 
 const PetDetail = (props) => {
   const route = props?.route?.params?.route;
+  const [petName, setPetName] = useState("");
+  const [petAge, setPetAge] = useState("");
+  const [petWeight, setPetWeight] = useState("");
+  const [petDescription, setPetDescription] = useState("");
   const [selectedPetType, setSelectedPetType] = useState();
+  const [selectPetBreed, setSelectedPetBreed] = useState();
   const [selectedGender, setSelectedGender] = useState(null);
   const [petImage, setPetImage] = useState([]);
   const [petImagesVisible, setPetImageVisible] = useState(false);
-
   const [medicalDocument, setMedicalDocument] = useState([]);
   const [medicalVisible, setMedicalVisible] = useState(false);
   const [registerModal, setRegisterModal] = useState(false);
+  const { parentProfie } = useSelector((state) => state?.commonReducer);
+  const { petDetails } = parentProfie;
+
+  useEffect(() => {
+    initData();
+  }, []);
+
+  const initData = () => {
+    if (validArray(petDetails)) {
+      const firstPet = petDetails[0];
+      if (firstPet?.about) {
+        setPetDescription(firstPet?.about);
+      }
+      if (firstPet?.age) {
+        setPetAge(firstPet?.age?.toString());
+      }
+      if (firstPet?.breed) {
+        const selectedBreed = BREEDS.find(
+          (it) => it?.label === firstPet?.breed
+        );
+        if (selectedBreed) {
+          setSelectedPetBreed([selectedBreed]);
+        }
+      }
+      if (firstPet?.gender) {
+        setSelectedGender(firstPet?.gender);
+      }
+      if (firstPet?.name) {
+        setPetName(firstPet?.name);
+      }
+      if (firstPet?.type) {
+        const selectedType = petType.find((it) => it?.label === firstPet?.type);
+        if (selectedType) {
+          setSelectedPetType([selectedType]);
+        }
+      }
+      if (validArray(firstPet?.documents)) {
+        const photos = [];
+        const certificates = [];
+        for (let index = 0; index < firstPet?.documents?.length; index++) {
+          const element = firstPet?.documents[index];
+          console.log("🚀 ~ initData ~ element:", element);
+          const obj = {
+            id: element?.id,
+          };
+          switch (element?.documenttype) {
+            case IMAGE_TYPE.photo:
+              photos.push({ ...obj, fileData: element?.url });
+              break;
+            case IMAGE_TYPE.certificate:
+              certificates.push({ ...obj, fileData: element?.url });
+              break;
+          }
+        }
+        setMedicalDocument(certificates);
+        setPetImage(photos);
+      }
+    }
+  };
 
   const handlePetImg = (image) => {
-    var temp = [...petImage];
+    const temp = [...petImage];
     temp.push(image);
     setPetImage(temp);
   };
 
   const handleDocuments = (image) => {
-    var temp = [...medicalDocument];
+    const temp = [...medicalDocument];
     temp.push(image);
     setMedicalDocument(temp);
   };
@@ -61,31 +133,81 @@ const PetDetail = (props) => {
     }
   };
 
-  const onSubmit = () => {
-    const params = {
-      userid: "8097479830",
-      name: "Luna",
-      type: "cat",
-      age: 2,
-      gender: "female",
-      about:
-        "I've always been a dog person, but my cat, Luna, has completely changed my perspective. She's a beautiful calico with the softest fur and the most expressive eyes. I got her when she was just a kitten, and we've been inseparable ever since.",
-      documents: [
-        {
-          documenttype: "photo",
-          extention: "png",
-          document: "",
-        },
-      ],
-    };
-    setRegisterModal(false);
+  const getDocuments = () => {
+    const output = [];
+    if (validArray(petImage)) {
+      for (let index = 0; index < petImage?.length; index++) {
+        const element = petImage[index];
+        if (element?.fileName && element?.fileData) {
+          const outputObj = {
+            documenttype: IMAGE_TYPE.photo,
+            extention: element?.fileName?.split(".")?.pop(),
+            document: element?.fileData,
+          };
+          output.push(outputObj);
+        }
+      }
+    }
+    if (validArray(medicalDocument)) {
+      for (let index = 0; index < medicalDocument?.length; index++) {
+        const element = medicalDocument[index];
+        if (element?.fileName && element?.fileData) {
+          const outputObj = {
+            documenttype: IMAGE_TYPE.certificate,
+            extention: element?.fileName?.split(".")?.pop(),
+            document: element?.fileData,
+          };
+          console.log("🚀 ~ getDocuments ~ outputObj:", outputObj);
+          output.push(outputObj);
+        }
+      }
+    }
+    return output;
+  };
+
+  const onSubmit = async () => {
+    if (!petName) {
+      showToast("error", "Please enter pet name");
+    } else if (!selectedPetType || !selectedPetType[0]?.label) {
+      showToast("error", "Please select pet type");
+    } else if (!selectPetBreed || !selectPetBreed[0]?.label) {
+      showToast("error", "Please select pet breed");
+    } else if (!petAge) {
+      showToast("error", "Please enter pet age");
+    } else if (!selectedGender) {
+      showToast("error", "Please select pet gender");
+    } else {
+      try {
+        const userId = await decryptService("userId");
+        const params = {
+          userid: userId,
+          name: petName,
+          type: selectedPetType[0]?.label || null,
+          age: Number(petAge),
+          gender: selectedGender,
+          about: petDescription ? petDescription : "",
+          documents: getDocuments(),
+        };
+        const res = await savePetDetails(params);
+        if (res?.data?.status_code == 200) {
+          setRegisterModal(true);
+        } else {
+          showToast("error", res?.data?.message);
+        }
+      } catch (error) {
+        showToast("error", "Something went wrong!!!");
+      }
+    }
+  };
+
+  const onSuccess = () => {
     props.navigation.reset({
       index: 0,
       routes: [{ name: "petParentAppStack" }],
     });
   };
 
-  const renderItem = (item, index) => {
+  const renderItem = (item) => {
     const photo = item?.item.fileData;
     return (
       <View style={styles.imgContent}>
@@ -97,7 +219,7 @@ const PetDetail = (props) => {
         <TouchableOpacity
           onPress={() => {
             const removeItemById = petImage.filter(
-              (item) => item?.fileData !== photo
+              (it) => it?.fileData !== photo
             );
             setPetImage(removeItemById);
           }}
@@ -121,7 +243,7 @@ const PetDetail = (props) => {
         <TouchableOpacity
           onPress={() => {
             const removeItemById = medicalDocument.filter(
-              (item) => item?.fileData !== photo
+              (it) => it?.fileData !== photo
             );
             setMedicalDocument(removeItemById);
           }}
@@ -194,25 +316,27 @@ const PetDetail = (props) => {
             <InputField
               label={"Pet Name*"}
               placeholderText={"Enter pet name"}
+              value={petName}
+              onChange={setPetName}
             />
           </View>
 
           <View style={{ paddingTop: moderateScale(16) }}>
             <ModalDropdown
-              placeholder="Service provider Role*"
+              placeholder="Pet Type*"
               data={petType}
-              title={"Select service role"}
+              title={"Select Pet Type"}
               setSelectedValue={setSelectedPetType}
               selectedValue={selectedPetType}
             />
           </View>
           <View style={{ paddingTop: moderateScale(16) }}>
             <ModalDropdown
-              placeholder="Service provider Role*"
-              data={petType}
-              title={"Select service role"}
-              setSelectedValue={setSelectedPetType}
-              selectedValue={selectedPetType}
+              placeholder="Breed*"
+              data={BREEDS}
+              title={"Select pet breed"}
+              setSelectedValue={setSelectedPetBreed}
+              selectedValue={selectPetBreed}
             />
           </View>
           <View
@@ -221,7 +345,13 @@ const PetDetail = (props) => {
               paddingHorizontal: moderateScale(20),
             }}
           >
-            <InputField label={"Age*"} placeholderText={"Enter age"} />
+            <InputField
+              label={"Age*"}
+              placeholderText={"Enter age"}
+              value={petAge}
+              onChange={setPetAge}
+              keyboardType="phone-pad"
+            />
           </View>
           <View style={styles.toggleContainer}>
             <TouchableOpacity
@@ -229,25 +359,25 @@ const PetDetail = (props) => {
                 styles.toggleButton,
                 {
                   backgroundColor:
-                    selectedGender === "Male"
+                    selectedGender === GENDER.male
                       ? THEMES.colors.cyan
                       : THEMES.colors.white,
                 },
               ]}
-              onPress={() => setSelectedGender("Male")}
+              onPress={() => setSelectedGender(GENDER.male)}
             >
               <Text
                 style={[
                   styles.toggleText,
                   {
                     color:
-                      selectedGender === "Male"
+                      selectedGender === GENDER.male
                         ? THEMES.colors.white
                         : THEMES.colors.cyan,
                   },
                 ]}
               >
-                Male
+                {GENDER.male}
               </Text>
             </TouchableOpacity>
 
@@ -256,25 +386,25 @@ const PetDetail = (props) => {
                 styles.toggleButton,
                 {
                   backgroundColor:
-                    selectedGender === "Female"
+                    selectedGender === GENDER.female
                       ? THEMES.colors.cyan
                       : THEMES.colors.white,
                 },
               ]}
-              onPress={() => setSelectedGender("Female")}
+              onPress={() => setSelectedGender(GENDER.female)}
             >
               <Text
                 style={[
                   styles.toggleText,
                   {
                     color:
-                      selectedGender === "Female"
+                      selectedGender === GENDER.female
                         ? THEMES.colors.white
                         : THEMES.colors.cyan,
                   },
                 ]}
               >
-                Female
+                {GENDER.female}
               </Text>
             </TouchableOpacity>
           </View>
@@ -284,7 +414,13 @@ const PetDetail = (props) => {
               paddingHorizontal: moderateScale(20),
             }}
           >
-            <InputField label={"Weight"} placeholderText={"Enter weight"} />
+            <InputField
+              label={"Weight"}
+              placeholderText={"Enter weight"}
+              value={petWeight}
+              onChange={setPetWeight}
+              keyboardType="phone-pad"
+            />
           </View>
           <View
             style={{
@@ -296,6 +432,8 @@ const PetDetail = (props) => {
               label={"About Pet"}
               placeholderText={"Enter about Pet"}
               multiline
+              value={petDescription}
+              onChange={setPetDescription}
             />
           </View>
           <View
@@ -403,7 +541,7 @@ const PetDetail = (props) => {
               paddingHorizontal: moderateScale(16),
             }}
           >
-            <Button title="Submit" onPress={() => setRegisterModal(true)} />
+            <Button title="Submit" onPress={onSubmit} />
           </View>
         </ScrollView>
       </View>
@@ -484,7 +622,7 @@ const PetDetail = (props) => {
               }}
             >
               <View style={{ width: "40%" }}>
-                <Button title="Close" onPress={onSubmit} />
+                <Button title="Close" onPress={onSuccess} />
               </View>
             </View>
           </View>

@@ -268,7 +268,8 @@ const RoleSelection = (props) => {
                         if (selected == "service") {
                           props.navigation.navigate("businessDetail");
                         } else {
-                          props.navigation.navigate("parentDetails");
+                          // props.navigation.navigate("parentDetails");
+                          props.navigation.navigate("petDetail");
                         }
                       }, 200);
                     }}

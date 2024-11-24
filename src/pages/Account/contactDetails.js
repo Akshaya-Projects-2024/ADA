@@ -90,10 +90,14 @@ const ContactDetails = (props) => {
           address: address,
           location: location,
           pin: postalCode,
+          ...(providerContact?.id ? { id: providerContact?.id } : {}),
         };
         const res = await saveContactDetails(postData);
         if (res?.data?.status_code == 200) {
-          props.navigation.navigate("uploadImagesDocs");
+          props.navigation.navigate(
+            "uploadImagesDocs",
+            route ? { route: route } : {}
+          );
         } else {
           showToast("error", res?.data?.message);
         }

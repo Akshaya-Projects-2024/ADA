@@ -141,10 +141,14 @@ const BusinessDetail = (props) => {
           name: businessValue,
           services: formattedServices,
           userid: userId,
+          ...(providerBusiness?.id ? { id: providerBusiness?.id } : {}),
         };
         const res = await saveBusinessDetails(postData);
         if (res?.data?.status_code == 200) {
-          props.navigation.navigate("contactDetails");
+          props.navigation.navigate(
+            "contactDetails",
+            route ? { route: route } : {}
+          );
         } else {
           showToast("error", res?.data?.message);
         }

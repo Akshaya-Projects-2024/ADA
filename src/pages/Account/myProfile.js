@@ -1,18 +1,18 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
   StatusBar,
   StyleSheet,
   TouchableOpacity,
-} from 'react-native';
-import {THEMES} from '../../assets/theme/themes';
-import Strings from '../../constants/strings';
-import Header from '../../components/Header';
-import RightArrow from '../../assets/svg/rightArrow.svg';
-import {moderateScale} from 'react-native-size-matters';
+} from "react-native";
+import { THEMES } from "../../assets/theme/themes";
+import Strings from "../../constants/strings";
+import Header from "../../components/Header";
+import RightArrow from "../../assets/svg/rightArrow.svg";
+import { moderateScale } from "react-native-size-matters";
 
-const MyProfile = props => {
+const MyProfile = (props) => {
   const renderItem = (title, addBottom, route, description, showPending) => {
     return (
       <TouchableOpacity
@@ -22,7 +22,8 @@ const MyProfile = props => {
           {
             paddingBottom: addBottom && moderateScale(16),
           },
-        ]}>
+        ]}
+      >
         <View>
           <Text style={styles.titleText}>{title}</Text>
           <Text style={styles.descriptionText}>{description}</Text>
@@ -44,35 +45,35 @@ const MyProfile = props => {
         <View style={styles.cardView}>
           {renderItem(
             Strings.businessDetails,
-            '',
-            'businessDetail',
-            Strings.businessDescription,
+            "",
+            "businessDetail",
+            Strings.businessDescription
           )}
 
           {renderItem(
             Strings.contactDetails,
-            '',
-            'contactDetails',
-            Strings.contactDescription,
+            "",
+            "contactDetails",
+            Strings.contactDescription
           )}
           {renderItem(
             Strings.uploadImages,
-            '',
-            'uploadImagesDocs',
-            Strings.uploadImagesDescription,
+            "",
+            "uploadImagesDocs",
+            Strings.uploadImagesDescription
           )}
           {renderItem(
             Strings.sessionDetails,
-            '',
-            'sessionDetail',
+            "",
+            "sessionDetail",
             Strings.sessionDescriptions,
-            true,
+            true
           )}
           {renderItem(
             Strings.mediaLinks,
-            'addBottom',
-            'mediaLink',
-            Strings.mediaDescription,
+            "addBottom",
+            "mediaLink",
+            Strings.mediaDescription
           )}
         </View>
       </View>
@@ -90,39 +91,39 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(20),
   },
   flexRowContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   cardView: {
     backgroundColor: THEMES.colors.white,
     paddingHorizontal: moderateScale(16),
     borderRadius: moderateScale(12),
     shadowColor: THEMES.colors.black,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: THEMES.colors.white,
   },
   flexRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingTop: moderateScale(16),
   },
   rowCenter: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   iconStyle: {
     width: 30,
     height: 30,
     borderRadius: 7,
     backgroundColor: THEMES.colors.bgColor,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: moderateScale(12),
   },
   titleText: {
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
     color: THEMES.colors.darkGrey,
   },
   pendingText: {
-    color: '#FF6437',
+    color: "#FF6437",
     fontSize: THEMES.fonts.font12,
     fontFamily: THEMES.fontFamily.regular,
   },

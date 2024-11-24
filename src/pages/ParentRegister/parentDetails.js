@@ -3,7 +3,6 @@ import {
   View,
   ScrollView,
   StatusBar,
-  Text,
   StyleSheet,
   Keyboard,
   TouchableOpacity,
@@ -13,11 +12,9 @@ import Strings from "../../constants/strings";
 import { THEMES } from "../../assets/theme/themes";
 import { moderateScale } from "react-native-size-matters";
 import Header from "../../components/Header";
-import ModalDropdown from "../../components/ModalDropdown";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import Stepper from "../../components/Stepper";
-import Icon from "react-native-vector-icons/MaterialIcons";
 import User from "../../assets/svg/user.svg";
 import Pencil from "../../assets/svg/pencil.svg";
 import Location from "../../assets/svg/location.svg";
@@ -29,6 +26,7 @@ import {
 } from "../../redux-store/actions/auth";
 import { showToast } from "../../utils/utils";
 import { useSelector } from "react-redux";
+import { getCurrentLocation } from "../../utils/geolocationUtils";
 
 const ParentDetails = (props) => {
   const route = props?.route?.params?.route;
@@ -105,7 +103,6 @@ const ParentDetails = (props) => {
   const apiCall = async (postData, type, item) => {
     try {
       const res = await uploadParentDocument(postData);
-      console.log("🚀 ~ apiCall ~ res:", res);
       if (res?.status == 200) {
         showToast("success", "Successfully uploaded the image");
       }
@@ -140,6 +137,7 @@ const ParentDetails = (props) => {
     } else {
       try {
         const userId = await decryptService("userId");
+        const currentPosition = await getCurrentLocation();
         const postData = {
           userid: userId,
           name: parentName,
@@ -148,12 +146,17 @@ const ParentDetails = (props) => {
           email: emailId,
           address: address,
           pin: pinCode,
-          lang: "454545",
-          lat: "45545454",
+          lat: currentPosition?.coords?.latitude
+            ? currentPosition?.coords?.latitude?.toString()
+            : "0",
+          lang: currentPosition?.coords?.longitude
+            ? currentPosition?.coords?.longitude?.toString()
+            : "0",
+          ...(parentContact?.id ? { id: parentContact?.id } : {}),
         };
         const res = await saveParentDetails(postData);
         if (res?.data?.status_code == 200) {
-          props.navigation.navigate("petDetail");
+          props.navigation.navigate("petDetail", route ? { route: route } : {});
         } else {
           showToast("error", res?.data?.message);
         }

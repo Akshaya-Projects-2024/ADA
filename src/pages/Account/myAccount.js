@@ -81,7 +81,7 @@ const MyAccount = (props) => {
       <StatusBar backgroundColor={THEMES.colors.lightCyan} />
       <Header
         customIcon={<SwitchIcon />}
-        title={Strings.myAccount}
+        title={"Strings.myAccount"}
         showSearch
         bgColor="transparent"
       />

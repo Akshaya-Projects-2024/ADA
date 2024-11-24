@@ -219,7 +219,6 @@ const SessionDetail = (props) => {
           userid: userId,
           sessionrate: sessionRateArray,
         };
-        console.log(sessionData, sessionCharge);
         const responses = await Promise.all([
           saveSession(sessionData),
           saveSessionCharges(sessionCharge),
@@ -230,7 +229,10 @@ const SessionDetail = (props) => {
           sessionRes?.data?.status_code === 200 &&
           sessionChargesRes?.data?.status_code === 200
         ) {
-          props.navigation.navigate("workingHours");
+          props.navigation.navigate(
+            "workingHours",
+            route ? { route: route } : {}
+          );
         } else {
           showToast(
             "error",

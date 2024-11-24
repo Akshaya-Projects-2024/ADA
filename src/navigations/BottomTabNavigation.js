@@ -1,10 +1,10 @@
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import Home from '../pages/Home/home';
-import TrendingTopics from '../pages/TrendingTopics/trendingTopics';
-import PetAdoption from '../pages/PetAdoption/petAdoption';
-import MyAccount from '../pages/Account/myAccount';
-import BottomTabBarItem from './BottomTabBarItem';
-import Chat from '../pages/Chat/chat';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Home from "../pages/Home/home";
+import TrendingTopics from "../pages/TrendingTopics/trendingTopics";
+import PetAdoption from "../pages/PetAdoption/petAdoption";
+import MyAccount from "../pages/Account/myAccount";
+import BottomTabBarItem from "./BottomTabBarItem";
+import Chat from "../pages/Chat/chat";
 
 const Tab = createBottomTabNavigator();
 
@@ -17,7 +17,8 @@ export default function BottomTabNavigation() {
   return (
     <Tab.Navigator
       initialRouteName="home"
-      tabBar={props => <BottomTabBarItem {...props} />}>
+      tabBar={(props) => <BottomTabBarItem {...props} />}
+    >
       <Tab.Screen name="home" component={Home} options={navOptionHandler} />
 
       <Tab.Screen

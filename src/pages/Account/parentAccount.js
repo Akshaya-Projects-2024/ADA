@@ -29,8 +29,45 @@ import AboutUs from "../../assets/svg/aboutUs.svg";
 import Strings from "../../constants/strings";
 import { moderateScale, s } from "react-native-size-matters";
 import Activity from "../../assets/svg/activity.svg";
+import { useSelector } from "react-redux";
+import { validateServiceProfile } from "../../utils/userUtils";
+
+const MenuItem = ({
+  bgColor,
+  icon,
+  title,
+  addBottom,
+  showPending = false,
+  onPress,
+}) => {
+  const Icon = icon;
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        styles.flexRow,
+        {
+          paddingBottom: addBottom && moderateScale(16),
+        },
+      ]}
+    >
+      <View style={styles.rowCenter}>
+        <View style={[styles.iconStyle, { backgroundColor: bgColor }]}>
+          {Icon}
+        </View>
+        <Text style={styles.titleText}>{title}</Text>
+      </View>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        {showPending && <Text style={styles.pendingText}>Pending</Text>}
+
+        <RightArrow stroke={THEMES.colors.boulder} />
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const ParentAccount = (props) => {
+  const { providerProfile } = useSelector((state) => state?.commonReducer);
   const renderItem = (
     bgColor,
     icon,
@@ -66,6 +103,20 @@ const ParentAccount = (props) => {
         </View>
       </TouchableOpacity>
     );
+  };
+
+  const onProviderClick = () => {
+    const validProviderProfile = validateServiceProfile(providerProfile);
+    if (validProviderProfile?.flag) {
+      props.navigation.navigate("auth", {
+        screen: "home",
+      });
+    } else {
+      props.navigation.navigate("auth", {
+        screen: validProviderProfile?.navigateTo,
+        params: { route: "myprofile" },
+      });
+    }
   };
 
   return (
@@ -106,31 +157,40 @@ const ParentAccount = (props) => {
             </View>
             <View style={styles.padding14}>
               <View style={styles.contentView}>
-                {renderItem(
-                  THEMES.colors.lightCyan,
-                  <ProfileImg />,
-                  Strings.myProfile,
-                  "",
-                  "parentDetails",
-                  true
-                )}
-                {renderItem(
-                  "#e8f2e1",
-                  <PawPrint />,
-                  Strings.myPetProfile,
-                  "",
-                  "petDetail",
-                  true
-                )}
-                {renderItem(
-                  "#d6ecfc",
-                  <Activity />,
-                  "Activity tracker",
-                  "addBottom",
-                  "petDetail",
-                  false
-                )}
-                 
+                <MenuItem
+                  bgColor={THEMES.colors.lightCyan}
+                  icon={<ProfileImg />}
+                  title={Strings.myProfile}
+                  showPending
+                  onPress={() =>
+                    props.navigation.navigate("parentDetails", {
+                      route: "parentAccount",
+                    })
+                  }
+                />
+                <MenuItem
+                  bgColor={THEMES.colors.zanah}
+                  icon={<PawPrint />}
+                  title={Strings.myPetProfile}
+                  showPending
+                  onPress={() =>
+                    props.navigation.navigate("petDetail", {
+                      route: "parentAccount",
+                    })
+                  }
+                />
+                <MenuItem
+                  bgColor={THEMES.colors.hawkesBlue}
+                  icon={<Activity />}
+                  title={"Activity tracker"}
+                  showPending={false}
+                  onPress={() =>
+                    props.navigation.navigate("petDetail", {
+                      route: "parentAccount",
+                    })
+                  }
+                  addBottom={"addBottom"}
+                />
               </View>
             </View>
 
@@ -167,13 +227,14 @@ const ParentAccount = (props) => {
 
             <View style={styles.padding12}>
               <View style={styles.contentView}>
-                {renderItem(
-                  THEMES.colors.cherub,
-                  <Users />,
-                  "Register as a Service provider",
-                  "addBottom",
-                  "parentDetails"
-                )}
+                <MenuItem
+                  bgColor={THEMES.colors.cherub}
+                  icon={<Users />}
+                  title={"Register as a Service provider"}
+                  showPending={false}
+                  onPress={onProviderClick}
+                  addBottom={"addBottom"}
+                />
               </View>
             </View>
 

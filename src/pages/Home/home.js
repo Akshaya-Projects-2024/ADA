@@ -155,6 +155,7 @@ const categories = [
 ];
 
 const Home = (props) => {
+  console.log("HOME");
   const [selectedValue, setSelectedValue] = useState();
   const { colors, fontFamily, fonts } = THEMES;
   const [activeIndex, setActiveIndex] = useState(0);
