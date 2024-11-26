@@ -27,8 +27,44 @@ import ContactUs from "../../assets/svg/contactUs.svg";
 import AboutUs from "../../assets/svg/aboutUs.svg";
 import Strings from "../../constants/strings";
 import { moderateScale, s } from "react-native-size-matters";
+import { validateParentProfile } from "../../utils/userUtils";
+import { useSelector } from "react-redux";
+
+const MenuItem = ({
+  bgColor,
+  icon,
+  title,
+  addBottom,
+  showPending = false,
+  onPress,
+}) => {
+  const Icon = icon;
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        styles.flexRow,
+        {
+          paddingBottom: addBottom && moderateScale(16),
+        },
+      ]}
+    >
+      <View style={styles.rowCenter}>
+        <View style={[styles.iconStyle, { backgroundColor: bgColor }]}>
+          {Icon}
+        </View>
+        <Text style={styles.titleText}>{title}</Text>
+      </View>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        {showPending && <Text style={styles.pendingText}>Pending</Text>}
+        <RightArrow stroke={THEMES.colors.boulder} />
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const MyAccount = (props) => {
+  const profile = useSelector((state) => state?.commonReducer);
   const renderItem = (
     bgColor,
     icon,
@@ -67,7 +103,22 @@ const MyAccount = (props) => {
       </TouchableOpacity>
     );
   };
-
+  const onParentClick = () => {
+    const validProviderProfile = validateParentProfile(profile);
+    if (validProviderProfile?.flag) {
+      props.navigation.reset({
+        index: 0,
+        routes: [{ name: "petParentAppStack" }],
+      });
+    } else {
+      props.navigation.reset({
+        index: 0,
+        routes: [
+          { name: "petParentAppStack", params: { route: "parentAccount" } },
+        ],
+      });
+    }
+  };
   return (
     <LinearGradient
       locations={[0, 0.5, 0.6]}
@@ -151,13 +202,14 @@ const MyAccount = (props) => {
             </View>
             <View style={styles.padding12}>
               <View style={styles.contentView}>
-                {renderItem(
-                  THEMES.colors.cherub,
-                  <Users />,
-                  Strings.registerAsParent,
-                  "addBottom",
-                  "parentDetails"
-                )}
+                <MenuItem
+                  bgColor={THEMES.colors.cherub}
+                  icon={<Users />}
+                  title={Strings.registerAsParent}
+                  showPending={false}
+                  onPress={onParentClick}
+                  addBottom={"addBottom"}
+                />
               </View>
             </View>
 

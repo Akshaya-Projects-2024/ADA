@@ -67,7 +67,7 @@ const MenuItem = ({
 };
 
 const ParentAccount = (props) => {
-  const { providerProfile } = useSelector((state) => state?.commonReducer);
+  const profile = useSelector((state) => state?.commonReducer);
   const renderItem = (
     bgColor,
     icon,
@@ -106,7 +106,7 @@ const ParentAccount = (props) => {
   };
 
   const onProviderClick = () => {
-    const validProviderProfile = validateServiceProfile(providerProfile);
+    const validProviderProfile = validateServiceProfile(profile);
     if (validProviderProfile?.flag) {
       props.navigation.navigate("auth", {
         screen: "home",

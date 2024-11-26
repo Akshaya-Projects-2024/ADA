@@ -9,12 +9,14 @@ const getCurrentLocation = () => {
       const locationPermission = await requestLocationPermission();
       if (locationPermission) {
         Geolocation.getCurrentPosition(
-          (info) => res(info),
+          (info) => {
+            console.log(info);
+            res(info);
+          },
           (err) => {
             console.log(err.message);
             res(false);
-          },
-          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+          }
         );
       } else {
         Alert.alert(
