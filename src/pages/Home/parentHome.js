@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,14 +9,12 @@ import {
   Dimensions,
   FlatList,
 } from "react-native";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Carousel from "react-native-snap-carousel";
 import { THEMES } from "../../assets/theme/themes";
 import { moderateScale } from "react-native-size-matters";
 import ArrowRight from "../../assets/svg/arrow-right-white.svg";
 import Calendar from "../../assets/svg/calendar-white.svg";
 import Clock from "../../assets/svg/clock.svg";
-import SwitchIcon from "../../assets/svg/switch.svg";
 import Bell from "../../assets/svg/bell.svg";
 import Event from "../../assets/svg/event.svg";
 import Search from "../../assets/svg/search.svg";
@@ -24,6 +22,14 @@ import Trainer from "../../assets/svg/trainer.svg";
 import Walker from "../../assets/svg/walker.svg";
 import Behaviourist from "../../assets/svg/behaviour.svg";
 import Groomer from "../../assets/svg/groomer.svg";
+import Toggle from "../../components/Toggle";
+import {
+  setLoggedInMoodule,
+  validateServiceProfile,
+} from "../../utils/userUtils";
+import { LoginModules } from "../../constants/enums";
+import { useIsFocused } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
 const { width: screenWidth } = Dimensions.get("window");
 
 const appointmentData = [
@@ -95,7 +101,17 @@ const Data = [
 const { width } = Dimensions.get("window");
 
 const ParentHome = (props) => {
+  const dispatch = useDispatch();
+  const isFocused = useIsFocused();
   const [activeIndex, setActiveIndex] = useState(0);
+  const { loggedInModule } = useSelector((state) => state?.register);
+  const profile = useSelector((state) => state?.commonReducer);
+
+  useEffect(() => {
+    if (isFocused) {
+      dispatch(setLoggedInMoodule(LoginModules.parent));
+    }
+  }, [isFocused, dispatch]);
 
   const renderTrendingItem = ({ item, index }) => {
     return (
@@ -362,6 +378,20 @@ const ParentHome = (props) => {
     );
   };
 
+  const switchProfile = () => {
+    const validProviderProfile = validateServiceProfile(profile);
+    if (validProviderProfile?.flag) {
+      props.navigation.navigate("auth", {
+        screen: "home",
+      });
+    } else {
+      props.navigation.navigate("auth", {
+        screen: validProviderProfile?.navigateTo,
+        params: { route: "myprofile" },
+      });
+    }
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
       <ScrollView
@@ -380,7 +410,11 @@ const ParentHome = (props) => {
           }}
         >
           <View style={{ width: "20%" }}>
-            <SwitchIcon />
+            {/* <SwitchIcon /> */}
+            <Toggle
+              state={loggedInModule === LoginModules.provider}
+              onPress={switchProfile}
+            />
           </View>
           <View style={{ width: "55%", alignItems: "center" }}>
             <Text

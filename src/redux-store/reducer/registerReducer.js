@@ -5,12 +5,14 @@ import {
   SERVICE_PROVIDER_ROLE,
   SERVICE_PROVIDER_ROLE_SUCCESS,
   SERVICE_PROVIDER_ROLE_ERROR,
+  PROFILE_LOGGED_IN_MODULE,
 } from "../types";
 
 const initialState = {
   registerData: {},
   isFetching: true,
   serviceProviderRoleData: [],
+  loggedInModule: "",
 };
 
 export const registerReducer = (state = initialState, action) => {
@@ -18,6 +20,8 @@ export const registerReducer = (state = initialState, action) => {
   switch (type) {
     case SERVICE_PROVIDER_DATA:
       return { ...state, registerData: payload };
+    case PROFILE_LOGGED_IN_MODULE:
+      return { ...state, loggedInModule: payload };
     case SERVICE_PROVIDER_DATA_SUCCESS:
       return {
         ...state,

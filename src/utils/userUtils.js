@@ -1,6 +1,8 @@
 import { SHIFTS } from "../components/TimeTracker";
 import { DOCUMENT_TYPES } from "../pages/Account/uploadImagesDocs";
 import { IMAGE_TYPE } from "../pages/ParentRegister/petDetail";
+import { dispatchLoggedInModule } from "../redux-store/actions/userActions";
+import { decryptService, encryptService } from "./storageFunc";
 import { validArray } from "./utils";
 
 export const validateParentProfile = (userData) => {
@@ -156,4 +158,15 @@ const validatePetDocuments = (docs) => {
   );
   const photo = docs?.some((it) => it?.documenttype === IMAGE_TYPE.photo);
   return photo && certificate;
+};
+
+export const setLoggedInMoodule = (loggedInModule) => {
+  return async (dispatch) => {
+    dispatch(dispatchLoggedInModule(loggedInModule));
+    await encryptService("loggedInModule", loggedInModule);
+  };
+};
+
+export const getLoggedInMoodule = async () => {
+  return await decryptService("loggedInModule");
 };

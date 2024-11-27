@@ -1,31 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   FlatList,
-  StatusBar,
   StyleSheet,
   Image,
   Pressable,
   TouchableOpacity,
   ScrollView,
   Alert,
-  Switch,
   Dimensions,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
-import Header from "../../components/Header";
-import SwitchIcon from "../../assets/svg/switch.svg";
 import Bell from "../../assets/svg/bell.svg";
 import Event from "../../assets/svg/event.svg";
 import Right from "../../assets/svg/chevronRight.svg";
 import Plus from "../../assets/svg/plus.svg";
 import Button from "../../components/Button";
 import { moderateScale } from "react-native-size-matters";
-import ModalDropdown from "../../components/ModalDropdown";
-import Stepper from "../../components/Stepper";
 import LinearGradient from "react-native-linear-gradient";
-import Filter from "../../assets/svg/listFilter.svg";
 import Check from "../../assets/svg/check.svg";
 import Cross from "../../assets/svg/redCross.svg";
 import BlackCross from "../../assets/svg/cross.svg";
@@ -35,12 +28,19 @@ import InputField from "../../components/InputField";
 import ReviewComponent from "../../components/ReviewComponent";
 import SwitchOn from "../../assets/svg/switchOn.svg";
 import SwitchOff from "../../assets/svg/switchOff.svg";
-import SwitchSession from "../../assets/svg/switchSession.svg";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import moment from "moment";
 import Strings from "../../constants/strings";
 import Calendars from "../../assets/svg/calendar.svg";
 import { showToast } from "../../utils/utils";
+import Toggle from "../../components/Toggle";
+import { useIsFocused } from "@react-navigation/native";
+import {
+  setLoggedInMoodule,
+  validateParentProfile,
+} from "../../utils/userUtils";
+import { LoginModules } from "../../constants/enums";
+import { useDispatch, useSelector } from "react-redux";
 
 const colorData = [
   { color: "#4FC3F7" }, // Example of blue
@@ -155,7 +155,8 @@ const categories = [
 ];
 
 const Home = (props) => {
-  console.log("HOME");
+  const dispatch = useDispatch();
+  const isFocused = useIsFocused();
   const [selectedValue, setSelectedValue] = useState();
   const { colors, fontFamily, fonts } = THEMES;
   const [activeIndex, setActiveIndex] = useState(0);
@@ -183,6 +184,14 @@ const Home = (props) => {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedAfternonnSlot, setSelectedAfternoonSlot] = useState(null);
   const { width: screenWidth } = Dimensions.get("window");
+  const { loggedInModule } = useSelector((state) => state?.register);
+  const profile = useSelector((state) => state?.commonReducer);
+
+  useEffect(() => {
+    if (isFocused) {
+      dispatch(setLoggedInMoodule(LoginModules.provider));
+    }
+  }, [isFocused, dispatch]);
 
   const renderCategory = ({ item }) => {
     const isSelected = selectedCategory === item;
@@ -542,6 +551,23 @@ const Home = (props) => {
     hideDateEndPickerCancel();
   };
 
+  const switchProfile = () => {
+    const validProviderProfile = validateParentProfile(profile);
+    if (validProviderProfile?.flag) {
+      props.navigation.reset({
+        index: 0,
+        routes: [{ name: "petParentAppStack" }],
+      });
+    } else {
+      props.navigation.reset({
+        index: 0,
+        routes: [
+          { name: "petParentAppStack", params: { route: "parentAccount" } },
+        ],
+      });
+    }
+  };
+
   return (
     <LinearGradient
       locations={[0, 0.5, 0.6]}
@@ -564,7 +590,11 @@ const Home = (props) => {
             }}
           >
             <View style={{ width: "20%" }}>
-              <SwitchIcon />
+              <Toggle
+                state={loggedInModule === LoginModules.provider}
+                onPress={switchProfile}
+              />
+              {/* <SwitchIcon /> */}
             </View>
             <View style={{ width: "55%", alignItems: "center" }}>
               <Text
