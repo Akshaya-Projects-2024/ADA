@@ -77,6 +77,7 @@ const MediaLink = (props) => {
         instagram: instaLink,
         facebook: fbLink,
         website: weblink,
+        ...(MediaLinks?.id ? { id: MediaLinks?.id } : {}),
       };
       const res = await saveMediaLinks(postData);
       if (res?.data?.status_code == 200) {

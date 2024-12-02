@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
@@ -27,7 +27,10 @@ import ContactUs from "../../assets/svg/contactUs.svg";
 import AboutUs from "../../assets/svg/aboutUs.svg";
 import Strings from "../../constants/strings";
 import { moderateScale, s } from "react-native-size-matters";
-import { validateParentProfile } from "../../utils/userUtils";
+import {
+  validateParentProfile,
+  validateServiceProfile,
+} from "../../utils/userUtils";
 import { useSelector } from "react-redux";
 
 const MenuItem = ({
@@ -64,7 +67,23 @@ const MenuItem = ({
 };
 
 const MyAccount = (props) => {
+  const { guestUser } = useSelector(({ register }) => register);
   const profile = useSelector((state) => state?.commonReducer);
+  const profileServices = useMemo(
+    () =>
+      profile?.providerProfile?.providerBusiness?.services?.reduce(
+        (accumulator, currentValue) =>
+          accumulator + `${currentValue?.service} `,
+        ""
+      ),
+    [profile?.providerProfile?.providerBusiness?.services]
+  );
+
+  const profileStatus = useMemo(() => {
+    const validProviderProfile = validateServiceProfile(profile);
+    return validProviderProfile;
+  }, [profile]);
+
   const renderItem = (
     bgColor,
     icon,
@@ -132,7 +151,7 @@ const MyAccount = (props) => {
       <StatusBar backgroundColor={THEMES.colors.lightCyan} />
       <Header
         customIcon={<SwitchIcon />}
-        title={"Strings.myAccount"}
+        title={Strings.myAccount}
         showSearch
         bgColor="transparent"
       />
@@ -154,10 +173,16 @@ const MyAccount = (props) => {
               <BadgeCheck />
             </View>
             <View style={styles.nameView}>
-              <Text style={styles.nameText}>KET</Text>
-              <Text style={styles.roleText}>Pet Trainer</Text>
+              <Text style={styles.nameText}>
+                {guestUser
+                  ? Strings.guest
+                  : profile?.providerProfile?.providerBusiness?.name}
+              </Text>
+              {profileServices ? (
+                <Text style={styles.roleText}>{profileServices}</Text>
+              ) : null}
               <Text style={styles.premiumMemberText}>
-                {Strings.premiumMemmber}
+                {guestUser ? Strings.guestUser : Strings.premiumMemmber}
               </Text>
             </View>
             <View style={styles.padding14}>
@@ -168,14 +193,19 @@ const MyAccount = (props) => {
                   Strings.myProfile,
                   "",
                   "myProfile",
-                  true
+                  guestUser ||
+                    (!profileStatus?.flag &&
+                      profileStatus?.navigateTo !== "paymentsSubscription")
                 )}
                 {renderItem(
                   THEMES.colors.cornFlowerBlue,
                   <Badge />,
                   Strings.paymentSubScription,
                   "",
-                  "paymentsSubscription"
+                  "paymentsSubscription",
+                  guestUser ||
+                    (!profileStatus?.flag &&
+                      profileStatus?.navigateTo === "paymentsSubscription")
                 )}
                 {renderItem(
                   THEMES.colors.sandyBeach,

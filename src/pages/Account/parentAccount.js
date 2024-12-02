@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
@@ -30,7 +30,10 @@ import Strings from "../../constants/strings";
 import { moderateScale, s } from "react-native-size-matters";
 import Activity from "../../assets/svg/activity.svg";
 import { useSelector } from "react-redux";
-import { validateServiceProfile } from "../../utils/userUtils";
+import {
+  validateParentProfile,
+  validateServiceProfile,
+} from "../../utils/userUtils";
 
 const MenuItem = ({
   bgColor,
@@ -67,7 +70,9 @@ const MenuItem = ({
 };
 
 const ParentAccount = (props) => {
+  const { guestUser } = useSelector(({ register }) => register);
   const profile = useSelector((state) => state?.commonReducer);
+
   const renderItem = (
     bgColor,
     icon,
@@ -119,6 +124,11 @@ const ParentAccount = (props) => {
     }
   };
 
+  const profileStatus = useMemo(() => {
+    const validParentProfile = validateParentProfile(profile);
+    return validParentProfile?.flag;
+  }, [profile]);
+
   return (
     <LinearGradient
       locations={[0, 0.5, 0.6]}
@@ -150,9 +160,13 @@ const ParentAccount = (props) => {
               <BadgeCheck />
             </View>
             <View style={styles.nameView}>
-              <Text style={styles.nameText}>Mickey</Text>
+              <Text style={styles.nameText}>
+                {guestUser
+                  ? Strings.guest
+                  : profile?.parentProfie?.parentContact?.name}
+              </Text>
               <Text style={styles.premiumMemberText}>
-                {Strings.premiumMemmber}
+                {guestUser ? Strings.guestUser : Strings.premiumMemmber}
               </Text>
             </View>
             <View style={styles.padding14}>
@@ -161,7 +175,7 @@ const ParentAccount = (props) => {
                   bgColor={THEMES.colors.lightCyan}
                   icon={<ProfileImg />}
                   title={Strings.myProfile}
-                  showPending
+                  showPending={guestUser || !profileStatus}
                   onPress={() =>
                     props.navigation.navigate("parentDetails", {
                       route: "parentAccount",
@@ -172,7 +186,7 @@ const ParentAccount = (props) => {
                   bgColor={THEMES.colors.zanah}
                   icon={<PawPrint />}
                   title={Strings.myPetProfile}
-                  showPending
+                  showPending={guestUser || !profileStatus}
                   onPress={() =>
                     props.navigation.navigate("petDetail", {
                       route: "parentAccount",

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
@@ -11,8 +11,21 @@ import Strings from "../../constants/strings";
 import Header from "../../components/Header";
 import RightArrow from "../../assets/svg/rightArrow.svg";
 import { moderateScale } from "react-native-size-matters";
+import { useSelector } from "react-redux";
+import {
+  validateCompleteServiceProfile,
+  validateServiceProfile,
+} from "../../utils/userUtils";
 
 const MyProfile = (props) => {
+  const { guestUser } = useSelector(({ register }) => register);
+  const profile = useSelector((state) => state?.commonReducer);
+
+  const profileStatus = useMemo(() => {
+    const validParentProfile = validateCompleteServiceProfile(profile);
+    return validParentProfile;
+  }, [profile]);
+
   const renderItem = (title, addBottom, route, description, showPending) => {
     return (
       <TouchableOpacity
@@ -30,7 +43,6 @@ const MyProfile = (props) => {
         </View>
         <View style={styles.flexRowContent}>
           {showPending && <Text style={styles.pendingText}>Pending</Text>}
-
           <RightArrow stroke={THEMES.colors.boulder} />
         </View>
       </TouchableOpacity>
@@ -47,33 +59,47 @@ const MyProfile = (props) => {
             Strings.businessDetails,
             "",
             "businessDetail",
-            Strings.businessDescription
+            Strings.businessDescription,
+            guestUser ||
+              (!profileStatus?.flag &&
+                profileStatus?.modules?.includes("businessDetail"))
           )}
 
           {renderItem(
             Strings.contactDetails,
             "",
             "contactDetails",
-            Strings.contactDescription
+            Strings.contactDescription,
+            guestUser ||
+              (!profileStatus?.flag &&
+                profileStatus?.modules?.includes("contactDetails"))
           )}
           {renderItem(
             Strings.uploadImages,
             "",
             "uploadImagesDocs",
-            Strings.uploadImagesDescription
+            Strings.uploadImagesDescription,
+            guestUser ||
+              (!profileStatus?.flag &&
+                profileStatus?.modules?.includes("uploadImagesDocs"))
           )}
           {renderItem(
             Strings.sessionDetails,
             "",
             "sessionDetail",
             Strings.sessionDescriptions,
-            true
+            guestUser ||
+              (!profileStatus?.flag &&
+                profileStatus?.modules?.includes("sessionDetail"))
           )}
           {renderItem(
             Strings.mediaLinks,
             "addBottom",
             "mediaLink",
-            Strings.mediaDescription
+            Strings.mediaDescription,
+            guestUser ||
+              (!profileStatus?.flag &&
+                profileStatus?.modules?.includes("mediaLink"))
           )}
         </View>
       </View>

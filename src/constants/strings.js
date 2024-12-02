@@ -10,6 +10,8 @@ const Strings = {
   deleteAccount: "Delete Account",
   logout: "Log Out",
   premiumMemmber: "Premium Member",
+  guestUser: "Guest User",
+  guest: "Guest",
   businessDetails: "Business details",
   businessDescription: "Name, Role, Services, Experience",
   contactDescription: "Phone number, Email ID, Address",

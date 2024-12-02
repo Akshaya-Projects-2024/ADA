@@ -18,6 +18,7 @@ import WorkingHours from "../pages/Account/WorkingHours";
 import ContactPage from "../pages/CommonPages/contactPage";
 import WriteUs from "../pages/CommonPages/WriteUs";
 import Feedback from "../pages/CommonPages/feedback";
+import MyBookings from "../pages/Account/myBookings";
 
 const Stack = createStackNavigator();
 
@@ -82,7 +83,11 @@ export default Routes = (props) => {
           component={ParentHome}
           options={navOptionHandler}
         />
-
+        <Stack.Screen
+          name="myBookings"
+          component={MyBookings}
+          options={navOptionHandler}
+        />
         <Stack.Screen
           name="trendDetail"
           component={TrendDetail}

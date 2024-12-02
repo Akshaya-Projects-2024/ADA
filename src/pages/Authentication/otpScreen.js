@@ -28,6 +28,10 @@ import { getCurrentLocation } from "../../utils/geolocationUtils";
 import { showToast } from "../../utils/utils";
 import { useDispatch } from "react-redux";
 import { dispatchUserData } from "../../redux-store/actions/registerAction";
+import {
+  validateParentProfile,
+  validateServiceProfile,
+} from "../../utils/userUtils";
 
 const OtpScreen = (props) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -142,13 +146,44 @@ const OtpScreen = (props) => {
         };
         const response = await getProfile(obj);
         if (response?.data?.status_code == 200) {
+          showToast("success", res?.data?.message);
+          setLoading(false);
+          setOtp(["", "", "", "", "", ""]);
           // dispatch(saveRegisterData(response?.data?.data)); No need
           dispatch(dispatchUserData(response?.data?.data));
+          const validProfile = validateParentProfile(response?.data?.data);
+          const validProviderProfile = validateServiceProfile(
+            response?.data?.data
+          );
+          if (validProfile?.flag && validProviderProfile?.flag) {
+            props.navigation.navigate("auth", {
+              screen: "home",
+            });
+          } else if (!validProfile?.flag && !validProviderProfile?.flag) {
+            props?.navigation.replace("auth");
+          } else if (validProviderProfile?.flag) {
+            props.navigation.navigate("auth", {
+              screen: "home",
+            });
+          } else if (validProfile?.flag) {
+            props.navigation.reset({
+              index: 0,
+              routes: [{ name: "petParentAppStack" }],
+            });
+          } else if (!validProviderProfile?.flag) {
+            showToast("error", "Please complete your registration");
+            props.navigation.navigate("auth", {
+              screen: validProviderProfile?.navigateTo,
+            });
+          } else if (!validProfile?.flag) {
+            props.navigation.reset({
+              index: 0,
+              routes: [{ name: "petParentAppStack" }],
+            });
+          } else {
+            props?.navigation.replace("auth");
+          }
         }
-        showToast("success", res?.data?.message);
-        props?.navigation.replace("auth");
-        setLoading(false);
-        setOtp(["", "", "", "", "", ""]);
       } else {
         showToast("error", res?.data?.message);
         setLoading(false);

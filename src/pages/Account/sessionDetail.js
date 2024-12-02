@@ -165,6 +165,7 @@ const SessionDetail = (props) => {
       let sessionRateArray = [];
       const sessionData = {
         userid: userId,
+        ...(ProviderSession?.id ? { id: ProviderSession?.id } : {}),
       };
 
       if (!homeVisit && !centerService && !onlineConsultation) {

@@ -33,7 +33,7 @@ export const validateParentProfile = (userData) => {
   return { flag: true };
 };
 
-export const validateServiceProfile = (userData) => {
+export const validateServiceProfile = (userData, excludePayment = false) => {
   if (
     !userData?.providerProfile?.providerBusiness?.name ||
     !validArray(userData?.providerProfile?.providerBusiness?.services) ||
@@ -85,12 +85,81 @@ export const validateServiceProfile = (userData) => {
     return { flag: false, navigateTo: "mediaLink" };
   }
   if (
-    !userData?.providerProfile?.subscription?.status ||
-    userData?.providerProfile?.subscription?.status === "inactive"
+    !excludePayment &&
+    (!userData?.providerProfile?.subscription?.status ||
+      userData?.providerProfile?.subscription?.status === "inactive")
   ) {
     return { flag: false, navigateTo: "paymentsSubscription" };
   }
   return { flag: true };
+};
+
+export const validateCompleteServiceProfile = (userData) => {
+  const output = { flag: true, modules: [] };
+  if (
+    !userData?.providerProfile?.providerBusiness?.name ||
+    !validArray(userData?.providerProfile?.providerBusiness?.services) ||
+    !userData?.providerProfile?.providerBusiness?.experience ||
+    !userData?.providerProfile?.providerBusiness?.description
+  ) {
+    output.flag = false;
+    output.modules.push("businessDetail");
+  }
+  if (
+    !userData?.providerProfile?.providerContact?.address ||
+    !userData?.providerProfile?.providerContact?.email ||
+    !userData?.providerProfile?.providerContact?.location ||
+    !userData?.providerProfile?.providerContact?.mobile ||
+    !userData?.providerProfile?.providerContact?.pin
+  ) {
+    output.flag = false;
+    output.modules.push("contactDetails");
+  }
+  if (
+    !validArray(userData?.providerProfile?.providerDocument) ||
+    !validateDocuments(userData?.providerProfile?.providerDocument)
+  ) {
+    output.flag = false;
+    output.modules.push("uploadImagesDocs");
+  }
+  if (
+    !validArray(userData?.providerProfile?.ProviderSession?.availableat) ||
+    !validMonthSession(
+      userData?.providerProfile?.ProviderSession,
+      userData?.providerProfile?.sessionRateDetails
+    ) ||
+    !validPerSession(
+      userData?.providerProfile?.ProviderSession,
+      userData?.providerProfile?.sessionRateDetails
+    )
+  ) {
+    output.flag = false;
+    output.modules.push("sessionDetail");
+  }
+  if (
+    !validArray(userData?.providerProfile?.sessionDetails) ||
+    !validateTimeData(userData?.providerProfile?.sessionDetails)
+  ) {
+    output.flag = false;
+    output.modules.push("workingHours");
+  }
+  if (
+    !userData?.providerProfile?.MediaLinks?.facebook ||
+    !userData?.providerProfile?.MediaLinks?.instagram ||
+    !userData?.providerProfile?.MediaLinks?.onlinelink ||
+    !userData?.providerProfile?.MediaLinks?.website
+  ) {
+    output.flag = false;
+    output.modules.push("mediaLink");
+  }
+  if (
+    !userData?.providerProfile?.subscription?.status ||
+    userData?.providerProfile?.subscription?.status === "inactive"
+  ) {
+    output.flag = false;
+    output.modules.push("paymentsSubscription");
+  }
+  return output;
 };
 
 const validateDocuments = (docs) => {

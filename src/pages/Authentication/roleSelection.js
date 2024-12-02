@@ -14,10 +14,30 @@ import Tick from "../../assets/svg/check-circle.svg";
 import Button from "../../components/Button";
 import Modal from "react-native-modal";
 import Cross from "../../assets/svg/cross.svg";
+import { useDispatch } from "react-redux";
+import { dispathGuestUser } from "../../redux-store/actions/userActions";
 
 const RoleSelection = (props) => {
+  const dispatch = useDispatch();
   const [selected, setSelected] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+
+  const onLaterPressed = () => {
+    dispatch(dispathGuestUser(true));
+    setModalVisible(false);
+    setTimeout(() => {
+      if (selected == "service") {
+        props.navigation.navigate("auth", {
+          screen: "home",
+        });
+      } else {
+        props.navigation.reset({
+          index: 0,
+          routes: [{ name: "petParentAppStack" }],
+        });
+      }
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -256,7 +276,7 @@ const RoleSelection = (props) => {
                     textColor="#000"
                     onlyBorder
                     title="Later"
-                    onPress={() => setModalVisible(false)}
+                    onPress={onLaterPressed}
                   />
                 </View>
                 <View style={{ width: "45%" }}>
@@ -268,7 +288,6 @@ const RoleSelection = (props) => {
                         if (selected == "service") {
                           props.navigation.navigate("businessDetail");
                         } else {
-                          // props.navigation.navigate("parentDetails");
                           props.navigation.navigate("petDetail");
                         }
                       }, 200);
