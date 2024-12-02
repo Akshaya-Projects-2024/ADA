@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -17,11 +17,28 @@ import InputField from "../../components/InputField";
 import UploadImageModal from "../../components/UploadImageModal";
 import CrossCircle from "../../assets/svg/crossCircle.svg";
 import Button from "../../components/Button";
+import { createTopic } from "../../redux-store/actions/topics";
+import { showToast } from "../../utils/utils";
+import { decryptService } from "../../utils/storageFunc";
+import { useSelector } from "react-redux";
+import { goBack } from "../../navigations/rootNavigationRef";
+import { RichEditor, RichToolbar } from "react-native-pell-rich-editor";
 
 const NewTopic = () => {
   const [visible, setVisible] = useState(false);
-  const [photo, setPhoto] = useState();
+  const [photo, setPhoto] = useState("");
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [title, setTitle] = useState();
+  const [blog, setBlog] = useState();
+  const { providerProfile } = useSelector(({ commonReducer }) => commonReducer);
+  const richText = useRef();
+  const [htmlContent, setHtmlContent] = useState("");
+
+  const handleGetContent = () => {
+    richText.current?.getContentHtml().then((html) => {
+      setHtmlContent(html);
+    });
+  };
 
   const getBase64Obj = (url) => {
     if (url) {
@@ -51,6 +68,38 @@ const NewTopic = () => {
     };
   }, []);
 
+  const onSubmit = async () => {
+    if (!title) {
+      showToast("error", "Please enter title for topic");
+    } else if (!photo) {
+      showToast("error", "Please select cover image");
+    } else if (!blog) {
+      showToast("error", "Please enter blog");
+    } else {
+      try {
+        const userId = await decryptService("userId");
+        let obj = {
+          id: 0,
+          subject: title,
+          Blog: blog,
+          userId: userId,
+          cover: photo?.fileData,
+          Author: "Akshaya Chikane",
+        };
+        let res = await createTopic(obj);
+        console.log("res", res);
+        if (res?.status == 200) {
+          showToast("success", "Topic created successfully!!!");
+          goBack();
+        } else {
+          showToast("error", "Something went wrong!!!");
+        }
+      } catch (error) {
+        console.log("error", error);
+      }
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
@@ -68,8 +117,10 @@ const NewTopic = () => {
           showsVerticalScrollIndicator={false}
         >
           <InputField
-            label={"Title"}
+            label={"Title*"}
             placeholderText={"Enter title"}
+            value={title}
+            onChange={setTitle}
           />
           <>
             <View style={styles.logoBoxView}>
@@ -101,19 +152,18 @@ const NewTopic = () => {
                         />
                       </TouchableOpacity>
                     </View>
-                    <Text
-                      disabled={photo ? true : false}
-                      onPress={() => setVisible(true)}
-                      style={{
-                        fontFamily: THEMES.fontFamily.semiBold,
-                        fontSize: THEMES.fonts.font14,
-                        color: photo
-                          ? THEMES.colors.silver
-                          : THEMES.colors.cyan,
-                      }}
-                    >
-                      {Strings.browse}
-                    </Text>
+                    {!photo && (
+                      <Text
+                        onPress={() => setVisible(true)}
+                        style={{
+                          fontFamily: THEMES.fontFamily.semiBold,
+                          fontSize: THEMES.fonts.font14,
+                          color: THEMES.colors.cyan,
+                        }}
+                      >
+                        Browse
+                      </Text>
+                    )}
                   </View>
                 </>
               ) : (
@@ -136,22 +186,47 @@ const NewTopic = () => {
                     </Text>
                   </View>
 
-                  <Text
-                    onPress={() => setVisible(true)}
-                    style={Strings.browseText}
-                  >
-                    {Strings.browse}
-                  </Text>
+                  {!photo && (
+                    <Text
+                      onPress={() => setVisible(true)}
+                      style={{
+                        fontFamily: THEMES.fontFamily.semiBold,
+                        fontSize: THEMES.fonts.font14,
+                        color: THEMES.colors.cyan,
+                      }}
+                    >
+                      Browse
+                    </Text>
+                  )}
                 </View>
               )}
             </View>
           </>
           <View style={{ paddingTop: moderateScale(16) }}>
-            <InputField
-              label={"Your blog"}
+            <RichEditor
+              ref={richText}
+              style={styles.editor}
+              placeholder="Start typing your HTML here..."
+              initialContentHTML={blog}
+            />
+            <RichToolbar
+              style={styles.toolbar}
+              editor={richText}
+              actions={[
+                "bold",
+                "italic",
+                "underline",
+                "orderedList",
+                "unorderedList",
+              ]}
+            />
+            {/* <InputField
+              label={"Your blog*"}
               placeholderText={Strings.writeBlog}
               multiline
-            />
+              value={blog}
+              onChange={setBlog}
+            /> */}
           </View>
         </ScrollView>
         <UploadImageModal
@@ -162,7 +237,7 @@ const NewTopic = () => {
       </View>
       {!isKeyboardVisible && (
         <View style={styles.submitButton}>
-          <Button title={Strings.submit} />
+          <Button title={Strings.submit} onPress={() => onSubmit()} />
         </View>
       )}
     </View>
@@ -242,13 +317,23 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.medium,
   },
   submitButton: {
-    marginHorizontal: moderateScale(27),
+    marginHorizontal: moderateScale(16),
     marginBottom: moderateScale(22),
   },
   browseText: {
     fontFamily: THEMES.fontFamily.semiBold,
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.cyan,
+  },
+  editor: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginBottom: 10,
+    backgroundColor: "#fff",
+  },
+  toolbar: {
+    backgroundColor: "#f1f1f1",
   },
 });
 

@@ -99,7 +99,7 @@ const SessionDetail = (props) => {
       setPerSession(true);
     }
     if (ProviderSession?.monthtime) {
-      setMonthTime(ProviderSession?.monthtime);
+      setMonthTime(ProviderSession?.monthtime ? ProviderSession?.monthtime : "0");
     }
     if (ProviderSession?.sessiontime) {
       setSessionTime(ProviderSession?.sessiontime);

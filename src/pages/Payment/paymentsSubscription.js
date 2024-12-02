@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -18,22 +18,104 @@ import LinearGradient from "react-native-linear-gradient";
 import Button from "../../components/Button";
 import Modal from "react-native-modal";
 import SubscriptionSuccess from "./subscriptionSuccess";
-
-const listItems = [
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-  "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-  "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-  "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-  "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-];
+import {
+  getSubscription,
+  getSubscriptionPlan,
+} from "../../redux-store/actions/payment";
+import { decryptService } from "../../utils/storageFunc";
+import { useSelector } from "react-redux";
+import RazorpayCheckout from "react-native-razorpay";
 
 const PaymentsSubscription = (props) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [subscriptionModal, setSubscription] = useState(false);
   const [month, setMonth] = useState("12Month");
+  const [selectedCard, setSelectedCard] = useState(null); // State to track selected card
+  const [subscriptionData, setSubscriptionData] = useState();
+  const [subscriptionDetails, setSubscriptionDetails] = useState();
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
+  };
+
+  useEffect(() => {
+    initData();
+  }, []);
+
+  const initData = async () => {
+    let obj = {
+      userId: await decryptService("userId"),
+      usertype: "provider", // parent or provider
+    };
+    let res = await getSubscriptionPlan(obj);
+    if (res.status == 200) {
+      if (res?.data?.data?.length) {
+        setSubscriptionData(res?.data?.data);
+        setSelectedCard(res?.data?.data[0]);
+      }
+    }
+
+    let obj1 = {
+      userId: await decryptService("userId"),
+      usertype: "provider", // parent or provider
+      subscriptioncode: res?.data?.data[0]?.code,
+      promocode: "",
+    };
+    let res1 = await getSubscription(obj1);
+    if (res1.status == 200) {
+      if (res1?.data?.data) {
+        setSubscriptionDetails(res1?.data?.data);
+      }
+    }
+  };
+
+  const handlePayment = async () => {
+    var options = {
+      description: "Pet Service Provider Payment",
+      image: "https://i.imgur.com/3g7nmJC.jpg",
+      currency: subscriptionDetails?.currency,
+      key: "rzp_test_PECnHmfOdkRLhw,pVoN1LnwMjhE881qPkQy4CDQ", // Replace with your Razorpay Key ID
+      amount: subscriptionDetails?.amount,
+      name: "ADA",
+      order_id: subscriptionDetails?.id, //Replace this with an order_id created using Orders API.
+      prefill: {
+        email: await decryptService("userId"),
+        contact: "7977276381",
+        name: "Akshaya Chikane",
+      },
+      theme: { color: "#53a20e" },
+    };
+    console.log("options", options);
+    props.navigation.reset({
+      index: 0,
+      routes: [{ name: "home" }],
+    });
+    // RazorpayCheckout.open(options)
+    //   .then((data) => {
+    //     // Handle success
+    //     alert(`Success: ${data.razorpay_payment_id}`);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //     // Handle failure
+    //     alert(`Error: ${error.code} | ${error.description}`);
+    //   });
+  };
+
+  onCardClick = async (plan) => {
+    setSelectedCard(plan);
+    let obj = {
+      userId: await decryptService("userId"),
+      usertype: "provider", // parent or provider
+      subscriptioncode: plan?.code,
+      promocode: "",
+    };
+    let res = await getSubscription(obj);
+    if (res.status == 200) {
+      if (res?.data?.data) {
+        setSubscriptionDetails(res1?.data?.data);
+      }
+    }
   };
 
   return (
@@ -62,86 +144,153 @@ const PaymentsSubscription = (props) => {
               <ArrowRight />
             </TouchableOpacity>
           </View>
-          <View>
-            <Text style={styles.joinTheFunText}>{Strings.joinTheFun}</Text>
-          </View>
-          <View style={styles.gradientRow}>
-            <LinearGradient
-              colors={["#fd3a77", "#fc699f", "#fd9f9f"]}
-              style={styles.gradientView}
+          <Text style={styles.joinTheFunText}>{Strings.joinTheFun}</Text>
+
+          <View style={styles.rowContainer}>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              style={{ flex: 1 }}
+              contentContainerStyle={{
+                flexGrow: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              <Text
-                onPress={() => {
-                  setMonth("12Month");
-                  setSubscription(true);
-                }}
-                style={styles.discountText}
-              >
-                20% Off
-              </Text>
-              <Text style={styles.month}>12</Text>
-              <Text style={styles.monthText}>{Strings.months}</Text>
-              <View style={styles.tickIcon}>
-                <Tick />
-              </View>
-            </LinearGradient>
-            <LinearGradient
-              colors={["#f2e2f4", "#f2e2f4", "#f2e2f4"]}
-              style={styles.deSelectGradient}
-            >
-              <Text
-                onPress={() => {
-                  setMonth("6Month");
-                  setSubscription(true);
-                }}
-                style={styles.discount2}
-              >
-                15% Off
-              </Text>
-              <Text style={styles.month2}>6</Text>
-              <Text style={styles.monthText2}>{Strings.months}</Text>
-            </LinearGradient>
+              {subscriptionData?.length &&
+                subscriptionData?.map((plan, index) => {
+                  return (
+                    <>
+                      <TouchableOpacity
+                        key={plan.id}
+                        style={[
+                          styles.card,
+                          selectedCard?.id === plan?.id
+                            ? { borderWidth: 0, elevation: 5 }
+                            : { borderWidth: 1, borderColor: "#d3d3d3" },
+                          ,
+                          {
+                            width: selectedCard?.id === plan?.id ? 130 : 113,
+                            height: selectedCard?.id === plan?.id ? 127 : 107,
+                            backgroundColor: "#f2e2f4",
+                            borderColor: "#ab47bc",
+                            marginRight:
+                              index !== subscriptionData?.length - 1 &&
+                              moderateScale(20),
+                          },
+                        ]}
+                        onPress={() => onCardClick(plan)}
+                      >
+                        {selectedCard?.id === plan.id ? (
+                          <LinearGradient
+                            colors={["#fb427c", "#fd6da2", "#fd98a5"]}
+                            style={[
+                              styles.gradientBackground,
+                              {
+                                width:
+                                  selectedCard?.id === plan?.id ? 130 : 113,
+                                height:
+                                  selectedCard?.id === plan?.id ? 127 : 107,
+                              },
+                            ]}
+                          >
+                            {plan.flatdiscount !== 0 && (
+                              <Text style={styles.discountText}>
+                                {plan.flatdiscount}% Off
+                              </Text>
+                            )}
+
+                            <Text style={styles.monthText}>
+                              {plan?.name.replace(" MONTH", "")}
+                            </Text>
+                            <Text
+                              style={{
+                                color: "#fff",
+                                fontFamily: THEMES.fontFamily.medium,
+                                fontSize: THEMES.fonts.font12,
+                              }}
+                            >
+                              Months
+                            </Text>
+                            <View style={styles.checkIcon}>
+                              <Text style={styles.checkText}>✔</Text>
+                            </View>
+                          </LinearGradient>
+                        ) : (
+                          <View
+                            style={[
+                              styles.cardContent,
+                              { backgroundColor: "#f2e2f4" },
+                            ]}
+                          >
+                            {plan.flatdiscount !== 0 && (
+                              <Text
+                                style={[styles.discountText, { color: "#000" }]}
+                              >
+                                {plan.flatdiscount}% Off
+                              </Text>
+                            )}
+                            <Text style={[styles.monthText, { color: "#000" }]}>
+                              {plan?.name?.replace(" MONTH", "")}
+                            </Text>
+                            <Text
+                              style={[styles.monthLabel, { color: "#000" }]}
+                            >
+                              Months
+                            </Text>
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    </>
+                  );
+                })}
+            </ScrollView>
           </View>
           <View style={styles.unlockView}>
             <Text style={styles.unlockText}>
               {Strings.unlockPremiumFeature}
             </Text>
           </View>
-          <View style={styles.descriptionView}>
-            {listItems.map((item, index) => (
-              <View key={index} style={styles.listItem}>
-                {/* Bullet Point */}
-                <View style={styles.bullet}>
-                  <Text style={styles.bulletText}>{"\u2022"}</Text>
+          <View>
+            {selectedCard && (
+              <>
+                <View style={styles.listItem}>
+                  {/* Bullet Point */}
+                  <View style={styles.bullet}>
+                    <Text style={styles.bulletText}>{"\u2022"}</Text>
+                  </View>
+                  {/* List Text */}
+                  <Text style={styles.listText}>{selectedCard?.details}</Text>
                 </View>
-                {/* List Text */}
-                <Text style={styles.listText}>{item}</Text>
-              </View>
-            ))}
+              </>
+            )}
           </View>
+        </ScrollView>
+        <View
+          style={{
+            position: "absolute",
+            flex: 1,
+            bottom: 0,
+            alignSelf: "center",
+            width: "100%",
+            marginBottom: moderateScale(20),
+          }}
+        >
           <View style={styles.subscriptionView}>
             <Text style={styles.subscriptionText}>
               {Strings.subscriptionCost}:{" "}
-              <Text style={styles.subscriptionCost}>₹ 999 </Text>
+              <Text style={styles.subscriptionCost}>₹500 </Text>
             </Text>
           </View>
-          <View style={{ paddingTop: moderateScale(7) }}>
-            <Text onPress={toggleModal} style={styles.viewBreakupText}>
-              {Strings.viewBreakup}
-            </Text>
+          {/* <View style={{ paddingTop: moderateScale(7) }}>
+              <Text onPress={toggleModal} style={styles.viewBreakupText}>
+                {Strings.viewBreakup}
+              </Text>
+            </View> */}
+          <View style={[styles.btnView, { paddingTop: moderateScale(20) }]}>
+            <Button onPress={() => handlePayment()} title={Strings.payNow} />
           </View>
-          <View style={styles.btnView}>
-            <Button
-              onPress={() =>
-                props.navigation.reset({
-                  index: 0,
-                  routes: [{ name: "home" }],
-                })
-              }
-              title={Strings.payNow}
-            />
-          </View>
-        </ScrollView>
+        </View>
         <Modal
           isVisible={isModalVisible}
           onBackdropPress={toggleModal}
@@ -199,7 +348,7 @@ const styles = StyleSheet.create({
   },
   mainContent: {
     flex: 1,
-    paddingHorizontal: moderateScale(25),
+    paddingHorizontal: moderateScale(20),
   },
   paymentDetailsView: {
     paddingTop: moderateScale(32),
@@ -230,6 +379,7 @@ const styles = StyleSheet.create({
     flexDirection: "row", // Align items in a row
     alignItems: "flex-start", // Align bullet and text from top
     marginBottom: moderateScale(5), // Space between list items
+    paddingTop: moderateScale(10),
   },
   bullet: {
     width: moderateScale(12), // Fixed width for the bullet point
@@ -308,8 +458,8 @@ const styles = StyleSheet.create({
     color: THEMES.colors.white,
   },
   monthText: {
-    fontFamily: THEMES.fontFamily.regular,
-    fontSize: THEMES.fonts.font12,
+    fontFamily: THEMES.fontFamily.medium,
+    fontSize: THEMES.fonts.font24,
     color: THEMES.colors.white,
   },
   tickIcon: {
@@ -360,6 +510,9 @@ const styles = StyleSheet.create({
   },
   subscriptionView: {
     paddingTop: moderateScale(11),
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
   },
   subscriptionText: {
     textAlign: "center",
@@ -381,8 +534,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   btnView: {
-    paddingVertical: moderateScale(25),
-    bottom: 0,
+    paddingVertical: moderateScale(10),
   },
   modalTitle: {
     fontSize: THEMES.fonts.font14,
@@ -445,6 +597,54 @@ const styles = StyleSheet.create({
     color: THEMES.colors.black,
     width: "45%",
     textAlign: "right",
+  },
+  rowContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: moderateScale(20),
+    backgroundColor: THEMES.colors.bgColor,
+  },
+  card: {
+    borderRadius: 12,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  gradientBackground: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 12,
+
+    borderRadius: 12,
+  },
+  cardContent: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 12,
+    borderRadius: 12,
+  },
+  discountText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+
+  checkIcon: {
+    marginTop: moderateScale(8),
+    width: 24,
+    height: 24,
+    borderWidth: 1,
+    borderColor: "#fff",
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
 

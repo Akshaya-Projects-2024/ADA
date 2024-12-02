@@ -12,4 +12,10 @@ export const urlList = {
   getMasterData: "master/getservices",
   addSessionDetails: "register/provider/addsessiondetails",
   saveSessionCharged: "register/provider/addsessionrates",
+  parentDetails: "register/parent/contacts",
+  parentUploadPhoto: "register/uploadphoto",
+  subscriptionplan: "register/subscriptionplan",
+  subscription: "register/subscription",
+  registerEvents:"provider/manageevents",
+  createTopic:"provider/managetopics",
 };

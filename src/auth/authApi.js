@@ -4,12 +4,14 @@ import { decryptService, encryptService } from "../utils/storageFunc";
 import { getCurrentLocation } from "../utils/geolocationUtils";
 import { refreshToken } from "../redux-store/actions/auth";
 
+const connectionTimeout = 20000;
 // Create an Axios instance
 const authApi = axios.create({
   baseURL: `${config.baseUrl}/`, // Replace with your API base URL
   headers: {
     "Content-Type": "application/json",
   },
+  timeout: connectionTimeout,
 });
 
 // Request interceptor to add token to headers
@@ -48,12 +50,14 @@ authApi?.interceptors?.response?.use(
           : "0",
       };
       const res = await refreshToken(params);
+
       if (res?.status === 200) {
         await encryptService("accessToken", res?.data?.data?.token);
         await encryptService("tokenId", res?.data?.data?.tokenId);
       }
     }
-    return Promise.reject(error);
+
+    return error;
   }
 );
 

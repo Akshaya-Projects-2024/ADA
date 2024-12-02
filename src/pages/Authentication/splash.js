@@ -12,7 +12,7 @@ import { decryptService } from "../../utils/storageFunc";
 import { THEMES } from "../../assets/theme/themes";
 import { screenHeight, screenWidth } from "../../utils/dimensions";
 import { getProfile } from "../../redux-store/actions/auth";
-import { dispatchUserData } from "../../redux-store/actions/registerAction";
+import { dispatchUserData, getServiceProviderRole } from "../../redux-store/actions/registerAction";
 import { useDispatch } from "react-redux";
 
 const Splash = (props) => {
@@ -27,6 +27,7 @@ const Splash = (props) => {
   useEffect(() => {
     if (isFocused) {
       checkIfUserExits();
+      dispatch(getServiceProviderRole());
     }
   }, [isFocused, checkIfUserExits]);
 
@@ -51,9 +52,125 @@ const Splash = (props) => {
     });
   }, [dispatch]);
 
-  const validateServiceProfile = (userData) => {};
+  // const validateServiceProfile = (userData) => {};
 
-  const validateParentProfile = (userData) => {};
+  const validMonthSession = (ProviderSession, sessionRateDetails) => {
+    const isChargesAvailable = sessionRateDetails?.some(
+      (rateDetail) =>
+        rateDetail.monthcharges && rateDetail.monthcharges !== "0.00"
+    );
+    if (
+      ProviderSession?.ispermonth &&
+      (!ProviderSession?.monthtime || !isChargesAvailable)
+    ) {
+      return false;
+    }
+    return true;
+  };
+
+  const validPerSession = (ProviderSession, sessionRateDetails) => {
+    const isChargesAvailable = sessionRateDetails?.some(
+      (rateDetail) =>
+        rateDetail.sessioncharges && rateDetail.sessioncharges !== "0.00"
+    );
+    if (
+      ProviderSession?.ispermonth &&
+      (!ProviderSession?.sessiontime || !isChargesAvailable)
+    ) {
+      return false;
+    }
+    return true;
+  };
+
+  const validateTimeData = (times) => {
+    for (let index = 0; index < times.length; index++) {
+      const element = times[index];
+      if (
+        element?.selected &&
+        element?.isfullday === SHIFTS.full &&
+        (!element?.shift1?.start || !element?.shift1?.end)
+      ) {
+        return false;
+      }
+      if (
+        element?.selected &&
+        element?.isfullday === SHIFTS.shifts &&
+        (!element?.shift1?.start ||
+          !element?.shift1?.end ||
+          !element?.shift2?.start ||
+          !element?.shift2?.end)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const validateServiceProfile = (userData) => {
+
+    if (
+      !userData?.providerProfile?.providerBusiness?.name ||
+      !validArray(userData?.providerProfile?.providerBusiness?.services) ||
+      !userData?.providerProfile?.providerBusiness?.experience ||
+      !userData?.providerProfile?.providerBusiness?.description
+    ) {
+      return { flag: false, navigateTo: "businessDetail" };
+    }
+    if (
+      !userData?.providerProfile?.providerContact?.address ||
+      !userData?.providerProfile?.providerContact?.email ||
+      !userData?.providerProfile?.providerContact?.location ||
+      !userData?.providerProfile?.providerContact?.mobile ||
+      !userData?.providerProfile?.providerContact?.pin
+    ) {
+      return { flag: false, navigateTo: "contactDetails" };
+    }
+    if (
+      !validArray(userData?.providerProfile?.providerDocument) ||
+      !validateDocuments(userData?.providerProfile?.providerDocument)
+    ) {
+      return { flag: false, navigateTo: "uploadImagesDocs" };
+    }
+    if (
+      !validArray(userData?.providerProfile?.ProviderSession?.availableat) ||
+      !validMonthSession(
+        userData?.providerProfile?.ProviderSession,
+        userData?.providerProfile?.sessionRateDetails
+      ) ||
+      !validPerSession(
+        userData?.providerProfile?.ProviderSession,
+        userData?.providerProfile?.sessionRateDetails
+      )
+    ) {
+      return { flag: false, navigateTo: "sessionDetail" };
+    }
+    if (
+      !validArray(userData?.providerProfile?.sessionDetails) ||
+      !validateTimeData(userData?.providerProfile?.sessionDetails)
+    ) {
+      return { flag: false, navigateTo: "workingHours" };
+    }
+    if (
+      !userData?.providerProfile?.MediaLinks?.facebook ||
+      !userData?.providerProfile?.MediaLinks?.instagram ||
+      !userData?.providerProfile?.MediaLinks?.onlinelink ||
+      !userData?.providerProfile?.MediaLinks?.website
+    ) {
+      return { flag: false, navigateTo: "mediaLink" };
+    }
+    if (
+      !userData?.providerProfile?.subscription?.status ||
+      userData?.providerProfile?.subscription?.status === "inactive"
+    ) {
+      return { flag: false, navigateTo: "paymentsSubscription" };
+    }
+    // return { flag: true };
+  };
+
+  const validateParentProfile = (userData) => {
+    // ["parentContact", "petDetails", "subscription"]
+    return { flag: false };
+  }; //parentProfie
 
   const checkIfUserExits = useCallback(async () => {
     const data = await decryptService("accessToken");

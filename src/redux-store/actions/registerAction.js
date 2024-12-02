@@ -8,7 +8,6 @@ import {
   SERVICE_PROVIDER_ROLE_ERROR,
   PROFILE_DATA,
 } from "../types";
-import authApi from "../../auth/authApi";
 import Api from "../../api/Api";
 
 export const saveRegisterData = (data) => {
