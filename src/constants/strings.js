@@ -10,6 +10,8 @@ const Strings = {
   deleteAccount: "Delete Account",
   logout: "Log Out",
   premiumMemmber: "Premium Member",
+  guestUser: "Guest User",
+  guest: "Guest",
   businessDetails: "Business details",
   businessDescription: "Name, Role, Services, Experience",
   contactDescription: "Phone number, Email ID, Address",
@@ -125,6 +127,9 @@ const Strings = {
   businessDetail: "Business details",
   next: "Next",
   myPetProfile: "My Pet Profile",
+  paymentError:
+    "Your payment is not completed. Please complete payment to access full potential of the app",
+  attention: "Attention!",
 };
 
 export default Strings;

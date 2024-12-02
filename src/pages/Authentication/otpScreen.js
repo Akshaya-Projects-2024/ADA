@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import Toast from "react-native-toast-message";
 import SmsListener from "react-native-android-sms-listener";
 import {
   View,
@@ -20,8 +19,19 @@ import Header from "../../components/Header";
 import Api from "../../api/Api";
 import { THEMES } from "../../assets/theme/themes";
 import { decryptService, encryptService } from "../../utils/storageFunc";
-import { checkLogin, verifyOtp } from "../../redux-store/actions/auth";
+import {
+  checkLogin,
+  getProfile,
+  verifyOtp,
+} from "../../redux-store/actions/auth";
 import { getCurrentLocation } from "../../utils/geolocationUtils";
+import { showToast } from "../../utils/utils";
+import { useDispatch } from "react-redux";
+import { dispatchUserData } from "../../redux-store/actions/registerAction";
+import {
+  validateParentProfile,
+  validateServiceProfile,
+} from "../../utils/userUtils";
 
 const OtpScreen = (props) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -30,6 +40,7 @@ const OtpScreen = (props) => {
   const [isMobileNumber, setIsMobileNumber] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isRefresh, setIsRefresh] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // Request SMS permission on Android
@@ -47,13 +58,6 @@ const OtpScreen = (props) => {
       subscription.remove(); // Clean up listener on unmount
     };
   }, [isRefresh]);
-
-  const showToast = (type, message) => {
-    Toast.show({
-      type: type,
-      text1: message,
-    });
-  };
 
   useEffect(() => {
     const phoneRegex = /^[0-9]{10}$/;
@@ -110,7 +114,6 @@ const OtpScreen = (props) => {
   };
 
   const apiCall = async (otpValue) => {
-    console.log("napiCall");
     try {
       setLoading(true);
       Keyboard.dismiss();
@@ -138,10 +141,49 @@ const OtpScreen = (props) => {
           AccessToken: `${res?.data?.data?.token}`,
         };
         Api.defaultHeader(header);
-        showToast("success", res?.data?.message);
-        props?.navigation.replace("auth");
-        setLoading(false);
-        setOtp(["", "", "", "", "", ""]);
+        const obj = {
+          userid: await decryptService("userId"),
+        };
+        const response = await getProfile(obj);
+        if (response?.data?.status_code == 200) {
+          showToast("success", res?.data?.message);
+          setLoading(false);
+          setOtp(["", "", "", "", "", ""]);
+          // dispatch(saveRegisterData(response?.data?.data)); No need
+          dispatch(dispatchUserData(response?.data?.data));
+          const validProfile = validateParentProfile(response?.data?.data);
+          const validProviderProfile = validateServiceProfile(
+            response?.data?.data
+          );
+          if (validProfile?.flag && validProviderProfile?.flag) {
+            props.navigation.navigate("auth", {
+              screen: "home",
+            });
+          } else if (!validProfile?.flag && !validProviderProfile?.flag) {
+            props?.navigation.replace("auth");
+          } else if (validProviderProfile?.flag) {
+            props.navigation.navigate("auth", {
+              screen: "home",
+            });
+          } else if (validProfile?.flag) {
+            props.navigation.reset({
+              index: 0,
+              routes: [{ name: "petParentAppStack" }],
+            });
+          } else if (!validProviderProfile?.flag) {
+            showToast("error", "Please complete your registration");
+            props.navigation.navigate("auth", {
+              screen: validProviderProfile?.navigateTo,
+            });
+          } else if (!validProfile?.flag) {
+            props.navigation.reset({
+              index: 0,
+              routes: [{ name: "petParentAppStack" }],
+            });
+          } else {
+            props?.navigation.replace("auth");
+          }
+        }
       } else {
         showToast("error", res?.data?.message);
         setLoading(false);

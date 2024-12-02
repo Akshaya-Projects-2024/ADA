@@ -18,4 +18,5 @@ export const urlList = {
   subscription: "register/subscription",
   registerEvents:"provider/manageevents",
   createTopic:"provider/managetopics",
+  savePetDetails: "register/pet/details",
 };

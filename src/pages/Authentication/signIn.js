@@ -13,21 +13,13 @@ import { getUniqueId } from "react-native-device-info";
 import { moderateScale, s } from "react-native-size-matters";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
-import Toast from "react-native-toast-message";
 import { checkLogin } from "../../redux-store/actions/auth";
 import { encryptService } from "../../utils/storageFunc";
-
+import { showToast } from "../../utils/utils";
 
 const SignIn = (props) => {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState("9769487604"); //a@yopmail.com //9769487604
   const [loading, setLoading] = useState(false);
-
-  const showToast = (type, message) => {
-    Toast.show({
-      type: type,
-      text1: message,
-    });
-  };
 
   const onSubmit = async () => {
     if (!inputValue) {

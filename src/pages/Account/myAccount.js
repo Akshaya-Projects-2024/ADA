@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   View,
   Text,
@@ -27,8 +27,73 @@ import ContactUs from "../../assets/svg/contactUs.svg";
 import AboutUs from "../../assets/svg/aboutUs.svg";
 import Strings from "../../constants/strings";
 import { moderateScale, s } from "react-native-size-matters";
+import {
+  validateParentProfile,
+  validateServiceProfile,
+} from "../../utils/userUtils";
+import { useSelector } from "react-redux";
+
+const MenuItem = ({
+  bgColor,
+  icon,
+  title,
+  addBottom,
+  showPending = false,
+  onPress,
+}) => {
+  const Icon = icon;
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        styles.flexRow,
+        {
+          paddingBottom: addBottom && moderateScale(16),
+        },
+      ]}
+    >
+      <View style={styles.rowCenter}>
+        <View style={[styles.iconStyle, { backgroundColor: bgColor }]}>
+          {Icon}
+        </View>
+        <Text style={styles.titleText}>{title}</Text>
+      </View>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        {showPending && <Text style={styles.pendingText}>Pending</Text>}
+        <RightArrow stroke={THEMES.colors.boulder} />
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const MyAccount = (props) => {
+  const { guestUser } = useSelector(({ register }) => register);
+  const profile = useSelector((state) => state?.commonReducer);
+  const profileServices = useMemo(
+    () =>
+      profile?.providerProfile?.providerBusiness?.services?.reduce(
+        (accumulator, currentValue) =>
+          accumulator + `${currentValue?.service} `,
+        ""
+      ),
+    [profile?.providerProfile?.providerBusiness?.services]
+  );
+
+  const paymentCompleted = useMemo(
+    () =>
+      profile?.providerProfile?.subscription?.reduce(
+        (accumulator, currentValue) =>
+          accumulator + `${currentValue?.service} `,
+        ""
+      ),
+    [profile?.providerProfile?.subscription]
+  );
+
+  const profileStatus = useMemo(() => {
+    const validProviderProfile = validateServiceProfile(profile);
+    return validProviderProfile;
+  }, [profile]);
+
   const renderItem = (
     bgColor,
     icon,
@@ -67,7 +132,22 @@ const MyAccount = (props) => {
       </TouchableOpacity>
     );
   };
-
+  const onParentClick = () => {
+    const validProviderProfile = validateParentProfile(profile);
+    if (validProviderProfile?.flag) {
+      props.navigation.reset({
+        index: 0,
+        routes: [{ name: "petParentAppStack" }],
+      });
+    } else {
+      props.navigation.reset({
+        index: 0,
+        routes: [
+          { name: "petParentAppStack", params: { route: "parentAccount" } },
+        ],
+      });
+    }
+  };
   return (
     <LinearGradient
       locations={[0, 0.5, 0.6]}
@@ -103,10 +183,16 @@ const MyAccount = (props) => {
               <BadgeCheck />
             </View>
             <View style={styles.nameView}>
-              <Text style={styles.nameText}>KET</Text>
-              <Text style={styles.roleText}>Pet Trainer</Text>
+              <Text style={styles.nameText}>
+                {guestUser
+                  ? Strings.guest
+                  : profile?.providerProfile?.providerBusiness?.name}
+              </Text>
+              {profileServices ? (
+                <Text style={styles.roleText}>{profileServices}</Text>
+              ) : null}
               <Text style={styles.premiumMemberText}>
-                {Strings.premiumMemmber}
+                {guestUser ? Strings.guestUser : Strings.premiumMemmber}
               </Text>
             </View>
             <View style={styles.padding14}>
@@ -117,14 +203,19 @@ const MyAccount = (props) => {
                   Strings.myProfile,
                   "",
                   "myProfile",
-                  true
+                  guestUser ||
+                    (!profileStatus?.flag &&
+                      profileStatus?.navigateTo !== "paymentsSubscription")
                 )}
                 {renderItem(
                   THEMES.colors.cornFlowerBlue,
                   <Badge />,
                   Strings.paymentSubScription,
                   "",
-                  "paymentsSubscription"
+                  "paymentsSubscription",
+                  guestUser ||
+                    (!profileStatus?.flag &&
+                      profileStatus?.navigateTo === "paymentsSubscription")
                 )}
                 {renderItem(
                   THEMES.colors.sandyBeach,
@@ -151,13 +242,14 @@ const MyAccount = (props) => {
             </View>
             <View style={styles.padding12}>
               <View style={styles.contentView}>
-                {renderItem(
-                  THEMES.colors.cherub,
-                  <Users />,
-                  Strings.registerAsParent,
-                  "addBottom",
-                  "parentDetails"
-                )}
+                <MenuItem
+                  bgColor={THEMES.colors.cherub}
+                  icon={<Users />}
+                  title={Strings.registerAsParent}
+                  showPending={false}
+                  onPress={onParentClick}
+                  addBottom={"addBottom"}
+                />
               </View>
             </View>
 

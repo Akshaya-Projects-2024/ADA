@@ -5,7 +5,6 @@ import PetParentBottoTabbarItem from "./petParentBottomTabbarItem";
 import ParentHome from "../../pages/Home/parentHome";
 import TrendingTopics from "../../pages/TrendingTopics/trendingTopics";
 import PetAdoption from "../../pages/PetAdoption/petAdoption";
-import MyAccount from "../../pages/Account/myAccount";
 import Chat from "../../pages/Chat/chat";
 import ParentAccount from "../../pages/Account/parentAccount";
 

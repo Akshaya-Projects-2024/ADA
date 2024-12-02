@@ -14,6 +14,14 @@ import { screenHeight, screenWidth } from "../../utils/dimensions";
 import { getProfile } from "../../redux-store/actions/auth";
 import { dispatchUserData, getServiceProviderRole } from "../../redux-store/actions/registerAction";
 import { useDispatch } from "react-redux";
+import { showToast, validArray } from "../../utils/utils";
+import { DOCUMENT_TYPES } from "../Account/uploadImagesDocs";
+import { SHIFTS } from "../../components/TimeTracker";
+import { IMAGE_TYPE } from "../ParentRegister/petDetail";
+import {
+  validateParentProfile,
+  validateServiceProfile,
+} from "../../utils/userUtils";
 
 const Splash = (props) => {
   const dispatch = useDispatch();
@@ -28,22 +36,22 @@ const Splash = (props) => {
     if (isFocused) {
       checkIfUserExits();
       dispatch(getServiceProviderRole());
+
     }
   }, [isFocused, checkIfUserExits]);
 
   const initData = useCallback(() => {
     return new Promise(async (resolve) => {
       try {
+        // resolve({});
         const obj = {
           userid: await decryptService("userId"),
         };
         const response = await getProfile(obj);
-        console.log(
-          "🚀 ~ returnnewPromise ~ response?.data?.data:",
-          response?.data?.data
-        );
-        // dispatch(saveRegisterData(response?.data?.data)); No need
-        dispatch(dispatchUserData(response?.data?.data));
+        if (response?.data?.status_code == 200) {
+          // dispatch(saveRegisterData(response?.data?.data)); No need
+          dispatch(dispatchUserData(response?.data?.data));
+        }
         resolve(response?.data?.data ? response?.data?.data : false);
       } catch (error) {
         console.log("err111", error);
@@ -52,138 +60,33 @@ const Splash = (props) => {
     });
   }, [dispatch]);
 
-  // const validateServiceProfile = (userData) => {};
-
-  const validMonthSession = (ProviderSession, sessionRateDetails) => {
-    const isChargesAvailable = sessionRateDetails?.some(
-      (rateDetail) =>
-        rateDetail.monthcharges && rateDetail.monthcharges !== "0.00"
-    );
-    if (
-      ProviderSession?.ispermonth &&
-      (!ProviderSession?.monthtime || !isChargesAvailable)
-    ) {
-      return false;
-    }
-    return true;
-  };
-
-  const validPerSession = (ProviderSession, sessionRateDetails) => {
-    const isChargesAvailable = sessionRateDetails?.some(
-      (rateDetail) =>
-        rateDetail.sessioncharges && rateDetail.sessioncharges !== "0.00"
-    );
-    if (
-      ProviderSession?.ispermonth &&
-      (!ProviderSession?.sessiontime || !isChargesAvailable)
-    ) {
-      return false;
-    }
-    return true;
-  };
-
-  const validateTimeData = (times) => {
-    for (let index = 0; index < times.length; index++) {
-      const element = times[index];
-      if (
-        element?.selected &&
-        element?.isfullday === SHIFTS.full &&
-        (!element?.shift1?.start || !element?.shift1?.end)
-      ) {
-        return false;
-      }
-      if (
-        element?.selected &&
-        element?.isfullday === SHIFTS.shifts &&
-        (!element?.shift1?.start ||
-          !element?.shift1?.end ||
-          !element?.shift2?.start ||
-          !element?.shift2?.end)
-      ) {
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const validateServiceProfile = (userData) => {
-
-    if (
-      !userData?.providerProfile?.providerBusiness?.name ||
-      !validArray(userData?.providerProfile?.providerBusiness?.services) ||
-      !userData?.providerProfile?.providerBusiness?.experience ||
-      !userData?.providerProfile?.providerBusiness?.description
-    ) {
-      return { flag: false, navigateTo: "businessDetail" };
-    }
-    if (
-      !userData?.providerProfile?.providerContact?.address ||
-      !userData?.providerProfile?.providerContact?.email ||
-      !userData?.providerProfile?.providerContact?.location ||
-      !userData?.providerProfile?.providerContact?.mobile ||
-      !userData?.providerProfile?.providerContact?.pin
-    ) {
-      return { flag: false, navigateTo: "contactDetails" };
-    }
-    if (
-      !validArray(userData?.providerProfile?.providerDocument) ||
-      !validateDocuments(userData?.providerProfile?.providerDocument)
-    ) {
-      return { flag: false, navigateTo: "uploadImagesDocs" };
-    }
-    if (
-      !validArray(userData?.providerProfile?.ProviderSession?.availableat) ||
-      !validMonthSession(
-        userData?.providerProfile?.ProviderSession,
-        userData?.providerProfile?.sessionRateDetails
-      ) ||
-      !validPerSession(
-        userData?.providerProfile?.ProviderSession,
-        userData?.providerProfile?.sessionRateDetails
-      )
-    ) {
-      return { flag: false, navigateTo: "sessionDetail" };
-    }
-    if (
-      !validArray(userData?.providerProfile?.sessionDetails) ||
-      !validateTimeData(userData?.providerProfile?.sessionDetails)
-    ) {
-      return { flag: false, navigateTo: "workingHours" };
-    }
-    if (
-      !userData?.providerProfile?.MediaLinks?.facebook ||
-      !userData?.providerProfile?.MediaLinks?.instagram ||
-      !userData?.providerProfile?.MediaLinks?.onlinelink ||
-      !userData?.providerProfile?.MediaLinks?.website
-    ) {
-      return { flag: false, navigateTo: "mediaLink" };
-    }
-    if (
-      !userData?.providerProfile?.subscription?.status ||
-      userData?.providerProfile?.subscription?.status === "inactive"
-    ) {
-      return { flag: false, navigateTo: "paymentsSubscription" };
-    }
-    // return { flag: true };
-  };
-
-  const validateParentProfile = (userData) => {
-    // ["parentContact", "petDetails", "subscription"]
-    return { flag: false };
-  }; //parentProfie
-
   const checkIfUserExits = useCallback(async () => {
     const data = await decryptService("accessToken");
     if (data) {
       const userData = await initData();
-      if (validateParentProfile(userData) && validateServiceProfile(userData)) {
+      const validProfile = validateParentProfile(userData);
+      const validProviderProfile = validateServiceProfile(userData);
+      if (validProfile?.flag && validProviderProfile?.flag) {
+        props.navigation.navigate("auth", {
+          screen: "home",
+        });
+      } else if (!validProfile?.flag && !validProviderProfile?.flag) {
         props?.navigation.replace("auth");
-      } else if (validateServiceProfile(userData)) {
+      } else if (validProviderProfile?.flag) {
+        props.navigation.navigate("auth", {
+          screen: "home",
+        });
+      } else if (validProfile?.flag) {
         props.navigation.reset({
           index: 0,
-          routes: [{ name: "home" }],
+          routes: [{ name: "petParentAppStack" }],
         });
-      } else if (validateParentProfile(userData)) {
+      } else if (!validProviderProfile?.flag) {
+        showToast("error", "Please complete your registration");
+        props.navigation.navigate("auth", {
+          screen: validProviderProfile?.navigateTo,
+        });
+      } else if (!validProfile?.flag) {
         props.navigation.reset({
           index: 0,
           routes: [{ name: "petParentAppStack" }],

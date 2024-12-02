@@ -15,7 +15,6 @@ import ModalDropdown from "../../components/ModalDropdown";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import Stepper from "../../components/Stepper";
-import Toast from "react-native-toast-message";
 import { decryptService } from "../../utils/storageFunc";
 import { saveBusinessDetails } from "../../redux-store/actions/auth";
 import { getServiceProviderRole } from "../../redux-store/actions/registerAction";
@@ -142,10 +141,14 @@ const BusinessDetail = (props) => {
           name: businessValue,
           services: formattedServices,
           userid: userId,
+          ...(providerBusiness?.id ? { id: providerBusiness?.id } : {}),
         };
         const res = await saveBusinessDetails(postData);
         if (res?.data?.status_code == 200) {
-          props.navigation.navigate("contactDetails");
+          props.navigation.navigate(
+            "contactDetails",
+            route ? { route: route } : {}
+          );
         } else {
           showToast("error", res?.data?.message);
         }

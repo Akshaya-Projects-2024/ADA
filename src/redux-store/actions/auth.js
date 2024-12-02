@@ -216,3 +216,57 @@ export const deleteDocument = async (params) => {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
+
+export const uploadParentDocument = async (params) => {
+  try {
+    const res = await Api.POST(urlList.parentUploadPhoto, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("uploadDocument Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const saveParentDetails = async (params) => {
+  try {
+    const res = await Api.POST(urlList.parentDetails, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("uploadDocument Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const savePetDetails = async (params) => {
+  try {
+    const res = await Api.POST(urlList.savePetDetails, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("savePetDetails Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};

@@ -23,7 +23,7 @@ import { deleteDocument, uploadDocument } from "../../redux-store/actions/auth";
 import { useSelector } from "react-redux";
 import { showToast } from "../../utils/utils";
 
-const DOCUMENT_TYPES = {
+export const DOCUMENT_TYPES = {
   image: "businessImg",
   document: "documentImg",
   logo: "companylogo",
@@ -48,7 +48,7 @@ const UploadImagesDocs = (props) => {
     const images = [];
     const documents = [];
     let logo;
-    for (let index = 0; index < providerDocument.length; index++) {
+    for (let index = 0; index < providerDocument?.length; index++) {
       const element = providerDocument[index];
       const obj = {
         id: element?.id,
@@ -402,7 +402,12 @@ const UploadImagesDocs = (props) => {
       <View style={styles.submitButton}>
         <Button
           title={route !== "myprofile" ? Strings.next : Strings.submit}
-          onPress={() => props.navigation.navigate("sessionDetail")}
+          onPress={() =>
+            props.navigation.navigate(
+              "sessionDetail",
+              route ? { route: route } : {}
+            )
+          }
         />
       </View>
     </View>

@@ -25,7 +25,7 @@ import CancelAppointment from "../Appointment/cancelAppointment";
 import RescheduleAppointment from "../Appointment/rescheduleAppointment";
 import Button from "../../components/Button";
 import InputField from "../../components/InputField";
-import Toast from "react-native-toast-message";
+import { showToast } from "../../utils/utils";
 
 const Data = [
   {
@@ -197,12 +197,9 @@ const MyBookings = (props) => {
       setSelectedItemId(selectedAttendedId);
       setAttendedModal(false);
       setSelectedAttendedId("");
-      setOtpInput("")
+      setOtpInput("");
     } else {
-      return Toast.show({
-        type: "error",
-        text1: "Please enter OTP first!",
-      });
+      return showToast("error", "Please enter OTP first!");
     }
   };
 

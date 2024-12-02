@@ -99,11 +99,11 @@ const AuthStack = () => (
       component={SessionDetail}
       options={navOptionHandler}
     />
-       <AuthStacks.Screen
-          name="workingHours"
-          component={WorkingHours}
-          options={navOptionHandler}
-        />
+    <AuthStacks.Screen
+      name="workingHours"
+      component={WorkingHours}
+      options={navOptionHandler}
+    />
 
     <AuthStacks.Screen
       name="paymentsSubscription"
@@ -208,8 +208,6 @@ const AuthStack = () => (
       options={navOptionHandler}
     />
 
- 
-
     <AuthStacks.Screen
       name="service"
       component={Service}
@@ -257,8 +255,6 @@ const AuthStack = () => (
       component={OtherPet}
       options={navOptionHandler}
     />
-
-
   </AuthStacks.Navigator>
 );
 

@@ -1,18 +1,31 @@
-import React from 'react';
+import React, { useMemo } from "react";
 import {
   View,
   Text,
   StatusBar,
   StyleSheet,
   TouchableOpacity,
-} from 'react-native';
-import {THEMES} from '../../assets/theme/themes';
-import Strings from '../../constants/strings';
-import Header from '../../components/Header';
-import RightArrow from '../../assets/svg/rightArrow.svg';
-import {moderateScale} from 'react-native-size-matters';
+} from "react-native";
+import { THEMES } from "../../assets/theme/themes";
+import Strings from "../../constants/strings";
+import Header from "../../components/Header";
+import RightArrow from "../../assets/svg/rightArrow.svg";
+import { moderateScale } from "react-native-size-matters";
+import { useSelector } from "react-redux";
+import {
+  validateCompleteServiceProfile,
+  validateServiceProfile,
+} from "../../utils/userUtils";
 
-const MyProfile = props => {
+const MyProfile = (props) => {
+  const { guestUser } = useSelector(({ register }) => register);
+  const profile = useSelector((state) => state?.commonReducer);
+
+  const profileStatus = useMemo(() => {
+    const validParentProfile = validateCompleteServiceProfile(profile);
+    return validParentProfile;
+  }, [profile]);
+
   const renderItem = (title, addBottom, route, description, showPending) => {
     return (
       <TouchableOpacity
@@ -22,14 +35,14 @@ const MyProfile = props => {
           {
             paddingBottom: addBottom && moderateScale(16),
           },
-        ]}>
+        ]}
+      >
         <View>
           <Text style={styles.titleText}>{title}</Text>
           <Text style={styles.descriptionText}>{description}</Text>
         </View>
         <View style={styles.flexRowContent}>
           {showPending && <Text style={styles.pendingText}>Pending</Text>}
-
           <RightArrow stroke={THEMES.colors.boulder} />
         </View>
       </TouchableOpacity>
@@ -44,35 +57,49 @@ const MyProfile = props => {
         <View style={styles.cardView}>
           {renderItem(
             Strings.businessDetails,
-            '',
-            'businessDetail',
+            "",
+            "businessDetail",
             Strings.businessDescription,
+            guestUser ||
+              (!profileStatus?.flag &&
+                profileStatus?.modules?.includes("businessDetail"))
           )}
 
           {renderItem(
             Strings.contactDetails,
-            '',
-            'contactDetails',
+            "",
+            "contactDetails",
             Strings.contactDescription,
+            guestUser ||
+              (!profileStatus?.flag &&
+                profileStatus?.modules?.includes("contactDetails"))
           )}
           {renderItem(
             Strings.uploadImages,
-            '',
-            'uploadImagesDocs',
+            "",
+            "uploadImagesDocs",
             Strings.uploadImagesDescription,
+            guestUser ||
+              (!profileStatus?.flag &&
+                profileStatus?.modules?.includes("uploadImagesDocs"))
           )}
           {renderItem(
             Strings.sessionDetails,
-            '',
-            'sessionDetail',
+            "",
+            "sessionDetail",
             Strings.sessionDescriptions,
-            true,
+            guestUser ||
+              (!profileStatus?.flag &&
+                profileStatus?.modules?.includes("sessionDetail"))
           )}
           {renderItem(
             Strings.mediaLinks,
-            'addBottom',
-            'mediaLink',
+            "addBottom",
+            "mediaLink",
             Strings.mediaDescription,
+            guestUser ||
+              (!profileStatus?.flag &&
+                profileStatus?.modules?.includes("mediaLink"))
           )}
         </View>
       </View>
@@ -90,39 +117,39 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(20),
   },
   flexRowContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   cardView: {
     backgroundColor: THEMES.colors.white,
     paddingHorizontal: moderateScale(16),
     borderRadius: moderateScale(12),
     shadowColor: THEMES.colors.black,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: THEMES.colors.white,
   },
   flexRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingTop: moderateScale(16),
   },
   rowCenter: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   iconStyle: {
     width: 30,
     height: 30,
     borderRadius: 7,
     backgroundColor: THEMES.colors.bgColor,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: moderateScale(12),
   },
   titleText: {
@@ -138,7 +165,7 @@ const styles = StyleSheet.create({
     color: THEMES.colors.darkGrey,
   },
   pendingText: {
-    color: '#FF6437',
+    color: "#FF6437",
     fontSize: THEMES.fonts.font12,
     fontFamily: THEMES.fontFamily.regular,
   },

@@ -18,7 +18,7 @@ const requestLocationPermission = () => {
       if (granted === RESULTS.GRANTED) {
         res(true);
       } else {
-        throw new Error("Location permission denied");
+        res(false);
       }
     } catch (err) {
       res(false);

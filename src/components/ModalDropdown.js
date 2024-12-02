@@ -22,6 +22,7 @@ const ModalDropdown = (props) => {
     title,
     placeholder,
     multiSelect = false,
+    noPadding,
   } = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedId, setSelectedId] = useState(false);
@@ -82,7 +83,7 @@ const ModalDropdown = (props) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingHorizontal: noPadding ? 0 : 20 }]}>
       {/* Button to open modal */}
       <TouchableOpacity
         style={styles.dropdownButton}
@@ -160,7 +161,6 @@ const ModalDropdown = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
   },
   dropdownButton: {
     height: 56,

@@ -8,17 +8,36 @@ const getCurrentLocation = () => {
     try {
       const locationPermission = await requestLocationPermission();
       if (locationPermission) {
-        Geolocation.getCurrentPosition((info) => res(info));
+        Geolocation.getCurrentPosition(
+          (info) => {
+            console.log(info);
+            res(info);
+          },
+          (err) => {
+            console.log(err.message);
+            res(false);
+          }
+        );
       } else {
         Alert.alert(
           "Permission Required",
           "Location permission is required to access your location.",
           [
-            { text: "Cancel" },
-            { text: "Open Settings", onPress: () => openSettings() },
+            {
+              text: "Cancel",
+              onPress: () => {
+                res(false);
+              },
+            },
+            {
+              text: "Open Settings",
+              onPress: () => {
+                res(false);
+                openSettings();
+              },
+            },
           ]
         );
-        return false;
       }
     } catch (err) {
       console.log("err", err);
