@@ -79,15 +79,15 @@ const MyAccount = (props) => {
     [profile?.providerProfile?.providerBusiness?.services]
   );
 
-  const paymentCompleted = useMemo(
-    () =>
-      profile?.providerProfile?.subscription?.reduce(
-        (accumulator, currentValue) =>
-          accumulator + `${currentValue?.service} `,
-        ""
-      ),
-    [profile?.providerProfile?.subscription]
-  );
+  // const paymentCompleted = useMemo(
+  //   () =>
+  //     profile?.providerProfile?.subscription?.reduce(
+  //       (accumulator, currentValue) =>
+  //         accumulator + `${currentValue?.service} `,
+  //       ""
+  //     ),
+  //   [profile?.providerProfile?.subscription]
+  // );
 
   const profileStatus = useMemo(() => {
     const validProviderProfile = validateServiceProfile(profile);
