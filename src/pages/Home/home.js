@@ -32,7 +32,7 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import moment from "moment";
 import Strings from "../../constants/strings";
 import Calendars from "../../assets/svg/calendar.svg";
-import { showToast } from "../../utils/utils";
+import { showPaymentAlert, showToast } from "../../utils/utils";
 import Toggle from "../../components/Toggle";
 import { useIsFocused } from "@react-navigation/native";
 import {
@@ -625,7 +625,8 @@ const Home = (props) => {
             >
               <Bell />
               <Event
-                onPress={() => props.navigation.navigate("createEvent")}
+                onPress={showPaymentAlert}
+                // onPress={() => props.navigation.navigate("createEvent")}
                 style={{ marginLeft: moderateScale(17) }}
               />
             </View>

@@ -127,6 +127,9 @@ const Strings = {
   businessDetail: "Business details",
   next: "Next",
   myPetProfile: "My Pet Profile",
+  paymentError:
+    "Your payment is not completed. Please complete payment to access full potential of the app",
+  attention: "Attention!",
 };
 
 export default Strings;

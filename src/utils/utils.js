@@ -1,10 +1,35 @@
+import { Alert } from "react-native";
 import Toast from "react-native-toast-message";
+import Strings from "../constants/strings";
 
 const showToast = (type, message) => {
   Toast.show({
     type: type,
     text1: message,
   });
+};
+
+const showAlert = (
+  title,
+  message,
+  onOkPressed = () => {},
+  onCancelPressed = () => {},
+  showCancel = false
+) => {
+  Alert.alert(title, message, [
+    showCancel
+      ? {
+          text: "Cancel",
+          onPress: onCancelPressed,
+          style: "cancel",
+        }
+      : {},
+    { text: "OK", onPress: onOkPressed },
+  ]);
+};
+
+const showPaymentAlert = () => {
+  showAlert(Strings.attention, Strings.paymentError);
 };
 
 const validObject = (obj) => {
@@ -39,4 +64,6 @@ export {
   validArray,
   formatServiceArray,
   formatServiceExperience,
+  showAlert,
+  showPaymentAlert,
 };
