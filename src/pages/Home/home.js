@@ -614,8 +614,7 @@ const Home = (props) => {
                   fontSize: THEMES.fonts.font20,
                 }}
               >
-                {`Hi 
-                ${
+                {`Hi ${
                   guestUser
                     ? Strings.guest
                     : profile?.providerProfile?.providerBusiness?.name
@@ -632,8 +631,8 @@ const Home = (props) => {
             >
               <Bell />
               <Event
-                onPress={showPaymentAlert}
-                // onPress={() => props.navigation.navigate("createEvent")}
+                // onPress={showPaymentAlert}
+                onPress={() => props.navigation.navigate("createEvent")}
                 style={{ marginLeft: moderateScale(17) }}
               />
             </View>

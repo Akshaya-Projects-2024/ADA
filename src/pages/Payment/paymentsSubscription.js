@@ -72,34 +72,35 @@ const PaymentsSubscription = (props) => {
   const handlePayment = async () => {
     var options = {
       description: "Pet Service Provider Payment",
-      image: "https://i.imgur.com/3g7nmJC.jpg",
+      image: "https://i.imgur.com/3g7nmJC.png",
       currency: subscriptionDetails?.currency,
-      key: "rzp_test_PECnHmfOdkRLhw,pVoN1LnwMjhE881qPkQy4CDQ", // Replace with your Razorpay Key ID
+      key: "rzp_test_PECnHmfOdkRLhw", // Replace with your Razorpay Key ID
       amount: subscriptionDetails?.amount,
       name: "ADA",
       order_id: subscriptionDetails?.id, //Replace this with an order_id created using Orders API.
       prefill: {
-        email: await decryptService("userId"),
+        email: "Akshaya.chikane2018@gmail.com",
         contact: "7977276381",
         name: "Akshaya Chikane",
       },
       theme: { color: "#53a20e" },
     };
-    console.log("options", options);
-    props.navigation.reset({
-      index: 0,
-      routes: [{ name: "home" }],
-    });
-    // RazorpayCheckout.open(options)
-    //   .then((data) => {
-    //     // Handle success
-    //     alert(`Success: ${data.razorpay_payment_id}`);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //     // Handle failure
-    //     alert(`Error: ${error.code} | ${error.description}`);
-    //   });
+    console.log("options",options)
+    // props.navigation.reset({
+    //   index: 0,
+    //   routes: [{ name: "home" }],
+    // });
+    RazorpayCheckout.open(options)
+      .then((data) => {
+        // Handle success
+        console.log(JSON.stringify(data))
+        alert(`Success: ${data}`);
+      })
+      .catch((error) => {
+        console.log(error);
+        // Handle failure
+        alert(`Error: ${error.code} | ${error.description}`);
+      });
   };
 
   onCardClick = async (plan) => {

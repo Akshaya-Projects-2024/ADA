@@ -131,6 +131,7 @@ const CreateEvent = () => {
           audience: audience,
           userId: userId,
         };
+
         let res = await createEvent(obj);
         if (res?.data?.status_code == 200) {
           setSuccess(true);
