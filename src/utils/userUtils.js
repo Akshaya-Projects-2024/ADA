@@ -14,7 +14,11 @@ export const validateParentProfile = (userData) => {
     !userData?.parentProfie?.parentContact?.address ||
     !userData?.parentProfie?.parentContact?.pin
   ) {
-    return { flag: false, navigateTo: "parentDetails" };
+    return {
+      flag: false,
+      navigateTo: "parentDetails",
+      partiallyCompleted: false,
+    };
   }
   if (
     !validArray(userData?.parentProfie?.petDetails) ||
@@ -28,9 +32,9 @@ export const validateParentProfile = (userData) => {
     // || !validArray(userData?.parentProfie?.petDetails[0]?.documents) ||
     // !validatePetDocuments(userData?.parentProfie?.petDetails[0]?.documents)
   ) {
-    return { flag: false, navigateTo: "petDetail" };
+    return { flag: false, navigateTo: "petDetail", partiallyCompleted: true };
   }
-  return { flag: true };
+  return { flag: true, partiallyCompleted: true };
 };
 
 export const validateServiceProfile = (userData, excludePayment = false) => {
@@ -40,7 +44,11 @@ export const validateServiceProfile = (userData, excludePayment = false) => {
     !userData?.providerProfile?.providerBusiness?.experience ||
     !userData?.providerProfile?.providerBusiness?.description
   ) {
-    return { flag: false, navigateTo: "businessDetail" };
+    return {
+      flag: false,
+      navigateTo: "businessDetail",
+      partiallyCompleted: false,
+    };
   }
   if (
     !userData?.providerProfile?.providerContact?.address ||
@@ -49,13 +57,21 @@ export const validateServiceProfile = (userData, excludePayment = false) => {
     !userData?.providerProfile?.providerContact?.mobile ||
     !userData?.providerProfile?.providerContact?.pin
   ) {
-    return { flag: false, navigateTo: "contactDetails" };
+    return {
+      flag: false,
+      navigateTo: "contactDetails",
+      partiallyCompleted: true,
+    };
   }
   if (
     !validArray(userData?.providerProfile?.providerDocument) ||
     !validateDocuments(userData?.providerProfile?.providerDocument)
   ) {
-    return { flag: false, navigateTo: "uploadImagesDocs" };
+    return {
+      flag: false,
+      navigateTo: "uploadImagesDocs",
+      partiallyCompleted: true,
+    };
   }
   if (
     !validArray(userData?.providerProfile?.ProviderSession?.availableat) ||
@@ -68,13 +84,21 @@ export const validateServiceProfile = (userData, excludePayment = false) => {
       userData?.providerProfile?.sessionRateDetails
     )
   ) {
-    return { flag: false, navigateTo: "sessionDetail" };
+    return {
+      flag: false,
+      navigateTo: "sessionDetail",
+      partiallyCompleted: true,
+    };
   }
   if (
     !validArray(userData?.providerProfile?.sessionDetails) ||
     !validateTimeData(userData?.providerProfile?.sessionDetails)
   ) {
-    return { flag: false, navigateTo: "workingHours" };
+    return {
+      flag: false,
+      navigateTo: "workingHours",
+      partiallyCompleted: true,
+    };
   }
   if (
     !userData?.providerProfile?.MediaLinks?.facebook ||
@@ -82,20 +106,24 @@ export const validateServiceProfile = (userData, excludePayment = false) => {
     !userData?.providerProfile?.MediaLinks?.onlinelink ||
     !userData?.providerProfile?.MediaLinks?.website
   ) {
-    return { flag: false, navigateTo: "mediaLink" };
+    return { flag: false, navigateTo: "mediaLink", partiallyCompleted: true };
   }
   if (
     !excludePayment &&
     (!userData?.providerProfile?.subscription?.status ||
       userData?.providerProfile?.subscription?.status === "inactive")
   ) {
-    return { flag: false, navigateTo: "paymentsSubscription" };
+    return {
+      flag: false,
+      navigateTo: "paymentsSubscription",
+      partiallyCompleted: true,
+    };
   }
-  return { flag: true };
+  return { flag: true, partiallyCompleted: true };
 };
 
 export const validateCompleteServiceProfile = (userData) => {
-  const output = { flag: true, modules: [] };
+  const output = { flag: true, modules: [], partiallyCompleted: true };
   if (
     !userData?.providerProfile?.providerBusiness?.name ||
     !validArray(userData?.providerProfile?.providerBusiness?.services) ||
@@ -103,6 +131,7 @@ export const validateCompleteServiceProfile = (userData) => {
     !userData?.providerProfile?.providerBusiness?.description
   ) {
     output.flag = false;
+    output.partiallyCompleted = false;
     output.modules.push("businessDetail");
   }
   if (
@@ -113,6 +142,7 @@ export const validateCompleteServiceProfile = (userData) => {
     !userData?.providerProfile?.providerContact?.pin
   ) {
     output.flag = false;
+    output.partiallyCompleted = true;
     output.modules.push("contactDetails");
   }
   if (
@@ -120,6 +150,7 @@ export const validateCompleteServiceProfile = (userData) => {
     !validateDocuments(userData?.providerProfile?.providerDocument)
   ) {
     output.flag = false;
+    output.partiallyCompleted = true;
     output.modules.push("uploadImagesDocs");
   }
   if (
@@ -134,6 +165,7 @@ export const validateCompleteServiceProfile = (userData) => {
     )
   ) {
     output.flag = false;
+    output.partiallyCompleted = true;
     output.modules.push("sessionDetail");
   }
   if (
@@ -141,6 +173,7 @@ export const validateCompleteServiceProfile = (userData) => {
     !validateTimeData(userData?.providerProfile?.sessionDetails)
   ) {
     output.flag = false;
+    output.partiallyCompleted = true;
     output.modules.push("workingHours");
   }
   if (
@@ -150,6 +183,7 @@ export const validateCompleteServiceProfile = (userData) => {
     !userData?.providerProfile?.MediaLinks?.website
   ) {
     output.flag = false;
+    output.partiallyCompleted = true;
     output.modules.push("mediaLink");
   }
   if (
@@ -157,6 +191,7 @@ export const validateCompleteServiceProfile = (userData) => {
     userData?.providerProfile?.subscription?.status === "inactive"
   ) {
     output.flag = false;
+    output.partiallyCompleted = true;
     output.modules.push("paymentsSubscription");
   }
   return output;
