@@ -79,16 +79,6 @@ const MyAccount = (props) => {
     [profile?.providerProfile?.providerBusiness?.services]
   );
 
-  // const paymentCompleted = useMemo(
-  //   () =>
-  //     profile?.providerProfile?.subscription?.reduce(
-  //       (accumulator, currentValue) =>
-  //         accumulator + `${currentValue?.service} `,
-  //       ""
-  //     ),
-  //   [profile?.providerProfile?.subscription]
-  // );
-
   const profileStatus = useMemo(() => {
     const validProviderProfile = validateServiceProfile(profile);
     return validProviderProfile;
@@ -143,7 +133,10 @@ const MyAccount = (props) => {
       props.navigation.reset({
         index: 0,
         routes: [
-          { name: "petParentAppStack", params: { route: "parentAccount" } },
+          {
+            name: validProviderProfile?.navigateTo,
+            params: { route: "parentAccount" },
+          },
         ],
       });
     }
@@ -192,7 +185,11 @@ const MyAccount = (props) => {
                 <Text style={styles.roleText}>{profileServices}</Text>
               ) : null}
               <Text style={styles.premiumMemberText}>
-                {guestUser ? Strings.guestUser : Strings.premiumMemmber}
+                {guestUser ||
+                (!profileStatus?.flag &&
+                  profileStatus?.navigateTo === "paymentsSubscription")
+                  ? Strings.guestUser
+                  : Strings.premiumMemmber}
               </Text>
             </View>
             <View style={styles.padding14}>

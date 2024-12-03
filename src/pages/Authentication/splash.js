@@ -65,7 +65,7 @@ const Splash = (props) => {
     if (data) {
       const userData = await initData();
       const validProfile = validateParentProfile(userData);
-      const validProviderProfile = validateServiceProfile(userData);
+      const validProviderProfile = validateServiceProfile(userData, true); //pass true as an argument for testing purpose till payment part is done
       if (validProfile?.flag && validProviderProfile?.flag) {
         props.navigation.navigate("auth", {
           screen: "home",
