@@ -12,7 +12,7 @@ import { decryptService } from "../../utils/storageFunc";
 import { THEMES } from "../../assets/theme/themes";
 import { screenHeight, screenWidth } from "../../utils/dimensions";
 import { getProfile } from "../../redux-store/actions/auth";
-import { dispatchUserData } from "../../redux-store/actions/registerAction";
+import { dispatchUserData, getServiceProviderRole } from "../../redux-store/actions/registerAction";
 import { useDispatch } from "react-redux";
 import { showToast, validArray } from "../../utils/utils";
 import { DOCUMENT_TYPES } from "../Account/uploadImagesDocs";
@@ -35,6 +35,8 @@ const Splash = (props) => {
   useEffect(() => {
     if (isFocused) {
       checkIfUserExits();
+      dispatch(getServiceProviderRole());
+
     }
   }, [isFocused, checkIfUserExits]);
 

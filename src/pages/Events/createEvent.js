@@ -27,6 +27,10 @@ import BlackCross from "../../assets/svg/cross.svg";
 import Modal from "react-native-modal";
 import UploadImageModal from "../../components/UploadImageModal";
 import CrossCircle from "../../assets/svg/crossCircle.svg";
+import { decryptService } from "../../utils/storageFunc";
+import { createEvent } from "../../redux-store/actions/events";
+import { showToast } from "../../utils/utils";
+import { goBack } from "../../navigations/rootNavigationRef";
 
 const CreateEvent = () => {
   const [isStartTimeModalVisible, setStartTimeModalVisible] = useState(false);
@@ -39,13 +43,19 @@ const CreateEvent = () => {
   const [eDate, setEDate] = useState();
   const [posterVisible, setPosterVisible] = useState(false);
   const [posterImg, setPosterImg] = useState([]);
+  const [eventName, setEventName] = useState();
+  const [description, setDescription] = useState();
+  const [contactNo, setContactNo] = useState();
+  const [registrationlink, setRegistrationlink] = useState("");
+  const [audience, setAudience] = useState("");
+  const [location, setLocation] = useState("");
 
   const hideStartDatePicker = () => {
     setStartTimeModalVisible(false);
   };
 
   const handleStartConfirm = (date) => {
-    const formattedTime = moment(date).format("HH:mm:A");
+    const formattedTime = moment(date).format("HH:mm:ss");
     setStartTime(formattedTime);
     hideStartDatePicker();
   };
@@ -55,12 +65,10 @@ const CreateEvent = () => {
   };
 
   const handleEndConfirm = (date) => {
-    const formattedTime = moment(date).format("HH:mm:A");
+    const formattedTime = moment(date).format("HH:mm:ss");
     setEndTime(formattedTime);
     hideEndDatePicker();
-  };
-
-  const onSubmit = () => {};
+  }; 
 
   const handlePosterImages = (image) => {
     var temp = [...posterImg];
@@ -100,6 +108,42 @@ const CreateEvent = () => {
     );
   };
 
+  const onSubmit = async () => {
+    if (!eventName) {
+      showToast("error", "Please enter Event name");
+    } else if (!description) {
+      showToast("error", "Please enter description");
+    } else if (!contactNo) {
+      showToast("error", "Please enter contact no");
+    } else {
+      try {
+        const userId = await decryptService("userId");
+        let obj = {
+          id: 0,
+          name: eventName,
+          description: description,
+          startdate: sDate ? sDate : "",
+          enddate: eDate ? eDate : "",
+          starttime: startTime ? startTime?.replace(/:AM|:PM/, "") : "",
+          endtime: endTime ? endTime?.replace(/:AM|:PM/, "") : "",
+          contact: contactNo,
+          registrationlink: registrationlink,
+          audience: audience,
+          userId: userId,
+        };
+
+        let res = await createEvent(obj);
+        if (res?.data?.status_code == 200) {
+          setSuccess(true);
+        } else {
+          setSuccess(false);
+        }
+      } catch (error) {
+        console.log("error", error);
+      }
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
@@ -119,12 +163,12 @@ const CreateEvent = () => {
           <InputField
             label={"Name of Event/ Offer*"}
             placeholderText={"Enter Name of Event/ Offer"}
+            value={eventName}
+            onChange={setEventName}
           />
           <>
             <View style={styles.secondaryFlex}>
-              <Text style={styles.titleText}>
-              Event poster/images
-              </Text>
+              <Text style={styles.titleText}>Event poster/images</Text>
               <TouchableOpacity onPress={() => setPosterVisible(true)}>
                 <Text style={styles.addText}>{Strings.add}</Text>
               </TouchableOpacity>
@@ -167,12 +211,16 @@ const CreateEvent = () => {
               label={"Description*"}
               placeholderText={"Enter the offer description"}
               multiline
+              value={description}
+              onChange={setDescription}
             />
           </View>
           <View style={styles.pt16}>
             <InputField
               label={"Location"}
               placeholderText={"Enter location name"}
+              value={location}
+              onChange={setLocation}
             />
           </View>
           <View style={styles.dateView}>
@@ -242,6 +290,10 @@ const CreateEvent = () => {
             <InputField
               label={"Contact Information*"}
               placeholderText={"Enter Contact Number"}
+              value={contactNo}
+              onChange={setContactNo}
+              maxLength={10}
+              keyboardType="phone-pad"
             />
           </View>
           <View style={styles.pt16}>
@@ -249,13 +301,17 @@ const CreateEvent = () => {
               label={"Registration Link"}
               placeholderText={"Paste registration link"}
               rightIcon={<ClipboardPaste stroke={THEMES.colors.silver} />}
+              value={registrationlink}
+              onChange={setRegistrationlink}
             />
           </View>
           <View style={styles.pt16}>
             <InputField
               label={"Select whom to send"}
               placeholderText={"Select"}
-              rightIcon={<ArrowDown stroke={THEMES.colors.darkGrey} />}
+              // rightIcon={<ArrowDown stroke={THEMES.colors.darkGrey} />}
+              value={audience}
+              onChange={setAudience}
             />
           </View>
         </View>
@@ -265,7 +321,7 @@ const CreateEvent = () => {
             marginBottom: moderateScale(10),
           }}
         >
-          <Button title="Submit" onPress={() => setSuccess(true)}></Button>
+          <Button title="Submit" onPress={() => onSubmit()}></Button>
           <Modal
             onBackdropPress={() => setSuccess(false)}
             isVisible={success}
@@ -325,13 +381,17 @@ const CreateEvent = () => {
               <View
                 style={{
                   alignItems: "center",
-
                   paddingTop: moderateScale(31),
                 }}
               >
                 <Button
                   title="Go back to Homescreen"
-                  onPress={() => setSuccess(false)}
+                  onPress={() => {
+                    setSuccess(false);
+                    setTimeout(() => {
+                      goBack();
+                    }, 500);
+                  }}
                 />
               </View>
             </View>
@@ -494,7 +554,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop:moderateScale(16)
+    paddingTop: moderateScale(16),
   },
   titleText: {
     fontSize: THEMES.fonts.font14,

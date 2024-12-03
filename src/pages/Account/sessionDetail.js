@@ -112,7 +112,7 @@ const SessionDetail = (props) => {
     }
 
     if (ProviderSession?.monthtime) {
-      setMonthTime(ProviderSession?.monthtime);
+      setMonthTime(ProviderSession?.monthtime ? ProviderSession?.monthtime : "0");
     }
     if (ProviderSession?.sessiontime) {
       setSessionTime(ProviderSession?.sessiontime);
@@ -191,8 +191,8 @@ const SessionDetail = (props) => {
         sessionData.availableat = getAvailability();
         sessionData.ispermonth = perMonth ? 1 : 0;
         sessionData.ispersession = perSession ? 1 : 0;
-        sessionData.sessiontime = sessionTime ? sessionTime : "";
-        sessionData.monthtime = monthTime ? monthTime : "";
+        sessionData.sessiontime = sessionTime ? sessionTime : "0";
+        sessionData.monthtime = monthTime ? monthTime : "0";
 
         if (perSession) {
           let obj = {
@@ -220,6 +220,8 @@ const SessionDetail = (props) => {
           userid: userId,
           sessionrate: sessionRateArray,
         };
+
+        console.log(sessionData,sessionCharge )
         const responses = await Promise.all([
           saveSession(sessionData),
           saveSessionCharges(sessionCharge),

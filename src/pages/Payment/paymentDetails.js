@@ -40,6 +40,7 @@ const paymentData = [
 ];
 
 const PaymentDetails = () => {
+  
   const renderItem = () => {
     return (
       <View style={styles.mainView}>
