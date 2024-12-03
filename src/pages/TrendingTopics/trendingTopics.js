@@ -73,8 +73,7 @@ const TrendingTopics = (props) => {
             backgroundColor: THEMES.colors.white,
           }}
         >
-          <Text 
-        
+          <Text
             numberOfLines={2}
             style={{
               fontFamily: THEMES.fontFamily.semiBold,
@@ -82,7 +81,6 @@ const TrendingTopics = (props) => {
               fontSize: THEMES.fonts.font12,
               paddingHorizontal: moderateScale(10),
               paddingVertical: moderateScale(8),
-          
             }}
           >
             Home Remedies for Tick Removal
@@ -96,7 +94,6 @@ const TrendingTopics = (props) => {
               paddingHorizontal: moderateScale(10),
               paddingTop: moderateScale(3),
               paddingBottom: moderateScale(5),
-
             }}
           >
             Kartik Kumar
@@ -222,7 +219,7 @@ const TrendingTopics = (props) => {
             >
               <View style={{ width: "87%" }}>
                 <TouchableOpacity
-                  onPress={()=>props.navigation.navigate('search')}
+                  onPress={() => props.navigation.navigate("search")}
                   style={{
                     padding: moderateScale(8),
                     borderRadius: 25,
@@ -245,9 +242,13 @@ const TrendingTopics = (props) => {
                   </Text>
                 </TouchableOpacity>
               </View>
-              
+
               <TouchableOpacity
-                onPress={() => props.navigation.navigate("newTopic")}
+                onPress={() =>
+                  props.navigation.navigate("auth", {
+                    screen: "newTopic",
+                  })
+                }
                 style={{
                   backgroundColor: THEMES.colors.cyan,
                   padding: moderateScale(11),
@@ -257,7 +258,7 @@ const TrendingTopics = (props) => {
                   borderBottomLeftRadius: moderateScale(0),
                 }}
               >
-                <Plus stroke={"#fff"}/>
+                <Plus stroke={"#fff"} />
               </TouchableOpacity>
             </View>
             <View style={{ paddingTop: moderateScale(15) }}>
