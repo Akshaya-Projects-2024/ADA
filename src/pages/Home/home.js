@@ -184,8 +184,9 @@ const Home = (props) => {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedAfternonnSlot, setSelectedAfternoonSlot] = useState(null);
   const { width: screenWidth } = Dimensions.get("window");
-  const { loggedInModule } = useSelector((state) => state?.register);
+  const { loggedInModule, guestUser } = useSelector((state) => state?.register);
   const profile = useSelector((state) => state?.commonReducer);
+  // const { guestUser } = useSelector(({ register }) => register);
 
   useEffect(() => {
     if (isFocused) {
@@ -613,7 +614,13 @@ const Home = (props) => {
                   fontSize: THEMES.fonts.font20,
                 }}
               >
-                Hi James
+                {`Hi 
+                ${
+                  guestUser
+                    ? Strings.guest
+                    : profile?.providerProfile?.providerBusiness?.name
+                }
+                `}
               </Text>
             </View>
             <View

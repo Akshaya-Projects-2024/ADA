@@ -288,7 +288,7 @@ const RoleSelection = (props) => {
                         if (selected == "service") {
                           props.navigation.navigate("businessDetail");
                         } else {
-                          props.navigation.navigate("petDetail");
+                          props.navigation.navigate("parentDetails");
                         }
                       }, 200);
                     }}
