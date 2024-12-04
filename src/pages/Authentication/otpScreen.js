@@ -159,7 +159,12 @@ const OtpScreen = (props) => {
             props.navigation.navigate("auth", {
               screen: "home",
             });
-          } else if (!validProfile?.flag && !validProviderProfile?.flag) {
+          } else if (
+            !validProfile?.flag &&
+            !validProfile?.partiallyCompleted &&
+            !validProviderProfile?.flag &&
+            !validProviderProfile?.partiallyCompleted
+          ) {
             props?.navigation.replace("auth");
           } else if (validProviderProfile?.flag) {
             props.navigation.navigate("auth", {
@@ -170,15 +175,17 @@ const OtpScreen = (props) => {
               index: 0,
               routes: [{ name: "petParentAppStack" }],
             });
-          } else if (!validProviderProfile?.flag) {
+          } else if (
+            !validProviderProfile?.flag &&
+            validProviderProfile?.partiallyCompleted
+          ) {
             showToast("error", "Please complete your registration");
             props.navigation.navigate("auth", {
               screen: validProviderProfile?.navigateTo,
             });
-          } else if (!validProfile?.flag) {
-            props.navigation.reset({
-              index: 0,
-              routes: [{ name: "petParentAppStack" }],
+          } else if (!validProfile?.flag && validProfile?.partiallyCompleted) {
+            props.navigation.navigate(validProfile?.navigateTo, {
+              route: "parentAccount",
             });
           } else {
             props?.navigation.replace("auth");
