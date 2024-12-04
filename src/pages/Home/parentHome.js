@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -30,6 +30,7 @@ import {
 import { LoginModules } from "../../constants/enums";
 import { useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
+import Strings from "../../constants/strings";
 const { width: screenWidth } = Dimensions.get("window");
 
 const appointmentData = [
@@ -104,8 +105,13 @@ const ParentHome = (props) => {
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
   const [activeIndex, setActiveIndex] = useState(0);
-  const { loggedInModule } = useSelector((state) => state?.register);
+  const { loggedInModule, guestUser } = useSelector((state) => state?.register);
   const profile = useSelector((state) => state?.commonReducer);
+
+  const paymentCompleted = useMemo(
+    () => profile?.parentProfie?.subscription?.status === "active",
+    [profile?.parentProfie?.subscription]
+  );
 
   useEffect(() => {
     if (isFocused) {
@@ -433,7 +439,11 @@ const ParentHome = (props) => {
                 fontSize: THEMES.fonts.font20,
               }}
             >
-              Hi James
+              {`Hi ${
+                guestUser
+                  ? Strings.guest
+                  : profile?.parentProfie?.parentContact?.name
+              }`}
             </Text>
           </View>
           <View

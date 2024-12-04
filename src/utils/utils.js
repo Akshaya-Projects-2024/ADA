@@ -28,8 +28,8 @@ const showAlert = (
   ]);
 };
 
-const showPaymentAlert = () => {
-  showAlert(Strings.attention, Strings.paymentError);
+const showPaymentAlert = (okPressed, onCancel = () => {}) => {
+  showAlert(Strings.attention, Strings.paymentError, okPressed, onCancel, true);
 };
 
 const validObject = (obj) => {

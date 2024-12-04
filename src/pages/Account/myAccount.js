@@ -116,28 +116,21 @@ const MyAccount = (props) => {
         </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           {showPending && <Text style={styles.pendingText}>Pending</Text>}
-
           <RightArrow stroke={THEMES.colors.boulder} />
         </View>
       </TouchableOpacity>
     );
   };
   const onParentClick = () => {
-    const validProviderProfile = validateParentProfile(profile);
-    if (validProviderProfile?.flag) {
+    const validParentProfile = validateParentProfile(profile);
+    if (validParentProfile?.flag) {
       props.navigation.reset({
         index: 0,
         routes: [{ name: "petParentAppStack" }],
       });
     } else {
-      props.navigation.reset({
-        index: 0,
-        routes: [
-          {
-            name: validProviderProfile?.navigateTo,
-            params: { route: "parentAccount" },
-          },
-        ],
+      props.navigation.navigate(validParentProfile?.navigateTo, {
+        route: "parentAccount",
       });
     }
   };

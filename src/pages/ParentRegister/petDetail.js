@@ -94,7 +94,6 @@ const PetDetail = (props) => {
         const certificates = [];
         for (let index = 0; index < firstPet?.documents?.length; index++) {
           const element = firstPet?.documents[index];
-          console.log("🚀 ~ initData ~ element:", element);
           const obj = {
             id: element?.id,
           };
@@ -157,7 +156,6 @@ const PetDetail = (props) => {
             extention: element?.fileName?.split(".")?.pop(),
             document: element?.fileData,
           };
-          console.log("🚀 ~ getDocuments ~ outputObj:", outputObj);
           output.push(outputObj);
         }
       }

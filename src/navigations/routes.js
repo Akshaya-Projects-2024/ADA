@@ -27,7 +27,7 @@ const navOptionHandler = () => ({
   gestureEnabled: false,
 });
 
-export default Routes = (props) => {
+const Routes = (props) => {
   return (
     <NavigationContainer
       ref={navigationRef}
@@ -138,3 +138,4 @@ export default Routes = (props) => {
     </NavigationContainer>
   );
 };
+export default Routes;

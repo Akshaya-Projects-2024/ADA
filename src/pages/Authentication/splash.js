@@ -12,7 +12,10 @@ import { decryptService } from "../../utils/storageFunc";
 import { THEMES } from "../../assets/theme/themes";
 import { screenHeight, screenWidth } from "../../utils/dimensions";
 import { getProfile } from "../../redux-store/actions/auth";
-import { dispatchUserData, getServiceProviderRole } from "../../redux-store/actions/registerAction";
+import {
+  dispatchUserData,
+  getServiceProviderRole,
+} from "../../redux-store/actions/registerAction";
 import { useDispatch } from "react-redux";
 import { showToast, validArray } from "../../utils/utils";
 import { DOCUMENT_TYPES } from "../Account/uploadImagesDocs";
@@ -36,7 +39,6 @@ const Splash = (props) => {
     if (isFocused) {
       checkIfUserExits();
       dispatch(getServiceProviderRole());
-
     }
   }, [isFocused, checkIfUserExits]);
 
@@ -95,9 +97,8 @@ const Splash = (props) => {
           screen: validProviderProfile?.navigateTo,
         });
       } else if (!validProfile?.flag && validProfile?.partiallyCompleted) {
-        props.navigation.reset({
-          index: 0,
-          routes: [{ name: "petParentAppStack" }],
+        props.navigation.navigate(validProfile?.navigateTo, {
+          route: "parentAccount",
         });
       } else {
         props?.navigation.replace("auth");

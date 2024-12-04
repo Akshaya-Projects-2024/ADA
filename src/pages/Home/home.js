@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -186,6 +186,12 @@ const Home = (props) => {
   const { width: screenWidth } = Dimensions.get("window");
   const { loggedInModule, guestUser } = useSelector((state) => state?.register);
   const profile = useSelector((state) => state?.commonReducer);
+
+  const paymentCompleted = useMemo(
+    () => profile?.providerProfile?.subscription?.status === "active",
+    [profile?.providerProfile?.subscription]
+  );
+
   // const { guestUser } = useSelector(({ register }) => register);
 
   useEffect(() => {
@@ -553,18 +559,27 @@ const Home = (props) => {
   };
 
   const switchProfile = () => {
-    const validProviderProfile = validateParentProfile(profile);
-    if (validProviderProfile?.flag) {
+    const validParentProfile = validateParentProfile(profile);
+    if (validParentProfile?.flag) {
       props.navigation.reset({
         index: 0,
         routes: [{ name: "petParentAppStack" }],
       });
     } else {
-      props.navigation.reset({
-        index: 0,
-        routes: [
-          { name: "petParentAppStack", params: { route: "parentAccount" } },
-        ],
+      props.navigation.navigate(validParentProfile?.navigateTo, {
+        route: "parentAccount",
+      });
+    }
+  };
+
+  const handlePremiumActionPressed = (premiumAction) => {
+    if (paymentCompleted) {
+      premiumAction();
+    } else {
+      showPaymentAlert(() => {
+        props.navigation.navigate("auth", {
+          screen: "paymentsSubscription",
+        });
       });
     }
   };
@@ -618,8 +633,7 @@ const Home = (props) => {
                   guestUser
                     ? Strings.guest
                     : profile?.providerProfile?.providerBusiness?.name
-                }
-                `}
+                }`}
               </Text>
             </View>
             <View
@@ -631,8 +645,11 @@ const Home = (props) => {
             >
               <Bell />
               <Event
-                // onPress={showPaymentAlert}
-                onPress={() => props.navigation.navigate("createEvent")}
+                onPress={() =>
+                  handlePremiumActionPressed(() =>
+                    props.navigation.navigate("createEvent")
+                  )
+                }
                 style={{ marginLeft: moderateScale(17) }}
               />
             </View>
@@ -683,7 +700,11 @@ const Home = (props) => {
                 </View>
                 <TouchableOpacity
                   hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-                  onPress={() => setAppointmentVisible(true)}
+                  onPress={() =>
+                    handlePremiumActionPressed(() =>
+                      setAppointmentVisible(true)
+                    )
+                  }
                   style={{
                     width: 30,
                     height: 30,
