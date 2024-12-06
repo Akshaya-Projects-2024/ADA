@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,9 +13,9 @@ import Header from "../../components/Header";
 import Strings from "../../constants/strings";
 import { moderateScale } from "react-native-size-matters";
 import ArrowRight from "../../assets/svg/arrowRight.svg";
-import Tick from "../../assets/svg/tick.svg";
 import LinearGradient from "react-native-linear-gradient";
 import Button from "../../components/Button";
+import { useDispatch, useSelector } from "react-redux";
 import Modal from "react-native-modal";
 import SubscriptionSuccess from "./subscriptionSuccess";
 import {
@@ -23,16 +23,21 @@ import {
   getSubscriptionPlan,
 } from "../../redux-store/actions/payment";
 import { decryptService } from "../../utils/storageFunc";
-import { useSelector } from "react-redux";
 import RazorpayCheckout from "react-native-razorpay";
+import { getProfile } from "../../redux-store/actions/auth";
+import { dispatchUserData } from "../../redux-store/actions/registerAction";
 
 const PaymentsSubscription = (props) => {
+  const { route } = props?.route?.params;
+  const dispatch = useDispatch();
   const [isModalVisible, setModalVisible] = useState(false);
   const [subscriptionModal, setSubscription] = useState(false);
   const [month, setMonth] = useState("12Month");
   const [selectedCard, setSelectedCard] = useState(null); // State to track selected card
   const [subscriptionData, setSubscriptionData] = useState();
   const [subscriptionDetails, setSubscriptionDetails] = useState();
+  const profile = useSelector((state) => state?.commonReducer);
+  const { loggedInModule } = useSelector((state) => state?.register);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -42,10 +47,31 @@ const PaymentsSubscription = (props) => {
     initData();
   }, []);
 
+  const getUserData = useCallback(() => {
+    return new Promise(async (resolve) => {
+      try {
+        const obj = {
+          userid: await decryptService("userId"),
+        };
+        const response = await getProfile(obj);
+        if (response?.data?.status_code === 200) {
+          dispatch(dispatchUserData(response?.data?.data));
+        }
+        resolve(response?.data?.data ? response?.data?.data : false);
+      } catch (error) {
+        console.log("err111", error);
+        resolve(false);
+      }
+    });
+  }, [dispatch]);
+
   const initData = async () => {
     let obj = {
       userId: await decryptService("userId"),
-      usertype: "provider", // parent or provider
+      usertype:
+        route === "myprofile" || route === "fromProvider"
+          ? "provider"
+          : "parent", // parent or provider
     };
     let res = await getSubscriptionPlan(obj);
     if (res.status == 200) {
@@ -54,15 +80,17 @@ const PaymentsSubscription = (props) => {
         setSelectedCard(res?.data?.data[0]);
       }
     }
-
     let obj1 = {
       userId: await decryptService("userId"),
-      usertype: "provider", // parent or provider
+      usertype:
+        route === "myprofile" || route === "fromProvider"
+          ? "provider"
+          : "parent", // parent or provider
       subscriptioncode: res?.data?.data[0]?.code,
       promocode: "",
     };
     let res1 = await getSubscription(obj1);
-    if (res1.status == 200) {
+    if (res1.status === 200) {
       if (res1?.data?.data) {
         setSubscriptionDetails(res1?.data?.data);
       }
@@ -70,7 +98,9 @@ const PaymentsSubscription = (props) => {
   };
 
   const handlePayment = async () => {
-    var options = {
+    const userData = await getUserData();
+    // console.log("🚀 ~ initData ~ userData:", userData);
+    const options = {
       description: "Pet Service Provider Payment",
       image: "https://i.imgur.com/3g7nmJC.png",
       currency: subscriptionDetails?.currency,
@@ -85,25 +115,25 @@ const PaymentsSubscription = (props) => {
       },
       theme: { color: "#53a20e" },
     };
-    console.log("options",options)
+    console.log("options", options);
     // props.navigation.reset({
     //   index: 0,
     //   routes: [{ name: "home" }],
     // });
-    RazorpayCheckout.open(options)
-      .then((data) => {
-        // Handle success
-        console.log(JSON.stringify(data))
-        alert(`Success: ${data}`);
-      })
-      .catch((error) => {
-        console.log(error);
-        // Handle failure
-        alert(`Error: ${error.code} | ${error.description}`);
-      });
+    // RazorpayCheckout.open(options)
+    //   .then((data) => {
+    //     // Handle success
+    //     console.log(JSON.stringify(data));
+    //     alert(`Success: ${data}`);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //     // Handle failure
+    //     alert(`Error: ${error.code} | ${error.description}`);
+    //   });
   };
 
-  onCardClick = async (plan) => {
+  const onCardClick = async (plan) => {
     setSelectedCard(plan);
     let obj = {
       userId: await decryptService("userId"),
@@ -114,7 +144,7 @@ const PaymentsSubscription = (props) => {
     let res = await getSubscription(obj);
     if (res.status == 200) {
       if (res?.data?.data) {
-        setSubscriptionDetails(res1?.data?.data);
+        setSubscriptionDetails(res?.data?.data);
       }
     }
   };

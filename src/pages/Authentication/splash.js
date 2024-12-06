@@ -17,30 +17,24 @@ import {
   getServiceProviderRole,
 } from "../../redux-store/actions/registerAction";
 import { useDispatch } from "react-redux";
-import { showToast, validArray } from "../../utils/utils";
-import { DOCUMENT_TYPES } from "../Account/uploadImagesDocs";
-import { SHIFTS } from "../../components/TimeTracker";
-import { IMAGE_TYPE } from "../ParentRegister/petDetail";
+import { showToast } from "../../utils/utils";
 import {
+  getLoggedInMoodule,
   validateParentProfile,
   validateServiceProfile,
 } from "../../utils/userUtils";
+import { LoginModules } from "../../constants/enums";
 
 const Splash = (props) => {
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     checkIfUserExits();
-  //   }, [])
-  // );
 
   useEffect(() => {
     if (isFocused) {
       checkIfUserExits();
       dispatch(getServiceProviderRole());
     }
-  }, [isFocused, checkIfUserExits]);
+  }, [isFocused, checkIfUserExits, dispatch]);
 
   const initData = useCallback(() => {
     return new Promise(async (resolve) => {
@@ -64,14 +58,22 @@ const Splash = (props) => {
 
   const checkIfUserExits = useCallback(async () => {
     const data = await decryptService("accessToken");
+    const loggedInModule = await getLoggedInMoodule();
     if (data) {
       const userData = await initData();
       const validProfile = validateParentProfile(userData);
       const validProviderProfile = validateServiceProfile(userData, true); //pass true as an argument for testing purpose till payment part is done
       if (validProfile?.flag && validProviderProfile?.flag) {
-        props.navigation.navigate("auth", {
-          screen: "home",
-        });
+        if (loggedInModule && loggedInModule === LoginModules.parent) {
+          props.navigation.reset({
+            index: 0,
+            routes: [{ name: "petParentAppStack" }],
+          });
+        } else {
+          props.navigation.navigate("auth", {
+            screen: "home",
+          });
+        }
       } else if (
         !validProfile?.flag &&
         !validProfile?.partiallyCompleted &&
