@@ -125,7 +125,7 @@ const PaymentsSubscription = (props) => {
           }
           resolve({ flag: false });
         } catch (error) {
-          console.log("err111", error);
+          console.log("err111", error?.message);
           resolve({ flag: false });
         }
       });
@@ -151,34 +151,52 @@ const PaymentsSubscription = (props) => {
   }, [dispatch]);
 
   const initData = async () => {
-    const obj = {
-      userId: await decryptService("userId"),
-      usertype:
-        route === "myprofile" || route === "fromProvider"
-          ? "provider"
-          : "parent", // parent or provider
-    };
-    const res = await getSubscriptionPlan(obj);
-    if (res.status === 200) {
-      if (res?.data?.data?.length) {
-        setSubscriptionData(res?.data?.data);
-        setSelectedCard(res?.data?.data[0]);
+    try {
+      const obj = {
+        userId: await decryptService("userId"),
+        usertype:
+          route === "myprofile" || route === "fromProvider"
+            ? "provider"
+            : "parent", // parent or provider
+      };
+      const res = await getSubscriptionPlan(obj);
+      if (res.status === 200) {
+        const outputArray = res?.data?.data;
+        if (validArray(outputArray)) {
+          let selectedSub = {};
+          setSubscriptionData(outputArray);
+          if (
+            profile?.providerProfile?.subscription?.subscriptioncode &&
+            profile?.providerProfile?.subscription?.status === "active"
+          ) {
+            selectedSub = outputArray.find(
+              (sub) =>
+                sub?.code ===
+                profile?.providerProfile?.subscription?.subscriptioncode
+            );
+          } else {
+            selectedSub = outputArray[0];
+            const obj1 = {
+              userId: await decryptService("userId"),
+              usertype:
+                route === "myprofile" || route === "fromProvider"
+                  ? "provider"
+                  : "parent", // parent or provider
+              subscriptioncode: selectedSub?.code,
+              promocode: "",
+            };
+            const res1 = await getSubscription(obj1);
+            if (res1.status === 200) {
+              if (res1?.data?.data) {
+                setSubscriptionDetails(res1?.data?.data);
+              }
+            }
+          }
+          setSelectedCard(selectedSub);
+        }
       }
-    }
-    const obj1 = {
-      userId: await decryptService("userId"),
-      usertype:
-        route === "myprofile" || route === "fromProvider"
-          ? "provider"
-          : "parent", // parent or provider
-      subscriptioncode: res?.data?.data[0]?.code,
-      promocode: "",
-    };
-    const res1 = await getSubscription(obj1);
-    if (res1.status === 200) {
-      if (res1?.data?.data) {
-        setSubscriptionDetails(res1?.data?.data);
-      }
+    } catch (error) {
+      console.log("🚀 ~ initData ~ error:", error?.message);
     }
   };
 
@@ -237,22 +255,10 @@ const PaymentsSubscription = (props) => {
               razorpay_signature: paymentResponse?.razorpay_signature,
               razorpay_payment_id: paymentResponse?.razorpay_payment_id,
             },
-            error: {
-              code: "",
-              description: "",
-              metadata: {},
-              reason: "",
-              source: "",
-              step: "",
-            },
           };
           const acknowledgeResponse = await acknowledgeSubscription(params);
           if (acknowledgeResponse?.data?.status_code === 200) {
-            showAlert(
-              "Status",
-              acknowledgeResponse?.data?.message,
-              navigateToHome
-            );
+            setSubscription(true);
           }
         }
       } else {
@@ -275,11 +281,7 @@ const PaymentsSubscription = (props) => {
       try {
         const acknowledgeResponse = await acknowledgeSubscription(params);
         if (acknowledgeResponse?.data?.status_code === 200) {
-          showAlert(
-            "Status",
-            acknowledgeResponse?.data?.message,
-            navigateToHome
-          );
+          setSubscription(true);
         }
       } catch (err) {
         throw new Error(
@@ -294,19 +296,33 @@ const PaymentsSubscription = (props) => {
     }
   };
 
+  const handleSubscriptionSuccess = () => {
+    setSubscription(false);
+    navigateToHome();
+  };
+
   const onCardClick = async (plan) => {
-    setSelectedCard(plan);
-    let obj = {
-      userId: await decryptService("userId"),
-      usertype: "provider",
-      subscriptioncode: plan?.code,
-      promocode: "",
-    };
-    let res = await getSubscription(obj);
-    if (res.status == 200) {
-      if (res?.data?.data) {
-        setSubscriptionDetails(res?.data?.data);
+    try {
+      setSelectedCard(plan);
+      if (
+        !profile?.providerProfile?.subscription?.subscriptioncode ||
+        profile?.providerProfile?.subscription?.status === "inactive"
+      ) {
+        let obj = {
+          userId: await decryptService("userId"),
+          usertype: "provider",
+          subscriptioncode: plan?.code,
+          promocode: "",
+        };
+        let res = await getSubscription(obj);
+        if (res.status == 200) {
+          if (res?.data?.data) {
+            setSubscriptionDetails(res?.data?.data);
+          }
+        }
       }
+    } catch (error) {
+      console.log("🚀 ~ onCardClick ~ error:", error?.message);
     }
   };
 
@@ -473,22 +489,27 @@ const PaymentsSubscription = (props) => {
             marginBottom: moderateScale(20),
           }}
         >
-          <View style={styles.subscriptionView}>
-            <Text style={styles.subscriptionText}>
-              {Strings.subscriptionCost}:{" "}
-              <Text
-                style={styles.subscriptionCost}
-              >{`₹${subscriptionDetails?.amount}`}</Text>
-            </Text>
-          </View>
+          {subscriptionDetails?.amoun ? (
+            <View style={styles.subscriptionView}>
+              <Text style={styles.subscriptionText}>
+                {Strings.subscriptionCost}:{" "}
+                <Text
+                  style={styles.subscriptionCost}
+                >{`₹${subscriptionDetails?.amount}`}</Text>
+              </Text>
+            </View>
+          ) : null}
           {/* <View style={{ paddingTop: moderateScale(7) }}>
               <Text onPress={toggleModal} style={styles.viewBreakupText}>
                 {Strings.viewBreakup}
               </Text>
             </View> */}
-          <View style={[styles.btnView, { paddingTop: moderateScale(20) }]}>
-            <Button onPress={() => handlePayment()} title={Strings.payNow} />
-          </View>
+          {profile?.providerProfile?.subscription?.subscriptioncode &&
+          profile?.providerProfile?.subscription?.status === "active" ? null : (
+            <View style={[styles.btnView, { paddingTop: moderateScale(20) }]}>
+              <Button onPress={() => handlePayment()} title={Strings.payNow} />
+            </View>
+          )}
         </View>
         <Modal
           isVisible={isModalVisible}
@@ -531,7 +552,7 @@ const PaymentsSubscription = (props) => {
         {subscriptionModal && (
           <SubscriptionSuccess
             isVisible={subscriptionModal}
-            onClose={() => setSubscription(false)}
+            onClose={handleSubscriptionSuccess}
             type={month}
           />
         )}
