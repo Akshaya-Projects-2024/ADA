@@ -156,8 +156,20 @@ const OtpScreen = (props) => {
             response?.data?.data
           );
           if (validProfile?.flag && validProviderProfile?.flag) {
-            props.navigation.navigate("auth", {
-              screen: "home",
+            props.navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "auth",
+                  state: {
+                    routes: [
+                      {
+                        name: "home",
+                      },
+                    ],
+                  },
+                },
+              ],
             });
           } else if (
             !validProfile?.flag &&
@@ -167,8 +179,20 @@ const OtpScreen = (props) => {
           ) {
             props?.navigation.replace("auth");
           } else if (validProviderProfile?.flag) {
-            props.navigation.navigate("auth", {
-              screen: "home",
+            props.navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "auth",
+                  state: {
+                    routes: [
+                      {
+                        name: "home",
+                      },
+                    ],
+                  },
+                },
+              ],
             });
           } else if (validProfile?.flag) {
             props.navigation.reset({

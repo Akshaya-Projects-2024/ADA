@@ -26,9 +26,21 @@ const RoleSelection = (props) => {
     dispatch(dispathGuestUser(true));
     setModalVisible(false);
     setTimeout(() => {
-      if (selected == "service") {
-        props.navigation.navigate("auth", {
-          screen: "home",
+      if (selected === "service") {
+        props.navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: "auth",
+              state: {
+                routes: [
+                  {
+                    name: "home",
+                  },
+                ],
+              },
+            },
+          ],
         });
       } else {
         props.navigation.reset({

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Modal from "react-native-modal";
 import SubscriptionSuccess from "./subscriptionSuccess";
 import {
+  acknowledgeSubscription,
   getSubscription,
   getSubscriptionPlan,
 } from "../../redux-store/actions/payment";
@@ -26,9 +27,14 @@ import { decryptService } from "../../utils/storageFunc";
 import RazorpayCheckout from "react-native-razorpay";
 import { getProfile } from "../../redux-store/actions/auth";
 import { dispatchUserData } from "../../redux-store/actions/registerAction";
+import {
+  validateParentProfile,
+  validateServiceProfile,
+} from "../../utils/userUtils";
+import { showAlert, validArray, validObject } from "../../utils/utils";
 
 const PaymentsSubscription = (props) => {
-  const { route } = props?.route?.params;
+  const route = props?.route?.params?.route || "";
   const dispatch = useDispatch();
   const [isModalVisible, setModalVisible] = useState(false);
   const [subscriptionModal, setSubscription] = useState(false);
@@ -37,17 +43,97 @@ const PaymentsSubscription = (props) => {
   const [subscriptionData, setSubscriptionData] = useState();
   const [subscriptionDetails, setSubscriptionDetails] = useState();
   const profile = useSelector((state) => state?.commonReducer);
-  const { loggedInModule } = useSelector((state) => state?.register);
-
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
 
   useEffect(() => {
     initData();
   }, []);
 
-  const getUserData = useCallback(() => {
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
+  const getUserData = useCallback(
+    (fetchFromCache = true) => {
+      return new Promise(async (resolve) => {
+        try {
+          let userData = {};
+          if (
+            (fetchFromCache && route === "myprofile") ||
+            route === "fromProvider"
+          ) {
+            const validProviderProfile = validateServiceProfile(profile, true);
+            if (validProviderProfile?.flag) {
+              userData = profile?.providerProfile;
+            }
+          } else if (fetchFromCache) {
+            const validProfile = validateParentProfile(profile);
+            if (validProfile?.flag) {
+              userData = profile?.parentProfie;
+            }
+          } else {
+            const response = await fetchUserProfile();
+            if (response?.flag) {
+              userData = response?.data;
+            }
+          }
+          if (validObject(userData)) {
+            if (route === "myprofile" || route === "fromProvider") {
+              resolve({
+                flag: true,
+                description: "Pet Service Provider Payment",
+                prefill: {
+                  ...(userData?.providerProfile?.providerContact?.email
+                    ? {
+                        email:
+                          userData?.providerProfile?.providerContact?.email,
+                      }
+                    : {}),
+                  ...(userData?.providerProfile?.providerContact?.mobile
+                    ? {
+                        contact:
+                          userData?.providerProfile?.providerContact?.mobile,
+                      }
+                    : {}),
+                  ...(userData?.providerProfile?.providerBusiness?.name
+                    ? {
+                        name: userData?.providerProfile?.providerBusiness?.name,
+                      }
+                    : {}),
+                },
+              });
+            } else {
+              resolve({
+                flag: true,
+                description: "Pet Payment Payment",
+                prefill: {
+                  ...(userData?.parentProfie?.parentContact?.email
+                    ? { email: userData?.parentProfie?.parentContact?.email }
+                    : {}),
+                  ...(userData?.parentProfie?.parentContact?.mobile
+                    ? {
+                        contact: userData?.parentProfie?.parentContact?.mobile,
+                      }
+                    : {}),
+                  ...(userData?.parentProfie?.parentContact?.name
+                    ? {
+                        name: userData?.parentProfie?.parentContact?.name,
+                      }
+                    : {}),
+                },
+              });
+            }
+          }
+          resolve({ flag: false });
+        } catch (error) {
+          console.log("err111", error);
+          resolve({ flag: false });
+        }
+      });
+    },
+    [fetchUserProfile, profile, route]
+  );
+
+  const fetchUserProfile = useCallback(() => {
     return new Promise(async (resolve) => {
       try {
         const obj = {
@@ -57,30 +143,29 @@ const PaymentsSubscription = (props) => {
         if (response?.data?.status_code === 200) {
           dispatch(dispatchUserData(response?.data?.data));
         }
-        resolve(response?.data?.data ? response?.data?.data : false);
+        resolve({ flag: true, data: response?.data?.data });
       } catch (error) {
-        console.log("err111", error);
-        resolve(false);
+        resolve({ flag: false });
       }
     });
   }, [dispatch]);
 
   const initData = async () => {
-    let obj = {
+    const obj = {
       userId: await decryptService("userId"),
       usertype:
         route === "myprofile" || route === "fromProvider"
           ? "provider"
           : "parent", // parent or provider
     };
-    let res = await getSubscriptionPlan(obj);
-    if (res.status == 200) {
+    const res = await getSubscriptionPlan(obj);
+    if (res.status === 200) {
       if (res?.data?.data?.length) {
         setSubscriptionData(res?.data?.data);
         setSelectedCard(res?.data?.data[0]);
       }
     }
-    let obj1 = {
+    const obj1 = {
       userId: await decryptService("userId"),
       usertype:
         route === "myprofile" || route === "fromProvider"
@@ -89,7 +174,7 @@ const PaymentsSubscription = (props) => {
       subscriptioncode: res?.data?.data[0]?.code,
       promocode: "",
     };
-    let res1 = await getSubscription(obj1);
+    const res1 = await getSubscription(obj1);
     if (res1.status === 200) {
       if (res1?.data?.data) {
         setSubscriptionDetails(res1?.data?.data);
@@ -97,47 +182,123 @@ const PaymentsSubscription = (props) => {
     }
   };
 
+  const navigateToHome = async () => {
+    await fetchUserProfile();
+    props.navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name:
+            route === "myprofile" || route === "fromProvider"
+              ? "auth"
+              : "petParentAppStack",
+          ...(route === "myprofile" || route === "fromProvider"
+            ? {
+                state: {
+                  routes: [
+                    {
+                      name: "home",
+                    },
+                  ],
+                },
+              }
+            : {}),
+        },
+      ],
+    });
+  };
+
   const handlePayment = async () => {
-    const userData = await getUserData();
-    // console.log("🚀 ~ initData ~ userData:", userData);
-    const options = {
-      description: "Pet Service Provider Payment",
-      image: "https://i.imgur.com/3g7nmJC.png",
-      currency: subscriptionDetails?.currency,
-      key: "rzp_test_PECnHmfOdkRLhw", // Replace with your Razorpay Key ID
-      amount: subscriptionDetails?.amount,
-      name: "ADA",
-      order_id: subscriptionDetails?.id, //Replace this with an order_id created using Orders API.
-      prefill: {
-        email: "Akshaya.chikane2018@gmail.com",
-        contact: "7977276381",
-        name: "Akshaya Chikane",
-      },
-      theme: { color: "#53a20e" },
-    };
-    console.log("options", options);
-    // props.navigation.reset({
-    //   index: 0,
-    //   routes: [{ name: "home" }],
-    // });
-    // RazorpayCheckout.open(options)
-    //   .then((data) => {
-    //     // Handle success
-    //     console.log(JSON.stringify(data));
-    //     alert(`Success: ${data}`);
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //     // Handle failure
-    //     alert(`Error: ${error.code} | ${error.description}`);
-    //   });
+    try {
+      const userData = await getUserData();
+      if (userData?.flag) {
+        const options = {
+          image: "https://i.imgur.com/3g7nmJC.png",
+          currency: subscriptionDetails?.currency,
+          key: "rzp_test_PECnHmfOdkRLhw", // Replace with your Razorpay Key ID
+          amount: subscriptionDetails?.amount,
+          name: "ADA",
+          order_id: subscriptionDetails?.id, //Replace this with an order_id created using Orders API.
+          theme: { color: "#53a20e" },
+        };
+        const paymentResponse = await RazorpayCheckout.open({
+          ...options,
+          ...userData,
+        });
+        if (
+          paymentResponse?.razorpay_order_id &&
+          paymentResponse?.razorpay_payment_id &&
+          paymentResponse?.razorpay_signature
+        ) {
+          const params = {
+            userid: await decryptService("userId"),
+            razorpay_order_id: paymentResponse?.razorpay_order_id,
+            success: {
+              razorpay_signature: paymentResponse?.razorpay_signature,
+              razorpay_payment_id: paymentResponse?.razorpay_payment_id,
+            },
+            error: {
+              code: "",
+              description: "",
+              metadata: {},
+              reason: "",
+              source: "",
+              step: "",
+            },
+          };
+          const acknowledgeResponse = await acknowledgeSubscription(params);
+          if (acknowledgeResponse?.data?.status_code === 200) {
+            showAlert(
+              "Status",
+              acknowledgeResponse?.data?.message,
+              navigateToHome
+            );
+          }
+        }
+      } else {
+        throw new Error(
+          "Your registrations seems to be pending. Please complete your registration first."
+        );
+      }
+    } catch (error) {
+      const params = {
+        userid: await decryptService("userId"),
+        error: {
+          code: error?.error?.code,
+          description: error?.error?.description,
+          metadata: {},
+          reason: "",
+          source: "",
+          step: "",
+        },
+      };
+      try {
+        const acknowledgeResponse = await acknowledgeSubscription(params);
+        if (acknowledgeResponse?.data?.status_code === 200) {
+          showAlert(
+            "Status",
+            acknowledgeResponse?.data?.message,
+            navigateToHome
+          );
+        }
+      } catch (err) {
+        throw new Error(
+          err?.message || err?.error?.code || err?.error?.description
+        );
+      }
+      showAlert(
+        "Status",
+        error?.message || error?.error?.code || error?.error?.description,
+        () => {}
+      );
+    }
   };
 
   const onCardClick = async (plan) => {
     setSelectedCard(plan);
     let obj = {
       userId: await decryptService("userId"),
-      usertype: "provider", // parent or provider
+      usertype: "provider",
       subscriptioncode: plan?.code,
       promocode: "",
     };
@@ -188,93 +349,98 @@ const PaymentsSubscription = (props) => {
                 justifyContent: "center",
               }}
             >
-              {subscriptionData?.length &&
-                subscriptionData?.map((plan, index) => {
-                  return (
-                    <>
-                      <TouchableOpacity
-                        key={plan.id}
-                        style={[
-                          styles.card,
-                          selectedCard?.id === plan?.id
-                            ? { borderWidth: 0, elevation: 5 }
-                            : { borderWidth: 1, borderColor: "#d3d3d3" },
-                          ,
-                          {
-                            width: selectedCard?.id === plan?.id ? 130 : 113,
-                            height: selectedCard?.id === plan?.id ? 127 : 107,
-                            backgroundColor: "#f2e2f4",
-                            borderColor: "#ab47bc",
-                            marginRight:
-                              index !== subscriptionData?.length - 1 &&
-                              moderateScale(20),
-                          },
-                        ]}
-                        onPress={() => onCardClick(plan)}
-                      >
-                        {selectedCard?.id === plan.id ? (
-                          <LinearGradient
-                            colors={["#fb427c", "#fd6da2", "#fd98a5"]}
-                            style={[
-                              styles.gradientBackground,
-                              {
-                                width:
-                                  selectedCard?.id === plan?.id ? 130 : 113,
-                                height:
-                                  selectedCard?.id === plan?.id ? 127 : 107,
-                              },
-                            ]}
-                          >
-                            {plan.flatdiscount !== 0 && (
-                              <Text style={styles.discountText}>
-                                {plan.flatdiscount}% Off
-                              </Text>
-                            )}
+              {validArray(subscriptionData)
+                ? subscriptionData?.map((plan, index) => {
+                    return (
+                      <View key={plan?.id}>
+                        <TouchableOpacity
+                          style={[
+                            styles.card,
+                            selectedCard?.id === plan?.id
+                              ? { borderWidth: 0, elevation: 5 }
+                              : { borderWidth: 1, borderColor: "#d3d3d3" },
+                            ,
+                            {
+                              width: selectedCard?.id === plan?.id ? 130 : 113,
+                              height: selectedCard?.id === plan?.id ? 127 : 107,
+                              backgroundColor: "#f2e2f4",
+                              borderColor: "#ab47bc",
+                              marginRight:
+                                index !== subscriptionData?.length - 1 &&
+                                moderateScale(20),
+                            },
+                          ]}
+                          onPress={() => onCardClick(plan)}
+                        >
+                          {selectedCard?.id === plan?.id ? (
+                            <LinearGradient
+                              colors={["#fb427c", "#fd6da2", "#fd98a5"]}
+                              style={[
+                                styles.gradientBackground,
+                                {
+                                  width:
+                                    selectedCard?.id === plan?.id ? 130 : 113,
+                                  height:
+                                    selectedCard?.id === plan?.id ? 127 : 107,
+                                },
+                              ]}
+                            >
+                              {plan?.flatdiscount !== 0 && (
+                                <Text style={styles.discountText}>
+                                  {plan?.flatdiscount}% Off
+                                </Text>
+                              )}
 
-                            <Text style={styles.monthText}>
-                              {plan?.name.replace(" MONTH", "")}
-                            </Text>
-                            <Text
-                              style={{
-                                color: "#fff",
-                                fontFamily: THEMES.fontFamily.medium,
-                                fontSize: THEMES.fonts.font12,
-                              }}
-                            >
-                              Months
-                            </Text>
-                            <View style={styles.checkIcon}>
-                              <Text style={styles.checkText}>✔</Text>
-                            </View>
-                          </LinearGradient>
-                        ) : (
-                          <View
-                            style={[
-                              styles.cardContent,
-                              { backgroundColor: "#f2e2f4" },
-                            ]}
-                          >
-                            {plan.flatdiscount !== 0 && (
-                              <Text
-                                style={[styles.discountText, { color: "#000" }]}
-                              >
-                                {plan.flatdiscount}% Off
+                              <Text style={styles.monthText}>
+                                {plan?.name.replace(" MONTH", "")}
                               </Text>
-                            )}
-                            <Text style={[styles.monthText, { color: "#000" }]}>
-                              {plan?.name?.replace(" MONTH", "")}
-                            </Text>
-                            <Text
-                              style={[styles.monthLabel, { color: "#000" }]}
+                              <Text
+                                style={{
+                                  color: "#fff",
+                                  fontFamily: THEMES.fontFamily.medium,
+                                  fontSize: THEMES.fonts.font12,
+                                }}
+                              >
+                                Months
+                              </Text>
+                              <View style={styles.checkIcon}>
+                                <Text style={styles.checkText}>✔</Text>
+                              </View>
+                            </LinearGradient>
+                          ) : (
+                            <View
+                              style={[
+                                styles.cardContent,
+                                { backgroundColor: "#f2e2f4" },
+                              ]}
                             >
-                              Months
-                            </Text>
-                          </View>
-                        )}
-                      </TouchableOpacity>
-                    </>
-                  );
-                })}
+                              {plan?.flatdiscount !== 0 && (
+                                <Text
+                                  style={[
+                                    styles.discountText,
+                                    { color: "#000" },
+                                  ]}
+                                >
+                                  {plan?.flatdiscount}% Off
+                                </Text>
+                              )}
+                              <Text
+                                style={[styles.monthText, { color: "#000" }]}
+                              >
+                                {plan?.name?.replace(" MONTH", "")}
+                              </Text>
+                              <Text
+                                style={[styles.monthLabel, { color: "#000" }]}
+                              >
+                                Months
+                              </Text>
+                            </View>
+                          )}
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  })
+                : null}
             </ScrollView>
           </View>
           <View style={styles.unlockView}>
@@ -310,7 +476,9 @@ const PaymentsSubscription = (props) => {
           <View style={styles.subscriptionView}>
             <Text style={styles.subscriptionText}>
               {Strings.subscriptionCost}:{" "}
-              <Text style={styles.subscriptionCost}>₹500 </Text>
+              <Text
+                style={styles.subscriptionCost}
+              >{`₹${subscriptionDetails?.amount}`}</Text>
             </Text>
           </View>
           {/* <View style={{ paddingTop: moderateScale(7) }}>

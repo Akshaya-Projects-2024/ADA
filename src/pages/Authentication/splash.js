@@ -62,7 +62,7 @@ const Splash = (props) => {
     if (data) {
       const userData = await initData();
       const validProfile = validateParentProfile(userData);
-      const validProviderProfile = validateServiceProfile(userData, true); //pass true as an argument for testing purpose till payment part is done
+      const validProviderProfile = validateServiceProfile(userData); //pass true as an argument for testing purpose till payment part is done
       if (validProfile?.flag && validProviderProfile?.flag) {
         if (loggedInModule && loggedInModule === LoginModules.parent) {
           props.navigation.reset({
@@ -70,8 +70,20 @@ const Splash = (props) => {
             routes: [{ name: "petParentAppStack" }],
           });
         } else {
-          props.navigation.navigate("auth", {
-            screen: "home",
+          props.navigation.reset({
+            index: 0,
+            routes: [
+              {
+                name: "auth",
+                state: {
+                  routes: [
+                    {
+                      name: "home",
+                    },
+                  ],
+                },
+              },
+            ],
           });
         }
       } else if (
@@ -82,8 +94,20 @@ const Splash = (props) => {
       ) {
         props?.navigation.replace("auth");
       } else if (validProviderProfile?.flag) {
-        props.navigation.navigate("auth", {
-          screen: "home",
+        props.navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: "auth",
+              state: {
+                routes: [
+                  {
+                    name: "home",
+                  },
+                ],
+              },
+            },
+          ],
         });
       } else if (validProfile?.flag) {
         props.navigation.reset({

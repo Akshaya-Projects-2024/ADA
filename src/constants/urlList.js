@@ -16,7 +16,8 @@ export const urlList = {
   parentUploadPhoto: "register/uploadphoto",
   subscriptionplan: "register/subscriptionplan",
   subscription: "register/subscription",
-  registerEvents:"provider/manageevents",
-  createTopic:"provider/managetopics",
+  registerEvents: "provider/manageevents",
+  createTopic: "provider/managetopics",
   savePetDetails: "register/pet/details",
+  acknowledgeSubscription: "register/paymentresponse",
 };

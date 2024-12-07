@@ -1,3 +1,4 @@
+import Api from "../../api/Api";
 import authApi from "../../auth/authApi";
 import { urlList } from "../../constants/urlList";
 
@@ -25,11 +26,7 @@ export const getSubscriptionPlan = async (params) => {
 
 export const getSubscription = async (params) => {
   try {
-    const res = await authApi({
-      method: "post",
-      url: urlList.subscription,
-      data: params,
-    });
+    const res = await Api.POST(urlList.subscription, params);
     if (!res || res?.data?.error || res?.data?.errorCode) {
       throw new Error(
         res?.data?.message || res?.data?.error || "Something went wrong!"
@@ -40,7 +37,25 @@ export const getSubscription = async (params) => {
     }
     throw new Error("Something went wrong!");
   } catch (error) {
-    console.log("payment ", error);
+    console.log("getSubscription Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const acknowledgeSubscription = async (obj) => {
+  try {
+    const res = await Api.POST(urlList.acknowledgeSubscription, obj);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("acknowledgeSubscription Error! ", error);
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };

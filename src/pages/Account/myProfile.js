@@ -12,10 +12,7 @@ import Header from "../../components/Header";
 import RightArrow from "../../assets/svg/rightArrow.svg";
 import { moderateScale } from "react-native-size-matters";
 import { useSelector } from "react-redux";
-import {
-  validateCompleteServiceProfile,
-  validateServiceProfile,
-} from "../../utils/userUtils";
+import { validateCompleteServiceProfile } from "../../utils/userUtils";
 
 const MyProfile = (props) => {
   const { guestUser } = useSelector(({ register }) => register);

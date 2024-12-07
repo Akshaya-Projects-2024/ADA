@@ -95,11 +95,7 @@ const MyAccount = (props) => {
     const Icon = icon;
     return (
       <TouchableOpacity
-        onPress={() =>
-          route == "contactDetails"
-            ? props.navigation.navigate(route, { route: "myprofile" })
-            : props.navigation.navigate(route)
-        }
+        onPress={() => props.navigation.navigate(route, { route: "myprofile" })}
         style={[
           styles.flexRow,
 
@@ -134,6 +130,7 @@ const MyAccount = (props) => {
       });
     }
   };
+
   return (
     <LinearGradient
       locations={[0, 0.5, 0.6]}
@@ -146,7 +143,8 @@ const MyAccount = (props) => {
     >
       <StatusBar backgroundColor={THEMES.colors.lightCyan} />
       <Header
-        customIcon={<SwitchIcon />}
+        // customIcon={<SwitchIcon />}
+        showBack
         title={Strings.myAccount}
         showSearch
         bgColor="transparent"

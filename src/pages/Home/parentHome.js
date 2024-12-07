@@ -387,8 +387,20 @@ const ParentHome = (props) => {
   const switchProfile = () => {
     const validProviderProfile = validateServiceProfile(profile);
     if (validProviderProfile?.flag) {
-      props.navigation.navigate("auth", {
-        screen: "home",
+      props.navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: "auth",
+            state: {
+              routes: [
+                {
+                  name: "home",
+                },
+              ],
+            },
+          },
+        ],
       });
     } else {
       props.navigation.navigate("auth", {
