@@ -79,10 +79,26 @@ const MediaLink = (props) => {
         website: weblink,
         ...(MediaLinks?.id ? { id: MediaLinks?.id } : {}),
       };
+      console.log("postData", postData);
       const res = await saveMediaLinks(postData);
-      if (res?.data?.status_code == 200) {
+      console.log("res", res.status);
+      if (res?.status == 200) {
         showToast("success", "You have been registered successfully!!!");
-        props.navigation.navigate(route, { route: "fromProvider" });
+
+        // props.navigation.navigate(route, { route: "fromProvider" });
+
+        props.navigation.reset({
+          index: 0,
+          routes: [
+            {
+              name: "paymentsSubscription",
+              params: {
+                route: "fromProvider",
+              },
+            },
+          ],
+        });
+
         // props.navigation.reset({
         //   index: 0,
         //   routes: [{ name: "paymentsSubscription" }],
@@ -91,6 +107,7 @@ const MediaLink = (props) => {
         showToast("error", res?.data?.message);
       }
     } catch (error) {
+      console.log("error", error);
       showToast("error", "Something went wrong!!!");
     }
   };

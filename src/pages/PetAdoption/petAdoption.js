@@ -7,13 +7,14 @@ import {
   StatusBar,
   TouchableOpacity,
   FlatList,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
 import Strings from "../../constants/strings";
 import { moderateScale } from "react-native-size-matters";
 import Search from "../../assets/svg/search.svg";
+import Plus from "../../assets/svg/plus.svg";
 
 const petData = ["Dogs", "Cats", "Birds", "Hamsters", "Others"];
 
@@ -78,7 +79,11 @@ const PetAdoption = (props) => {
   const renderItem = ({ item, index }) => {
     return (
       <TouchableOpacity
-      onPress={() => props.navigation.navigate("adoptionDetail")}
+        onPress={() =>
+          props.navigation.navigate("auth", {
+            screen: "adoptionDetail",
+          })
+        }
         style={{
           borderWidth: 1,
           borderColor: "#ddd",
@@ -153,7 +158,64 @@ const PetAdoption = (props) => {
         fontColor={THEMES.colors.black}
       />
       <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
-        <View
+      <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <View style={{ width: "85%" }}>
+                <TouchableOpacity
+                  onPress={() =>
+                    props.navigation.navigate("auth", {
+                      screen: "search",
+                    })
+                  }
+                  style={{
+                    padding: moderateScale(8),
+                    borderRadius: 25,
+                    borderWidth: 1.5,
+                    backgroundColor: "#f5f5f5",
+                    borderColor: "#bebebd",
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <Search />
+                  <Text
+                    style={{
+                      paddingLeft: moderateScale(8),
+                      fontSize: THEMES.fonts.font12,
+                      color: THEMES.colors.darkGrey,
+                    }}
+                  >
+                    Search
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity
+                onPress={() =>
+                  props.navigation.navigate("auth", {
+                    screen: "addAdoption",
+                  })
+                }
+                style={{
+                  backgroundColor: THEMES.colors.white,
+                  padding: moderateScale(11),
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderColor:'#EC559C',
+                  borderWidth:1,
+                  borderRadius: moderateScale(8),
+                  borderBottomLeftRadius: moderateScale(0),
+                }}
+              >
+                <Plus stroke={"#EC559C"} />
+              </TouchableOpacity>
+            </View>
+        {/* <View
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -185,7 +247,7 @@ const PetAdoption = (props) => {
               </Text>
             </View>
           </View>
-        </View>
+        </View> */}
         <View
           style={{ paddingVertical: moderateScale(28), flexDirection: "row" }}
         >

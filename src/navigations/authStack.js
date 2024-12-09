@@ -38,6 +38,8 @@ import LostPetAlert from "../pages/Alerts/LostPetAlert";
 import MedicalHelp from "../pages/Alerts/MedicalHelp";
 import OtherPet from "../pages/Alerts/OtherPet";
 import WorkingHours from "../pages/Account/WorkingHours";
+import addAdoption from "../pages/PetAdoption/addAdoption";
+import AddAdoption from "../pages/PetAdoption/addAdoption";
 
 const AuthStacks = createStackNavigator();
 
@@ -253,6 +255,12 @@ const AuthStack = () => (
     <AuthStacks.Screen
       name="otherPet"
       component={OtherPet}
+      options={navOptionHandler}
+    />
+
+    <AuthStacks.Screen
+      name="addAdoption"
+      component={AddAdoption}
       options={navOptionHandler}
     />
   </AuthStacks.Navigator>

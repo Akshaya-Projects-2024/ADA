@@ -489,7 +489,9 @@ const ParentHome = (props) => {
             }}
           >
             <TouchableOpacity
-              onPress={() => props.navigation.navigate("search")}
+              onPress={() =>
+                props.navigation.navigate("auth", { screen: "search" })
+              }
               style={{
                 padding: moderateScale(8),
                 borderRadius: 25,

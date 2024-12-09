@@ -32,12 +32,15 @@ import {
   validateServiceProfile,
 } from "../../utils/userUtils";
 import { showAlert, validArray, validObject } from "../../utils/utils";
+import SubscriptionError from "./subscriptionError";
 
 const PaymentsSubscription = (props) => {
   const route = props?.route?.params?.route || "";
+  console.log("route", route);
   const dispatch = useDispatch();
   const [isModalVisible, setModalVisible] = useState(false);
   const [subscriptionModal, setSubscription] = useState(false);
+  const [errorModal, setError] = useState(false);
   const [month, setMonth] = useState("12Month");
   const [selectedCard, setSelectedCard] = useState(null); // State to track selected card
   const [subscriptionData, setSubscriptionData] = useState();
@@ -154,11 +157,13 @@ const PaymentsSubscription = (props) => {
     try {
       const obj = {
         userId: await decryptService("userId"),
-        usertype:
-          route === "myprofile" || route === "fromProvider"
-            ? "provider"
-            : "parent", // parent or provider
+        usertype: "provider",
+        // usertype:
+        //   route === "myprofile" || route === "fromProvider"
+        //     ? "provider"
+        //     : "parent", // parent or provider
       };
+      console.log(obj);
       const res = await getSubscriptionPlan(obj);
       if (res.status === 200) {
         const outputArray = res?.data?.data;
@@ -229,42 +234,38 @@ const PaymentsSubscription = (props) => {
   const handlePayment = async () => {
     try {
       const userData = await getUserData();
-      if (userData?.flag) {
-        const options = {
-          image: "https://i.imgur.com/3g7nmJC.png",
-          currency: subscriptionDetails?.currency,
-          key: "rzp_test_PECnHmfOdkRLhw", // Replace with your Razorpay Key ID
-          amount: subscriptionDetails?.amount,
-          name: "ADA",
-          order_id: subscriptionDetails?.id, //Replace this with an order_id created using Orders API.
-          theme: { color: "#53a20e" },
+
+      const options = {
+        image: "https://i.imgur.com/3g7nmJC.png",
+        currency: subscriptionDetails?.currency,
+        key: "rzp_test_PECnHmfOdkRLhw", // Replace with your Razorpay Key ID
+        amount: subscriptionDetails?.amount,
+        name: "ADA",
+        order_id: subscriptionDetails?.id, //Replace this with an order_id created using Orders API.
+        theme: { color: "#53a20e" },
+      };
+      const paymentResponse = await RazorpayCheckout.open({
+        ...options,
+        ...userData,
+      });
+      if (
+        paymentResponse?.razorpay_order_id &&
+        paymentResponse?.razorpay_payment_id &&
+        paymentResponse?.razorpay_signature
+      ) {
+        const params = {
+          userid: await decryptService("userId"),
+          razorpay_order_id: paymentResponse?.razorpay_order_id,
+          success: {
+            razorpay_signature: paymentResponse?.razorpay_signature,
+            razorpay_payment_id: paymentResponse?.razorpay_payment_id,
+          },
         };
-        const paymentResponse = await RazorpayCheckout.open({
-          ...options,
-          ...userData,
-        });
-        if (
-          paymentResponse?.razorpay_order_id &&
-          paymentResponse?.razorpay_payment_id &&
-          paymentResponse?.razorpay_signature
-        ) {
-          const params = {
-            userid: await decryptService("userId"),
-            razorpay_order_id: paymentResponse?.razorpay_order_id,
-            success: {
-              razorpay_signature: paymentResponse?.razorpay_signature,
-              razorpay_payment_id: paymentResponse?.razorpay_payment_id,
-            },
-          };
-          const acknowledgeResponse = await acknowledgeSubscription(params);
-          if (acknowledgeResponse?.data?.status_code === 200) {
-            setSubscription(true);
-          }
+        const acknowledgeResponse = await acknowledgeSubscription(params);
+        console.log(acknowledgeResponse, "acknowledgeResponse");
+        if (acknowledgeResponse?.status === 200) {
+          setSubscription(true);
         }
-      } else {
-        throw new Error(
-          "Your registrations seems to be pending. Please complete your registration first."
-        );
       }
     } catch (error) {
       const params = {
@@ -280,8 +281,8 @@ const PaymentsSubscription = (props) => {
       };
       try {
         const acknowledgeResponse = await acknowledgeSubscription(params);
-        if (acknowledgeResponse?.data?.status_code === 200) {
-          setSubscription(true);
+        if (acknowledgeResponse?.status === 200) {
+          setError(true);
         }
       } catch (err) {
         throw new Error(
@@ -298,6 +299,11 @@ const PaymentsSubscription = (props) => {
 
   const handleSubscriptionSuccess = () => {
     setSubscription(false);
+    navigateToHome();
+  };
+
+  const handleSubscriptionError = () => {
+    setError(false);
     navigateToHome();
   };
 
@@ -553,6 +559,14 @@ const PaymentsSubscription = (props) => {
           <SubscriptionSuccess
             isVisible={subscriptionModal}
             onClose={handleSubscriptionSuccess}
+            type={month}
+          />
+        )}
+
+        {errorModal && (
+          <SubscriptionError
+            isVisible={errorModal}
+            onClose={handleSubscriptionError}
             type={month}
           />
         )}

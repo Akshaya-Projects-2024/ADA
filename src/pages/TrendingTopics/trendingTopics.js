@@ -219,7 +219,11 @@ const TrendingTopics = (props) => {
             >
               <View style={{ width: "87%" }}>
                 <TouchableOpacity
-                  onPress={() => props.navigation.navigate("search")}
+                  onPress={() =>
+                    props.navigation.navigate("auth", {
+                      screen: "search",
+                    })
+                  }
                   style={{
                     padding: moderateScale(8),
                     borderRadius: 25,

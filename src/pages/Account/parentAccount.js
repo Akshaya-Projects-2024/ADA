@@ -226,7 +226,7 @@ const ParentAccount = (props) => {
                 )}
               </View>
             </View>
-
+{/* 
             <View style={styles.padding12}>
               <View style={styles.contentView}>
                 {renderItem(
@@ -237,7 +237,7 @@ const ParentAccount = (props) => {
                   "paymentsSubscription"
                 )}
               </View>
-            </View>
+            </View> */}
 
             <View style={styles.padding12}>
               <View style={styles.contentView}>
