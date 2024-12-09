@@ -183,10 +183,7 @@ const PaymentsSubscription = (props) => {
             selectedSub = outputArray[0];
             const obj1 = {
               userId: await decryptService("userId"),
-              usertype:
-                route === "myprofile" || route === "fromProvider"
-                  ? "provider"
-                  : "parent", // parent or provider
+              usertype: "provider", // parent or provider
               subscriptioncode: selectedSub?.code,
               promocode: "",
             };
@@ -211,21 +208,22 @@ const PaymentsSubscription = (props) => {
       index: 0,
       routes: [
         {
-          name:
-            route === "myprofile" || route === "fromProvider"
-              ? "auth"
-              : "petParentAppStack",
-          ...(route === "myprofile" || route === "fromProvider"
-            ? {
-                state: {
-                  routes: [
-                    {
-                      name: "home",
-                    },
-                  ],
-                },
-              }
-            : {}),
+          name: route == "myprofile" ? "petParentAppStack" : "home",
+          // name:
+          //   route === "myprofile" || route === "fromProvider"
+          //     ? "auth"
+          //     : "petParentAppStack",
+          // ...(route === "myprofile" || route === "fromProvider"
+          //   ? {
+          //       state: {
+          //         routes: [
+          //           {
+          //             name: "home",
+          //           },
+          //         ],
+          //       },
+          //     }
+          //   : {}),
         },
       ],
     });
