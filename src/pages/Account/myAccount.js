@@ -167,21 +167,23 @@ const MyAccount = (props) => {
               <BadgeCheck />
             </View>
             <View style={styles.nameView}>
+            
               <Text style={styles.nameText}>
-                {guestUser
-                  ? Strings.guest
-                  : profile?.providerProfile?.providerBusiness?.name}
+                {guestUser? Strings.guest : profile?.providerProfile?.providerBusiness?.name}
               </Text>
+              <View style={{alignItems:'center',width:'80%'}}>
               {profileServices ? (
-                <Text style={styles.roleText}>{profileServices}</Text>
+                <Text numberOfLines={2} style={[styles.roleText,{textAlign:'center'}]}>{profileServices}</Text>
               ) : null}
-              <Text style={styles.premiumMemberText}>
+              </View>
+         
+              {/* <Text style={styles.premiumMemberText}>
                 {guestUser ||
                 (!profileStatus?.flag &&
                   profileStatus?.navigateTo === "paymentsSubscription")
                   ? Strings.guestUser
                   : Strings.premiumMemmber}
-              </Text>
+              </Text> */}
             </View>
             <View style={styles.padding14}>
               <View style={styles.contentView}>
@@ -359,10 +361,12 @@ const styles = StyleSheet.create({
     paddingTop: moderateScale(4),
   },
   roleText: {
-    fontSize: THEMES.fonts.font16,
+    fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.regular,
     paddingTop: moderateScale(4),
+    paddingBottom:moderateScale(10)
+ 
   },
   nameText: {
     fontSize: THEMES.fonts.font16,
@@ -373,6 +377,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingTop: moderateScale(15),
+ 
   },
   flexRow: {
     flexDirection: "row",
