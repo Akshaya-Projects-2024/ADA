@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -28,6 +28,7 @@ import moment from "moment";
 import ModalDropdown from "../../components/ModalDropdown";
 import CheckBox from "react-native-check-box";
 import Location from "../../assets/svg/location.svg";
+import { useSelector } from "react-redux";
 
 const categoryData = [
   { id: "1", label: "Training" },
@@ -49,12 +50,21 @@ const AddAdoption = () => {
   const hideDatePickerCancel = () => {
     setDateVisibility(false);
   };
+  const { serviceProviderRoleData } = useSelector(({ register }) => register);
+  const [serviceProviderRole, setServiceProviderRole] = useState();
+  const [selectedServiceProvider, setServiceProviderValue] = useState();
 
   const handleDateConfirm = (date) => {
     const formattedDate = moment(date).format("DD/MM/YYYY");
     selectedDate(formattedDate);
     hideDatePickerCancel();
   };
+
+  useEffect(() => {
+    if (serviceProviderRoleData.length) {
+      setServiceProviderRole(serviceProviderRoleData);
+    }
+  }, [serviceProviderRoleData]);
 
   const handlePetImg = (image) => {
     var temp = [...petImage];
@@ -107,15 +117,78 @@ const AddAdoption = () => {
             marginBottom: moderateScale(24),
           }}
         >
+          <View style={{ paddingTop: moderateScale(24) }}>
+            <ModalDropdown
+              placeholder="Category*"
+              data={serviceProviderRole}
+              title={"Select category"}
+              setSelectedValue={setServiceProviderValue}
+              selectedValue={selectedServiceProvider}
+              multiSelect={false}
+            />
+          </View>
           <View
             style={{
-              paddingTop: moderateScale(24),
+              paddingTop: moderateScale(16),
+              paddingHorizontal: moderateScale(20),
+            }}
+          >
+            <InputField label={"Breed*"} placeholderText={"Enter Breed"} />
+          </View>
+
+          <View
+            style={{
+              paddingTop: moderateScale(16),
+              paddingHorizontal: moderateScale(20),
+            }}
+          >
+            <InputField label={"Age*"} placeholderText={"Enter age"} />
+          </View>
+          <View
+            style={{
+              paddingTop: moderateScale(16),
+              paddingHorizontal: moderateScale(20),
+            }}
+          >
+            <InputField
+              label={"Location*"}
+              placeholderText={"Enter location"}
+              rightIcon={<Location stroke={THEMES.colors.darkGrey} />}
+            />
+          </View>
+          <View
+            style={{
+              paddingTop: moderateScale(16),
+              paddingHorizontal: moderateScale(20),
+            }}
+          >
+            <InputField
+              label={"Reason For Adoption*"}
+              placeholderText={"Enter reason"}
+              multiline={true}
+            />
+          </View>
+          <View
+            style={{
+              paddingTop: moderateScale(16),
+              paddingHorizontal: moderateScale(20),
+            }}
+          >
+            <InputField
+              label={"Medical Condition*"}
+              placeholderText={"Enter conditions"}
+              multiline={true}
+            />
+          </View>
+          <View
+            style={{
+              paddingTop: moderateScale(16),
               paddingHorizontal: moderateScale(20),
             }}
           >
             <InputField
               label={"Pet Name*"}
-              placeholderText={"Enter Pet name"}
+              placeholderText={"Enter pet name"}
             />
           </View>
           <View style={styles.toggleContainer}>
@@ -225,102 +298,6 @@ const AddAdoption = () => {
               paddingHorizontal: moderateScale(20),
             }}
           >
-            <InputField
-              label={"Location"}
-              placeholderText={Strings.enterLocation}
-              rightIcon={<Location stroke={THEMES.colors.darkGrey} />}
-            />
-          </View>
-
-          <View
-            style={{
-              paddingHorizontal: moderateScale(20),
-              paddingTop: moderateScale(24),
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => setDateVisibility(true)}
-              style={[
-                styles.dateContainer,
-                {
-                  paddingHorizontal: moderateScale(15),
-                  flexDirection: "row",
-                  alignItems: "center",
-                },
-              ]}
-            >
-              <View style={{ paddingRight: moderateScale(10) }}>
-                {date ? (
-                  <>
-                    <Text
-                      style={[
-                        styles.datePlaceholderText,
-                        {
-                          paddingBottom: moderateScale(1),
-                          fontSize: THEMES.fonts.font10,
-                        },
-                      ]}
-                    >
-                      Help needed date
-                    </Text>
-                    <Text style={styles.dateValue}>{date}</Text>
-                  </>
-                ) : (
-                  <>
-                    <Text
-                      style={[
-                        styles.datePlaceholderText,
-                        {
-                          paddingBottom: moderateScale(2),
-                          fontSize: THEMES.fonts.font10,
-                        },
-                      ]}
-                    >
-                      Help needed date
-                    </Text>
-                    <Text style={styles.datePlaceholderText}>
-                      {Strings.ddMMYYYY}
-                    </Text>
-                  </>
-                )}
-              </View>
-              <Calendars />
-            </TouchableOpacity>
-          </View>
-
-          <View
-            style={{
-              paddingHorizontal: moderateScale(20),
-              paddingTop: moderateScale(24),
-            }}
-          >
-            <InputField
-              label={"Help Description*"}
-              placeholderText={"Enter description"}
-              multiline={true}
-            />
-          </View>
-
-          <View
-            style={{
-              paddingTop: moderateScale(24),
-            }}
-          >
-            <ModalDropdown
-              placeholder="Select whom to send"
-              data={categoryData}
-              title={"Select"}
-              setSelectedValue={setSelectedCategory}
-              selectedValue={selectedCategory}
-            />
-          </View>
-
-          <View
-            style={{
-              paddingTop: moderateScale(24),
-              paddingHorizontal: moderateScale(20),
-            }}
-          >
             <Text
               style={{
                 fontFamily: THEMES.fontFamily.semiBold,
@@ -380,12 +357,10 @@ const AddAdoption = () => {
               paddingHorizontal: moderateScale(20),
             }}
           >
-           
-              <InputField
-                label={"Additional contact number*"}
-                placeholderText={"Enter addditional number"}
-              />
-           
+            <InputField
+              label={"Contact number*"}
+              placeholderText={"Enter contact number"}
+            />
 
             <View
               style={{
