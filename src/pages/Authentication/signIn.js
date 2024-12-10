@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -18,7 +18,7 @@ import { encryptService } from "../../utils/storageFunc";
 import { showToast } from "../../utils/utils";
 
 const SignIn = (props) => {
-  const [inputValue, setInputValue] = useState(""); //a@yopmail.com //9769487604
+  const [inputValue, setInputValue] = useState("alt.rl-ami4ueo@yopmail.com"); //a@yopmail.com //9769487604
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async () => {
