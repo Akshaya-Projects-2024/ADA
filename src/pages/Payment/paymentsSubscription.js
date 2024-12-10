@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -27,16 +27,11 @@ import { decryptService } from "../../utils/storageFunc";
 import RazorpayCheckout from "react-native-razorpay";
 import { getProfile } from "../../redux-store/actions/auth";
 import { dispatchUserData } from "../../redux-store/actions/registerAction";
-import {
-  validateParentProfile,
-  validateServiceProfile,
-} from "../../utils/userUtils";
+import { validateServiceProfile } from "../../utils/userUtils";
 import { showAlert, validArray, validObject } from "../../utils/utils";
 import SubscriptionError from "./subscriptionError";
 
 const PaymentsSubscription = (props) => {
-  const route = props?.route?.params?.route || "";
-  console.log("route", route);
   const dispatch = useDispatch();
   const [isModalVisible, setModalVisible] = useState(false);
   const [subscriptionModal, setSubscription] = useState(false);
@@ -49,92 +44,55 @@ const PaymentsSubscription = (props) => {
 
   useEffect(() => {
     initData();
-  }, []);
+  }, [initData]);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
 
-  const getUserData = useCallback(
-    (fetchFromCache = true) => {
-      return new Promise(async (resolve) => {
-        try {
-          let userData = {};
-          if (
-            (fetchFromCache && route === "myprofile") ||
-            route === "fromProvider"
-          ) {
-            const validProviderProfile = validateServiceProfile(profile, true);
-            if (validProviderProfile?.flag) {
-              userData = profile?.providerProfile;
-            }
-          } else if (fetchFromCache) {
-            const validProfile = validateParentProfile(profile);
-            if (validProfile?.flag) {
-              userData = profile?.parentProfie;
-            }
-          } else {
-            const response = await fetchUserProfile();
-            if (response?.flag) {
-              userData = response?.data;
-            }
+  const getUserData = useCallback(() => {
+    return new Promise(async (resolve) => {
+      try {
+        let userData = {};
+        const response = await fetchUserProfile();
+        if (response?.flag) {
+          userData = response?.data;
+        } else {
+          const validProviderProfile = validateServiceProfile(profile, true);
+          if (validProviderProfile?.flag) {
+            userData = profile?.providerProfile;
           }
-          if (validObject(userData)) {
-            if (route === "myprofile" || route === "fromProvider") {
-              resolve({
-                flag: true,
-                description: "Pet Service Provider Payment",
-                prefill: {
-                  ...(userData?.providerProfile?.providerContact?.email
-                    ? {
-                        email:
-                          userData?.providerProfile?.providerContact?.email,
-                      }
-                    : {}),
-                  ...(userData?.providerProfile?.providerContact?.mobile
-                    ? {
-                        contact:
-                          userData?.providerProfile?.providerContact?.mobile,
-                      }
-                    : {}),
-                  ...(userData?.providerProfile?.providerBusiness?.name
-                    ? {
-                        name: userData?.providerProfile?.providerBusiness?.name,
-                      }
-                    : {}),
-                },
-              });
-            } else {
-              resolve({
-                flag: true,
-                description: "Pet Payment Payment",
-                prefill: {
-                  ...(userData?.parentProfie?.parentContact?.email
-                    ? { email: userData?.parentProfie?.parentContact?.email }
-                    : {}),
-                  ...(userData?.parentProfie?.parentContact?.mobile
-                    ? {
-                        contact: userData?.parentProfie?.parentContact?.mobile,
-                      }
-                    : {}),
-                  ...(userData?.parentProfie?.parentContact?.name
-                    ? {
-                        name: userData?.parentProfie?.parentContact?.name,
-                      }
-                    : {}),
-                },
-              });
-            }
-          }
-          resolve({ flag: false });
-        } catch (error) {
-          console.log("err111", error?.message);
-          resolve({ flag: false });
         }
-      });
-    },
-    [fetchUserProfile, profile, route]
-  );
+        if (validObject(userData)) {
+          resolve({
+            flag: true,
+            description: "Pet Service Provider Payment",
+            prefill: {
+              ...(userData?.providerProfile?.providerContact?.email
+                ? {
+                    email: userData?.providerProfile?.providerContact?.email,
+                  }
+                : {}),
+              ...(userData?.providerProfile?.providerContact?.mobile
+                ? {
+                    contact: userData?.providerProfile?.providerContact?.mobile,
+                  }
+                : {}),
+              ...(userData?.providerProfile?.providerBusiness?.name
+                ? {
+                    name: userData?.providerProfile?.providerBusiness?.name,
+                  }
+                : {}),
+            },
+          });
+        }
+        resolve({ flag: false });
+      } catch (error) {
+        console.log("err111", error?.message);
+        resolve({ flag: false });
+      }
+    });
+  }, [fetchUserProfile, profile]);
 
   const fetchUserProfile = useCallback(() => {
     return new Promise(async (resolve) => {
@@ -153,15 +111,11 @@ const PaymentsSubscription = (props) => {
     });
   }, [dispatch]);
 
-  const initData = async () => {
+  const initData = useCallback(async () => {
     try {
       const obj = {
         userId: await decryptService("userId"),
-        usertype: "provider",
-        // usertype:
-        //   route === "myprofile" || route === "fromProvider"
-        //     ? "provider"
-        //     : "parent", // parent or provider
+        usertype: "provider", // parent or provider
       };
       console.log(obj);
       const res = await getSubscriptionPlan(obj);
@@ -200,7 +154,10 @@ const PaymentsSubscription = (props) => {
     } catch (error) {
       console.log("🚀 ~ initData ~ error:", error?.message);
     }
-  };
+  }, [
+    profile?.providerProfile?.subscription?.status,
+    profile?.providerProfile?.subscription?.subscriptioncode,
+  ]);
 
   const navigateToHome = async () => {
     await fetchUserProfile();
@@ -208,22 +165,14 @@ const PaymentsSubscription = (props) => {
       index: 0,
       routes: [
         {
-          name: route == "myprofile" ? "petParentAppStack" : "home",
-          // name:
-          //   route === "myprofile" || route === "fromProvider"
-          //     ? "auth"
-          //     : "petParentAppStack",
-          // ...(route === "myprofile" || route === "fromProvider"
-          //   ? {
-          //       state: {
-          //         routes: [
-          //           {
-          //             name: "home",
-          //           },
-          //         ],
-          //       },
-          //     }
-          //   : {}),
+          name: "auth",
+          state: {
+            routes: [
+              {
+                name: "home",
+              },
+            ],
+          },
         },
       ],
     });
@@ -259,13 +208,31 @@ const PaymentsSubscription = (props) => {
             razorpay_payment_id: paymentResponse?.razorpay_payment_id,
           },
         };
-        const acknowledgeResponse = await acknowledgeSubscription(params);
-        console.log(acknowledgeResponse, "acknowledgeResponse");
-        if (acknowledgeResponse?.status === 200) {
-          setSubscription(true);
+        const paymentResponse = await RazorpayCheckout.open({
+          ...options,
+          ...userData,
+        });
+        if (
+          paymentResponse?.razorpay_order_id &&
+          paymentResponse?.razorpay_payment_id &&
+          paymentResponse?.razorpay_signature
+        ) {
+          const params = {
+            userid: await decryptService("userId"),
+            razorpay_order_id: paymentResponse?.razorpay_order_id,
+            success: {
+              razorpay_signature: paymentResponse?.razorpay_signature,
+              razorpay_payment_id: paymentResponse?.razorpay_payment_id,
+            },
+          };
+          const acknowledgeResponse = await acknowledgeSubscription(params);
+          if (acknowledgeResponse?.status === 200) {
+            setSubscription(true);
+          }
         }
       }
     } catch (error) {
+      console.log("🚀 ~ handlePayment ~ error:", error);
       const params = {
         userid: await decryptService("userId"),
         error: {
@@ -280,18 +247,21 @@ const PaymentsSubscription = (props) => {
       try {
         const acknowledgeResponse = await acknowledgeSubscription(params);
         if (acknowledgeResponse?.status === 200) {
-          setError(true);
+          showAlert(
+            "Payment Failed",
+            error?.message || error?.error?.code || error?.error?.description,
+            () => {},
+            navigateToHome,
+            "Later"
+          );
         }
       } catch (err) {
-        throw new Error(
-          err?.message || err?.error?.code || err?.error?.description
+        showAlert(
+          "Status",
+          error?.message || error?.error?.code || error?.error?.description,
+          () => {}
         );
       }
-      showAlert(
-        "Status",
-        error?.message || error?.error?.code || error?.error?.description,
-        () => {}
-      );
     }
   };
 

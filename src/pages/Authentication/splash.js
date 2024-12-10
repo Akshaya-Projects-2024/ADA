@@ -44,7 +44,8 @@ const Splash = (props) => {
           userid: await decryptService("userId"),
         };
         const response = await getProfile(obj);
-        if (response?.data?.status_code == 200) {
+
+        if (response?.status === 200) {
           // dispatch(saveRegisterData(response?.data?.data)); No need
           dispatch(dispatchUserData(response?.data?.data));
         }

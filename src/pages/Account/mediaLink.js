@@ -84,25 +84,10 @@ const MediaLink = (props) => {
       console.log("res", res.status);
       if (res?.status == 200) {
         showToast("success", "You have been registered successfully!!!");
-
-        // props.navigation.navigate(route, { route: "fromProvider" });
-
         props.navigation.reset({
           index: 0,
-          routes: [
-            {
-              name: "paymentsSubscription",
-              params: {
-                route: "fromProvider",
-              },
-            },
-          ],
+          routes: [{ name: "paymentsSubscription" }],
         });
-
-        // props.navigation.reset({
-        //   index: 0,
-        //   routes: [{ name: "paymentsSubscription" }],
-        // });
       } else {
         showToast("error", res?.data?.message);
       }

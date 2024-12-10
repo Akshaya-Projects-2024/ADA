@@ -14,12 +14,13 @@ const showAlert = (
   message,
   onOkPressed = () => {},
   onCancelPressed = () => {},
-  showCancel = false
+  showCancel = false,
+  cancelLabel
 ) => {
   Alert.alert(title, message, [
     showCancel
       ? {
-          text: "Cancel",
+          text: cancelLabel ? cancelLabel : "Cancel",
           onPress: onCancelPressed,
           style: "cancel",
         }
