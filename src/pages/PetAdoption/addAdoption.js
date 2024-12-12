@@ -9,6 +9,7 @@ import {
   TextInput,
   Image,
   StatusBar,
+  ActivityIndicator,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
@@ -29,6 +30,10 @@ import ModalDropdown from "../../components/ModalDropdown";
 import CheckBox from "react-native-check-box";
 import Location from "../../assets/svg/location.svg";
 import { useSelector } from "react-redux";
+import { CATEGORIES } from "../../constants/mockData";
+import { showToast } from "../../utils/utils";
+import { decryptService } from "../../utils/storageFunc";
+import { addAdoption } from "../../redux-store/actions/auth";
 
 const categoryData = [
   { id: "1", label: "Training" },
@@ -37,7 +42,16 @@ const categoryData = [
   { id: "4", label: "MNO" },
 ];
 
-const AddAdoption = () => {
+const AddAdoption = (props) => {
+  const { navigation } = props;
+  const [loading, setLoading] = useState(false);
+  const [breed, setBreed] = useState();
+  const [age, setAge] = useState();
+  const [location, setLocation] = useState();
+  const [reason, setReason] = useState();
+  const [medicalCondition, setMedicalCondition] = useState();
+  const [name, setName] = useState();
+  const [contactNumber, setContactNumber] = useState();
   const [selectedGender, setSelectedGender] = useState(null);
   const [petImage, setPetImage] = useState([]);
   const [petImagesVisible, setPetImageVisible] = useState(false);
@@ -50,21 +64,12 @@ const AddAdoption = () => {
   const hideDatePickerCancel = () => {
     setDateVisibility(false);
   };
-  const { serviceProviderRoleData } = useSelector(({ register }) => register);
-  const [serviceProviderRole, setServiceProviderRole] = useState();
-  const [selectedServiceProvider, setServiceProviderValue] = useState();
 
   const handleDateConfirm = (date) => {
     const formattedDate = moment(date).format("DD/MM/YYYY");
     selectedDate(formattedDate);
     hideDatePickerCancel();
   };
-
-  useEffect(() => {
-    if (serviceProviderRoleData.length) {
-      setServiceProviderRole(serviceProviderRoleData);
-    }
-  }, [serviceProviderRoleData]);
 
   const handlePetImg = (image) => {
     var temp = [...petImage];
@@ -77,6 +82,36 @@ const AddAdoption = () => {
       return {
         uri: url.includes("https") ? url : `data:image/jpg;base64,${url}`,
       };
+    }
+  };
+
+  const onSubmitPressed = async () => {
+    setLoading(true);
+    try {
+      const userId = await decryptService("userId");
+      const params = {
+        category: selectedCategory?.label,
+        breed: breed,
+        age: Number(age),
+        location: location,
+        reason: reason,
+        medicalcondition: medicalCondition,
+        name: name,
+        gender: selectedGender,
+        documentid: 2, //TODO
+        contactnumber: contactNumber,
+        createdby: userId,
+      };
+      const response = await addAdoption(params);
+      if (response?.status === 200) {
+        showToast("success", "Data Added");
+        navigation.goBack();
+      }
+      setLoading(false);
+    } catch (error) {
+      console.log("🚀 ~ initData ~ error:", error);
+      setLoading(false);
+      showToast("error", error?.message);
     }
   };
 
@@ -120,10 +155,10 @@ const AddAdoption = () => {
           <View style={{ paddingTop: moderateScale(24) }}>
             <ModalDropdown
               placeholder="Category*"
-              data={serviceProviderRole}
+              data={CATEGORIES}
               title={"Select category"}
-              setSelectedValue={setServiceProviderValue}
-              selectedValue={selectedServiceProvider}
+              setSelectedValue={setSelectedCategory}
+              selectedValue={selectedCategory}
               multiSelect={false}
             />
           </View>
@@ -133,7 +168,12 @@ const AddAdoption = () => {
               paddingHorizontal: moderateScale(20),
             }}
           >
-            <InputField label={"Breed*"} placeholderText={"Enter Breed"} />
+            <InputField
+              label={"Breed*"}
+              placeholderText={"Enter Breed"}
+              value={breed}
+              onChange={setBreed}
+            />
           </View>
 
           <View
@@ -142,7 +182,12 @@ const AddAdoption = () => {
               paddingHorizontal: moderateScale(20),
             }}
           >
-            <InputField label={"Age*"} placeholderText={"Enter age"} />
+            <InputField
+              label={"Age*"}
+              placeholderText={"Enter age"}
+              value={age}
+              onChange={setAge}
+            />
           </View>
           <View
             style={{
@@ -154,6 +199,8 @@ const AddAdoption = () => {
               label={"Location*"}
               placeholderText={"Enter location"}
               rightIcon={<Location stroke={THEMES.colors.darkGrey} />}
+              value={location}
+              onChange={setLocation}
             />
           </View>
           <View
@@ -166,6 +213,8 @@ const AddAdoption = () => {
               label={"Reason For Adoption*"}
               placeholderText={"Enter reason"}
               multiline={true}
+              value={reason}
+              onChange={setReason}
             />
           </View>
           <View
@@ -178,6 +227,8 @@ const AddAdoption = () => {
               label={"Medical Condition*"}
               placeholderText={"Enter conditions"}
               multiline={true}
+              value={medicalCondition}
+              onChange={setMedicalCondition}
             />
           </View>
           <View
@@ -189,6 +240,8 @@ const AddAdoption = () => {
             <InputField
               label={"Pet Name*"}
               placeholderText={"Enter pet name"}
+              value={name}
+              onChange={setName}
             />
           </View>
           <View style={styles.toggleContainer}>
@@ -360,6 +413,8 @@ const AddAdoption = () => {
             <InputField
               label={"Contact number*"}
               placeholderText={"Enter contact number"}
+              value={contactNumber}
+              onChange={setContactNumber}
             />
 
             <View
@@ -390,7 +445,7 @@ const AddAdoption = () => {
                 paddingTop: moderateScale(30),
               }}
             >
-              <Button title="Submit"></Button>
+              <Button onPress={onSubmitPressed} title="Submit" />
             </View>
           </View>
         </View>
@@ -407,6 +462,13 @@ const AddAdoption = () => {
         onConfirm={handleDateConfirm}
         onCancel={hideDatePickerCancel}
       />
+      {loading && (
+        <View style={styles.loadingView}>
+          <View style={styles.loadingBox}>
+            <ActivityIndicator color={THEMES.colors.white} />
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -516,6 +578,24 @@ const styles = StyleSheet.create({
     paddingTop: moderateScale(20),
     flexDirection: "row",
     alignItems: "center",
+  },
+  loadingView: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingBox: {
+    width: 70,
+    height: 70,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "transparent",
+    borderRadius: 10,
+    backgroundColor: THEMES.colors.cyan,
+    borderWidth: 1,
   },
 });
 

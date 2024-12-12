@@ -20,4 +20,6 @@ export const urlList = {
   createTopic: "provider/managetopics",
   savePetDetails: "register/pet/details",
   acknowledgeSubscription: "register/paymentresponse",
+  getAllAdoption: "parent/getadoptionrequest",
+  addAdoption: "parent/addadoptionrequest",
 };

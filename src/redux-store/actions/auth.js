@@ -270,3 +270,39 @@ export const savePetDetails = async (params) => {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
+
+export const getAdoption = async (params) => {
+  try {
+    const res = await Api.POST(urlList.getAllAdoption, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("getAdoption Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const addAdoption = async (params) => {
+  try {
+    const res = await Api.POST(urlList.addAdoption, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("addAdoption Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
