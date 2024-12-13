@@ -22,62 +22,7 @@ import { showToast, validArray } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
 import { useIsFocused } from "@react-navigation/native";
 
-const petData = ["Dogs", "Cats", "Birds", "Hamsters", "Others"];
 
-const Data = [
-  {
-    id: 1,
-    name: "Dog",
-    description: "German Shepherd | Gurgaon",
-  },
-  {
-    id: 2,
-    name: "Dog",
-    description: "Dachshund | Delhi",
-  },
-
-  {
-    id: 3,
-    name: "Cat",
-    description: "British Shorthair | Lucknow",
-  },
-  {
-    id: 4,
-    name: "Dog",
-    description: "Labrador Retriever | Gurgaon",
-  },
-  {
-    id: 5,
-    name: "Bird",
-    description: "Macaw | Dehradun",
-  },
-  {
-    id: 6,
-    name: "Dog",
-    description: "German Shepherd | Gurgaon",
-  },
-  {
-    id: 7,
-    name: "Dog",
-    description: "Dachshund | Delhi",
-  },
-
-  {
-    id: 8,
-    name: "Cat",
-    description: "British Shorthair | Lucknow",
-  },
-  {
-    id: 9,
-    name: "Dog",
-    description: "Labrador Retriever | Gurgaon",
-  },
-  {
-    id: 10,
-    name: "Bird",
-    description: "Macaw | Dehradun",
-  },
-];
 
 const PetAdoption = (props) => {
   const { colors, fontFamily, fonts } = THEMES;
@@ -186,7 +131,7 @@ const PetAdoption = (props) => {
               color: THEMES.colors.black,
             }}
           >
-            {item.description}
+            {item.breed} | {item.location}
           </Text>
         </View>
       </TouchableOpacity>

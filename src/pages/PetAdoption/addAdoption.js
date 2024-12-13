@@ -34,6 +34,7 @@ import { CATEGORIES } from "../../constants/mockData";
 import { showToast } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
 import { addAdoption } from "../../redux-store/actions/auth";
+import { getAdoptionCategory } from "../../redux-store/actions/commonApis";
 
 const categoryData = [
   { id: "1", label: "Training" },
@@ -61,6 +62,31 @@ const AddAdoption = (props) => {
   const [facebook, setFacebook] = useState();
   const [instagram, setInstagram] = useState();
   const [whatsup, setWhatsup] = useState();
+  const [categoryList, setCategoryList] = useState([]);
+  const [petData, setPetData] = useState([]);
+  const [breedList, setBreedList] = useState([]);
+  const [selectedBreed, setSelectedBreed] = useState([]);
+  const [agree, setAgree] = useState();
+
+  useEffect(() => {
+    initData();
+  }, []);
+
+  const initData = async () => {
+    let obj = {
+      category: "",
+    };
+    const data = await getAdoptionCategory(obj);
+    setPetData(data);
+    const result = data.map((item, index) => ({
+      id: index,
+      label: item.category,
+    }));
+    if (result?.length) {
+      setCategoryList(result);
+    }
+  };
+
   const hideDatePickerCancel = () => {
     setDateVisibility(false);
   };
@@ -86,28 +112,50 @@ const AddAdoption = (props) => {
   };
 
   const onSubmitPressed = async () => {
-    setLoading(true);
     try {
-      const userId = await decryptService("userId");
-      const params = {
-        category: selectedCategory?.label,
-        breed: breed,
-        age: Number(age),
-        location: location,
-        reason: reason,
-        medicalcondition: medicalCondition,
-        name: name,
-        gender: selectedGender,
-        documentid: 2, //TODO
-        contactnumber: contactNumber,
-        createdby: userId,
-      };
-      const response = await addAdoption(params);
-      if (response?.status === 200) {
-        showToast("success", "Data Added");
-        navigation.goBack();
+      if (!selectedCategory) {
+        showToast("error", "Please select category");
+      } else if (!selectedBreed) {
+        showToast("error", "Please select breed");
+      } else if (!age) {
+        showToast("error", "Please enter age");
+      } else if (!location) {
+        showToast("error", "Please enter location");
+      } else if (!reason) {
+        showToast("error", "Please enter Reason");
+      } else if (!medicalCondition) {
+        showToast("error", "Please enter medical condition");
+      } else if (!name) {
+        showToast("error", "Please enter pet name");
+      } else if (!selectedGender) {
+        showToast("error", "Please select gender");
+      } else if (!contactNumber) {
+        showToast("error", "Please enter contact Number");
+      } else if (!agree) {
+        showToast("error", "Please select terms and conditions");
+      } else {
+        setLoading(true);
+        const userId = await decryptService("userId");
+        const params = {
+          category: selectedCategory[0]?.label,
+          breed: selectedBreed[0]?.label,
+          age: Number(age),
+          location: location,
+          reason: reason,
+          medicalcondition: medicalCondition,
+          name: name,
+          gender: selectedGender,
+          documentid: 2, //TODO
+          contactnumber: contactNumber,
+          createdby: userId,
+        };
+        const response = await addAdoption(params);
+        if (response?.status === 200) {
+          showToast("success", "Data Added Successfully");
+          navigation.goBack();
+        }
+        setLoading(false);
       }
-      setLoading(false);
     } catch (error) {
       console.log("🚀 ~ initData ~ error:", error);
       setLoading(false);
@@ -139,6 +187,19 @@ const AddAdoption = (props) => {
     );
   };
 
+  const handleSelectedCategory = (value) => {
+    setSelectedCategory(value);
+    setSelectedBreed([]);
+    const selectedData = petData.find(
+      (item) => item.category == value[0].label
+    );
+    const result = selectedData?.breeds.map((item, index) => ({
+      id: index,
+      label: item,
+    }));
+    setBreedList(result ? result : []);
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
       <StatusBar backgroundColor={THEMES.colors.white} />
@@ -155,9 +216,9 @@ const AddAdoption = (props) => {
           <View style={{ paddingTop: moderateScale(24) }}>
             <ModalDropdown
               placeholder="Category*"
-              data={CATEGORIES}
+              data={categoryList}
               title={"Select category"}
-              setSelectedValue={setSelectedCategory}
+              setSelectedValue={(value) => handleSelectedCategory(value)}
               selectedValue={selectedCategory}
               multiSelect={false}
             />
@@ -165,14 +226,15 @@ const AddAdoption = (props) => {
           <View
             style={{
               paddingTop: moderateScale(16),
-              paddingHorizontal: moderateScale(20),
             }}
           >
-            <InputField
-              label={"Breed*"}
-              placeholderText={"Enter Breed"}
-              value={breed}
-              onChange={setBreed}
+            <ModalDropdown
+              placeholder="Breed*"
+              data={breedList}
+              title={"Select breed"}
+              setSelectedValue={setSelectedBreed}
+              selectedValue={selectedBreed}
+              multiSelect={false}
             />
           </View>
 
@@ -428,8 +490,8 @@ const AddAdoption = (props) => {
               <CheckBox
                 checkedImage={<Checked />}
                 unCheckedImage={<UnChecked />}
-                onClick={() => setWhatsup(!whatsup)}
-                isChecked={whatsup}
+                onClick={() => setAgree(!whatsup)}
+                isChecked={agree}
                 style={{ flex: 1 }}
                 rightText={"Agree terms and conditions"}
                 rightTextStyle={{

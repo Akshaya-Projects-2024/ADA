@@ -43,6 +43,7 @@ const PaymentsSubscription = (props) => {
   const profile = useSelector((state) => state?.commonReducer);
 
   useEffect(() => {
+    
     initData();
   }, [initData]);
 
@@ -113,6 +114,8 @@ const PaymentsSubscription = (props) => {
 
   const initData = useCallback(async () => {
     try {
+      const token = await decryptService("accessToken");
+      console.log("token", token)
       const obj = {
         userId: await decryptService("userId"),
         usertype: "provider", // parent or provider
@@ -181,7 +184,6 @@ const PaymentsSubscription = (props) => {
   const handlePayment = async () => {
     try {
       const userData = await getUserData();
-
       const options = {
         image: "https://i.imgur.com/3g7nmJC.png",
         currency: subscriptionDetails?.currency,
@@ -193,8 +195,8 @@ const PaymentsSubscription = (props) => {
       };
       const paymentResponse = await RazorpayCheckout.open({
         ...options,
-        ...userData,
       });
+
       if (
         paymentResponse?.razorpay_order_id &&
         paymentResponse?.razorpay_payment_id &&
@@ -208,27 +210,9 @@ const PaymentsSubscription = (props) => {
             razorpay_payment_id: paymentResponse?.razorpay_payment_id,
           },
         };
-        const paymentResponse = await RazorpayCheckout.open({
-          ...options,
-          ...userData,
-        });
-        if (
-          paymentResponse?.razorpay_order_id &&
-          paymentResponse?.razorpay_payment_id &&
-          paymentResponse?.razorpay_signature
-        ) {
-          const params = {
-            userid: await decryptService("userId"),
-            razorpay_order_id: paymentResponse?.razorpay_order_id,
-            success: {
-              razorpay_signature: paymentResponse?.razorpay_signature,
-              razorpay_payment_id: paymentResponse?.razorpay_payment_id,
-            },
-          };
-          const acknowledgeResponse = await acknowledgeSubscription(params);
-          if (acknowledgeResponse?.status === 200) {
-            setSubscription(true);
-          }
+        const acknowledgeResponse = await acknowledgeSubscription(params);
+        if (acknowledgeResponse?.status === 200) {
+          setSubscription(true);
         }
       }
     } catch (error) {
@@ -244,24 +228,24 @@ const PaymentsSubscription = (props) => {
           step: "",
         },
       };
-      try {
-        const acknowledgeResponse = await acknowledgeSubscription(params);
-        if (acknowledgeResponse?.status === 200) {
-          showAlert(
-            "Payment Failed",
-            error?.message || error?.error?.code || error?.error?.description,
-            () => {},
-            navigateToHome,
-            "Later"
-          );
-        }
-      } catch (err) {
-        showAlert(
-          "Status",
-          error?.message || error?.error?.code || error?.error?.description,
-          () => {}
-        );
-      }
+      // try {
+      //   const acknowledgeResponse = await acknowledgeSubscription(params);
+      //   if (acknowledgeResponse?.status === 200) {
+      //     showAlert(
+      //       "Payment Failed",
+      //       error?.message || error?.error?.code || error?.error?.description,
+      //       () => {},
+      //       navigateToHome,
+      //       "Later"
+      //     );
+      //   }
+      // } catch (err) {
+      //   showAlert(
+      //     "Status",
+      //     error?.message || error?.error?.code || error?.error?.description,
+      //     () => {}
+      //   );
+      // }
     }
   };
 
