@@ -64,7 +64,7 @@ const PetAdoption = (props) => {
           const result = new Set(
             output.map((adoptionData) => adoptionData.category)
           );
-          setPetCategories(["Clear", ...result]);
+          setPetCategories([Strings.clear, ...result]);
         }
       }
       setLoading(false);
