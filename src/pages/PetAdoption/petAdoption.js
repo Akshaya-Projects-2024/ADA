@@ -64,8 +64,7 @@ const PetAdoption = (props) => {
           const result = new Set(
             output.map((adoptionData) => adoptionData.category)
           );
-          const clearFilter = new Set(["Clear"]);
-          setPetCategories(Array.from([...clearFilter, ...result]));
+          setPetCategories(["Clear", ...result]);
         }
       }
       setLoading(false);
