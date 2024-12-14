@@ -185,7 +185,7 @@ const PetDetail = (props) => {
           gender: selectedGender,
           about: petDescription ? petDescription : "",
           documents: getDocuments(),
-          breed: selectPetBreed,
+          breed: selectPetBreed[0]?.label,
           weight: petWeight,
         };
         const res = await savePetDetails(params);

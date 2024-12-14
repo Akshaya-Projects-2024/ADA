@@ -27,6 +27,7 @@ export const DOCUMENT_TYPES = {
   image: "businessImg",
   document: "documentImg",
   logo: "companylogo",
+  lostpet: "lostpet",
 };
 
 const UploadImagesDocs = (props) => {

@@ -33,8 +33,13 @@ import { useSelector } from "react-redux";
 import { CATEGORIES } from "../../constants/mockData";
 import { showToast } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
-import { addAdoption } from "../../redux-store/actions/auth";
+import {
+  addAdoption,
+  deleteDocument,
+  uploadDocument,
+} from "../../redux-store/actions/auth";
 import { getAdoptionCategory } from "../../redux-store/actions/commonApis";
+import { DOCUMENT_TYPES } from "../Account/uploadImagesDocs";
 
 const categoryData = [
   { id: "1", label: "Training" },
@@ -97,10 +102,16 @@ const AddAdoption = (props) => {
     hideDatePickerCancel();
   };
 
-  const handlePetImg = (image) => {
-    var temp = [...petImage];
-    temp.push(image);
-    setPetImage(temp);
+  const handlePetImg = async (image) => {
+    const extension = image?.uri?.split(".").pop();
+    const userId = await decryptService("userId");
+    let payload = {
+      userid: userId,
+      documenttype: DOCUMENT_TYPES.image,
+      extention: extension,
+      document: image?.fileData,
+    };
+    apiCall(payload, DOCUMENT_TYPES.image, image);
   };
 
   const getBase64Obj = (url) => {
@@ -108,6 +119,19 @@ const AddAdoption = (props) => {
       return {
         uri: url.includes("https") ? url : `data:image/jpg;base64,${url}`,
       };
+    }
+  };
+  const apiCall = async (postData, type, item) => {
+    try {
+      const res = await uploadDocument(postData);
+      if (res?.status === 200) {
+        const data = [...petImage];
+        data.push({ ...item, id: res?.data?.data?.reqId });
+        setPetImage(data);
+        showToast("success", "Successfully uploaded the image");
+      }
+    } catch (error) {
+      showToast("error", error.message);
     }
   };
 
@@ -163,21 +187,38 @@ const AddAdoption = (props) => {
     }
   };
 
-  const renderItem = (item, index) => {
-    const photo = item?.item.fileData;
+  const onCancel = async (doc) => {
+    try {
+      const userId = await decryptService("userId");
+      const postData = {
+        userid: userId,
+        id: doc?.id,
+      };
+      const res = await deleteDocument(postData);
+      if (res?.status === 200) {
+        const removeItemById = petImage?.filter(
+          (it) => it?.fileName !== doc?.fileName
+        );
+        deleteDocument(removeItemById);
+        showToast("success", "Successfully deleted the image");
+      }
+    } catch (error) {
+      showToast("error", error.message);
+    }
+  };
+
+  const renderItem = (item) => {
+    const photoItem = item?.item.fileData;
     return (
       <View style={styles.imgContent}>
         <Image
           style={styles.img}
           resizeMode="contain"
-          source={getBase64Obj(photo)}
+          source={getBase64Obj(photoItem)}
         />
         <TouchableOpacity
           onPress={() => {
-            const removeItemById = petImage.filter(
-              (item) => item?.fileData !== photo
-            );
-            setPetImage(removeItemById);
+            onCancel(item?.item);
           }}
           style={styles.crossView}
         >
@@ -186,6 +227,29 @@ const AddAdoption = (props) => {
       </View>
     );
   };
+  // const renderItem = (item, index) => {
+  //   const photo = item?.item.fileData;
+  //   return (
+  //     <View style={styles.imgContent}>
+  //       <Image
+  //         style={styles.img}
+  //         resizeMode="contain"
+  //         source={getBase64Obj(photo)}
+  //       />
+  //       <TouchableOpacity
+  //         onPress={() => {
+  //           const removeItemById = petImage.filter(
+  //             (item) => item?.fileData !== photo
+  //           );
+  //           setPetImage(removeItemById);
+  //         }}
+  //         style={styles.crossView}
+  //       >
+  //         <CrossCircle stroke={THEMES.colors.black} style={styles.crossImg} />
+  //       </TouchableOpacity>
+  //     </View>
+  //   );
+  // };
 
   const handleSelectedCategory = (value) => {
     setSelectedCategory(value);
@@ -490,7 +554,7 @@ const AddAdoption = (props) => {
               <CheckBox
                 checkedImage={<Checked />}
                 unCheckedImage={<UnChecked />}
-                onClick={() => setAgree(!whatsup)}
+                onClick={() => setAgree(!agree)}
                 isChecked={agree}
                 style={{ flex: 1 }}
                 rightText={"Agree terms and conditions"}

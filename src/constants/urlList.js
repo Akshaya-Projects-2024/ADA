@@ -22,5 +22,5 @@ export const urlList = {
   acknowledgeSubscription: "register/paymentresponse",
   getAllAdoption: "parent/getadoptionrequest",
   addAdoption: "parent/addadoptionrequest",
-  getPetCategory:'master/getpetcategory'
+  getPetCategory: "master/getpetcategory",
 };

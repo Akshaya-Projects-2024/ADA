@@ -21,13 +21,14 @@ import { getAdoption } from "../../redux-store/actions/auth";
 import { showToast, validArray } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
 import { useIsFocused } from "@react-navigation/native";
-
-
+import { getBase64Obj } from "../../utils/documentUtils";
+import CrossIcon from "../../assets/svg/CrossIcon";
 
 const PetAdoption = (props) => {
   const { colors, fontFamily, fonts } = THEMES;
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [petCategories, setPetCategories] = useState([]);
   const [filterCategory, setFilterCategory] = useState("");
   const isFocused = useIsFocused();
@@ -37,6 +38,15 @@ const PetAdoption = (props) => {
       initData();
     }
   }, [isFocused]);
+
+  useEffect(() => {
+    if (filterCategory && validArray(data)) {
+      const filteredPets = data?.filter((it) => {
+        return it.category === filterCategory;
+      });
+      setFilteredData(validArray(filteredPets) ? filteredPets : []);
+    }
+  }, [data, filterCategory]);
 
   const initData = async () => {
     setLoading(true);
@@ -54,7 +64,8 @@ const PetAdoption = (props) => {
           const result = new Set(
             output.map((adoptionData) => adoptionData.category)
           );
-          setPetCategories(Array.from(result));
+          const clearFilter = new Set(["Clear"]);
+          setPetCategories(Array.from([...clearFilter, ...result]));
         }
       }
       setLoading(false);
@@ -65,7 +76,7 @@ const PetAdoption = (props) => {
     }
   };
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({ item }) => {
     return (
       <TouchableOpacity
         onPress={() =>
@@ -101,7 +112,6 @@ const PetAdoption = (props) => {
           }}
         >
           <Image
-            source={require("../../assets/images/dogImg.png")}
             style={{
               width: 48,
               height: 48,
@@ -109,7 +119,14 @@ const PetAdoption = (props) => {
               borderWidth: 1,
               borderColor: "transparent",
             }}
+            resizeMode="contain"
+            source={
+              item?.document?.url
+                ? getBase64Obj(item?.document?.url)
+                : require("../../assets/images/dogImg.png")
+            }
           />
+          {/* <Image source={require("../../assets/images/dogImg.png")} /> */}
         </View>
         <View style={{ marginHorizontal: moderateScale(15), width: "80%" }}>
           <Text
@@ -247,9 +264,10 @@ const PetAdoption = (props) => {
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
           >
-            {petCategories.map((item, index) => {
+            {petCategories?.map((item, index) => {
               return (
                 <Pressable
+                  key={`${item}_${index}`}
                   onPress={() => {
                     setFilterCategory(item);
                   }}
@@ -259,17 +277,33 @@ const PetAdoption = (props) => {
                     paddingVertical: moderateScale(8),
                     borderWidth: 1,
                     borderColor:
-                      filterCategory === item
+                      index === 0
+                        ? THEMES.colors.red
+                        : filterCategory === item
                         ? THEMES.colors.adoptionPink
                         : THEMES.colors.silver,
                     borderRadius: 20,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                   }}
                 >
+                  {index === 0 ? (
+                    <View style={styles.iconStyle}>
+                      <CrossIcon
+                        width={moderateScale(18)}
+                        height={moderateScale(18)}
+                        color={THEMES.colors.red}
+                      />
+                    </View>
+                  ) : null}
                   <Text
                     style={{
                       fontFamily: THEMES.fontFamily.semiBold,
                       color:
-                        filterCategory === item
+                        index === 0
+                          ? THEMES.colors.red
+                          : filterCategory === item
                           ? THEMES.colors.adoptionPink
                           : THEMES.colors.black,
                       fontSize: THEMES.fonts.font12,
@@ -285,7 +319,7 @@ const PetAdoption = (props) => {
         <View style={{ flex: 1 }}>
           <FlatList
             showsVerticalScrollIndicator={false}
-            data={data}
+            data={validArray(filteredData) ? filteredData : data}
             bounces={false}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
@@ -325,6 +359,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: THEMES.colors.cyan,
     borderWidth: 1,
+  },
+  iconStyle: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: moderateScale(5),
   },
 });
 

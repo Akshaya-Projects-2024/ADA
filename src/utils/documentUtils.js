@@ -9,4 +9,12 @@ const getBase64Data = async (documentPath) => {
     return null;
   }
 };
-export { getBase64Data };
+
+const getBase64Obj = (url) => {
+  if (url) {
+    return {
+      uri: url.includes("https") ? url : `data:image/jpg;base64,${url}`,
+    };
+  }
+};
+export { getBase64Data, getBase64Obj };
