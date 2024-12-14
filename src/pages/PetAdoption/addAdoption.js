@@ -199,7 +199,7 @@ const AddAdoption = (props) => {
         const removeItemById = petImage?.filter(
           (it) => it?.fileName !== doc?.fileName
         );
-        deleteDocument(removeItemById);
+        setPetImage(removeItemById);
         showToast("success", "Successfully deleted the image");
       }
     } catch (error) {
