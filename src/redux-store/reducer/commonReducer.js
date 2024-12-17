@@ -4,6 +4,7 @@ const initialState = {
   logindetails: {},
   parentProfie: {},
   providerProfile: {},
+  profileData: {},
 };
 
 export const commonReducer = (state = initialState, action) => {
@@ -12,6 +13,7 @@ export const commonReducer = (state = initialState, action) => {
     case PROFILE_DATA:
       return {
         ...state,
+        profileData: payload?.logindetails?.isprovider !== 0 ?  payload?.providerProfile : payload?.parentProfie, 
         logindetails: payload?.logindetails,
         ...(payload?.parentProfie
           ? { parentProfie: payload?.parentProfie }

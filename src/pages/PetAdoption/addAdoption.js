@@ -72,6 +72,8 @@ const AddAdoption = (props) => {
   const [breedList, setBreedList] = useState([]);
   const [selectedBreed, setSelectedBreed] = useState([]);
   const [agree, setAgree] = useState();
+  const [weight, setWeight] = useState();
+  const [description, setDescription] = useState();
 
   useEffect(() => {
     initData();
@@ -143,8 +145,12 @@ const AddAdoption = (props) => {
         showToast("error", "Please select breed");
       } else if (!age) {
         showToast("error", "Please enter age");
+      } else if (!weight) {
+        showToast("error", "Please enter weight");
       } else if (!location) {
         showToast("error", "Please enter location");
+      } else if (!description) {
+        showToast("error", "Please enter description");
       } else if (!reason) {
         showToast("error", "Please enter Reason");
       } else if (!medicalCondition) {
@@ -153,6 +159,8 @@ const AddAdoption = (props) => {
         showToast("error", "Please enter pet name");
       } else if (!selectedGender) {
         showToast("error", "Please select gender");
+      } else if (!petImage?.length) {
+        showToast("error", "Please add pet images");
       } else if (!contactNumber) {
         showToast("error", "Please enter contact Number");
       } else if (!agree) {
@@ -169,9 +177,11 @@ const AddAdoption = (props) => {
           medicalcondition: medicalCondition,
           name: name,
           gender: selectedGender,
-          documentid: 2, //TODO
+          documentid: petImage[0]?.id, //TODO
           contactnumber: contactNumber,
           createdby: userId,
+          weight: weight,
+          description: description,
         };
         const response = await addAdoption(params);
         if (response?.status === 200) {
@@ -313,6 +323,23 @@ const AddAdoption = (props) => {
               placeholderText={"Enter age"}
               value={age}
               onChange={setAge}
+              maxLength={2}
+              keyboardType="phone-pad"
+            />
+          </View>
+          <View
+            style={{
+              paddingTop: moderateScale(16),
+              paddingHorizontal: moderateScale(20),
+            }}
+          >
+            <InputField
+              label={"Weight*"}
+              placeholderText={"Enter weight"}
+              value={weight}
+              onChange={setWeight}
+              maxLength={2}
+              keyboardType="phone-pad"
             />
           </View>
           <View
@@ -327,6 +354,20 @@ const AddAdoption = (props) => {
               rightIcon={<Location stroke={THEMES.colors.darkGrey} />}
               value={location}
               onChange={setLocation}
+            />
+          </View>
+          <View
+            style={{
+              paddingTop: moderateScale(16),
+              paddingHorizontal: moderateScale(20),
+            }}
+          >
+            <InputField
+              label={"About pet*"}
+              placeholderText={"Enter description about the pet"}
+              multiline={true}
+              value={description}
+              onChange={setDescription}
             />
           </View>
           <View
@@ -433,9 +474,22 @@ const AddAdoption = (props) => {
             }}
           >
             <View style={styles.secondaryFlex}>
-              <Text style={styles.titleText}>Photo of the pet</Text>
-              <TouchableOpacity onPress={() => setPetImageVisible(true)}>
-                <Text style={styles.addText}>{Strings.add}</Text>
+              <Text style={styles.titleText}>Photo of the pet*</Text>
+              <TouchableOpacity
+                disabled={petImage?.length == 1 ? true : false}
+                onPress={() => setPetImageVisible(true)}
+              >
+                <Text
+                  style={[
+                    styles.addText,
+                    {
+                      color:
+                        petImage?.length == 1 ? "#d0d0d0" : THEMES.colors.cyan,
+                    },
+                  ]}
+                >
+                  {Strings.add}
+                </Text>
               </TouchableOpacity>
             </View>
             <View
@@ -541,6 +595,8 @@ const AddAdoption = (props) => {
               placeholderText={"Enter contact number"}
               value={contactNumber}
               onChange={setContactNumber}
+              maxLength={10}
+              keyboardType="phone-pad"
             />
 
             <View
@@ -664,7 +720,6 @@ const styles = StyleSheet.create({
   addText: {
     fontSize: THEMES.fonts.font14,
     fontFamily: THEMES.fontFamily.semiBold,
-    color: THEMES.colors.cyan,
   },
   flatlistView: {
     marginTop: moderateScale(5),

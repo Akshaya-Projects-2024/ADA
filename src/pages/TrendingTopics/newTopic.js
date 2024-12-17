@@ -30,7 +30,10 @@ const NewTopic = () => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [title, setTitle] = useState();
   const [blog, setBlog] = useState();
-  const { providerProfile } = useSelector(({ commonReducer }) => commonReducer);
+  const { providerProfile, profileData } = useSelector(
+    ({ commonReducer }) => commonReducer
+  );
+
   const richText = useRef();
   const [htmlContent, setHtmlContent] = useState("");
 
@@ -69,6 +72,7 @@ const NewTopic = () => {
   }, []);
 
   const onSubmit = async () => {
+    console.log("profileData",profileData)
     if (!title) {
       showToast("error", "Please enter title for topic");
     } else if (!photo) {
@@ -84,7 +88,7 @@ const NewTopic = () => {
           Blog: blog,
           userId: userId,
           cover: photo?.fileData,
-          Author: "Akshaya Chikane",
+          Author: profileData?.providerBusiness?.name || profileData?.parentContact?.name,
         };
         let res = await createTopic(obj);
         console.log("res", res);
@@ -208,6 +212,7 @@ const NewTopic = () => {
               style={styles.editor}
               placeholder="Start typing your HTML here..."
               initialContentHTML={blog}
+              onChange={setBlog}
             />
             <RichToolbar
               style={styles.toolbar}

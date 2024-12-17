@@ -13,10 +13,11 @@ import { ScrollView } from "react-native-gesture-handler";
 import Back from "../../assets/svg/back.svg";
 
 const AdoptionDetail = (props) => {
+  const selectedAdotpionData = props.route.params.selectedData;
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../../assets/images/dogBackground.png")}
+        source={{ uri: selectedAdotpionData?.document?.url }}
         resizeMode="cover"
         style={styles.imgBackground}
       >
@@ -37,27 +38,36 @@ const AdoptionDetail = (props) => {
             <View style={styles.content}>
               <View style={styles.contentRow}>
                 <Text numberOfLines={1} style={styles.petName}>
-                  Sheru
+                  {selectedAdotpionData?.name}
                 </Text>
                 <Text numberOfLines={1} style={styles.breedType}>
-                  German Shepard
+                  {selectedAdotpionData?.breed}
                 </Text>
               </View>
               <View style={styles.dogDetailView}>
                 <View style={styles.dogView}>
-                  <Text style={styles.dogText}>Dog</Text>
+                  <Text style={styles.dogText}>
+                    {" "}
+                    {selectedAdotpionData?.category}
+                  </Text>
                   <Text style={styles.type}>Type</Text>
                 </View>
                 <View style={styles.ageView}>
-                  <Text style={styles.ageText}>1 Y 8 M</Text>
+                  <Text style={styles.ageText}>
+                    {selectedAdotpionData?.age}
+                  </Text>
                   <Text style={styles.age}>Age</Text>
                 </View>
                 <View style={styles.genderView}>
-                  <Text style={styles.genderText}>Male</Text>
+                  <Text style={styles.genderText}>
+                    {selectedAdotpionData?.gender}
+                  </Text>
                   <Text style={styles.gender}>Gender</Text>
                 </View>
                 <View style={styles.weightView}>
-                  <Text style={styles.weightText}>50kg</Text>
+                  <Text style={styles.weightText}>
+                    {selectedAdotpionData?.weight}
+                  </Text>
                   <Text style={styles.weight}>Weight</Text>
                 </View>
               </View>
@@ -65,9 +75,7 @@ const AdoptionDetail = (props) => {
               <View>
                 <Text style={styles.featureTitle}>About the pet</Text>
                 <Text style={styles.descriptionText}>
-                  A 5 month old German Shepherd named Lisa. Loves to cuddle and
-                  play with tennis balls. Highly energetic and great with kids!
-                  Looking for a lovely parent to match her spirit.
+                  {selectedAdotpionData?.medicalcondition}
                 </Text>
                 <View style={styles.locationMain}>
                   <Text style={styles.lastSeenText}>Reason for Adoption </Text>
@@ -75,15 +83,14 @@ const AdoptionDetail = (props) => {
                     numberOfLines={2}
                     style={[styles.location, { paddingTop: moderateScale(5) }]}
                   >
-                    The current parents are moving out of country and can not
-                    take her along with them.
+                    {selectedAdotpionData?.reason}
                   </Text>
                 </View>
 
                 <View style={styles.cardView}>
                   <View style={styles.imgView}>
                     <Image
-                      source={require("../../assets/images/dogImg.png")}
+                        source={{ uri: selectedAdotpionData?.document?.url }}
                       style={styles.img}
                     />
                   </View>
@@ -94,7 +101,9 @@ const AdoptionDetail = (props) => {
                     <Text numberOfLines={2} style={styles.parentNameLocation}>
                       Mr. Mickey Hawkins - Mumbai
                     </Text>
-                    <Text style={styles.mobileNoText}>987654321</Text>
+                    <Text style={styles.mobileNoText}>
+                      {selectedAdotpionData?.contactnumber}
+                    </Text>
                   </View>
                 </View>
               </View>

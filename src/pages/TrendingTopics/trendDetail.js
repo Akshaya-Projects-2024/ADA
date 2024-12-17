@@ -15,15 +15,29 @@ import { moderateScale, s } from "react-native-size-matters";
 import Back from "../../assets/svg/back.svg";
 import Share from "../../assets/svg/share.svg";
 import Button from "../../components/Button";
+import RenderHTML from "react-native-render-html";
+import { useWindowDimensions } from "react-native";
+import moment from "moment";
 
 const TrendDetail = (props) => {
+  const { width } = useWindowDimensions();
+  const data = props.route.params.selectedData;
+
+  const calculateReadTime = (content) => {
+    const words = content.trim().split(/\s+/).length; // Count words
+    const readingSpeed = 200; // Words per minute
+    const minutes = Math.ceil(words / readingSpeed); // Calculate minutes
+    return `${minutes} min read`;
+  };
+
+  const formatDate = (dateString) => {
+    return moment(dateString).format("DD MMMM YYYY");
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.imgStyle}>
-        <Image
-          style={styles.imgStyle}
-          source={require("../../assets/images/trend.png")}
-        />
+        <Image style={styles.imgStyle} source={{ uri: data.cover }} />
       </View>
       <View style={styles.headerView}>
         <TouchableOpacity
@@ -34,7 +48,7 @@ const TrendDetail = (props) => {
         </TouchableOpacity>
 
         <Share />
-      </View> 
+      </View>
       <ScrollView
         style={{ flex: 1 }}
         bounces={false}
@@ -42,11 +56,9 @@ const TrendDetail = (props) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.contentView}>
-          <Text style={styles.timeText}>8 min read</Text>
+          <Text style={styles.timeText}>{calculateReadTime(data.blog)}</Text>
           <View style={{ paddingTop: moderateScale(4) }}>
-            <Text style={styles.titleText}>
-              How Long You Should Be Walking Your Dog Based on Their Breed
-            </Text>
+            <Text style={styles.titleText}>{data.subject}</Text>
           </View>
           <View style={styles.profileView}>
             <View style={styles.profile}>
@@ -55,24 +67,16 @@ const TrendDetail = (props) => {
                 source={require("../../assets/images/profileImg.png")}
               />
             </View>
-            <Text style={styles.profileName}>Sai Joshi , 10th June 2024</Text>
+            <Text style={styles.profileName}>
+              {data.author} , {formatDate(data.createdon)}
+            </Text>
           </View>
           <View style={{ paddingTop: moderateScale(20) }}>
-            <Text style={styles.descriptionText}>
-              Taking your dog on daily walks keeps them healthy in many
-              different ways. It decreases stress, strengthens their bones and
-              muscles, and helps against cardiovascular disease too. But while
-              you strive to keep your dog healthy, one mistake you want to avoid
-              is taking it on walks that are too long and will make your pet
-              excessively tired.
-            </Text>
-            <Text style={styles.descriptionText}>
-              Dr. Kelly Diehl, a small animal internal medicine specialist and
-              senior director of science and communication at the Morris Animal
-              Foundation, told Newsweek that the length of your dog's walk
-              depends on its age, breed as well as on the environmental
-              conditions.
-            </Text>
+            <RenderHTML
+              contentWidth={width}
+              source={{ html: data.blog }}
+              baseStyle={styles.descriptionText}
+            />
           </View>
         </View>
       </ScrollView>
@@ -113,7 +117,7 @@ const styles = StyleSheet.create({
     color: THEMES.colors.black,
   },
   profileView: {
-    paddingTop: moderateScale(22),
+    paddingTop: moderateScale(15),
     flexDirection: "row",
     alignItems: "center",
   },

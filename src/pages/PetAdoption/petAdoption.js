@@ -81,6 +81,9 @@ const PetAdoption = (props) => {
         onPress={() =>
           props.navigation.navigate("auth", {
             screen: "adoptionDetail",
+            params: {
+              selectedData: item
+            }
           })
         }
         style={{
@@ -271,9 +274,9 @@ const PetAdoption = (props) => {
                     setFilterCategory(item);
                   }}
                   style={{
-                    paddingHorizontal: moderateScale(15),
+                    paddingHorizontal: moderateScale(12),
                     marginLeft: index === 0 ? 0 : moderateScale(10),
-                    paddingVertical: moderateScale(8),
+                    paddingVertical: moderateScale(6),
                     borderWidth: 1,
                     borderColor:
                       index === 0
@@ -290,8 +293,8 @@ const PetAdoption = (props) => {
                   {index === 0 ? (
                     <View style={styles.iconStyle}>
                       <CrossIcon
-                        width={moderateScale(18)}
-                        height={moderateScale(18)}
+                        width={moderateScale(15)}
+                        height={moderateScale(15)}
                         color={THEMES.colors.red}
                       />
                     </View>

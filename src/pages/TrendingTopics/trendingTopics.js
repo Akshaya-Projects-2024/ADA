@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   FlatList,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
@@ -16,6 +17,10 @@ import Search from "../../assets/svg/search.svg";
 import Plus from "../../assets/svg/plus.svg";
 import DropDown from "../../components/DropDown";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { decryptService } from "../../utils/storageFunc";
+import { getMyTopics } from "../../redux-store/actions/topics";
+import { useIsFocused } from "@react-navigation/native";
+import { getBase64Obj } from "../../utils/documentUtils";
 
 const Data = [
   {
@@ -42,11 +47,36 @@ const Data = [
 
 const TrendingTopics = (props) => {
   const { colors, fontFamily, fonts } = THEMES;
+  const isFocused = useIsFocused();
+  const [trendingTopics, setTrendingTopics] = useState();
+  const [topicList, setTopicList] = useState();
+
+  useEffect(() => {
+    initData();
+  }, [isFocused]);
+
+  const initData = async () => {
+    let obj = {
+      userId: await decryptService("userId"),
+    };
+    let res = await getMyTopics(obj);
+    if (res?.data?.data) {
+      let dataArray = res?.data?.data;
+      if (dataArray.length < 5) {
+        const firstFiveObjects = dataArray.slice(0, 5);
+        setTrendingTopics(firstFiveObjects);
+      } else {
+        setTopicList(dataArray);
+      }
+    }
+  };
 
   const renderItem = ({ item, index }) => {
     return (
       <TouchableOpacity
-        onPress={() => props.navigation.navigate("trendDetail")}
+        onPress={() =>
+          props.navigation.navigate("trendDetail", { selectedData: item })
+        }
         style={{ flexDirection: "column" }}
       >
         <View
@@ -56,9 +86,11 @@ const TrendingTopics = (props) => {
           ]}
         >
           <Image
-            resizeMode="cover"
-            source={require("../../assets/images/dogImg.png")}
-            style={styles.image}
+            source={{ uri: item.cover }}
+            style={{
+              width: "100%",
+              height: Dimensions.get("window").height * 0.3,
+            }}
           />
         </View>
         <View
@@ -83,7 +115,7 @@ const TrendingTopics = (props) => {
               paddingVertical: moderateScale(8),
             }}
           >
-            Home Remedies for Tick Removal
+            {item?.subject}
           </Text>
           <Text
             numberOfLines={2}
@@ -96,14 +128,14 @@ const TrendingTopics = (props) => {
               paddingBottom: moderateScale(5),
             }}
           >
-            Kartik Kumar
+            {item?.author}
           </Text>
         </View>
       </TouchableOpacity>
     );
   };
 
-  const renderDataItem = () => {
+  const renderDataItem = ({ item, index }) => {
     return (
       <TouchableOpacity
         onPress={() => props.navigation.navigate("trendDetail")}
@@ -155,15 +187,9 @@ const TrendingTopics = (props) => {
               lineHeight: 24,
             }}
           >
-            Home Remedies for Tick Removal due to ticks
+            {item.subject}
           </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              width: "75%",
-              justifyContent: "space-between",
-            }}
-          >
+          <View style={{ width: "100%" }}>
             <Text
               style={{
                 color: THEMES.colors.darkGrey,
@@ -171,9 +197,10 @@ const TrendingTopics = (props) => {
                 fontSize: THEMES.fonts.font14,
               }}
             >
-              Soni Kapoor
+              {item.author}
             </Text>
-            <Text
+
+            {/* <Text
               style={{
                 color: THEMES.colors.darkGrey,
                 fontFamily: THEMES.fontFamily.regular,
@@ -181,7 +208,7 @@ const TrendingTopics = (props) => {
               }}
             >
               1d
-            </Text>
+            </Text> */}
           </View>
         </View>
       </TouchableOpacity>
@@ -279,7 +306,7 @@ const TrendingTopics = (props) => {
             <View style={{ paddingTop: moderateScale(15) }}>
               <FlatList
                 showsHorizontalScrollIndicator={false}
-                data={Data}
+                data={trendingTopics}
                 horizontal={true}
                 showsVerticalScrollIndicator={false}
                 bounces={false}
@@ -287,47 +314,51 @@ const TrendingTopics = (props) => {
                 keyExtractor={(item) => item.id}
               />
             </View>
-            <View
-              style={{
-                paddingTop: moderateScale(20),
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <View style={{ width: "65%" }}>
-                <Text
+            {topicList?.length > 5 && (
+              <>
+                <View
                   style={{
-                    fontFamily: THEMES.fontFamily.semiBold,
-                    fontSize: THEMES.fonts.font14,
-                    color: THEMES.colors.black,
+                    paddingTop: moderateScale(20),
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
-                  Explore More Topis
-                </Text>
-              </View>
+                  <View style={{ width: "65%" }}>
+                    <Text
+                      style={{
+                        fontFamily: THEMES.fontFamily.semiBold,
+                        fontSize: THEMES.fonts.font14,
+                        color: THEMES.colors.black,
+                      }}
+                    >
+                      Explore More Topis
+                    </Text>
+                  </View>
 
-              <View style={{ width: "35%" }}>
-                <DropDown
-                  width={130}
-                  dropdownData={[
-                    { label: "Most Recent", value: "1" },
-                    { label: "Most Relevant", value: "2" },
-                    { label: "Filter by Service", value: "3" },
-                  ]}
-                />
-              </View>
-            </View>
+                  <View style={{ width: "35%" }}>
+                    <DropDown
+                      width={130}
+                      dropdownData={[
+                        { label: "Most Recent", value: "1" },
+                        { label: "Most Relevant", value: "2" },
+                        { label: "Filter by Service", value: "3" },
+                      ]}
+                    />
+                  </View>
+                </View>
 
-            <View>
-              <FlatList
-                showsVerticalScrollIndicator={false}
-                data={Data}
-                bounces={false}
-                renderItem={renderDataItem}
-                keyExtractor={(item) => item.id}
-              />
-            </View>
+                <View>
+                  <FlatList
+                    showsVerticalScrollIndicator={false}
+                    data={topicList}
+                    bounces={false}
+                    renderItem={renderDataItem}
+                    keyExtractor={(item) => item.id}
+                  />
+                </View>
+              </>
+            )}
           </View>
         </ScrollView>
       </View>
