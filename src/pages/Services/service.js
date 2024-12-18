@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
   FlatList,
   StyleSheet,
   TextInput,
   Image,
   StatusBar,
+  ActivityIndicator,
+  useWindowDimensions,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
@@ -17,6 +18,10 @@ import Search from "../../assets/svg/search.svg";
 import Cross from "../../assets/svg/closeSquare.svg";
 import Star from "../../assets/svg/yellowStar.svg";
 import { moderateScale } from "react-native-size-matters";
+import { decryptService } from "../../utils/storageFunc";
+import { getProviderByService } from "../../redux-store/actions/auth";
+import { showToast, validArray } from "../../utils/utils";
+import { getBase64Obj } from "../../utils/documentUtils";
 
 const Data = [
   {
@@ -45,13 +50,62 @@ const Data = [
   },
 ];
 
-const Service = (props) => {
+const Service = ({ navigation, route }) => {
+  const selectedService = route?.params?.selectedService;
   const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState([]);
 
-  const renderItem = () => {
+  useEffect(() => {
+    initData();
+  }, []);
+
+  const initData = async () => {
+    try {
+      const userId = await decryptService("userId");
+      const params = {
+        userid: userId,
+        servicecode: selectedService?.code,
+      };
+      const response = await getProviderByService(params);
+      if (response?.status === 200) {
+        const output = response?.data?.data;
+        if (validArray(output)) {
+          setData(output);
+        }
+      }
+      setLoading(false);
+    } catch (error) {
+      console.log("🚀 ~ initData ~ error:", error);
+      setLoading(false);
+      showToast("error", error?.message);
+    }
+  };
+
+  const renderItem = ({ item }) => {
+    const service = item?.profile?.providerBusiness?.services?.reduce(
+      (accumulator, currentValue, currIndx) =>
+        accumulator +
+        `${currentValue?.service} ${
+          currIndx === item?.profile?.providerBusiness?.services?.length - 1
+            ? ""
+            : "| "
+        }`,
+      ""
+    );
+    const foundService = item?.profile?.sessionRateDetails?.find(
+      (it) => it?.service === selectedService?.service
+    );
+    console.log("🚀 ~ renderItem ~ item:", {
+      foundService,
+      sa: selectedService?.service,
+      s: item?.profile?.ProviderSession,
+      sd: item?.profile?.sessionRateDetails[0]?.service,
+      q: Object.keys(item?.profile),
+    });
     return (
       <TouchableOpacity
-      onPress={()=>props.navigation.navigate('serviceDetail')}
+        onPress={() => navigation.navigate("serviceDetail")}
         style={{
           borderWidth: 1,
           borderColor: "#ddd",
@@ -99,8 +153,16 @@ const Service = (props) => {
                     height: 55,
                     borderRadius: 55 / 2,
                   }}
-                  source={require("../../assets/images/profileImg.png")}
+                  source={getBase64Obj(item?.photo)}
                 />
+                {/* <Image
+                  style={{
+                    width: 55,
+                    height: 55,
+                    borderRadius: 55 / 2,
+                  }}
+                  source={require("../../assets/images/profileImg.png")}
+                /> */}
               </View>
             </View>
             <View style={{ paddingLeft: moderateScale(12) }}>
@@ -112,18 +174,18 @@ const Service = (props) => {
                   fontSize: THEMES.fonts.font14,
                 }}
               >
-                Dr. Shreeram Laghu
+                {item?.profile?.providerBusiness?.name}
               </Text>
               <Text
-                numberOfLines={1}
                 style={{
                   color: THEMES.colors.darkGrey,
                   fontFamily: THEMES.fontFamily.medium,
                   fontSize: THEMES.fonts.font10,
                   paddingTop: moderateScale(3),
+                  maxWidth: moderateScale(275),
                 }}
               >
-                Services Provided | 12 Years exp
+                {`${selectedService?.service} | ${item?.profile?.providerBusiness?.experience} Years exp`}
               </Text>
               <View
                 style={{
@@ -141,7 +203,7 @@ const Service = (props) => {
                     paddingHorizontal: moderateScale(5),
                   }}
                 >
-                  4.3
+                  {item?.profile?.providerRating?.rating}
                 </Text>
               </View>
             </View>
@@ -155,7 +217,7 @@ const Service = (props) => {
                 fontSize: THEMES.fonts.font14,
               }}
             >
-              ₹ 1000
+              {`₹ ${foundService?.sessioncharges}`}
             </Text>
           </View>
         </View>
@@ -171,7 +233,7 @@ const Service = (props) => {
         fontColor="#EC559C"
         showBack
         bgColor="transparent"
-        right={<Filter onPress={()=>props.navigation.navigate('emergencyAlert')}/>}
+        right={<Filter onPress={() => navigation.navigate("emergencyAlert")} />}
       />
       <View
         style={{
@@ -240,12 +302,18 @@ const Service = (props) => {
       </View>
 
       <FlatList
-        data={Data}
+        data={data}
         showsVerticalScrollIndicator={false}
         bounces={false}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
       />
+      {loading && (
+        <View style={styles.loadingView}>
+          <View style={styles.loadingBox}>
+            <ActivityIndicator color={THEMES.colors.white} />
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -254,6 +322,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FAF9F6",
+  },
+  loadingView: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingBox: {
+    width: 70,
+    height: 70,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "transparent",
+    borderRadius: 10,
+    backgroundColor: THEMES.colors.cyan,
+    borderWidth: 1,
   },
 });
 

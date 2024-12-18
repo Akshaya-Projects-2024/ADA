@@ -23,5 +23,6 @@ export const urlList = {
   getAllAdoption: "parent/getadoptionrequest",
   addAdoption: "parent/addadoptionrequest",
   getPetCategory: "master/getpetcategory",
-  getTopics:'provider/getmytopics'
+  getTopics: "provider/getmytopics",
+  getProviderByService: "provider/getproviderbyservicecode",
 };
