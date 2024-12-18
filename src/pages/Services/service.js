@@ -83,6 +83,9 @@ const Service = ({ navigation, route }) => {
   };
 
   const renderItem = ({ item }) => {
+    const foundService = item?.profile?.sessionRateDetails?.find(
+      (it) => it?.servicecode === selectedService?.code
+    );
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate("serviceDetail")}
@@ -174,7 +177,7 @@ const Service = ({ navigation, route }) => {
                   paddingTop: moderateScale(3),
                 }}
               >
-                <Star></Star>
+                <Star />
                 <Text
                   style={{
                     color: "#000",
@@ -198,9 +201,7 @@ const Service = ({ navigation, route }) => {
               }}
             >
               {`₹ ${
-                item?.profile?.sessionRateDetails[0]?.sessioncharges ||
-                item?.profile?.sessionRateDetails[0]?.monthcharges ||
-                0
+                foundService?.sessioncharges || foundService?.monthcharges || 0
               }`}
             </Text>
           </View>
