@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-  <!-- deny cleartext traffic for React Native packager ips in release -->
-  <domain-config cleartextTrafficPermitted="true">
-   <domain includeSubdomains="true">localhost</domain>
-   <domain includeSubdomains="true">register.uat.advikapetworld.com</domain>
-  </domain-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">register.uat.advikapetworld.com</domain>
+    </domain-config>
 </network-security-config> 

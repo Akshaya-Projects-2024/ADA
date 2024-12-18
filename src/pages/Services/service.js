@@ -83,26 +83,6 @@ const Service = ({ navigation, route }) => {
   };
 
   const renderItem = ({ item }) => {
-    const service = item?.profile?.providerBusiness?.services?.reduce(
-      (accumulator, currentValue, currIndx) =>
-        accumulator +
-        `${currentValue?.service} ${
-          currIndx === item?.profile?.providerBusiness?.services?.length - 1
-            ? ""
-            : "| "
-        }`,
-      ""
-    );
-    const foundService = item?.profile?.sessionRateDetails?.find(
-      (it) => it?.service === selectedService?.service
-    );
-    console.log("🚀 ~ renderItem ~ item:", {
-      foundService,
-      sa: selectedService?.service,
-      s: item?.profile?.ProviderSession,
-      sd: item?.profile?.sessionRateDetails[0]?.service,
-      q: Object.keys(item?.profile),
-    });
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate("serviceDetail")}
@@ -217,7 +197,11 @@ const Service = ({ navigation, route }) => {
                 fontSize: THEMES.fonts.font14,
               }}
             >
-              {`₹ ${foundService?.sessioncharges}`}
+              {`₹ ${
+                item?.profile?.sessionRateDetails[0]?.sessioncharges ||
+                item?.profile?.sessionRateDetails[0]?.monthcharges ||
+                0
+              }`}
             </Text>
           </View>
         </View>
@@ -229,7 +213,7 @@ const Service = ({ navigation, route }) => {
     <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
       <StatusBar backgroundColor={THEMES.colors.white} />
       <Header
-        title={"Services"}
+        title={selectedService?.service}
         fontColor="#EC559C"
         showBack
         bgColor="transparent"
