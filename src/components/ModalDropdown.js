@@ -29,8 +29,8 @@ const ModalDropdown = (props) => {
 
   const toggleRoleSelection = (role, id) => {
     if (multiSelect) {
-      if (selectedValue?.includes(role)) {
-        setSelectedValue(selectedValue?.filter((item) => item !== role)); // Remove if already selected
+      if (selectedValue?.findIndex((it) => it?.id === id) >= 0) {
+        setSelectedValue(selectedValue?.filter((item) => item?.id !== id)); // Remove if already selected
       } else {
         if (selectedValue) {
           setSelectedValue([...selectedValue, { id: id, label: role }]); // Add if not selected  setSelectedValue([...selectedValue, { id: id, label: role }]);
