@@ -12,7 +12,7 @@ const InputField = (props) => {
     value,
     onChange,
     keyboardType,
-    maxLength,
+    maxLength = 250,
   } = props;
   return (
     <View style={styles.mainView}>
