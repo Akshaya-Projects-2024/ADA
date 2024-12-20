@@ -306,3 +306,39 @@ export const addAdoption = async (params) => {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
+
+export const getServices = async (params) => {
+  try {
+    const res = await Api.POST(urlList.getMasterData, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("getServices Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const getProviderByService = async (params) => {
+  try {
+    const res = await Api.POST(urlList.getProviderByService, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("getProviderByService Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};

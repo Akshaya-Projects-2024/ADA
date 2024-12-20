@@ -23,6 +23,8 @@ import { decryptService } from "../../utils/storageFunc";
 import { useIsFocused } from "@react-navigation/native";
 import { getBase64Obj } from "../../utils/documentUtils";
 import CrossIcon from "../../assets/svg/CrossIcon";
+import { useSelector } from "react-redux";
+import { LoginModules } from "../../constants/enums";
 
 const PetAdoption = (props) => {
   const { colors, fontFamily, fonts } = THEMES;
@@ -32,6 +34,7 @@ const PetAdoption = (props) => {
   const [petCategories, setPetCategories] = useState([]);
   const [filterCategory, setFilterCategory] = useState("");
   const isFocused = useIsFocused();
+  const { loggedInModule, guestUser } = useSelector((state) => state?.register);
 
   useEffect(() => {
     if (isFocused) {
@@ -82,8 +85,8 @@ const PetAdoption = (props) => {
           props.navigation.navigate("auth", {
             screen: "adoptionDetail",
             params: {
-              selectedData: item
-            }
+              selectedData: item,
+            },
           })
         }
         style={{
@@ -173,7 +176,7 @@ const PetAdoption = (props) => {
             justifyContent: "space-between",
           }}
         >
-          <View style={{ width: "85%" }}>
+          <View style={{ flex: 1 }}>
             <TouchableOpacity
               onPress={() =>
                 props.navigation.navigate("auth", {
@@ -203,25 +206,28 @@ const PetAdoption = (props) => {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            onPress={() =>
-              props.navigation.navigate("auth", {
-                screen: "addAdoption",
-              })
-            }
-            style={{
-              backgroundColor: THEMES.colors.white,
-              padding: moderateScale(11),
-              alignItems: "center",
-              justifyContent: "center",
-              borderColor: "#EC559C",
-              borderWidth: 1,
-              borderRadius: moderateScale(8),
-              borderBottomLeftRadius: moderateScale(0),
-            }}
-          >
-            <Plus stroke={"#EC559C"} />
-          </TouchableOpacity>
+          {loggedInModule === LoginModules.parent && !guestUser ? (
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.navigate("auth", {
+                  screen: "addAdoption",
+                })
+              }
+              style={{
+                marginLeft: moderateScale(13),
+                backgroundColor: THEMES.colors.white,
+                padding: moderateScale(11),
+                alignItems: "center",
+                justifyContent: "center",
+                borderColor: "#EC559C",
+                borderWidth: 1,
+                borderRadius: moderateScale(8),
+                borderBottomLeftRadius: moderateScale(0),
+              }}
+            >
+              <Plus stroke={"#EC559C"} />
+            </TouchableOpacity>
+          ) : null}
         </View>
         {/* <View
           style={{

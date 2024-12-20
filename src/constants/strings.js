@@ -131,6 +131,7 @@ const Strings = {
     "Your payment is not completed. Please complete payment to access full potential of the app",
   attention: "Attention!",
   clear: "Clear",
+  services: "Services",
 };
 
 export default Strings;
