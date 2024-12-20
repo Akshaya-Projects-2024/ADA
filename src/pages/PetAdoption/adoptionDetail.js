@@ -14,6 +14,7 @@ import Back from "../../assets/svg/back.svg";
 
 const AdoptionDetail = (props) => {
   const selectedAdotpionData = props.route.params.selectedData;
+  console.log("selectedAdotpionData",selectedAdotpionData)
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -75,7 +76,7 @@ const AdoptionDetail = (props) => {
               <View>
                 <Text style={styles.featureTitle}>About the pet</Text>
                 <Text style={styles.descriptionText}>
-                  {selectedAdotpionData?.medicalcondition}
+                  {selectedAdotpionData?.description}
                 </Text>
                 <View style={styles.locationMain}>
                   <Text style={styles.lastSeenText}>Reason for Adoption </Text>
@@ -360,7 +361,6 @@ const styles = StyleSheet.create({
     color: THEMES.colors.blue,
     fontFamily: THEMES.fontFamily.regular,
     fontSize: THEMES.fonts.font12,
-    paddingTop: moderateScale(4),
   },
 });
 export default AdoptionDetail;

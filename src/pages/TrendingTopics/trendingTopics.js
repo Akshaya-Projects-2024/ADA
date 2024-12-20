@@ -292,17 +292,20 @@ const TrendingTopics = (props) => {
                 <Plus stroke={"#fff"} />
               </TouchableOpacity>
             </View>
-            <View style={{ paddingTop: moderateScale(15) }}>
-              <Text
-                style={{
-                  fontFamily: THEMES.fontFamily.semiBold,
-                  fontSize: THEMES.fonts.font14,
-                  color: THEMES.colors.black,
-                }}
-              >
-                Find Out What’s Trending
-              </Text>
-            </View>
+            {topicList?.length > 5 && (
+              <View style={{ paddingTop: moderateScale(15) }}>
+                <Text
+                  style={{
+                    fontFamily: THEMES.fontFamily.semiBold,
+                    fontSize: THEMES.fonts.font14,
+                    color: THEMES.colors.black,
+                  }}
+                >
+                  Find Out What’s Trending
+                </Text>
+              </View>
+            )}
+
             <View style={{ paddingTop: moderateScale(15) }}>
               <FlatList
                 showsHorizontalScrollIndicator={false}
@@ -312,6 +315,9 @@ const TrendingTopics = (props) => {
                 bounces={false}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
+                ListHeaderComponent={() => (topicList?.length > 5 ? 
+                  <Text style={{ textAlign: 'center',}}>The list is empty</Text>  
+                  : null)}
               />
             </View>
             {topicList?.length > 5 && (
