@@ -25,4 +25,6 @@ export const urlList = {
   getPetCategory: "master/getpetcategory",
   getTopics: "provider/getmytopics",
   getProviderByService: "provider/getproviderbyservicecode",
+  uploadCommonDocument: "document/upload",
+  deleteCommonDocument: "document/delete",
 };

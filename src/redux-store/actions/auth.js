@@ -183,7 +183,7 @@ export const refreshToken = async (params) => {
 
 export const uploadDocument = async (params) => {
   try {
-    const res = await Api.POST(urlList.uploadDocument, params);
+    const res = await Api.POST(urlList.uploadCommonDocument, params);
     if (!res || res?.data?.error || res?.data?.errorCode) {
       throw new Error(
         res?.data?.message || res?.data?.error || "Something went wrong!"
@@ -201,7 +201,7 @@ export const uploadDocument = async (params) => {
 
 export const deleteDocument = async (params) => {
   try {
-    const res = await Api.POST(urlList.deleteDocument, params);
+    const res = await Api.POST(urlList.deleteCommonDocument, params);
     if (!res || res?.data?.error || res?.data?.errorCode) {
       throw new Error(
         res?.data?.message || res?.data?.error || "Something went wrong!"
