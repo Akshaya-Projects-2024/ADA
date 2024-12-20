@@ -90,7 +90,7 @@ const AdoptionDetail = (props) => {
                 <View style={styles.cardView}>
                   <View style={styles.imgView}>
                     <Image
-                        source={{ uri: selectedAdotpionData?.document?.url }}
+                      source={{ uri: selectedAdotpionData?.parentphoto}}
                       style={styles.img}
                     />
                   </View>
@@ -99,7 +99,8 @@ const AdoptionDetail = (props) => {
                       Pet parent details
                     </Text>
                     <Text numberOfLines={2} style={styles.parentNameLocation}>
-                      Mr. Mickey Hawkins - Mumbai
+                      {selectedAdotpionData?.parentname} -{" "}
+                      {selectedAdotpionData?.parentlocation}
                     </Text>
                     <Text style={styles.mobileNoText}>
                       {selectedAdotpionData?.contactnumber}
