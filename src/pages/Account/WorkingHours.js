@@ -27,10 +27,11 @@ const WorkingHours = (props) => {
   const [times, setTimes] = useState(
     DAYS.map((it) => {
       return {
-        label: it,
+        label: it.key,
         shift1: { start: "", end: "" },
         shift2: { start: "", end: "" },
         selected: false,
+        value: it.value,
       };
     })
   );
@@ -69,21 +70,23 @@ const WorkingHours = (props) => {
           setSelectedShiftType(SHIFTS.shifts);
         }
       }
-      const outputObj = output.find((it) => it?.label === element?.day);
-      outputObj.selected = true;
-      if (!element?.isfullday) {
-        if (element?.type === "1st half") {
+      const outputObj = output.find((it) => it?.value === element?.day);
+      if (outputObj) {
+        outputObj.selected = true;
+        if (!element?.isfullday) {
+          if (element?.type === "1st half") {
+            outputObj.shift1.start = element?.start;
+            outputObj.shift1.end = element?.close;
+          } else {
+            outputObj.shift2.start = element?.start;
+            outputObj.shift2.end = element?.close;
+          }
+        } else {
           outputObj.shift1.start = element?.start;
           outputObj.shift1.end = element?.close;
-        } else {
-          outputObj.shift2.start = element?.start;
-          outputObj.shift2.end = element?.close;
         }
-      } else {
-        outputObj.shift1.start = element?.start;
-        outputObj.shift1.end = element?.close;
+        output[index] = outputObj;
       }
-      output[index] = outputObj;
     }
     setTimes(output);
   };
@@ -95,7 +98,7 @@ const WorkingHours = (props) => {
       if (element.selected) {
         if (selectedShiftType === SHIFTS.full) {
           const outputObj = {};
-          outputObj.day = element.label;
+          outputObj.day = element.value;
           outputObj.type = "fullday";
           outputObj.isfullday = 1;
           outputObj.start = element?.shift1?.start;
@@ -104,7 +107,7 @@ const WorkingHours = (props) => {
         } else {
           for (let indx = 0; indx < 2; indx++) {
             const outputObj = {};
-            outputObj.day = element.label;
+            outputObj.day = element.value;
             outputObj.isfullday = 0;
             if (indx === 0) {
               outputObj.type = "1st half";

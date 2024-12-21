@@ -17,7 +17,16 @@ import Strings from "../constants/strings";
 import RadioSelected from "../assets/svg/radioSelected.svg";
 import Radio from "../assets/svg/radio.svg";
 
-export const DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+export const DAYS = [
+  { key: "Mo", value: "Monday" },
+  { key: "Tu", value: "Tuesday" },
+  { key: "We", value: "Wednesday" },
+  { key: "Th", value: "Thursday" },
+  { key: "Fr", value: "Friday" },
+  { key: "Sa", value: "Saturday" },
+  { key: "Su", value: "Sunday" },
+];
+
 export const SHIFTS = { full: "full", shifts: "shifts" };
 
 const TimeTracker = ({
@@ -45,7 +54,7 @@ const TimeTracker = ({
   };
 
   const handleConfirm = (date) => {
-    const formattedTime = moment(date).format("HH:mm A");
+    const formattedTime = moment(date).format("HH:mm");
     handleTimeChange(pickerDay, pickerShift, pickerType, formattedTime);
     hideDatePicker();
   };

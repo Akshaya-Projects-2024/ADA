@@ -38,6 +38,112 @@ const afterTimeSlots = [
   { time: "04:00", disabled: false, enabled: true },
 ];
 
+const MOCK_SLOTS = {
+  status_code: 200,
+  message_code: "OK",
+  message: "fetching provider slots",
+  data: {
+    "2024-12-22": [
+      {
+        start_time: "09:30",
+        end_time: "10:30",
+        isavailable: true,
+        isbooked: false,
+        isfullday: 0,
+      },
+    ],
+    "2024-12-23": [
+      {
+        start_time: "09:30",
+        end_time: "10:30",
+        isavailable: true,
+        isbooked: false,
+        isfullday: 0,
+      },
+      {
+        start_time: "11:00",
+        end_time: "13:00",
+        isavailable: true,
+        isbooked: false,
+        isfullday: 0,
+      },
+    ],
+    "2024-12-26": [
+      {
+        start_time: "08:30",
+        end_time: "09:30",
+        isavailable: true,
+        isbooked: false,
+        isfullday: 0,
+      },
+      {
+        start_time: "09:30",
+        end_time: "10:30",
+        isavailable: true,
+        isbooked: false,
+        isfullday: 0,
+      },
+      {
+        start_time: "10:30",
+        end_time: "11:00",
+        isavailable: true,
+        isbooked: false,
+        isfullday: 0,
+      },
+    ],
+    "2024-12-27": [
+      {
+        start_time: "09:30",
+        end_time: "20:00",
+        isavailable: true,
+        isbooked: false,
+        isfullday: 0,
+      },
+      {
+        start_time: "09:30",
+        end_time: "10:30",
+        isavailable: true,
+        isbooked: false,
+        isfullday: 0,
+      },
+    ],
+    "2024-12-28": [
+      {
+        start_time: "09:30",
+        end_time: "10:30",
+        isavailable: true,
+        isbooked: false,
+        isfullday: 0,
+      },
+    ],
+    "2024-12-29": [
+      {
+        start_time: "09:30",
+        end_time: "10:30",
+        isavailable: true,
+        isbooked: false,
+        isfullday: 0,
+      },
+    ],
+    "2024-12-30": [
+      {
+        start_time: "09:30",
+        end_time: "10:30",
+        isavailable: true,
+        isbooked: false,
+        isfullday: 0,
+      },
+      {
+        start_time: "11:00",
+        end_time: "13:00",
+        isavailable: false,
+        isbooked: false,
+        isfullday: 0,
+      },
+    ],
+  },
+};
+
 const SESSION_TYPE = { oneTime: "one_time", recursive: "recursive" };
 
 const SelectAppointment = ({ navigation, route }) => {
@@ -97,7 +203,7 @@ const SelectAppointment = ({ navigation, route }) => {
       console.log("🚀 ~ getSessionData ~ params:", params);
       const res = await getProviderSlots(params);
       if (res?.status === 200) {
-        console.log("🚀 ~ getSessionData ~ res:", res?.data);
+        console.log("🚀 ~ getSessionData ~ res:", res);
       }
     } catch (error) {
       showToast("error", error?.message);
