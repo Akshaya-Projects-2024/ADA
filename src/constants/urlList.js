@@ -27,4 +27,5 @@ export const urlList = {
   getProviderByService: "provider/getproviderbyservicecode",
   uploadCommonDocument: "document/upload",
   deleteCommonDocument: "document/delete",
+  getProviderTimeSlots: "appointment/gettimeslot",
 };

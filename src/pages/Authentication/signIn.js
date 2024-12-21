@@ -18,7 +18,7 @@ import { encryptService } from "../../utils/storageFunc";
 import { showToast } from "../../utils/utils";
 
 const SignIn = (props) => {
-  const [inputValue, setInputValue] = useState("homec12376@kelenson.com"); //a@yopmail.com //9769487604 //"jogayex376@bawsny.com"
+  const [inputValue, setInputValue] = useState("cicocaj728@evusd.com"); //a@yopmail.com //9769487604 //"jogayex376@bawsny.com"
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async () => {

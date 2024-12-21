@@ -1,0 +1,58 @@
+--- Add appointment change endpoints
+
+curl --location 'localhost:8000/v1/appointment/add' \
+--header 'AccessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRGF0YSI6eyJ1c2VyX2lkIjoiODA5NzQ3OTgzMCIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTE3VDE4OjQ1OjQ3LjY5ODcxOTgxMiswNTozMCJ9LCJleHAiOjE3MzQ0NDMxNDcsImlzcyI6InNtYXJ0cGV0In0.2mu2NfUCztieok_dNU0Y7mv-_kP527uaZcvkrDBWcjo' \
+--header 'Content-Type: application/json' \
+--data '{
+    "parent_id": "8097479830",
+    "provider_id": "7977276381",
+    "service_code": 105,
+    "start_date": "2025-01-01",
+    "end_date": "2025-01-12",
+    "start_time": "09:30",
+    "end_time": "10:30",
+    "status": "scheduled",
+    "notes": "First appointment of the day",
+    "petid": 1,
+    "requestedby": "parent"
+}'
+
+
+-----get only next appointment 
+--- also provide appointment otp
+
+curl --location 'localhost:8000/v1/appointment/getupcoming' \
+--header 'AccessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRGF0YSI6eyJ1c2VyX2lkIjoiNzk3NzI3NjM4MSIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTE3VDE5OjI1OjQ5LjQ4MDM3NTUxOCswNTozMCJ9LCJleHAiOjE3MzQ0NDU1NDksImlzcyI6InNtYXJ0cGV0In0.mj5PKD8BWmOtUjK06xvHhkv2QKe39pw1_6dwBpUftCM' \
+--header 'Content-Type: application/json' \
+--data '{
+    "userid": "7977276381",
+    "usertype": "provider"
+}'
+
+
+----appointment accepted by provider 
+
+curl --location 'localhost:8000/v1/appointment/accept' \
+--header 'AccessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRGF0YSI6eyJ1c2VyX2lkIjoiNzk3NzI3NjM4MSIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTE3VDE4OjUxOjMzLjA3ODI0NjEwNCswNTozMCJ9LCJleHAiOjE3MzQ0NDM0OTMsImlzcyI6InNtYXJ0cGV0In0.9vWDDYugDgzQsE21_Hc1WsskxuLry1zvvzde4NKp8Hc' \
+--header 'Content-Type: application/json' \
+--data '{
+    "appointment_id": 7,
+    "parent_id": "8097479830",
+    "provider_id": "7977276381"
+  
+}'
+
+
+-----complete appointment with OTP 
+
+curl --location 'localhost:8000/v1/appointment/complete' \
+--header 'AccessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRGF0YSI6eyJ1c2VyX2lkIjoiNzk3NzI3NjM4MSIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTE3VDE5OjI1OjQ5LjQ4MDM3NTUxOCswNTozMCJ9LCJleHAiOjE3MzQ0NDU1NDksImlzcyI6InNtYXJ0cGV0In0.mj5PKD8BWmOtUjK06xvHhkv2QKe39pw1_6dwBpUftCM' \
+--header 'Content-Type: application/json' \
+--data '{
+    "appointment_id": 6,
+    "parent_id": "8097479830",
+    "provider_id": "7977276381",
+    "otp": "5657"
+}'
+
+

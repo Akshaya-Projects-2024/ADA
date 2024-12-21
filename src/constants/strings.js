@@ -132,6 +132,10 @@ const Strings = {
   attention: "Attention!",
   clear: "Clear",
   services: "Services",
+  oneSession: "One Session",
+  dailySession: "Daily Session",
+  startDate: "Start Date",
+  endDate: "End Date",
 };
 
 export default Strings;

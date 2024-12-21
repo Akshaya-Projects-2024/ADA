@@ -11,11 +11,6 @@ import {
   StatusBar,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
-import Header from "../../components/Header";
-import Filter from "../../assets/svg/funnel.svg";
-import Search from "../../assets/svg/search.svg";
-import Cross from "../../assets/svg/closeSquare.svg";
-import Star from "../../assets/svg/yellowStar.svg";
 import { moderateScale } from "react-native-size-matters";
 import { goBack } from "../../navigations/rootNavigationRef";
 import Back from "../../assets/svg/back.svg";
@@ -26,7 +21,8 @@ import Button from "../../components/Button";
 
 const Data = ["Vaccinations", "Document 1", "Document 2", "Document 3"];
 
-const ServiceDetail = (props) => {
+const ServiceDetail = ({ navigation, route }) => {
+  const selectedProvider = route?.params?.selectedProvider;
   return (
     <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
       <StatusBar backgroundColor={THEMES.colors.white} />
@@ -42,7 +38,7 @@ const ServiceDetail = (props) => {
       >
         <TouchableOpacity
           hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-          onPress={() =>  goBack()}
+          onPress={() => goBack()}
         >
           <Back stroke={"#000"} />
         </TouchableOpacity>
@@ -319,7 +315,7 @@ const ServiceDetail = (props) => {
                     fontSize: THEMES.fonts.font14,
                   }}
                 >
-                 Address
+                  Address
                 </Text>
                 <Text
                   style={{
@@ -344,36 +340,41 @@ const ServiceDetail = (props) => {
               </Text>
             </View>
             <View style={styles.medicalDocView}>
-                  <Text style={styles.medicalText}>Certification</Text>
-                  <RightArrow stroke={THEMES.colors.cyan} />
-                </View>
+              <Text style={styles.medicalText}>Certification</Text>
+              <RightArrow stroke={THEMES.colors.cyan} />
+            </View>
             <View style={styles.documentView}>
-           
-                  <ScrollView
-                    horizontal={true}
-                    style={{ flex: 1 }}
-                    bounces={false}
-                    showsHorizontalScrollIndicator={false}
-                    showsVerticalScrollIndicator={false}
-                  >
-                    {Data.map((item, index) => {
-                      return (
-                        <View
-                          style={[
-                            styles.documents,
-                            { marginLeft: index === 0 ? 0 : moderateScale(10) },
-                          ]}
-                        >
-                          <Text style={styles.docText}>{item}</Text>
-                        </View>
-                      );
-                    })}
-                  </ScrollView>
-                </View>
-             <View style={{paddingTop:moderateScale(40)}}>
-             <Button title="Book Appointment" onPress={()=>props.navigation.navigate('selectAppointment')}/>   
-                </View>       
-          
+              <ScrollView
+                horizontal={true}
+                style={{ flex: 1 }}
+                bounces={false}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+              >
+                {Data.map((item, index) => {
+                  return (
+                    <View
+                      style={[
+                        styles.documents,
+                        { marginLeft: index === 0 ? 0 : moderateScale(10) },
+                      ]}
+                    >
+                      <Text style={styles.docText}>{item}</Text>
+                    </View>
+                  );
+                })}
+              </ScrollView>
+            </View>
+            <View style={{ paddingTop: moderateScale(40) }}>
+              <Button
+                title="Book Appointment"
+                onPress={() =>
+                  navigation.navigate("selectAppointment", {
+                    selectedProvider: selectedProvider,
+                  })
+                }
+              />
+            </View>
           </View>
         </View>
       </ScrollView>

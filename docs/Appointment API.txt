@@ -1,0 +1,91 @@
+----Get available slots
+
+curl --location 'register.uat.advikapetworld.com/v1/appointment/gettimeslot' \
+--header 'AccessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRGF0YSI6eyJ1c2VyX2lkIjoiODA5NzQ3OTgzMCIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTEwVDIwOjQ0OjE3LjIzNTM5NjkyNyswNTozMCJ9LCJleHAiOjE3MzM4NDU0NTcsImlzcyI6InNtYXJ0cGV0In0._02QATlzkxHky8L_uKiiH0eDnVdbc7v78GcchqjJ2r8' \
+--header 'Content-Type: application/json' \
+--data '{
+    "userid": "8097479830",
+    "providerid": "7977276381",
+    "startdate": "2025-01-01",
+    "enddate": "2025-01-12"
+}'
+
+
+--- Add appointment 
+
+curl --location 'localhost:8000/v1/appointment/accept' \
+--header 'AccessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRGF0YSI6eyJ1c2VyX2lkIjoiODA5NzQ3OTgzMCIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTExVDE0OjU4OjQzLjgyOTQ5ODc3MiswNTozMCJ9LCJleHAiOjE3MzM5MTExMjMsImlzcyI6InNtYXJ0cGV0In0.c3hDdCSe518scSSOig1COMiDyclL2ojFLMijGKe8pPw' \
+--header 'Content-Type: application/json' \
+--data '{
+    "parent_id": "8097479830",
+    "provider_id": "7977276381",
+    "service_code": 105,
+    "start_date": "2025-01-01",
+    "end_date": "2025-01-12",
+    "start_time": "09:30",
+    "end_time": "10:30",
+    "status": "scheduled",
+    "notes": "First appointment of the day",
+    "petid": 1,
+    "requestedby": "parent"
+}'
+
+
+---Reschedule appointment 
+
+curl --location 'localhost:8000/v1/appointment/reschedule' \
+--header 'AccessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRGF0YSI6eyJ1c2VyX2lkIjoiODA5NzQ3OTgzMCIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTExVDE0OjMzOjUxLjY2MzIxOTkzNiswNTozMCJ9LCJleHAiOjE3MzM5MDk2MzEsImlzcyI6InNtYXJ0cGV0In0.j9VtomBil8-HOLMtedQnEx8ziGPzLNZvOmqqG-L6a7k' \
+--header 'Content-Type: application/json' \
+--data '{
+    "appointment_id": 1,
+    "parent_id": "8097479830",
+    "provider_id": "7977276381",
+    "appointment_date": "2024-12-09",
+    "start_time": "09:30",
+    "end_time": "10:30",
+    "status": "rescheduled",
+    "notes": "I am not available",
+    "requestedby": "provider"
+}'
+
+
+---Cancel appointment 
+
+curl --location 'localhost:8000/v1/appointment/cancel' \
+--header 'AccessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRGF0YSI6eyJ1c2VyX2lkIjoiODA5NzQ3OTgzMCIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTExVDE2OjM2OjUzLjk4NjMwOTM2MyswNTozMCJ9LCJleHAiOjE3MzM5MTcwMTMsImlzcyI6InNtYXJ0cGV0In0.lf7rqZ2xEx-1C11JbC-jMkyTbFdBDaEeLnSBzowzIQo' \
+--header 'Content-Type: application/json' \
+--data '{
+    "appointment_id": 1,
+    "parent_id": "8097479830",
+    "provider_id": "7977276381",
+    "notes": "I am not available",
+    "requestedby": "parent"
+}'
+
+
+--- Mark Holiday
+
+curl --location 'localhost:8000/v1/appointment/holiday' \
+--header 'AccessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRGF0YSI6eyJ1c2VyX2lkIjoiNzk3NzI3NjM4MSIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTEyVDEzOjQ0OjI4LjYxMDMzMzg0MyswNTozMCJ9LCJleHAiOjE3MzM5OTMwNjgsImlzcyI6InNtYXJ0cGV0In0.lgYeHTdI4cArPSqsRTKKtnZrCHRSO0ONLDJYKeg4yq4' \
+--header 'Content-Type: application/json' \
+--data '{
+ 
+  "provider_id": "7977276381",
+  "start_date": "2025-01-03",
+  "end_date": "2025-01-03",
+  "start_time": "09:00",
+  "end_time": "18:00",
+  "isfullday": 0,
+  "notes": "Scheduled maintenance"
+}'
+
+
+--- Get all appointments
+
+curl --location 'localhost:8000/v1/appointment/getall' \
+--header 'AccessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyRGF0YSI6eyJ1c2VyX2lkIjoiODA5NzQ3OTgzMCIsImNyZWF0ZWRfYXQiOiIyMDI0LTEyLTExVDE3OjIxOjE4LjQ3MTg2MTI3MyswNTozMCJ9LCJleHAiOjE3MzM5MTk2NzgsImlzcyI6InNtYXJ0cGV0In0.JO05piLfpvPd663-BWkwHL7mnPyXRUDijunJaIYxscI' \
+--header 'Content-Type: application/json' \
+--data '{
+    "userid": "8097479830",
+    "usertype": "parent"
+}'

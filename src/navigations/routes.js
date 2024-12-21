@@ -14,11 +14,11 @@ import ServiceList from "../pages/Services/serviceList";
 import ServiceDetail from "../pages/Services/serviceDetail";
 import UpcomingEvents from "../pages/Events/upcomingEvents";
 import Service from "../pages/Services/service";
-import WorkingHours from "../pages/Account/WorkingHours";
 import ContactPage from "../pages/CommonPages/contactPage";
 import WriteUs from "../pages/CommonPages/WriteUs";
 import Feedback from "../pages/CommonPages/feedback";
 import MyBookings from "../pages/Account/myBookings";
+import SelectAppointment from "../pages/Services/selectAppointment";
 
 const Stack = createStackNavigator();
 
@@ -105,7 +105,11 @@ const Routes = (props) => {
           component={ServiceDetail}
           options={navOptionHandler}
         />
-
+        <Stack.Screen
+          name="selectAppointment"
+          component={SelectAppointment}
+          options={navOptionHandler}
+        />
         <Stack.Screen
           name="upComingEvents"
           component={UpcomingEvents}

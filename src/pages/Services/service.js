@@ -88,7 +88,9 @@ const Service = ({ navigation, route }) => {
     );
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate("serviceDetail")}
+        onPress={() =>
+          navigation.navigate("serviceDetail", { selectedProvider: item })
+        }
         style={{
           borderWidth: 1,
           borderColor: "#ddd",

@@ -19,7 +19,10 @@ import Button from "../../components/Button";
 import Stepper from "../../components/Stepper";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { decryptService } from "../../utils/storageFunc";
-import { deleteDocument, uploadDocument } from "../../redux-store/actions/auth";
+import {
+  deleteDocument,
+  uploadProviderDocument,
+} from "../../redux-store/actions/auth";
 import { useSelector } from "react-redux";
 import { showToast } from "../../utils/utils";
 
@@ -117,7 +120,7 @@ const UploadImagesDocs = (props) => {
 
   const apiCall = async (postData, type, item) => {
     try {
-      const res = await uploadDocument(postData);
+      const res = await uploadProviderDocument(postData);
       if (res?.status == 200) {
         if (type === DOCUMENT_TYPES.logo) {
           setPhoto({ ...item, id: res?.data?.data?.reqId });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,26 +6,24 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  TextInput,
-  Image,
   StatusBar,
-  Dimensions,
+  Pressable,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
-import Filter from "../../assets/svg/funnel.svg";
-import Search from "../../assets/svg/search.svg";
-import Cross from "../../assets/svg/closeSquare.svg";
 import Chat from "../../assets/svg/chat.svg";
 import { moderateScale } from "react-native-size-matters";
 import moment from "moment";
 import Button from "../../components/Button";
 import SwitchOn from "../../assets/svg/switchOn.svg";
-import SwitchOff from "../../assets/svg/switchOff.svg";
+import SwitchOff from "../../assets/svg/switchSession.svg";
 import Modal from "react-native-modal";
 import InputField from "../../components/InputField";
-
-const { width } = Dimensions.get("window");
+import Strings from "../../constants/strings";
+import { showToast, validArray } from "../../utils/utils";
+import { getProviderSlots } from "../../redux-store/actions/auth";
+import { decryptService } from "../../utils/storageFunc";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const afterTimeSlots = [
   { time: "09:00", disabled: false, enabled: true },
@@ -40,40 +38,71 @@ const afterTimeSlots = [
   { time: "04:00", disabled: false, enabled: true },
 ];
 
-const categories = [
-  "Trainer",
-  "Pet Nutritionist",
-  "Animal Therapist",
-  "Pet Walker",
-  "Animal Communicator",
-  "Groomer",
-];
+const SESSION_TYPE = { oneTime: "one_time", recursive: "recursive" };
 
-const SelectAppointment = () => {
+const SelectAppointment = ({ navigation, route }) => {
+  const selectedProvider = route?.params?.selectedProvider;
+
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [currentDate, setCurrentDate] = useState(moment());
   const [weekDates, setWeekDates] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedDate, setSelectedDate] = useState(moment());
-  const [oneSession, setOneSession] = useState(true);
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
   const [modalVisible, setModalVisible] = useState(false);
+  const [sessionSelection, setSessionSelection] = useState(
+    SESSION_TYPE.oneTime
+  );
+  const [startDateVisible, setStartDateVisible] = useState(false);
+  const [endDateVisible, setEndDateVisible] = useState(false);
 
   useEffect(() => {
-    // Get all dates for the current week (Monday to Sunday)
-    const startOfWeek = moment().startOf("week"); // Adjust start of week if needed (default is Sunday)
-    const dates = [];
+    getDates();
+  }, [getDates, sessionSelection]);
 
-    for (let i = 0; i < 7; i++) {
-      dates.push(moment(startOfWeek).add(i, "days"));
+  useEffect(() => {
+    if (startDate && endDate) {
+      getSessionData();
     }
-    setWeekDates(dates);
-  }, []);
+  }, [startDate, endDate, getSessionData]);
 
   const selectTimeSlot = (time) => {
     if (!time.disabled) {
       setSelectedSlot(time.time);
     }
   };
+
+  const getDates = useCallback(async () => {
+    if (sessionSelection === SESSION_TYPE.oneTime) {
+      const start = moment();
+      const end = moment(start).add(14, "days");
+      setStartDate(start);
+      setEndDate(end);
+    } else {
+      setStartDate();
+      setEndDate();
+    }
+  }, [sessionSelection]);
+
+  const getSessionData = useCallback(async () => {
+    try {
+      const userId = await decryptService("userId");
+      const params = {
+        userid: userId,
+        providerid: selectedProvider?.profile?.providerBusiness?.userid,
+        startdate: moment(startDate)?.format("YYYY-MM-DD"),
+        enddate: moment(endDate)?.format("YYYY-MM-DD"),
+      };
+      console.log("🚀 ~ getSessionData ~ params:", params);
+      const res = await getProviderSlots(params);
+      if (res?.status === 200) {
+        console.log("🚀 ~ getSessionData ~ res:", res?.data);
+      }
+    } catch (error) {
+      showToast("error", error?.message);
+    }
+  }, [endDate, selectedProvider?.profile?.providerBusiness?.userid, startDate]);
 
   const renderCategory = ({ item }) => {
     const isSelected = selectedCategory === item;
@@ -89,9 +118,38 @@ const SelectAppointment = () => {
     );
   };
 
+  const handleStartDateConfirm = (date) => {
+    setStartDate(date);
+    hideStartDatePicker();
+  };
+
+  const handleEndDateConfirm = (date) => {
+    setEndDate(date);
+    hideEndDatePicker();
+  };
+
+  const hideStartDatePicker = () => {
+    setStartDateVisible(false);
+  };
+
+  const hideEndDatePicker = () => {
+    setEndDateVisible(false);
+  };
+
   const handleDatePress = (date) => {
-    // Set the selected date to the date that was pressed
     setSelectedDate(date);
+  };
+
+  const handleSwitch = () => {
+    if (sessionSelection === SESSION_TYPE.oneTime) {
+      setStartDate();
+      setEndDate();
+    }
+    setSessionSelection((prevData) => {
+      return prevData === SESSION_TYPE.oneTime
+        ? SESSION_TYPE.recursive
+        : SESSION_TYPE.oneTime;
+    });
   };
 
   return (
@@ -115,74 +173,102 @@ const SelectAppointment = () => {
             paddingHorizontal: moderateScale(16),
           }}
         >
-          <Text
-            style={{
-              color: THEMES.colors.black,
-              fontFamily: THEMES.fontFamily.semiBold,
-              fontSize: THEMES.fonts.font14,
-              paddingBottom: moderateScale(10),
-            }}
-          >
-            Category
-          </Text>
+          <Text style={styles.headerText}>Category</Text>
           <FlatList
-            data={categories}
+            data={selectedProvider?.profile?.ProviderSession?.availableat ?? []}
             renderItem={renderCategory}
             keyExtractor={(item) => item}
             horizontal={false}
             contentContainerStyle={styles.categoryList}
           />
         </View>
-
-        <View
+        <Pressable
+          onPress={handleSwitch}
           style={{
             marginHorizontal: moderateScale(14),
             paddingTop: moderateScale(20),
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
-          <Text style={styles.headerText}>Date</Text>
-          <ScrollView
-            horizontal
-            bounces={false}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContainer}
+          <Text style={styles.headerTextV2}>{Strings.oneSession}</Text>
+          {sessionSelection === SESSION_TYPE.oneTime ? (
+            <SwitchOn />
+          ) : (
+            <SwitchOff />
+          )}
+          <Text style={styles.headerTextV2}>{Strings.dailySession}</Text>
+        </Pressable>
+        {sessionSelection === SESSION_TYPE.recursive ? (
+          <View style={styles.pickerContainer}>
+            <InputField
+              label={Strings.startDate}
+              placeholderText={"--"}
+              value={startDate ? moment(startDate)?.format("YYYY-MM-DD") : null}
+              type="small"
+              inputStyle={styles.startDateInput}
+            />
+            <InputField
+              label={Strings.endDate}
+              placeholderText={"--"}
+              value={endDate ? moment(endDate)?.format("YYYY-MM-DD") : null}
+              type="small"
+              inputStyle={styles.endDateInput}
+            />
+          </View>
+        ) : null}
+        {validArray(weekDates) ? (
+          <View
+            style={{
+              marginHorizontal: moderateScale(14),
+              paddingTop: moderateScale(20),
+            }}
           >
-            {weekDates.map((date, index) => {
-              const isToday = date.isSame(currentDate, "day");
-              const isSelected = date.isSame(selectedDate, "day");
-              return (
-                <TouchableOpacity
-                  onPress={() => handleDatePress(date)}
-                  key={index}
-                  style={[
-                    styles.dateContainer,
-                    isSelected ? styles.selectedDate : null, // Highlight selected date
-                    isToday && !isSelected ? styles.activeDate : null, // Highlight current date if it's not selected
-                  ]}
-                >
-                  <Text
+            <Text style={styles.headerText}>Date</Text>
+            <ScrollView
+              horizontal
+              bounces={false}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.scrollContainer}
+            >
+              {weekDates.map((date, index) => {
+                const isToday = date.isSame(currentDate, "day");
+                const isSelected = date.isSame(selectedDate, "day");
+                return (
+                  <TouchableOpacity
+                    onPress={() => handleDatePress(date)}
+                    key={index}
                     style={[
-                      styles.dayText,
-                      isSelected ? styles.selectedDayText : null, // Highlight selected day text
-                      isToday && !isSelected ? styles.activeDayText : null, // Highlight today's text
+                      styles.dateContainer,
+                      isSelected ? styles.selectedDate : null, // Highlight selected date
+                      isToday && !isSelected ? styles.activeDate : null, // Highlight current date if it's not selected
                     ]}
                   >
-                    {date.format("ddd")}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.dateText,
-                      isSelected ? styles.selectedDateText : null, // Highlight selected date text
-                      isToday && !isSelected ? styles.activeDateText : null, // Highlight today's text
-                    ]}
-                  >
-                    {date.format("D")}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
+                    <Text
+                      style={[
+                        styles.dayText,
+                        isSelected ? styles.selectedDayText : null, // Highlight selected day text
+                        isToday && !isSelected ? styles.activeDayText : null, // Highlight today's text
+                      ]}
+                    >
+                      {date.format("ddd")}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.dateText,
+                        isSelected ? styles.selectedDateText : null, // Highlight selected date text
+                        isToday && !isSelected ? styles.activeDateText : null, // Highlight today's text
+                      ]}
+                    >
+                      {date.format("D")}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        ) : null}
         <>
           <View
             style={{
@@ -319,7 +405,6 @@ const SelectAppointment = () => {
           </View>
         </View>
       </ScrollView>
-
       <Modal
         isVisible={modalVisible}
         backdropOpacity={0.5}
@@ -375,6 +460,18 @@ const SelectAppointment = () => {
           <Button title="Apply" onPress={() => setModalVisible(false)}></Button>
         </View>
       </Modal>
+      <DateTimePickerModal
+        isVisible={startDateVisible}
+        mode="date"
+        onConfirm={handleStartDateConfirm}
+        onCancel={hideStartDatePicker}
+      />
+      <DateTimePickerModal
+        isVisible={endDateVisible}
+        mode="date"
+        onConfirm={handleEndDateConfirm}
+        onCancel={hideEndDatePicker}
+      />
     </View>
   );
 };
@@ -416,6 +513,12 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font14,
     fontFamily: THEMES.fontFamily.semiBold,
     marginBottom: 10,
+    marginHorizontal: moderateScale(6),
+    color: THEMES.colors.black,
+  },
+  headerTextV2: {
+    fontSize: THEMES.fonts.font14,
+    fontFamily: THEMES.fontFamily.semiBold,
     marginHorizontal: moderateScale(6),
     color: THEMES.colors.black,
   },
@@ -495,6 +598,17 @@ const styles = StyleSheet.create({
   selectedRadioText: {
     color: "#000", // Darker color for selected text
     fontWeight: "bold",
+  },
+  pickerContainer: { flexDirection: "row", marginTop: moderateScale(16) },
+  startDateInput: {
+    flex: 1,
+    marginStart: moderateScale(16),
+    marginEnd: moderateScale(8),
+  },
+  endDateInput: {
+    flex: 1,
+    marginEnd: moderateScale(16),
+    marginStart: moderateScale(8),
   },
 });
 

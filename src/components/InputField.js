@@ -13,9 +13,10 @@ const InputField = (props) => {
     onChange,
     keyboardType,
     maxLength = 250,
+    inputStyle = {},
   } = props;
   return (
-    <View style={styles.mainView}>
+    <View style={[styles.mainView, inputStyle]}>
       <View style={styles.flexRow}>
         <View
           style={{

@@ -199,6 +199,24 @@ export const uploadDocument = async (params) => {
   }
 };
 
+export const uploadProviderDocument = async (params) => {
+  try {
+    const res = await Api.POST(urlList.uploadDocument, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("uploadProviderDocument Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
 export const deleteDocument = async (params) => {
   try {
     const res = await Api.POST(urlList.deleteCommonDocument, params);
@@ -230,7 +248,7 @@ export const uploadParentDocument = async (params) => {
     }
     throw new Error("Something went wrong!");
   } catch (error) {
-    console.log("uploadDocument Error! ", error);
+    console.log("uploadParentDocument Error! ", error);
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
@@ -248,7 +266,7 @@ export const saveParentDetails = async (params) => {
     }
     throw new Error("Something went wrong!");
   } catch (error) {
-    console.log("uploadDocument Error! ", error);
+    console.log("saveParentDetails Error! ", error);
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
@@ -339,6 +357,24 @@ export const getProviderByService = async (params) => {
     throw new Error("Something went wrong!");
   } catch (error) {
     console.log("getProviderByService Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const getProviderSlots = async (params) => {
+  try {
+    const res = await Api.POST(urlList.getProviderTimeSlots, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("getProviderSlots Error! ", error);
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
