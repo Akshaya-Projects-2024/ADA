@@ -730,7 +730,11 @@ const MyBookings = (props) => {
         </View>
       </Modal>
       <Modal
-        onBackdropPress={() => setAttendedModal(false)}
+        onBackdropPress={() => {
+          setAttendedModal(false);
+          setSelectedItem();
+          setOtpInput("");
+        }}
         isVisible={attendedModal}
         backdropOpacity={0.5}
         style={{

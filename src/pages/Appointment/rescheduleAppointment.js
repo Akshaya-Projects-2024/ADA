@@ -77,6 +77,7 @@ const RescheduleAppointment = ({ navigation, route }) => {
     selectedDate(formattedDate);
     hideDatePickerCancel();
   };
+
   const onSubmit = async () => {
     try {
       setLoading(true);
