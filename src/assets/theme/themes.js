@@ -53,6 +53,7 @@ export const THEMES = {
     crimsonRed: "#E21E1E",
     persimmon: "#FF6F4D",
     adoptionPink: "#ed65a5",
+    bookedSlot: "#ffc7b7",
   },
   fontFamily: {
     regular: "Inter-Regular",

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Pressable,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import Filter from "../../assets/svg/listFilter.svg";
 import Check from "../../assets/svg/check.svg";
@@ -25,7 +26,17 @@ import CancelAppointment from "../Appointment/cancelAppointment";
 import RescheduleAppointment from "../Appointment/rescheduleAppointment";
 import Button from "../../components/Button";
 import InputField from "../../components/InputField";
-import { showToast } from "../../utils/utils";
+import { showToast, validArray } from "../../utils/utils";
+import {
+  completeAppointment,
+  confirmAppointment,
+  getAllAppointment,
+} from "../../redux-store/actions/auth";
+import { decryptService } from "../../utils/storageFunc";
+import { DOCUMENT_TYPES } from "./uploadImagesDocs";
+import { getBase64Obj } from "../../utils/documentUtils";
+import moment from "moment";
+import { useIsFocused } from "@react-navigation/native";
 
 const Data = [
   {
@@ -119,14 +130,20 @@ const Data = [
     isSeduled: true,
   },
 ];
-
+const STATUSES = {
+  pending: "pending",
+  scheduled: "scheduled",
+  completed: "completed",
+  cancelled: "cancelled",
+  rescheduled: "rescheduled",
+};
 const MyBookings = (props) => {
+  const focus = useIsFocused();
   const menuRef = useRef(null);
-  const [data, setData] = useState(Data);
-  const [selectedItemId, setSelectedItemId] = useState(null);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedAttendedId, setSelectedAttendedId] = useState();
-
   const [menuPosition, setMenuPosition] = useState({
     x: 0,
     y: 0,
@@ -139,6 +156,17 @@ const MyBookings = (props) => {
   const [otpInput, setOtpInput] = useState();
 
   const filterOptions = ["Daily", "Weekly", "Monthly", "Custom"];
+
+  useEffect(() => {
+    if (!focus) {
+      setVisible(false);
+      setAttendedModal(false);
+      setOtpInput("");
+      setSelectedItem();
+    } else {
+      initData();
+    }
+  }, [focus]);
 
   const handleFilterSelect = (filter) => {
     setSelectedFilter(filter);
@@ -158,56 +186,119 @@ const MyBookings = (props) => {
       setMenuPosition({ x: x, y: y, width: widthX, height: heightY });
     });
   };
-  const handleCancel = (id) => {
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === id
-          ? { ...item, isCanceled: true, isConfirmed: false }
-          : item
-      )
-    );
-    setSelectedItemId(id);
-  };
 
-  const handleConfirm = (id) => {
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === id
-          ? { ...item, isConfirmed: true, isCanceled: false }
-          : item
-      )
-    );
-    setSelectedItemId(id);
-  };
-
-  const handleAttended = () => {
-    if (selectedAttendedId && otpInput) {
-      setData((prevData) =>
-        prevData.map((item) =>
-          item.id === selectedAttendedId
-            ? {
-                ...item,
-                isAttended: true,
-                isCanceled: false,
-                isConfirmed: false,
-              }
-            : item
-        )
-      );
-      setSelectedItemId(selectedAttendedId);
-      setAttendedModal(false);
-      setSelectedAttendedId("");
-      setOtpInput("");
-    } else {
-      return showToast("error", "Please enter OTP first!");
+  const initData = async () => {
+    try {
+      setLoading(true);
+      const userId = await decryptService("userId");
+      const params = {
+        userid: userId,
+        usertype: "provider", //parent
+      };
+      const res = await getAllAppointment(params);
+      if (res?.status === 200) {
+        const output = res?.data?.data;
+        if (validArray(output)) {
+          setData(output);
+        } else {
+          setData([]);
+        }
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      showToast("error", error?.message);
     }
   };
 
-  const confirmAppointment = (id) => {
-    handleConfirm(id);
+  // const handleCancel = (id) => {
+  //   setData((prevData) =>
+  //     prevData.map((item) =>
+  //       item.id === id
+  //         ? { ...item, isCanceled: true, isConfirmed: false }
+  //         : item
+  //     )
+  //   );
+  //   setSelectedItemId(id);
+  // };
+
+  // const handleConfirm = (id) => {
+  //   setData((prevData) =>
+  //     prevData.map((item) =>
+  //       item.id === id
+  //         ? { ...item, isConfirmed: true, isCanceled: false }
+  //         : item
+  //     )
+  //   );
+  //   setSelectedItemId(id);
+  // };
+
+  const handleAttended = async () => {
+    try {
+      setLoading(true);
+      if (!selectedItem) {
+        throw new Error("Please select the appointment!");
+      } else if (!otpInput) {
+        throw new Error("Please enter OTP first!");
+      } else {
+        const params = {
+          appointment_id: selectedItem?.appointment_id,
+          parent_id: selectedItem?.parentdetails?.userid,
+          provider_id: selectedItem?.provider_id,
+          otp: otpInput,
+        };
+        const res = await completeAppointment(params);
+        if (res?.status === 200) {
+          initData();
+        }
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      showToast("error", error?.message);
+    }
+    // if (selectedAttendedId && otpInput) {
+    //   setData((prevData) =>
+    //     prevData.map((item) =>
+    //       item.id === selectedAttendedId
+    //         ? {
+    //             ...item,
+    //             isAttended: true,
+    //             isCanceled: false,
+    //             isConfirmed: false,
+    //           }
+    //         : item
+    //     )
+    //   );
+    //   // setSelectedItemId(selectedAttendedId);
+    //   setAttendedModal(false);
+    //   setSelectedAttendedId("");
+    //   setOtpInput("");
+    // } else {
+    //   return showToast("error", "Please enter OTP first!");
+    // }
   };
 
-  const handleOnConfirm = (id) => {
+  const confirm = async (appointment) => {
+    try {
+      setLoading(true);
+      const params = {
+        appointment_id: appointment?.appointment_id,
+        parent_id: appointment?.parentdetails?.userid,
+        provider_id: appointment?.provider_id,
+      };
+      const res = await confirmAppointment(params);
+      if (res?.status === 200) {
+        initData();
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      showToast("error", error?.message);
+    }
+  };
+
+  const handleOnConfirm = (appointment) => {
     Alert.alert(
       "",
       "Are you sure you want to confirm this appointment?",
@@ -216,56 +307,57 @@ const MyBookings = (props) => {
           text: "No",
           style: "cancel",
         },
-        { text: "Yes", onPress: () => confirmAppointment(id) },
+        { text: "Yes", onPress: () => confirm(appointment) },
       ],
       { cancelable: false }
     );
   };
 
   const onCancel = () => {
-    setVisible(false);
-    setTimeout(() => {
-      props.navigation.navigate("cancelAppointment");
-    }, 500);
+    props.navigation.navigate("cancelAppointment", {
+      selectedItem: selectedItem,
+    });
   };
 
   const onReschedule = () => {
-    setVisible(false);
-    setTimeout(() => {
-      props.navigation.navigate("rescheduleAppointment");
-    }, 500);
+    props.navigation.navigate("rescheduleAppointment", {
+      selectedItem: selectedItem,
+    });
   };
 
   const renderItem = ({ item }) => {
+    const petImage = item?.petdetails?.documents?.find(
+      (it) => it?.documenttype === "photo"
+    );
     let itemBackgroundColor = THEMES.colors.white;
-    if (item.isCanceled) {
+    if (item?.status === STATUSES.cancelled) {
       itemBackgroundColor = "#fee9e9";
-    } else if (item.isConfirmed) {
+    } else if (item?.status === STATUSES.scheduled) {
       itemBackgroundColor = "#f0ffe6";
-    } else if (item.isSeduled) {
+    } else if (item?.status === STATUSES.rescheduled) {
       itemBackgroundColor = "#feefd4";
-    } else if (item.isAttended) {
+    } else if (item?.status === STATUSES.completed) {
       itemBackgroundColor = "#d6f2f5";
     }
     let itemtextColor = THEMES.colors.black;
-    if (item.isCanceled) {
+    if (item?.status === STATUSES.cancelled) {
       itemtextColor = "#F4511E";
-    } else if (item.isConfirmed) {
+    } else if (item?.status === STATUSES.scheduled) {
       itemtextColor = "#6DAE43";
-    } else if (item.isSeduled) {
+    } else if (item?.status === STATUSES.rescheduled) {
       itemtextColor = "#FD9F00";
-    } else if (item.isAttended) {
+    } else if (item?.status === STATUSES.completed) {
       itemtextColor = "#02bac7";
     }
     return (
       <Pressable
         onPress={() => {
-          setSelectedItemId(item.id);
+          setSelectedItem(item);
           props.navigation.navigate("appointmentDetail");
         }}
         style={[styles.flatlistView, { backgroundColor: itemBackgroundColor }]}
       >
-        {!item.isSeduled && !item.isCanceled && !item.isConfirmed ? (
+        {item?.status === STATUSES.pending ? (
           <View style={styles.tagView}>
             <Text style={styles.tagText}>New</Text>
           </View>
@@ -293,7 +385,11 @@ const MyBookings = (props) => {
                     height: 32,
                     borderRadius: 32 / 2,
                   }}
-                  source={require("../../assets/images/profileImg.png")}
+                  source={
+                    petImage?.url
+                      ? getBase64Obj(petImage?.url)
+                      : require("../../assets/images/profileImg.png")
+                  }
                 />
               </View>
               <View
@@ -324,9 +420,12 @@ const MyBookings = (props) => {
               style={{
                 marginHorizontal: moderateScale(8),
                 paddingVertical: moderateScale(5),
+                flex: 1,
               }}
             >
-              <Text style={[styles.name]}>{item.name}</Text>
+              <Text
+                style={[styles.name]}
+              >{`${item?.parentdetails?.name} & ${item?.petdetails?.name}`}</Text>
               <View style={styles.flatListNameRow}>
                 <View
                   style={{
@@ -341,9 +440,9 @@ const MyBookings = (props) => {
                       { paddingRight: moderateScale(3) },
                     ]}
                   >
-                    {item.category}
+                    {item?.servicedetails?.service}
                   </Text>
-                  <Text style={styles.profileTypeText}>|</Text>
+                  {/* <Text style={styles.profileTypeText}>|</Text>
                   <Text
                     style={[
                       styles.profileTypeText,
@@ -352,7 +451,7 @@ const MyBookings = (props) => {
                     ]}
                   >
                     {item.visitType}
-                  </Text>
+                  </Text> */}
                 </View>
               </View>
               <View style={styles.flatListNameRow}>
@@ -368,7 +467,7 @@ const MyBookings = (props) => {
                       },
                     ]}
                   >
-                    {item.visitDay}
+                    {moment(item?.appointment_date)?.format("Do MMM")}
                   </Text>
                   <Text
                     style={[
@@ -393,16 +492,59 @@ const MyBookings = (props) => {
                       },
                     ]}
                   >
-                    {item.time}
+                    {item?.start_time}
                   </Text>
                 </View>
-                {item.isSeduled && (
+                {/* {item.isSeduled && (
                   <Text style={styles.visitTypeText}>26th JUN @ 11:00 AM</Text>
-                )}
+                )} */}
               </View>
             </View>
           </View>
-          <View>
+          {item?.status === STATUSES.pending ? (
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Pressable
+                onPress={() => {
+                  setSelectedItem(item);
+                  setVisible(true);
+                }}
+              >
+                <Cross width={24} height={24} />
+              </Pressable>
+              <Pressable
+                style={{ marginLeft: moderateScale(12) }}
+                onPress={() => handleOnConfirm(item)}
+              >
+                <Check width={24} height={24} />
+              </Pressable>
+            </View>
+          ) : null}
+          {item?.status === STATUSES.cancelled ? (
+            <Text style={[(styles.statusText, { color: itemtextColor })]}>
+              Cancelled
+            </Text>
+          ) : null}
+          {item?.status === STATUSES.scheduled ? (
+            <TouchableOpacity
+              onPress={() => {
+                setSelectedItem(item);
+                setAttendedModal(true);
+              }}
+              style={{
+                borderRadius: 8,
+                borderBottomStartRadius: 0,
+                borderWidth: 1,
+                paddingHorizontal: moderateScale(12),
+                paddingVertical: moderateScale(6),
+                borderColor: "#6DAE43",
+              }}
+            >
+              <Text style={(styles.statusText, { color: itemtextColor })}>
+                Confirm
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          {/* <View>
             {item.isCanceled ? (
               <Text style={[(styles.statusText, { color: itemtextColor })]}>
                 Canceled
@@ -454,7 +596,7 @@ const MyBookings = (props) => {
                 </Pressable>
               </View>
             )}
-          </View>
+          </View> */}
         </View>
       </Pressable>
     );
@@ -463,7 +605,6 @@ const MyBookings = (props) => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
-
       <Header
         title={Strings.appointments}
         showBack
@@ -482,7 +623,7 @@ const MyBookings = (props) => {
           showsVerticalScrollIndicator={false}
           bounces={false}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item?.appointment_id?.toString()}
         />
       </View>
       <FilterModal
@@ -510,7 +651,10 @@ const MyBookings = (props) => {
         />
       </FilterModal>
       <Modal
-        onBackdropPress={() => setVisible(false)}
+        onBackdropPress={() => {
+          setVisible(false);
+          setSelectedItem();
+        }}
         isVisible={isVisible}
         backdropOpacity={0.5}
         style={{
@@ -548,7 +692,10 @@ const MyBookings = (props) => {
             </Text>
             <TouchableOpacity
               hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-              onPress={() => setVisible(false)}
+              onPress={() => {
+                setVisible(false);
+                setSelectedItem();
+              }}
             >
               <BlackCross />
             </TouchableOpacity>
@@ -623,14 +770,18 @@ const MyBookings = (props) => {
             />
 
             <View style={{ paddingTop: moderateScale(20) }}>
-              <Button
-                onPress={() => handleAttended()}
-                title="Attended"
-              ></Button>
+              <Button onPress={handleAttended} title="Attended" />
             </View>
           </View>
         </View>
       </Modal>
+      {loading && (
+        <View style={styles.loadingView}>
+          <View style={styles.loadingBox}>
+            <ActivityIndicator color={THEMES.colors.white} />
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -666,6 +817,7 @@ const styles = StyleSheet.create({
   flatListRow: {
     flexDirection: "row",
     alignItems: "center",
+    flex: 1,
   },
   flatListImgView: {
     width: 55,
@@ -679,7 +831,7 @@ const styles = StyleSheet.create({
   filterModalItem: { color: "black" },
   flatListNameRow: {
     flexDirection: "row",
-    width: "88%",
+    flex: 1,
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -747,6 +899,24 @@ const styles = StyleSheet.create({
     backgroundColor: THEMES.colors.white,
     borderTopStartRadius: 16,
     borderTopRightRadius: 16,
+  },
+  loadingView: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingBox: {
+    width: 70,
+    height: 70,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "transparent",
+    borderRadius: 10,
+    backgroundColor: THEMES.colors.cyan,
+    borderWidth: 1,
   },
 });
 

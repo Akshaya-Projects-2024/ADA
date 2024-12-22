@@ -29,4 +29,9 @@ export const urlList = {
   deleteCommonDocument: "document/delete",
   getProviderTimeSlots: "appointment/gettimeslot",
   createAppointment: "appointment/add",
+  getAllAppointment: "appointment/getall",
+  confirmAppointment: "appointment/accept",
+  cancelAppointment: "appointment/cancel",
+  rescheduleAppointment: "appointment/reschedule",
+  completeAppointment: "appointment/complete",
 };

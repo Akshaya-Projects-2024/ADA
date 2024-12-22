@@ -1,14 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StatusBar, StyleSheet, Keyboard } from "react-native";
+import {
+  View,
+  Text,
+  StatusBar,
+  StyleSheet,
+  Keyboard,
+  ActivityIndicator,
+} from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
 import Header from "../../components/Header";
 import { moderateScale } from "react-native-size-matters";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
+import { showToast } from "../../utils/utils";
+import { cancelAppointment } from "../../redux-store/actions/auth";
 
-const CancelAppointment = () => {
+const CancelAppointment = ({ navigation, route }) => {
+  const selectedItem = route?.params?.selectedItem;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [reason, setReason] = useState("");
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -30,6 +42,31 @@ const CancelAppointment = () => {
     };
   }, []);
 
+  const onCancel = async () => {
+    try {
+      setLoading(true);
+      if (!reason) {
+        throw new Error("Please provide valid reason");
+      } else {
+        const params = {
+          appointment_id: selectedItem?.appointment_id,
+          parent_id: selectedItem?.parentdetails?.userid,
+          provider_id: selectedItem?.provider_id,
+          notes: reason,
+          requestedby: "provider",
+        };
+        const res = await cancelAppointment(params);
+        if (res?.status === 200) {
+          navigation.goBack();
+        }
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      showToast("error", error?.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
@@ -45,16 +82,26 @@ const CancelAppointment = () => {
           label={""}
           placeholderText={Strings.writeAMessage}
           multiline={true}
+          value={reason}
+          onChange={setReason}
         />
         {!isKeyboardVisible && (
           <View style={styles.submitButton}>
             <Button
+              onPress={onCancel}
               title={Strings.cancelAppointment}
               bgColor={THEMES.colors.crimsonRed}
             />
           </View>
         )}
       </View>
+      {loading && (
+        <View style={styles.loadingView}>
+          <View style={styles.loadingBox}>
+            <ActivityIndicator color={THEMES.colors.white} />
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -74,6 +121,24 @@ const styles = StyleSheet.create({
     width: "100%",
     alignSelf: "center",
     marginBottom: moderateScale(20),
+  },
+  loadingView: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingBox: {
+    width: 70,
+    height: 70,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "transparent",
+    borderRadius: 10,
+    backgroundColor: THEMES.colors.cyan,
+    borderWidth: 1,
   },
 });
 

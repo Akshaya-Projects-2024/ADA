@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
@@ -17,15 +18,19 @@ import Button from "../../components/Button";
 import Calendars from "../../assets/svg/calendar.svg";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import moment from "moment";
+import { rescheduleAppointment } from "../../redux-store/actions/auth";
+import { showToast } from "../../utils/utils";
 
-const RescheduleAppointment = () => {
+const RescheduleAppointment = ({ navigation, route }) => {
+  const selectedItem = route?.params?.selectedItem;
   const [isAM, setIsAM] = useState(true);
-
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isDateVisible, setDateVisibility] = useState(false);
   const [time, setTime] = useState();
   const [date, selectedDate] = useState();
+  const [loading, setLoading] = useState(false);
+  const [reason, setReason] = useState("");
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -51,10 +56,9 @@ const RescheduleAppointment = () => {
     setDatePickerVisibility(false);
   };
 
-  const handleConfirm = (date) => {
-    const formattedTime = moment(date).format("HH:mm");
-    const formattedPeriod = moment(date).format("A");
-
+  const handleConfirm = (pickedTime) => {
+    const formattedTime = moment(pickedTime).format("HH:mm");
+    const formattedPeriod = moment(pickedTime).format("A");
     setTime(formattedTime);
     if (formattedPeriod == "PM") {
       setIsAM(false);
@@ -68,12 +72,43 @@ const RescheduleAppointment = () => {
     setDateVisibility(false);
   };
 
-  const handleDateConfirm = (date) => {
-    const formattedDate = moment(date).format("DD/MM/YYYY");
+  const handleDateConfirm = (pickedDate) => {
+    const formattedDate = moment(pickedDate).format("DD/MM/YYYY");
     selectedDate(formattedDate);
     hideDatePickerCancel();
   };
-
+  const onSubmit = async () => {
+    try {
+      setLoading(true);
+      if (!date) {
+        throw new Error("Please select valid date");
+      } else if (!time) {
+        throw new Error("Please provide valid time");
+      } else if (!reason) {
+        throw new Error("Please provide valid reason");
+      } else {
+        const params = {
+          appointment_id: selectedItem?.appointment_id,
+          parent_id: selectedItem?.parentdetails?.userid,
+          provider_id: selectedItem?.provider_id,
+          appointment_date: moment(date, "DD/MM/YYYY").format("YYYY-MM-DD"),
+          start_time: time,
+          end_time: moment(time, "HH:mm").add(1, "hours").format("HH:mm"),
+          status: "rescheduled",
+          notes: reason,
+          requestedby: "provider",
+        };
+        const res = await rescheduleAppointment(params);
+        if (res?.status === 200) {
+          navigation.goBack();
+        }
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      showToast("error", error?.message);
+    }
+  };
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
@@ -169,12 +204,14 @@ const RescheduleAppointment = () => {
             label={""}
             placeholderText={Strings.writeAMessageForReschedule}
             multiline={true}
+            value={reason}
+            onChange={setReason}
           />
         </View>
       </View>
       {!isKeyboardVisible && (
         <View style={styles.submitButton}>
-          <Button title={Strings.sendRequest} />
+          <Button title={Strings.sendRequest} onPress={onSubmit} />
         </View>
       )}
       <DateTimePicker
@@ -190,6 +227,13 @@ const RescheduleAppointment = () => {
         onConfirm={handleDateConfirm}
         onCancel={hideDatePickerCancel}
       />
+      {loading && (
+        <View style={styles.loadingView}>
+          <View style={styles.loadingBox}>
+            <ActivityIndicator color={THEMES.colors.white} />
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -313,6 +357,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     height: 40,
     borderWidth: 0.8,
+  },
+  loadingView: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingBox: {
+    width: 70,
+    height: 70,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "transparent",
+    borderRadius: 10,
+    backgroundColor: THEMES.colors.cyan,
+    borderWidth: 1,
   },
 });
 

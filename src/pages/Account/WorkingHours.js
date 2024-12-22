@@ -71,6 +71,7 @@ const WorkingHours = (props) => {
         }
       }
       const outputObj = output.find((it) => it?.value === element?.day);
+      const outputIndex = output.findIndex((it) => it?.value === element?.day);
       if (outputObj) {
         outputObj.selected = true;
         if (!element?.isfullday) {
@@ -85,7 +86,7 @@ const WorkingHours = (props) => {
           outputObj.shift1.start = element?.start;
           outputObj.shift1.end = element?.close;
         }
-        output[index] = outputObj;
+        output[outputIndex] = outputObj;
       }
     }
     setTimes(output);

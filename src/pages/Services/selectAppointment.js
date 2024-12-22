@@ -290,8 +290,14 @@ const SelectAppointment = ({ navigation, route }) => {
           parent_id: userId,
           provider_id: selectedProvider?.profile?.providerBusiness?.userid,
           service_code: Number(selectedService?.code),
-          start_date: moment(startDate).format("YYYY-MM-DD"),
-          end_date: moment(endDate).format("YYYY-MM-DD"),
+          start_date:
+            sessionSelection === SESSION_TYPE.oneTime
+              ? moment(selectedDate).format("YYYY-MM-DD")
+              : moment(startDate).format("YYYY-MM-DD"),
+          end_date:
+            sessionSelection === SESSION_TYPE.oneTime
+              ? moment(selectedDate).format("YYYY-MM-DD")
+              : moment(endDate).format("YYYY-MM-DD"),
           start_time: selectedSlot?.start_time,
           end_time: selectedSlot?.end_time,
           status: "scheduled", //HARDCODE
@@ -527,7 +533,8 @@ const SelectAppointment = ({ navigation, route }) => {
                     key={index}
                     style={[
                       styles.timeSlot,
-                      slot?.isbooked && styles.disabledSlot,
+                      !slot?.isavailable && styles.disabledSlot,
+                      slot?.isbooked && styles.bookedSlot,
                       selectedSlot?.start_time === slot?.start_time &&
                         !slot?.isbooked &&
                         styles.selectedSlotStyle,
@@ -539,13 +546,12 @@ const SelectAppointment = ({ navigation, route }) => {
                       style={[
                         slot?.isbooked && styles.disabledText,
                         {
-                          color: slot?.isbooked
-                            ? "#000"
-                            : selectedSlot?.start_time === slot?.start_time
-                            ? "#fff"
-                            : slot?.isavailable
-                            ? "#000"
-                            : "#fff",
+                          color:
+                            selectedSlot?.start_time === slot?.start_time
+                              ? "#fff"
+                              : slot?.isavailable || slot?.isbooked
+                              ? "#000"
+                              : "#fff",
                           fontSize: THEMES.fonts.font12,
                           fontFamily: THEMES.fontFamily.medium,
                         },
@@ -584,7 +590,8 @@ const SelectAppointment = ({ navigation, route }) => {
                     key={index}
                     style={[
                       styles.timeSlot,
-                      slot?.isbooked && styles.disabledSlot,
+                      !slot?.isavailable && styles.disabledSlot,
+                      slot?.isbooked && styles.bookedSlot,
                       selectedSlot?.start_time === slot?.start_time &&
                         !slot?.isbooked &&
                         styles.selectedSlotStyle,
@@ -596,13 +603,12 @@ const SelectAppointment = ({ navigation, route }) => {
                       style={[
                         slot?.isbooked && styles.disabledText,
                         {
-                          color: slot?.isbooked
-                            ? "#000"
-                            : selectedSlot?.start_time === slot?.start_time
-                            ? "#fff"
-                            : slot?.isavailable
-                            ? "#000"
-                            : "#fff",
+                          color:
+                            selectedSlot?.start_time === slot?.start_time
+                              ? "#fff"
+                              : slot?.isavailable || slot?.isbooked
+                              ? "#000"
+                              : "#fff",
                           fontSize: THEMES.fonts.font12,
                           fontFamily: THEMES.fontFamily.medium,
                         },
@@ -639,7 +645,8 @@ const SelectAppointment = ({ navigation, route }) => {
                     key={index}
                     style={[
                       styles.timeSlot,
-                      slot?.isbooked && styles.disabledSlot,
+                      !slot?.isavailable && styles.disabledSlot,
+                      slot?.isbooked && styles.bookedSlot,
                       selectedSlot?.start_time === slot?.start_time &&
                         !slot?.isbooked &&
                         styles.selectedSlotStyle,
@@ -651,13 +658,12 @@ const SelectAppointment = ({ navigation, route }) => {
                       style={[
                         slot?.isbooked && styles.disabledText,
                         {
-                          color: slot?.isbooked
-                            ? "#000"
-                            : selectedSlot?.start_time === slot?.start_time
-                            ? "#fff"
-                            : slot?.isavailable
-                            ? "#000"
-                            : "#fff",
+                          color:
+                            selectedSlot?.start_time === slot?.start_time
+                              ? "#fff"
+                              : slot?.isavailable || slot?.isbooked
+                              ? "#000"
+                              : "#fff",
                           fontSize: THEMES.fonts.font12,
                           fontFamily: THEMES.fontFamily.medium,
                         },
@@ -882,8 +888,12 @@ const styles = StyleSheet.create({
     backgroundColor: THEMES.colors.cyan,
   },
   disabledSlot: {
-    backgroundColor: "#f0f0f0", // Gray background for disabled slots
-    borderColor: "#d0d0d0",
+    backgroundColor: "#AAAAAA", // Gray background for disabled slots
+    borderColor: "#AAAAAA",
+  },
+  bookedSlot: {
+    backgroundColor: THEMES.colors.bookedSlot,
+    borderColor: THEMES.colors.outrageousOrange,
   },
   selectedDate: {
     backgroundColor: THEMES.colors.cyan, // Highlight for selected date
