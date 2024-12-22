@@ -23,6 +23,7 @@ const Data = ["Vaccinations", "Document 1", "Document 2", "Document 3"];
 
 const ServiceDetail = ({ navigation, route }) => {
   const selectedProvider = route?.params?.selectedProvider;
+  const selectedService = route?.params?.selectedService;
   return (
     <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
       <StatusBar backgroundColor={THEMES.colors.white} />
@@ -371,6 +372,7 @@ const ServiceDetail = ({ navigation, route }) => {
                 onPress={() =>
                   navigation.navigate("selectAppointment", {
                     selectedProvider: selectedProvider,
+                    selectedService: selectedService,
                   })
                 }
               />

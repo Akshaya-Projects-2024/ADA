@@ -79,9 +79,7 @@ const MediaLink = (props) => {
         website: weblink,
         ...(MediaLinks?.id ? { id: MediaLinks?.id } : {}),
       };
-      console.log("postData", postData);
       const res = await saveMediaLinks(postData);
-      console.log("res", res.status);
       if (res?.status == 200) {
         showToast("success", "You have been registered successfully!!!");
         props.navigation.reset({

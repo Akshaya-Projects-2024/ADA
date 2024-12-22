@@ -28,5 +28,5 @@ export const urlList = {
   uploadCommonDocument: "document/upload",
   deleteCommonDocument: "document/delete",
   getProviderTimeSlots: "appointment/gettimeslot",
-  createAppointment: "appointment/accept",
+  createAppointment: "appointment/add",
 };

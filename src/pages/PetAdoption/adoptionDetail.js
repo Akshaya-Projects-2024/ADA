@@ -14,7 +14,6 @@ import Back from "../../assets/svg/back.svg";
 
 const AdoptionDetail = (props) => {
   const selectedAdotpionData = props.route.params.selectedData;
-  console.log("selectedAdotpionData",selectedAdotpionData)
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -91,7 +90,7 @@ const AdoptionDetail = (props) => {
                 <View style={styles.cardView}>
                   <View style={styles.imgView}>
                     <Image
-                      source={{ uri: selectedAdotpionData?.parentphoto}}
+                      source={{ uri: selectedAdotpionData?.parentphoto }}
                       style={styles.img}
                     />
                   </View>

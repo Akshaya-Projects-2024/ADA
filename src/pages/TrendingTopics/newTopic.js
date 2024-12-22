@@ -72,7 +72,6 @@ const NewTopic = () => {
   }, []);
 
   const onSubmit = async () => {
-    console.log("profileData",profileData)
     if (!title) {
       showToast("error", "Please enter title for topic");
     } else if (!photo) {
@@ -88,10 +87,11 @@ const NewTopic = () => {
           Blog: blog,
           userId: userId,
           cover: photo?.fileData,
-          Author: profileData?.providerBusiness?.name || profileData?.parentContact?.name,
+          Author:
+            profileData?.providerBusiness?.name ||
+            profileData?.parentContact?.name,
         };
         let res = await createTopic(obj);
-        console.log("res", res);
         if (res?.status == 200) {
           showToast("success", "Topic created successfully!!!");
           goBack();

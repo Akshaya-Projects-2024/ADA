@@ -10,7 +10,6 @@ const getCurrentLocation = () => {
       if (locationPermission) {
         Geolocation.getCurrentPosition(
           (info) => {
-            console.log(info);
             res(info);
           },
           (err) => {

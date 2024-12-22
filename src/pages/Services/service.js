@@ -89,7 +89,10 @@ const Service = ({ navigation, route }) => {
     return (
       <TouchableOpacity
         onPress={() =>
-          navigation.navigate("serviceDetail", { selectedProvider: item })
+          navigation.navigate("serviceDetail", {
+            selectedProvider: item,
+            selectedService: selectedService,
+          })
         }
         style={{
           borderWidth: 1,
@@ -203,7 +206,13 @@ const Service = ({ navigation, route }) => {
               }}
             >
               {`₹ ${
-                foundService?.sessioncharges || foundService?.monthcharges || 0
+                foundService?.sessioncharges &&
+                foundService?.sessioncharges !== "0.00"
+                  ? foundService?.sessioncharges
+                  : foundService?.monthcharges &&
+                    foundService?.monthcharges !== "0.00"
+                  ? foundService?.monthcharges
+                  : "0.00"
               }`}
             </Text>
           </View>

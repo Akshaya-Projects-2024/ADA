@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
   StatusBar,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
@@ -21,9 +22,13 @@ import Modal from "react-native-modal";
 import InputField from "../../components/InputField";
 import Strings from "../../constants/strings";
 import { showToast, validArray } from "../../utils/utils";
-import { getProviderSlots } from "../../redux-store/actions/auth";
+import {
+  createAppointment,
+  getProviderSlots,
+} from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { useSelector } from "react-redux";
 
 const afterTimeSlots = [
   { time: "09:00", disabled: false, enabled: true },
@@ -148,20 +153,58 @@ const SESSION_TYPE = { oneTime: "one_time", recursive: "recursive" };
 
 const SelectAppointment = ({ navigation, route }) => {
   const selectedProvider = route?.params?.selectedProvider;
+  const selectedService = route?.params?.selectedService;
 
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [currentDate, setCurrentDate] = useState(moment());
   const [weekDates, setWeekDates] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(moment());
-  const [startDate, setStartDate] = useState();
-  const [endDate, setEndDate] = useState();
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [sessionSelection, setSessionSelection] = useState(
     SESSION_TYPE.oneTime
   );
   const [startDateVisible, setStartDateVisible] = useState(false);
   const [endDateVisible, setEndDateVisible] = useState(false);
+  const [timeSlots, setTimeSlots] = useState({});
+  const [loading, setLoading] = useState(false);
+  const profile = useSelector((state) => state?.commonReducer);
+
+  const memorizedSlots = useMemo(() => {
+    if (selectedDate) {
+      const slots = timeSlots[selectedDate.format("YYYY-MM-DD")];
+      const morningSlots = [];
+      const afternoonSlots = [];
+      const eveningSlots = [];
+      for (let index = 0; index < slots.length; index++) {
+        const element = slots[index];
+        const startArray = element?.start_time?.split(":");
+        if (validArray(startArray)) {
+          const start = startArray[0];
+          if (start >= "00" && start <= "11") {
+            morningSlots.push(element);
+          }
+          if (start >= "12" && start <= "13") {
+            afternoonSlots.push(element);
+          }
+          if (start >= "14") {
+            eveningSlots.push(element);
+          }
+        }
+      }
+      return {
+        morning: morningSlots,
+        afternoon: afternoonSlots,
+        evening: eveningSlots,
+      };
+    }
+    return {
+      morning: [],
+      afternoon: [],
+      evening: [],
+    };
+  }, [selectedDate, timeSlots]);
 
   useEffect(() => {
     getDates();
@@ -174,8 +217,8 @@ const SelectAppointment = ({ navigation, route }) => {
   }, [startDate, endDate, getSessionData]);
 
   const selectTimeSlot = (time) => {
-    if (!time.disabled) {
-      setSelectedSlot(time.time);
+    if (time.isavailable) {
+      setSelectedSlot(time);
     }
   };
 
@@ -193,6 +236,7 @@ const SelectAppointment = ({ navigation, route }) => {
 
   const getSessionData = useCallback(async () => {
     try {
+      setLoading(true);
       const userId = await decryptService("userId");
       const params = {
         userid: userId,
@@ -200,28 +244,74 @@ const SelectAppointment = ({ navigation, route }) => {
         startdate: moment(startDate)?.format("YYYY-MM-DD"),
         enddate: moment(endDate)?.format("YYYY-MM-DD"),
       };
-      console.log("🚀 ~ getSessionData ~ params:", params);
       const res = await getProviderSlots(params);
       if (res?.status === 200) {
-        console.log("🚀 ~ getSessionData ~ res:", res);
+        const data = res?.data?.data;
+        const datesData = Object.keys(data);
+        if (validArray(datesData)) {
+          const weeksData = [];
+          for (let index = 0; index < datesData.length; index++) {
+            const element = datesData[index];
+            weeksData.push(moment(element));
+          }
+          setWeekDates(weeksData);
+        }
+        setTimeSlots(data);
       }
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       showToast("error", error?.message);
     }
   }, [endDate, selectedProvider?.profile?.providerBusiness?.userid, startDate]);
 
-  const renderCategory = ({ item }) => {
-    const isSelected = selectedCategory === item;
-    return (
-      <TouchableOpacity
-        style={[styles.categoryButton, isSelected && styles.selectedButton]}
-        onPress={() => setSelectedCategory(item)}
-      >
-        <Text style={[styles.categoryText, isSelected && styles.selectedText]}>
-          {item}
-        </Text>
-      </TouchableOpacity>
-    );
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      if (!selectedProvider?.profile?.providerBusiness?.userid) {
+        throw new Error("Invalid Provider! Please select valid provider");
+      } else if (!selectedService?.code) {
+        throw new Error("Invalid Service! Please select valid service");
+      } else if (!selectedDate) {
+        throw new Error("Please Select valid date");
+      } else if (!startDate) {
+        throw new Error("Please Select valid start date");
+      } else if (!endDate) {
+        throw new Error("Please Select valid end date");
+      } else if (!selectedSlot?.start_time) {
+        throw new Error("Please Select valid time slot");
+      } else if (!selectedSlot?.end_time) {
+        throw new Error("Please Select valid time slot");
+      } else if (!profile?.parentProfie?.petDetails[0]?.id) {
+        throw new Error("No pet found in your profile");
+      } else {
+        const userId = await decryptService("userId");
+        const params = {
+          parent_id: userId,
+          provider_id: selectedProvider?.profile?.providerBusiness?.userid,
+          service_code: Number(selectedService?.code),
+          start_date: moment(startDate).format("YYYY-MM-DD"),
+          end_date: moment(endDate).format("YYYY-MM-DD"),
+          start_time: selectedSlot?.start_time,
+          end_time: selectedSlot?.end_time,
+          status: "scheduled", //HARDCODE
+          notes: "First appointment of the day", //HARDCODE
+          petid: profile?.parentProfie?.petDetails[0]?.id,
+          requestedby: "parent", //HARDCODE
+        };
+        const res = await createAppointment(params);
+        if (res?.status === 200) {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "petParentAppStack" }],
+          });
+        }
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      showToast("error", error?.message);
+    }
   };
 
   const handleStartDateConfirm = (date) => {
@@ -244,18 +334,37 @@ const SelectAppointment = ({ navigation, route }) => {
 
   const handleDatePress = (date) => {
     setSelectedDate(date);
+    setSelectedSlot(null);
   };
 
   const handleSwitch = () => {
-    if (sessionSelection === SESSION_TYPE.oneTime) {
-      setStartDate();
-      setEndDate();
-    }
+    // if (sessionSelection === SESSION_TYPE.oneTime) {
+    setStartDate();
+    setEndDate();
+    setSelectedDate(null);
+    setSelectedSlot(null);
+    setTimeSlots();
+    setWeekDates();
+    // }
     setSessionSelection((prevData) => {
       return prevData === SESSION_TYPE.oneTime
         ? SESSION_TYPE.recursive
         : SESSION_TYPE.oneTime;
     });
+  };
+
+  const renderCategory = ({ item }) => {
+    const isSelected = selectedCategory === item;
+    return (
+      <TouchableOpacity
+        style={[styles.categoryButton, isSelected && styles.selectedButton]}
+        onPress={() => setSelectedCategory(item)}
+      >
+        <Text style={[styles.categoryText, isSelected && styles.selectedText]}>
+          {item}
+        </Text>
+      </TouchableOpacity>
+    );
   };
 
   return (
@@ -268,7 +377,7 @@ const SelectAppointment = ({ navigation, route }) => {
         bgColor="transparent"
       />
       <ScrollView
-        style={{ flex: 1 }}
+        style={styles.flex}
         bounces={false}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
@@ -308,20 +417,38 @@ const SelectAppointment = ({ navigation, route }) => {
         </Pressable>
         {sessionSelection === SESSION_TYPE.recursive ? (
           <View style={styles.pickerContainer}>
-            <InputField
-              label={Strings.startDate}
-              placeholderText={"--"}
-              value={startDate ? moment(startDate)?.format("YYYY-MM-DD") : null}
-              type="small"
-              inputStyle={styles.startDateInput}
-            />
-            <InputField
-              label={Strings.endDate}
-              placeholderText={"--"}
-              value={endDate ? moment(endDate)?.format("YYYY-MM-DD") : null}
-              type="small"
-              inputStyle={styles.endDateInput}
-            />
+            <Pressable
+              style={styles.flex}
+              onPress={() => {
+                setStartDateVisible(true);
+              }}
+            >
+              <InputField
+                label={Strings.startDate}
+                placeholderText={"--"}
+                value={
+                  startDate ? moment(startDate)?.format("YYYY-MM-DD") : null
+                }
+                type="small"
+                inputStyle={styles.startDateInput}
+                editable={false}
+              />
+            </Pressable>
+            <Pressable
+              style={styles.flex}
+              onPress={() => {
+                setEndDateVisible(true);
+              }}
+            >
+              <InputField
+                label={Strings.endDate}
+                placeholderText={"--"}
+                value={endDate ? moment(endDate)?.format("YYYY-MM-DD") : null}
+                type="small"
+                inputStyle={styles.endDateInput}
+                editable={false}
+              />
+            </Pressable>
           </View>
         ) : null}
         {validArray(weekDates) ? (
@@ -339,7 +466,7 @@ const SelectAppointment = ({ navigation, route }) => {
               contentContainerStyle={styles.scrollContainer}
             >
               {weekDates.map((date, index) => {
-                const isToday = date.isSame(currentDate, "day");
+                const isToday = date.isSame(moment(), "day");
                 const isSelected = date.isSame(selectedDate, "day");
                 return (
                   <TouchableOpacity
@@ -376,111 +503,173 @@ const SelectAppointment = ({ navigation, route }) => {
           </View>
         ) : null}
         <>
-          <View
-            style={{
-              paddingTop: moderateScale(20),
-              paddingHorizontal: moderateScale(16),
-            }}
-          >
-            <Text
+          {validArray(memorizedSlots?.morning) ? (
+            <View
               style={{
-                color: THEMES.colors.black,
-                fontFamily: THEMES.fontFamily.semiBold,
-                fontSize: THEMES.fonts.font14,
-                paddingBottom: moderateScale(5),
-                paddingHorizontal: moderateScale(5),
+                paddingTop: moderateScale(20),
+                paddingHorizontal: moderateScale(16),
               }}
             >
-              Morning
-            </Text>
-
-            <View style={styles.timeSlotRow}>
-              {afterTimeSlots.map((slot, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.timeSlot,
-                    slot.disabled && styles.disabledSlot,
-                    selectedSlot === slot.time &&
-                      !slot.disabled &&
-                      styles.selectedSlotStyle,
-                  ]}
-                  onPress={() => selectTimeSlot(slot)}
-                  disabled={slot.disabled} // Disable if the slot is marked as disabled
-                >
-                  <Text
+              <Text
+                style={{
+                  color: THEMES.colors.black,
+                  fontFamily: THEMES.fontFamily.semiBold,
+                  fontSize: THEMES.fonts.font14,
+                  paddingBottom: moderateScale(5),
+                  paddingHorizontal: moderateScale(5),
+                }}
+              >
+                Morning
+              </Text>
+              <View style={styles.timeSlotRow}>
+                {memorizedSlots?.morning?.map((slot, index) => (
+                  <TouchableOpacity
+                    key={index}
                     style={[
-                      slot.disabled && styles.disabledText,
-                      {
-                        color: slot.disabled
-                          ? "#000"
-                          : slot.enabled
-                          ? "#000"
-                          : "#fff",
-                        fontSize: THEMES.fonts.font12,
-                        fontFamily: THEMES.fontFamily.medium,
-                      },
+                      styles.timeSlot,
+                      slot?.isbooked && styles.disabledSlot,
+                      selectedSlot?.start_time === slot?.start_time &&
+                        !slot?.isbooked &&
+                        styles.selectedSlotStyle,
                     ]}
+                    onPress={() => selectTimeSlot(slot)}
+                    disabled={slot?.isbooked} // Disable if the slot is marked as disabled
                   >
-                    {slot.time}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+                    <Text
+                      style={[
+                        slot?.isbooked && styles.disabledText,
+                        {
+                          color: slot?.isbooked
+                            ? "#000"
+                            : selectedSlot?.start_time === slot?.start_time
+                            ? "#fff"
+                            : slot?.isavailable
+                            ? "#000"
+                            : "#fff",
+                          fontSize: THEMES.fonts.font12,
+                          fontFamily: THEMES.fontFamily.medium,
+                        },
+                      ]}
+                    >
+                      {slot?.start_time}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
-          </View>
+          ) : null}
 
-          <View
-            style={{
-              paddingTop: moderateScale(15),
-              paddingHorizontal: moderateScale(16),
-            }}
-          >
-            <Text
+          {validArray(memorizedSlots?.afternoon) ? (
+            <View
               style={{
-                color: THEMES.colors.black,
-                fontFamily: THEMES.fontFamily.semiBold,
-                fontSize: THEMES.fonts.font14,
-                paddingBottom: moderateScale(5),
-                paddingHorizontal: moderateScale(5),
+                paddingTop: moderateScale(20),
+                paddingHorizontal: moderateScale(16),
               }}
             >
-              Afternoon
-            </Text>
+              <Text
+                style={{
+                  color: THEMES.colors.black,
+                  fontFamily: THEMES.fontFamily.semiBold,
+                  fontSize: THEMES.fonts.font14,
+                  paddingBottom: moderateScale(5),
+                  paddingHorizontal: moderateScale(5),
+                }}
+              >
+                Afternoon
+              </Text>
 
-            <View style={styles.timeSlotRow}>
-              {afterTimeSlots.map((slot, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.timeSlot,
-                    slot.disabled && styles.disabledSlot,
-                    selectedSlot === slot.time &&
-                      !slot.disabled &&
-                      styles.selectedSlotStyle,
-                  ]}
-                  onPress={() => selectTimeSlot(slot)}
-                  disabled={slot.disabled} // Disable if the slot is marked as disabled
-                >
-                  <Text
+              <View style={styles.timeSlotRow}>
+                {memorizedSlots?.afternoon?.map((slot, index) => (
+                  <TouchableOpacity
+                    key={index}
                     style={[
-                      slot.disabled && styles.disabledText,
-                      {
-                        color: slot.disabled
-                          ? "#000"
-                          : slot.enabled
-                          ? "#000"
-                          : "#fff",
-                        fontSize: THEMES.fonts.font12,
-                        fontFamily: THEMES.fontFamily.medium,
-                      },
+                      styles.timeSlot,
+                      slot?.isbooked && styles.disabledSlot,
+                      selectedSlot?.start_time === slot?.start_time &&
+                        !slot?.isbooked &&
+                        styles.selectedSlotStyle,
                     ]}
+                    onPress={() => selectTimeSlot(slot)}
+                    disabled={slot?.isbooked} // Disable if the slot is marked as disabled
                   >
-                    {slot.time}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+                    <Text
+                      style={[
+                        slot?.isbooked && styles.disabledText,
+                        {
+                          color: slot?.isbooked
+                            ? "#000"
+                            : selectedSlot?.start_time === slot?.start_time
+                            ? "#fff"
+                            : slot?.isavailable
+                            ? "#000"
+                            : "#fff",
+                          fontSize: THEMES.fonts.font12,
+                          fontFamily: THEMES.fontFamily.medium,
+                        },
+                      ]}
+                    >
+                      {slot?.start_time}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
-          </View>
+          ) : null}
+          {validArray(memorizedSlots?.evening) ? (
+            <View
+              style={{
+                paddingTop: moderateScale(20),
+                paddingHorizontal: moderateScale(16),
+              }}
+            >
+              <Text
+                style={{
+                  color: THEMES.colors.black,
+                  fontFamily: THEMES.fontFamily.semiBold,
+                  fontSize: THEMES.fonts.font14,
+                  paddingBottom: moderateScale(5),
+                  paddingHorizontal: moderateScale(5),
+                }}
+              >
+                Evening
+              </Text>
+              <View style={styles.timeSlotRow}>
+                {memorizedSlots.evening.map((slot, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.timeSlot,
+                      slot?.isbooked && styles.disabledSlot,
+                      selectedSlot?.start_time === slot?.start_time &&
+                        !slot?.isbooked &&
+                        styles.selectedSlotStyle,
+                    ]}
+                    onPress={() => selectTimeSlot(slot)}
+                    disabled={slot?.isbooked} // Disable if the slot is marked as disabled
+                  >
+                    <Text
+                      style={[
+                        slot?.isbooked && styles.disabledText,
+                        {
+                          color: slot?.isbooked
+                            ? "#000"
+                            : selectedSlot?.start_time === slot?.start_time
+                            ? "#fff"
+                            : slot?.isavailable
+                            ? "#000"
+                            : "#fff",
+                          fontSize: THEMES.fonts.font12,
+                          fontFamily: THEMES.fontFamily.medium,
+                        },
+                      ]}
+                    >
+                      {slot?.start_time}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          ) : null}
         </>
         <View
           style={{
@@ -492,7 +681,7 @@ const SelectAppointment = ({ navigation, route }) => {
           }}
         >
           <TouchableOpacity
-            onPress={() => setModalVisible(true)}
+            onPress={null}
             style={{
               borderWidth: 1,
               borderRadius: 8,
@@ -507,7 +696,7 @@ const SelectAppointment = ({ navigation, route }) => {
             <Chat />
           </TouchableOpacity>
           <View style={{ width: "80%" }}>
-            <Button title="Confirm" />
+            <Button title="Confirm" onPress={handleSubmit} />
           </View>
         </View>
       </ScrollView>
@@ -571,13 +760,22 @@ const SelectAppointment = ({ navigation, route }) => {
         mode="date"
         onConfirm={handleStartDateConfirm}
         onCancel={hideStartDatePicker}
+        minimumDate={new Date()}
       />
       <DateTimePickerModal
         isVisible={endDateVisible}
         mode="date"
         onConfirm={handleEndDateConfirm}
         onCancel={hideEndDatePicker}
+        minimumDate={startDate || new Date()}
       />
+      {loading && (
+        <View style={styles.loadingView}>
+          <View style={styles.loadingBox}>
+            <ActivityIndicator color={THEMES.colors.white} />
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -586,6 +784,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: THEMES.colors.bgColor,
+  },
+  flex: {
+    flex: 1,
   },
   categoryText: {
     color: "#707070",
@@ -715,6 +916,24 @@ const styles = StyleSheet.create({
     flex: 1,
     marginEnd: moderateScale(16),
     marginStart: moderateScale(8),
+  },
+  loadingView: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingBox: {
+    width: 70,
+    height: 70,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "transparent",
+    borderRadius: 10,
+    backgroundColor: THEMES.colors.cyan,
+    borderWidth: 1,
   },
 });
 

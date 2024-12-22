@@ -43,7 +43,6 @@ const PaymentsSubscription = (props) => {
   const profile = useSelector((state) => state?.commonReducer);
 
   useEffect(() => {
-    
     initData();
   }, [initData]);
 
@@ -115,12 +114,10 @@ const PaymentsSubscription = (props) => {
   const initData = useCallback(async () => {
     try {
       const token = await decryptService("accessToken");
-      console.log("token", token)
       const obj = {
         userId: await decryptService("userId"),
         usertype: "provider", // parent or provider
       };
-      console.log(obj);
       const res = await getSubscriptionPlan(obj);
       if (res.status === 200) {
         const outputArray = res?.data?.data;
