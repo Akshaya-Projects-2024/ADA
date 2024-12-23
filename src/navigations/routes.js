@@ -19,6 +19,7 @@ import WriteUs from "../pages/CommonPages/WriteUs";
 import Feedback from "../pages/CommonPages/feedback";
 import MyBookings from "../pages/Account/myBookings";
 import SelectAppointment from "../pages/Services/selectAppointment";
+import AppointmentDetail from "../pages/Appointment/appointmentDetail";
 
 const Stack = createStackNavigator();
 
@@ -86,6 +87,11 @@ const Routes = (props) => {
         <Stack.Screen
           name="myBookings"
           component={MyBookings}
+          options={navOptionHandler}
+        />
+        <Stack.Screen
+          name="appointmentDetail"
+          component={AppointmentDetail}
           options={navOptionHandler}
         />
         <Stack.Screen

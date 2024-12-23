@@ -137,7 +137,8 @@ const STATUSES = {
   cancelled: "cancelled",
   rescheduled: "rescheduled",
 };
-const MyBookings = (props) => {
+const MyBookings = ({ navigation, route }) => {
+  const routeFrom = route?.params?.route;
   const focus = useIsFocused();
   const menuRef = useRef(null);
   const [data, setData] = useState([]);
@@ -193,7 +194,8 @@ const MyBookings = (props) => {
       const userId = await decryptService("userId");
       const params = {
         userid: userId,
-        usertype: "provider", //parent
+        usertype:
+          routeFrom && routeFrom === "parentAccount" ? "parent" : "provider", //parent
       };
       const res = await getAllAppointment(params);
       if (res?.status === 200) {
@@ -249,6 +251,10 @@ const MyBookings = (props) => {
         };
         const res = await completeAppointment(params);
         if (res?.status === 200) {
+          setVisible(false);
+          setAttendedModal(false);
+          setOtpInput("");
+          setSelectedItem();
           initData();
         }
       }
@@ -314,13 +320,13 @@ const MyBookings = (props) => {
   };
 
   const onCancel = () => {
-    props.navigation.navigate("cancelAppointment", {
+    navigation.navigate("cancelAppointment", {
       selectedItem: selectedItem,
     });
   };
 
   const onReschedule = () => {
-    props.navigation.navigate("rescheduleAppointment", {
+    navigation.navigate("rescheduleAppointment", {
       selectedItem: selectedItem,
     });
   };
@@ -353,7 +359,7 @@ const MyBookings = (props) => {
       <Pressable
         onPress={() => {
           setSelectedItem(item);
-          props.navigation.navigate("appointmentDetail");
+          navigation.navigate("appointmentDetail");
         }}
         style={[styles.flatlistView, { backgroundColor: itemBackgroundColor }]}
       >
@@ -499,9 +505,13 @@ const MyBookings = (props) => {
                   <Text style={styles.visitTypeText}>26th JUN @ 11:00 AM</Text>
                 )} */}
               </View>
+              {routeFrom && routeFrom === "parentAccount" && item?.otp ? (
+                <Text style={styles.otp}>{`OTP: ${item?.otp}`}</Text>
+              ) : null}
             </View>
           </View>
-          {item?.status === STATUSES.pending ? (
+          {routeFrom && routeFrom === "parentAccount" ? null : item?.status ===
+            STATUSES.pending ? (
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Pressable
                 onPress={() => {
@@ -524,7 +534,8 @@ const MyBookings = (props) => {
               Cancelled
             </Text>
           ) : null}
-          {item?.status === STATUSES.scheduled ? (
+          {routeFrom && routeFrom === "parentAccount" ? null : item?.status ===
+            STATUSES.scheduled ? (
             <TouchableOpacity
               onPress={() => {
                 setSelectedItem(item);
@@ -543,6 +554,23 @@ const MyBookings = (props) => {
                 Confirm
               </Text>
             </TouchableOpacity>
+          ) : null}
+          {item?.status === STATUSES.rescheduled ? (
+            <Text
+              style={
+                (styles.statusText,
+                {
+                  color: itemtextColor,
+                })
+              }
+            >
+              Rescheduled
+            </Text>
+          ) : null}
+          {item?.status === STATUSES.completed ? (
+            <Text style={(styles.statusText, { color: itemtextColor })}>
+              Attended
+            </Text>
           ) : null}
           {/* <View>
             {item.isCanceled ? (
@@ -841,6 +869,11 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.black,
+    fontFamily: THEMES.fontFamily.semiBold,
+  },
+  otp: {
+    fontSize: THEMES.fonts.font12,
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.semiBold,
   },
