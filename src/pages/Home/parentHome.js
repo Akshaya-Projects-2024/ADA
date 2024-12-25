@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Dimensions,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import Carousel from "react-native-snap-carousel";
 import { THEMES } from "../../assets/theme/themes";
@@ -31,43 +32,11 @@ import { LoginModules } from "../../constants/enums";
 import { useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import Strings from "../../constants/strings";
+import { showToast, validArray } from "../../utils/utils";
+import { decryptService } from "../../utils/storageFunc";
+import { getUpcomingAppointments } from "../../redux-store/actions/auth";
+import moment from "moment";
 const { width: screenWidth } = Dimensions.get("window");
-
-const appointmentData = [
-  {
-    id: 1,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh1",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: false,
-    type: "data",
-  },
-  {
-    id: 2,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: false,
-    type: "Banner",
-  },
-  {
-    id: 3,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: false,
-    type: "Banner",
-  },
-];
 
 const services = [
   { id: 1, title: "Trainer", icon: <Trainer /> },
@@ -104,6 +73,8 @@ const { width } = Dimensions.get("window");
 const ParentHome = (props) => {
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
+  const [loading, setLoading] = useState(false);
+  const [appointmentData, setAppointmentData] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const { loggedInModule, guestUser } = useSelector((state) => state?.register);
   const profile = useSelector((state) => state?.commonReducer);
@@ -115,9 +86,29 @@ const ParentHome = (props) => {
 
   useEffect(() => {
     if (isFocused) {
+      initData();
       dispatch(setLoggedInMoodule(LoginModules.parent));
     }
   }, [isFocused, dispatch]);
+
+  const initData = async () => {
+    try {
+      setLoading(true);
+      const userId = await decryptService("userId");
+      const params = {
+        userid: userId,
+        usertype: LoginModules?.parent,
+      };
+      const res = await getUpcomingAppointments(params);
+      if (res?.status === 200) {
+        setAppointmentData(validArray(res?.data?.data) ? res?.data?.data : []);
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      showToast("error", error?.message);
+    }
+  };
 
   const renderTrendingItem = ({ item, index }) => {
     return (
@@ -272,7 +263,7 @@ const ParentHome = (props) => {
                       fontSize: THEMES.fonts.font16,
                     }}
                   >
-                    Dr. Shreeram Laghu
+                    {item?.name}
                   </Text>
                   <Text
                     numberOfLines={1}
@@ -283,7 +274,7 @@ const ParentHome = (props) => {
                       paddingTop: moderateScale(3),
                     }}
                   >
-                    Services Provided
+                    {item?.servicedetails?.service}
                   </Text>
 
                   <Text
@@ -294,7 +285,7 @@ const ParentHome = (props) => {
                       paddingTop: moderateScale(5),
                     }}
                   >
-                    OTP: 2457
+                    {`OTP: ${item?.otp}`}
                   </Text>
                 </View>
               </View>
@@ -333,7 +324,7 @@ const ParentHome = (props) => {
                     marginLeft: moderateScale(4),
                   }}
                 >
-                  Sun, 12 September
+                  {`${moment(item?.appointment_date)?.format("ddd, DD MMMM")}`}
                 </Text>
               </View>
 
@@ -354,7 +345,9 @@ const ParentHome = (props) => {
                     marginLeft: moderateScale(4),
                   }}
                 >
-                  11:00 - 12:00 AM
+                  {`${moment(item?.start_time, "HH:mm")?.format(
+                    "h:mm"
+                  )} - ${moment(item?.end_time, "HH:mm")?.format("h:mm A")}`}
                 </Text>
               </View>
             </View>
@@ -367,7 +360,7 @@ const ParentHome = (props) => {
   const paginationDots = () => {
     return (
       <View style={styles.paginationContainer}>
-        {appointmentData.map((_, index) => (
+        {appointmentData?.map((_, index) => (
           <View
             key={index}
             style={[
@@ -593,6 +586,13 @@ const ParentHome = (props) => {
           />
         </View>
       </ScrollView>
+      {loading && (
+        <View style={styles.loadingView}>
+          <View style={styles.loadingBox}>
+            <ActivityIndicator color={THEMES.colors.white} />
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -708,6 +708,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
     // Spacing between cards
+  },
+  loadingView: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingBox: {
+    width: 70,
+    height: 70,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "transparent",
+    borderRadius: 10,
+    backgroundColor: THEMES.colors.cyan,
+    borderWidth: 1,
   },
 });
 

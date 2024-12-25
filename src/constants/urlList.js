@@ -34,4 +34,5 @@ export const urlList = {
   cancelAppointment: "appointment/cancel",
   rescheduleAppointment: "appointment/reschedule",
   completeAppointment: "appointment/complete",
+  getUpcomingAppointments: "appointment/getupcoming",
 };
