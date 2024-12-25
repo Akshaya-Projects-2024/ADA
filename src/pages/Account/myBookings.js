@@ -130,7 +130,7 @@ const Data = [
     isSeduled: true,
   },
 ];
-const STATUSES = {
+export const STATUSES = {
   pending: "pending",
   scheduled: "scheduled",
   completed: "completed",

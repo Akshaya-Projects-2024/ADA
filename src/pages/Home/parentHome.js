@@ -36,6 +36,7 @@ import { showToast, validArray } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
 import { getUpcomingAppointments } from "../../redux-store/actions/auth";
 import moment from "moment";
+import { STATUSES } from "../Account/myBookings";
 const { width: screenWidth } = Dimensions.get("window");
 
 const services = [
@@ -101,7 +102,14 @@ const ParentHome = (props) => {
       };
       const res = await getUpcomingAppointments(params);
       if (res?.status === 200) {
-        setAppointmentData(validArray(res?.data?.data) ? res?.data?.data : []);
+        let output = res?.data?.data;
+        output = output.filter((it) => {
+          return (
+            it?.status === STATUSES.scheduled ||
+            it?.status === STATUSES.rescheduled
+          );
+        });
+        setAppointmentData(validArray(output) ? output : []);
       }
       setLoading(false);
     } catch (error) {
