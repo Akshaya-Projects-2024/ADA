@@ -15,7 +15,6 @@ import SwitchIcon from "../../assets/svg/switch.svg";
 import BadgeCheck from "../../assets/svg/badge.svg";
 import ProfileImg from "../../assets/svg/profile.svg";
 import RightArrow from "../../assets/svg/rightArrow.svg";
-import Badge from "../../assets/svg/badgeCheck.svg";
 import PawPrint from "../../assets/svg/paw-print.svg";
 import BottomOpenCheck from "../../assets/svg/bookings.svg";
 import Star from "../../assets/svg/star.svg";
@@ -226,7 +225,7 @@ const ParentAccount = (props) => {
                 )}
               </View>
             </View>
-{/* 
+            {/* 
             <View style={styles.padding12}>
               <View style={styles.contentView}>
                 {renderItem(

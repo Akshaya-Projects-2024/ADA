@@ -11,7 +11,6 @@ import {
 import { THEMES } from "../../assets/theme/themes";
 import LinearGradient from "react-native-linear-gradient";
 import Header from "../../components/Header";
-import SwitchIcon from "../../assets/svg/switch.svg";
 import BadgeCheck from "../../assets/svg/badge.svg";
 import ProfileImg from "../../assets/svg/profile.svg";
 import RightArrow from "../../assets/svg/rightArrow.svg";
@@ -26,7 +25,7 @@ import Logout from "../../assets/svg/logout.svg";
 import ContactUs from "../../assets/svg/contactUs.svg";
 import AboutUs from "../../assets/svg/aboutUs.svg";
 import Strings from "../../constants/strings";
-import { moderateScale, s } from "react-native-size-matters";
+import { moderateScale } from "react-native-size-matters";
 import {
   validateParentProfile,
   validateServiceProfile,
@@ -167,16 +166,22 @@ const MyAccount = (props) => {
               <BadgeCheck />
             </View>
             <View style={styles.nameView}>
-            
               <Text style={styles.nameText}>
-                {guestUser? Strings.guest : profile?.providerProfile?.providerBusiness?.name}
+                {guestUser
+                  ? Strings.guest
+                  : profile?.providerProfile?.providerBusiness?.name}
               </Text>
-              <View style={{alignItems:'center',width:'80%'}}>
-              {profileServices ? (
-                <Text numberOfLines={2} style={[styles.roleText,{textAlign:'center'}]}>{profileServices}</Text>
-              ) : null}
+              <View style={{ alignItems: "center", width: "80%" }}>
+                {profileServices ? (
+                  <Text
+                    numberOfLines={2}
+                    style={[styles.roleText, { textAlign: "center" }]}
+                  >
+                    {profileServices}
+                  </Text>
+                ) : null}
               </View>
-         
+
               {/* <Text style={styles.premiumMemberText}>
                 {guestUser ||
                 (!profileStatus?.flag &&
@@ -365,8 +370,7 @@ const styles = StyleSheet.create({
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.regular,
     paddingTop: moderateScale(4),
-    paddingBottom:moderateScale(10)
- 
+    paddingBottom: moderateScale(10),
   },
   nameText: {
     fontSize: THEMES.fonts.font16,
@@ -377,7 +381,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingTop: moderateScale(15),
- 
   },
   flexRow: {
     flexDirection: "row",

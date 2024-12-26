@@ -37,6 +37,7 @@ import { decryptService } from "../../utils/storageFunc";
 import { getUpcomingAppointments } from "../../redux-store/actions/auth";
 import moment from "moment";
 import { STATUSES } from "../Account/myBookings";
+import { getBase64Obj } from "../../utils/documentUtils";
 const { width: screenWidth } = Dimensions.get("window");
 
 const services = [
@@ -79,6 +80,7 @@ const ParentHome = (props) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const { loggedInModule, guestUser } = useSelector((state) => state?.register);
   const profile = useSelector((state) => state?.commonReducer);
+  // console.log("🚀 ~ ParentHome ~ profile:", profile);
 
   const paymentCompleted = useMemo(
     () => profile?.parentProfie?.subscription?.status === "active",
@@ -258,7 +260,11 @@ const ParentHome = (props) => {
                         height: 55,
                         borderRadius: 55 / 2,
                       }}
-                      source={require("../../assets/images/profileImg.png")}
+                      source={
+                        item?.providerPhoto
+                          ? getBase64Obj(item?.providerPhoto)
+                          : require("../../assets/images/profileImg.png")
+                      }
                     />
                   </View>
                 </View>
@@ -271,7 +277,7 @@ const ParentHome = (props) => {
                       fontSize: THEMES.fonts.font16,
                     }}
                   >
-                    {item?.name}
+                    {item?.providername}
                   </Text>
                   <Text
                     numberOfLines={1}

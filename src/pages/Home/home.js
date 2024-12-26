@@ -39,7 +39,7 @@ import {
   setLoggedInMoodule,
   validateParentProfile,
 } from "../../utils/userUtils";
-import { LoginModules } from "../../constants/enums";
+import { ApprovalStatus, LoginModules } from "../../constants/enums";
 import { useDispatch, useSelector } from "react-redux";
 
 const colorData = [
@@ -188,8 +188,13 @@ const Home = (props) => {
   const profile = useSelector((state) => state?.commonReducer);
 
   const paymentCompleted = useMemo(
-    () => profile?.providerProfile?.subscription?.status === "active",
-    [profile?.providerProfile?.subscription]
+    () =>
+      profile?.providerProfile?.subscription?.status === "active" &&
+      profile?.logindetails?.isprovider === ApprovalStatus.approved,
+    [
+      profile?.logindetails?.isprovider,
+      profile?.providerProfile?.subscription?.status,
+    ]
   );
 
   // const { guestUser } = useSelector(({ register }) => register);

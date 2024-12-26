@@ -1,0 +1,17 @@
+Tasks => Provider
+    Pramod=> 1) `getAvailableSlotsWithStatus` api
+             2) `getupcoming` will need provider name and his/her profile photo also make all appointment related data sorted by date by default
+             3) Client Review resposne object
+             4) logindetails enums for statuses
+             5) Mobile OTP
+
+
+    Krunal=> 1) Appointment Card-Integrate new api 
+             2) Upcoming appointment carousel- integrate api 
+             3) Today's appointment will redirect to myBookings with today's date filter
+             4) Update splash with new loader
+             5) Client Review
+             6) Create dialog according to the figma
+             7) Empty view for the app
+             8) Service hard coded screen has to be worked on
+             9) Appontment creation when we are asking user to pick start/end date dont allow to select particular date. All dates will be selected by default
