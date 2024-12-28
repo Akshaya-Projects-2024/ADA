@@ -18,6 +18,7 @@ import Api from "./src/api/Api";
 import { decryptService, encryptService } from "./src/utils/storageFunc";
 import { getCurrentLocation } from "./src/utils/geolocationUtils";
 import { refreshToken } from "./src/redux-store/actions/auth";
+import Loader from "./src/components/Loader";
 
 const store = configureStore();
 
@@ -80,7 +81,9 @@ function App() {
     <SafeAreaView style={{ flex: 1 }}>
       <Provider store={store}>
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <Routes />
+          <Loader>
+            <Routes />
+          </Loader>
           <Toast />
         </GestureHandlerRootView>
       </Provider>

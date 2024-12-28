@@ -50,6 +50,7 @@ import {
   getUpcomingAppointments,
   providerDashboardSlotsData,
 } from "../../redux-store/actions/auth";
+import { contextValue } from "../../components/Loader";
 
 const afterTimeSlots = [
   { time: "09:00", disabled: false, enabled: true },
@@ -99,7 +100,6 @@ const Home = (props) => {
   const [isDateEndVisible, setDateEndVisibility] = useState(false);
   const [startDate, selectedStartDate] = useState();
   const [endDate, selectedEndDate] = useState();
-  const [loading, setLoading] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedAfternonnSlot, setSelectedAfternoonSlot] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -143,7 +143,7 @@ const Home = (props) => {
   };
 
   const initData = useCallback(async () => {
-    setLoading(true);
+    contextValue?.setLoader(true);
     getAppointmentData();
     getSlotsData();
   }, []);
@@ -166,9 +166,9 @@ const Home = (props) => {
         });
         setAppointmentData(validArray(output) ? output : []);
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
@@ -235,9 +235,9 @@ const Home = (props) => {
         setTotalBookedSlots(confirmedAppointments);
         setSlotsData(output);
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
@@ -277,7 +277,7 @@ const Home = (props) => {
 
   const handleAttended = async () => {
     try {
-      setLoading(true);
+      contextValue?.setLoader(true);
       if (!selectedItem) {
         throw new Error("Please select the appointment!");
       } else if (!otpInput) {
@@ -298,9 +298,9 @@ const Home = (props) => {
           initData();
         }
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
@@ -319,7 +319,7 @@ const Home = (props) => {
 
   const confirm = async (appointment) => {
     try {
-      setLoading(true);
+      contextValue?.setLoader(true);
       const params = {
         appointment_id: appointment?.appointment_id,
         parent_id: appointment?.parentdetails?.userid,
@@ -329,9 +329,9 @@ const Home = (props) => {
       if (res?.status === 200) {
         initData();
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
@@ -1247,7 +1247,7 @@ const Home = (props) => {
           />
         </ScrollView>
       </Modal>
-      {loading && (
+      {contextValue?.loading && (
         <View style={styles.loadingView}>
           <View style={styles.loadingBox}>
             <ActivityIndicator color={THEMES.colors.white} />

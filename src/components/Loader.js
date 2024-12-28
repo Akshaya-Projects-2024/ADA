@@ -1,57 +1,60 @@
-import React from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
-import ModalView from "react-native-modal";
+import Lottie from "lottie-react-native";
+import { Image, Pressable, StyleSheet, View } from "react-native";
+import { ms } from "react-native-size-matters";
+let contextValue;
+const Loader = ({ children }) => {
+  const [loading, setLoading] = useState(true);
+  const setLoader = useCallback((status) => {
+    setLoading(status);
+  }, []);
 
-import LoaderGif from "../assets/images/loading.gif";
-
-import { LoadingImage, LoadingView } from "./styles";
-import { ActivityIndicator, Text, Image, View } from "react-native";
-import { THEMES } from "../assets/theme/themes";
-
-const modalStyle = {
-  justifyContent: "center",
-  alignItems: "center",
-};
-
-const Loader = (props) => {
-  const { isVisible } = props;
+  contextValue = useMemo(() => {
+    return { loading, setLoader };
+  }, [setLoader, loading]);
 
   return (
-    <View
-      style={{
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-        backgroundColor: "transparent",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <ActivityIndicator color={THEMES.colors.cyan} />
+    <View style={styles.flex}>
+      {loading ? (
+        <Pressable
+          onPress={() => {
+            setLoader(false);
+          }}
+          style={styles.backdropContainerRoot}
+        >
+          <Lottie
+            autoPlay
+            loop={true}
+            source={require("../assets/gif/loader.json")}
+            style={{ width: ms(100), height: ms(100) }}
+          />
+          <Image
+            style={{ width: ms(75), height: ms(75), position: "absolute" }}
+            source={require("../assets/images/roundIcon.png")}
+          />
+        </Pressable>
+      ) : null}
+      {children}
     </View>
-    // <ModalView
-    //   animationIn="zoomIn"
-    //   style={modalStyle}
-    //   backdropOpacity={0.3}
-    //   isVisible={isVisible}
-    // >
-    //   <View
-    //     style={{
-    //       width: 80,
-    //       height: 80,
-    //       alignItems: "center",
-    //       justifyContent: "center",
-    //       borderColor: "transparent",
-    //       borderRadius: 20,
-    //       backgroundColor: THEMES.colors.white,
-    //       borderWidth: 1,
-    //     }}
-    //   >
-    //     {isVisible &&   <ActivityIndicator color={THEMES.colors.cyan}/>}
-
-    //   </View>
-    // </ModalView>
   );
 };
 
+const styles = StyleSheet.create({
+  backdropContainerRoot: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    height: "100%",
+    width: "100%",
+    backgroundColor: "#00000099",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
+  },
+  flex: {
+    flex: 1,
+  },
+});
+export { contextValue };
 export default Loader;
