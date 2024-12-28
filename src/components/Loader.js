@@ -5,7 +5,7 @@ import { Image, Pressable, StyleSheet, View } from "react-native";
 import { ms } from "react-native-size-matters";
 let contextValue;
 const Loader = ({ children }) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const setLoader = useCallback((status) => {
     setLoading(status);
   }, []);

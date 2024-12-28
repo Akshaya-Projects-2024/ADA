@@ -1,16 +1,7 @@
 import { useIsFocused } from "@react-navigation/native";
 import React, { useCallback, useEffect } from "react";
-import {
-  ImageBackground,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { moderateScale } from "react-native-size-matters";
+import { Image, StyleSheet, useWindowDimensions, View } from "react-native";
 import { decryptService } from "../../utils/storageFunc";
-import { THEMES } from "../../assets/theme/themes";
-import { screenHeight, screenWidth } from "../../utils/dimensions";
 import { getProfile } from "../../redux-store/actions/auth";
 import {
   dispatchUserData,
@@ -26,6 +17,7 @@ import {
 import { LoginModules } from "../../constants/enums";
 
 const Splash = (props) => {
+  const { width, height } = useWindowDimensions();
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
 
@@ -39,14 +31,11 @@ const Splash = (props) => {
   const initData = useCallback(() => {
     return new Promise(async (resolve) => {
       try {
-        // resolve({});
         const obj = {
           userid: await decryptService("userId"),
         };
         const response = await getProfile(obj);
-
         if (response?.status === 200) {
-          // dispatch(saveRegisterData(response?.data?.data)); No need
           dispatch(dispatchUserData(response?.data?.data));
         }
         resolve(response?.data?.data ? response?.data?.data : false);
@@ -136,30 +125,20 @@ const Splash = (props) => {
   }, [initData, props.navigation]);
 
   return (
-    <View style={{ flex: 1 }}>
-      <StatusBar backgroundColor={"#04DBB0"} />
-      <ImageBackground
-        source={require("../../assets/images/splashS.png")}
-        style={styles.img}
-      >
-        <Text style={styles.appText}>ADA</Text>
-      </ImageBackground>
+    <View style={styles.flex}>
+      <Image
+        style={StyleSheet.flatten([
+          styles.absolute,
+          { width: width, height: height },
+        ])}
+        source={require("../../assets/images/Splash.png")}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  appText: {
-    color: THEMES.colors.white,
-    paddingTop: moderateScale(20),
-    fontSize: moderateScale(50),
-    fontFamily: THEMES.fontFamily.semiBold,
-  },
-  img: {
-    width: screenWidth,
-    height: screenHeight,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  flex: { flex: 1 },
+  absolute: { position: "absolute" },
 });
 export default Splash;
