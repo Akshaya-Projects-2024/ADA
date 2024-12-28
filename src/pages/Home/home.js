@@ -1,15 +1,14 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
   FlatList,
   StyleSheet,
-  Image,
-  Pressable,
   TouchableOpacity,
   ScrollView,
   Alert,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Bell from "../../assets/svg/bell.svg";
@@ -19,8 +18,6 @@ import Plus from "../../assets/svg/plus.svg";
 import Button from "../../components/Button";
 import { moderateScale } from "react-native-size-matters";
 import LinearGradient from "react-native-linear-gradient";
-import Check from "../../assets/svg/check.svg";
-import Cross from "../../assets/svg/redCross.svg";
 import BlackCross from "../../assets/svg/cross.svg";
 import Carousel from "react-native-snap-carousel";
 import Modal from "react-native-modal";
@@ -32,105 +29,27 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import moment from "moment";
 import Strings from "../../constants/strings";
 import Calendars from "../../assets/svg/calendar.svg";
-import { showPaymentAlert, showToast } from "../../utils/utils";
+import { showPaymentAlert, showToast, validArray } from "../../utils/utils";
 import Toggle from "../../components/Toggle";
 import { useIsFocused } from "@react-navigation/native";
 import {
   setLoggedInMoodule,
   validateParentProfile,
 } from "../../utils/userUtils";
-import { ApprovalStatus, LoginModules } from "../../constants/enums";
+import {
+  AppointmentStatus,
+  ApprovalStatus,
+  LoginModules,
+} from "../../constants/enums";
 import { useDispatch, useSelector } from "react-redux";
-
-const colorData = [
-  { color: "#4FC3F7" }, // Example of blue
-  { color: "#4FC3F7" }, // Example of blue
-  { color: "#81C784" }, // Example of green
-  { color: "#81C784" }, // Example of green
-  { color: "#81C784" }, // Example of green
-  { color: "#BDBDBD" }, // Example of grey
-  { color: "#BDBDBD" },
-  { color: "#81C784" }, // Example of green
-  { color: "#81C784" }, // Example of green
-  { color: "#BDBDBD" }, // Example of grey
-  { color: "#BDBDBD" },
-  { color: "#BDBDBD" },
-  { color: "#BDBDBD" },
-  { color: "#81C784" }, // Example of green
-  { color: "#81C784" }, // Example of green
-  { color: "#BDBDBD" }, // Example of grey
-  { color: "#BDBDBD" },
-  { color: "#BDBDBD" },
-];
-
-const countData = [
-  {
-    count: 6,
-    status: "Confirmed",
-    color: "#7DB857",
-  },
-  {
-    count: 2,
-    status: "Attended",
-    color: "#00BBC8",
-  },
-  {
-    count: 1,
-    status: "Canceled",
-    color: "#F4521F",
-  },
-  {
-    count: 1,
-    status: "Rescheduled",
-    color: "#FD9F00",
-  },
-];
-
-const appointmentData = [
-  {
-    id: 1,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh1",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: false,
-  },
-  {
-    id: 2,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: false,
-  },
-  {
-    id: 3,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: false,
-  },
-];
-
-const timeSlots = [
-  { time: "09:00", disabled: false, enabled: true },
-  { time: "09:30", disabled: true, enabled: false },
-  { time: "10:00", disabled: false, enabled: true },
-  { time: "10:30", disabled: true, enabled: false },
-  { time: "11:00", disabled: false, enabled: true },
-  { time: "09:00", disabled: false, enabled: true },
-  { time: "09:30", disabled: true, enabled: false },
-  { time: "10:00", disabled: false, enabled: true },
-  { time: "10:30", disabled: true, enabled: false },
-  { time: "11:00", disabled: false, enabled: true },
-];
+import AppointmentCard from "../../components/AppointmentCard";
+import { decryptService } from "../../utils/storageFunc";
+import {
+  completeAppointment,
+  confirmAppointment,
+  getUpcomingAppointments,
+  providerDashboardSlotsData,
+} from "../../redux-store/actions/auth";
 
 const afterTimeSlots = [
   { time: "09:00", disabled: false, enabled: true },
@@ -173,7 +92,6 @@ const Home = (props) => {
   const [selectedFilter, setSelectedFilter] = useState("Daily");
   const [attendedModal, setAttendedModal] = useState(false);
   const [otpInput, setOtpInput] = useState();
-  const [data, setData] = useState(appointmentData);
   const [appointmentVisible, setAppointmentVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [oneSession, setOneSession] = useState(true);
@@ -181,9 +99,15 @@ const Home = (props) => {
   const [isDateEndVisible, setDateEndVisibility] = useState(false);
   const [startDate, selectedStartDate] = useState();
   const [endDate, selectedEndDate] = useState();
+  const [loading, setLoading] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedAfternonnSlot, setSelectedAfternoonSlot] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(null);
   const { width: screenWidth } = Dimensions.get("window");
+  const [appointmentData, setAppointmentData] = useState([]);
+  const [countData, setCountData] = useState([]);
+  const [slotsData, setSlotsData] = useState([]);
+  const [totalBookedSlots, setTotalBookedSlots] = useState(0);
   const { loggedInModule, guestUser } = useSelector((state) => state?.register);
   const profile = useSelector((state) => state?.commonReducer);
 
@@ -197,13 +121,12 @@ const Home = (props) => {
     ]
   );
 
-  // const { guestUser } = useSelector(({ register }) => register);
-
   useEffect(() => {
     if (isFocused) {
+      initData();
       dispatch(setLoggedInMoodule(LoginModules.provider));
     }
-  }, [isFocused, dispatch]);
+  }, [isFocused, dispatch, initData]);
 
   const renderCategory = ({ item }) => {
     const isSelected = selectedCategory === item;
@@ -219,240 +142,116 @@ const Home = (props) => {
     );
   };
 
-  const renderItem = ({ item, index }) => {
-    let itemBackgroundColor = THEMES.colors.white;
-    if (item.isCanceled) {
-      itemBackgroundColor = "#fee9e9";
-    } else if (item.isConfirmed) {
-      itemBackgroundColor = "#f0ffe6";
-    } else if (item.isSeduled) {
-      itemBackgroundColor = "#feefd4";
-    } else if (item.isAttended) {
-      itemBackgroundColor = "#d6f2f5";
-    }
-    let itemtextColor = THEMES.colors.black;
-    if (item.isCanceled) {
-      itemtextColor = "#F4511E";
-    } else if (item.isConfirmed) {
-      itemtextColor = "#6DAE43";
-    } else if (item.isSeduled) {
-      itemtextColor = "#FD9F00";
-    } else if (item.isAttended) {
-      itemtextColor = "#02bac7";
-    }
-    return (
-      <Pressable
-        key={`${item?.id}_${index}`}
-        onPress={() => {
-          setSelectedItemId(item.id);
-          props.navigation.navigate("appointmentDetail");
-        }}
-        style={[styles.flatlistView, { backgroundColor: itemBackgroundColor }]}
-      >
-        {!item.isSeduled && !item.isCanceled && !item.isConfirmed ? (
-          <View style={styles.tagView}>
-            <Text style={styles.tagText}>New</Text>
-          </View>
-        ) : null}
+  const initData = useCallback(async () => {
+    setLoading(true);
+    getAppointmentData();
+    getSlotsData();
+  }, []);
 
-        <View style={styles.flatlistContent}>
-          <View style={styles.flatListRow}>
-            <View style={styles.flatListImgView}>
-              <View
-                style={{
-                  width: 35,
-                  height: 35,
-                  borderRadius: 35 / 2,
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "#fffff",
-                }}
-              >
-                <Image
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 32 / 2,
-                  }}
-                  source={require("../../assets/images/profileImg.png")}
-                />
-              </View>
-              <View
-                style={{
-                  width: 35,
-                  height: 35,
-                  borderRadius: 35 / 2,
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <Image
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 32 / 2,
-                  }}
-                  source={require("../../assets/images/profileImg.png")}
-                />
-              </View>
-            </View>
-
-            <View
-              style={{
-                marginHorizontal: moderateScale(8),
-                paddingVertical: moderateScale(5),
-              }}
-            >
-              <Text style={[styles.name]}>{item.name}</Text>
-              <View style={styles.flatListNameRow}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingVertical: moderateScale(1),
-                  }}
-                >
-                  <Text
-                    style={[
-                      styles.profileTypeText,
-                      { paddingRight: moderateScale(3) },
-                    ]}
-                  >
-                    {item.category}
-                  </Text>
-                  <Text style={styles.profileTypeText}>|</Text>
-                  <Text
-                    style={[
-                      styles.profileTypeText,
-                      ,
-                      { paddingLeft: moderateScale(3) },
-                    ]}
-                  >
-                    {item.visitType}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.flatListNameRow}>
-                <View style={{ flexDirection: "row" }}>
-                  <Text
-                    style={[
-                      styles.visitTypeText,
-                      {
-                        marginRight: moderateScale(5),
-                        textDecorationLine: item.isSeduled
-                          ? "line-through"
-                          : "none",
-                      },
-                    ]}
-                  >
-                    {item.visitDay}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.visitTypeText,
-                      {
-                        marginRight: moderateScale(5),
-                        textDecorationLine: item.isSeduled
-                          ? "line-through"
-                          : "none",
-                      },
-                    ]}
-                  >
-                    |
-                  </Text>
-                  <Text
-                    style={[
-                      styles.visitTypeText,
-                      {
-                        textDecorationLine: item.isSeduled
-                          ? "line-through"
-                          : "none",
-                      },
-                    ]}
-                  >
-                    {item.time}
-                  </Text>
-                </View>
-                {item.isSeduled && (
-                  <Text style={styles.visitTypeText}>26th JUN @ 11:00 AM</Text>
-                )}
-              </View>
-            </View>
-          </View>
-          <View>
-            {item.isCanceled ? (
-              <Text style={[(styles.statusText, { color: itemtextColor })]}>
-                Canceled
-              </Text>
-            ) : item.isConfirmed ? (
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedAttendedId(item.id);
-                  setAttendedModal(true);
-                }}
-                style={{
-                  borderRadius: 8,
-                  borderBottomStartRadius: 0,
-                  borderWidth: 1,
-                  paddingHorizontal: moderateScale(12),
-                  paddingVertical: moderateScale(6),
-                  borderColor: "#6DAE43",
-                }}
-              >
-                <Text style={(styles.statusText, { color: itemtextColor })}>
-                  Confirm
-                </Text>
-              </TouchableOpacity>
-            ) : item.isAttended ? (
-              <Text style={(styles.statusText, { color: itemtextColor })}>
-                Attended
-              </Text>
-            ) : item.isSeduled ? (
-              <Text
-                style={
-                  (styles.statusText,
-                  {
-                    color: itemtextColor,
-                  })
-                }
-              >
-                Rescheduled
-              </Text>
-            ) : (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Pressable onPress={() => setVisible(true)}>
-                  <Cross width={24} height={24} />
-                </Pressable>
-                <Pressable
-                  onPress={() => handleOnConfirm(item.id)}
-                  style={{ marginLeft: moderateScale(12) }}
-                >
-                  <Check width={24} height={24} />
-                </Pressable>
-              </View>
-            )}
-          </View>
-        </View>
-      </Pressable>
-    );
+  const getAppointmentData = async () => {
+    try {
+      const userId = await decryptService("userId");
+      const params = {
+        userid: userId,
+        usertype: LoginModules?.provider,
+      };
+      const res = await getUpcomingAppointments(params);
+      if (res?.status === 200) {
+        let output = res?.data?.data;
+        output = output.filter((it) => {
+          return (
+            it?.status === AppointmentStatus.scheduled ||
+            it?.status === AppointmentStatus.rescheduled
+          );
+        });
+        setAppointmentData(validArray(output) ? output : []);
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      showToast("error", error?.message);
+    }
   };
 
-  const handleConfirm = (id) => {
-    setData((prevData) =>
-      prevData.map((item) =>
-        item.id === id
-          ? { ...item, isConfirmed: true, isCanceled: false }
-          : item
-      )
+  const getSlotsData = async () => {
+    try {
+      const userId = await decryptService("userId");
+      const start = moment();
+      const end = moment(start).add(14, "days");
+      const params = {
+        userid: userId,
+        providerid: userId,
+        startdate: start.format("YYYY-MM-DD"),
+        enddate: end.format("YYYY-MM-DD"),
+      };
+      const res = await providerDashboardSlotsData(params);
+      if (res?.status === 200) {
+        let output = [];
+        let confirmedAppointments = 0;
+        let attendedAppointments = 0;
+        let canceledAppointments = 0;
+        let rescheduledAppointments = 0;
+        const response = Object.values(res?.data?.data);
+        for (let index = 0; index < response.length; index++) {
+          const element = response[index];
+          for (let index2 = 0; index2 < element.length; index2++) {
+            if (output?.length < 15) {
+              const element2 = element[index2];
+              if (element2?.status === AppointmentStatus.cancelled) {
+                canceledAppointments++;
+              } else if (element2?.status === AppointmentStatus.completed) {
+                attendedAppointments++;
+              } else if (element2?.status === AppointmentStatus.rescheduled) {
+                rescheduledAppointments++;
+              } else if (element2?.status === AppointmentStatus.scheduled) {
+                confirmedAppointments++;
+              }
+              output.push(element2);
+            }
+          }
+        }
+        setCountData([
+          {
+            count: confirmedAppointments,
+            status: "Confirmed",
+            color: "#7DB857",
+          },
+          {
+            count: attendedAppointments,
+            status: "Attended",
+            color: "#00BBC8",
+          },
+          {
+            count: canceledAppointments,
+            status: "Canceled",
+            color: "#F4521F",
+          },
+          {
+            count: rescheduledAppointments,
+            status: "Rescheduled",
+            color: "#FD9F00",
+          },
+        ]);
+        setSlotsData(output);
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      showToast("error", error?.message);
+    }
+  };
+
+  const renderItem = ({ item }) => {
+    return (
+      <AppointmentCard
+        handleOnConfirm={handleOnConfirm}
+        item={item}
+        routeFrom={"myprofile"}
+        setAttendedModal={setAttendedModal}
+        setSelectedItem={setSelectedItem}
+        setVisible={setVisible}
+      />
     );
-    setSelectedItemId(id);
   };
 
   const paginationDots = () => {
@@ -475,31 +274,34 @@ const Home = (props) => {
     );
   };
 
-  const handleAttended = () => {
-    if (selectedAttendedId && otpInput) {
-      setData((prevData) =>
-        prevData.map((item) =>
-          item.id === selectedAttendedId
-            ? {
-                ...item,
-                isAttended: true,
-                isCanceled: false,
-                isConfirmed: false,
-              }
-            : item
-        )
-      );
-      setSelectedItemId(selectedAttendedId);
-      setAttendedModal(false);
-      setSelectedAttendedId("");
-      setOtpInput("");
-    } else {
-      return showToast("error", "Please enter OTP first!");
+  const handleAttended = async () => {
+    try {
+      setLoading(true);
+      if (!selectedItem) {
+        throw new Error("Please select the appointment!");
+      } else if (!otpInput) {
+        throw new Error("Please enter OTP first!");
+      } else {
+        const params = {
+          appointment_id: selectedItem?.appointment_id,
+          parent_id: selectedItem?.parentdetails?.userid,
+          provider_id: selectedItem?.provider_id,
+          otp: otpInput,
+        };
+        const res = await completeAppointment(params);
+        if (res?.status === 200) {
+          setVisible(false);
+          setAttendedModal(false);
+          setOtpInput("");
+          setSelectedItem();
+          initData();
+        }
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      showToast("error", error?.message);
     }
-  };
-
-  const confirmAppointment = (id) => {
-    handleConfirm(id);
   };
 
   const selectTimeSlot = (time) => {
@@ -514,7 +316,26 @@ const Home = (props) => {
     }
   };
 
-  const handleOnConfirm = (id) => {
+  const confirm = async (appointment) => {
+    try {
+      setLoading(true);
+      const params = {
+        appointment_id: appointment?.appointment_id,
+        parent_id: appointment?.parentdetails?.userid,
+        provider_id: appointment?.provider_id,
+      };
+      const res = await confirmAppointment(params);
+      if (res?.status === 200) {
+        initData();
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      showToast("error", error?.message);
+    }
+  };
+
+  const handleOnConfirm = (appointment) => {
     Alert.alert(
       "",
       "Are you sure you want to confirm this appointment?",
@@ -523,7 +344,7 @@ const Home = (props) => {
           text: "No",
           style: "cancel",
         },
-        { text: "Yes", onPress: () => confirmAppointment(id) },
+        { text: "Yes", onPress: () => confirm(appointment) },
       ],
       { cancelable: false }
     );
@@ -587,6 +408,13 @@ const Home = (props) => {
         });
       });
     }
+  };
+
+  const onTodayPressed = () => {
+    props.navigation.navigate("myBookings", {
+      route: "myprofile",
+      isToday: true,
+    });
   };
 
   return (
@@ -692,6 +520,7 @@ const Home = (props) => {
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Text
+                    onPress={onTodayPressed}
                     style={{
                       color: THEMES.colors.cyan,
                       fontSize: THEMES.fonts.font12,
@@ -699,7 +528,7 @@ const Home = (props) => {
                       paddingRight: moderateScale(10),
                     }}
                   >
-                    Today’s Appointments{" "}
+                    Today’s Appointments
                   </Text>
                   <Right />
                 </View>
@@ -733,12 +562,26 @@ const Home = (props) => {
                   <View style={{ width: "75%" }}>
                     <View style={styles.chartContainer}>
                       <View style={styles.timeBar}>
-                        {colorData.map((block, index) => (
+                        {slotsData.map((block, index) => (
                           <View
                             key={index}
                             style={[
                               styles.block,
-                              { backgroundColor: block.color },
+                              {
+                                backgroundColor:
+                                  block?.status === AppointmentStatus.cancelled
+                                    ? "#F4521F"
+                                    : block?.status ===
+                                      AppointmentStatus.completed
+                                    ? "#00BBC8"
+                                    : block?.status ===
+                                      AppointmentStatus.rescheduled
+                                    ? "#FD9F00"
+                                    : block?.status ===
+                                      AppointmentStatus.scheduled
+                                    ? "#7DB857"
+                                    : "#B8B8B8",
+                              },
                             ]}
                           />
                         ))}
@@ -754,7 +597,7 @@ const Home = (props) => {
                         fontSize: THEMES.fonts.font14,
                       }}
                     >
-                      9/12
+                      {`${countData?.length || 0}/${slotsData?.length || 0}`}
                     </Text>
                     <Text
                       style={{
@@ -818,7 +661,7 @@ const Home = (props) => {
                       fontSize: THEMES.fonts.font10,
                     }}
                   >
-                    11
+                    {countData?.length || 0}
                   </Text>
                   <Text
                     style={{
@@ -853,7 +696,7 @@ const Home = (props) => {
               }}
             >
               <Carousel
-                data={data}
+                data={appointmentData}
                 renderItem={renderItem}
                 sliderWidth={screenWidth}
                 itemWidth={screenWidth * 0.9}
@@ -883,18 +726,52 @@ const Home = (props) => {
             <View style={styles.headerView}>
               <View style={styles.headerRow}>
                 <View style={styles.w25}>
-                  <Text style={styles.reviewCount}>4.8</Text>
-                  <Text style={styles.reviewsText}>10 Reviews</Text>
+                  <Text style={styles.reviewCount}>
+                    {profile?.providerProfile?.providerRating?.rating}
+                  </Text>
+                  <Text
+                    style={styles.reviewsText}
+                  >{`${profile?.providerProfile?.providerRating?.totalratingcount} Reviews`}</Text>
                 </View>
                 <View style={styles.line} />
                 <View style={styles.w70}>
                   <ReviewComponent
                     reviewData={[
-                      { stars: 5, count: 5, bgColor: "#FDD835" },
-                      { stars: 4, count: 4, bgColor: "#fcc7b7" },
-                      { stars: 3, count: 3, bgColor: "#6dae43" },
-                      { stars: 2, count: 2, bgColor: "#21c2ce" },
-                      { stars: 1, count: 1, bgColor: "#ab47bc" },
+                      {
+                        stars: 5,
+                        count:
+                          profile?.providerProfile?.providerRating
+                            ?.providerRatingCount?.five || 0,
+                        bgColor: "#FDD835",
+                      },
+                      {
+                        stars: 4,
+                        count:
+                          profile?.providerProfile?.providerRating
+                            ?.providerRatingCount?.four || 0,
+                        bgColor: "#fcc7b7",
+                      },
+                      {
+                        stars: 3,
+                        count:
+                          profile?.providerProfile?.providerRating
+                            ?.providerRatingCount?.three || 0,
+                        bgColor: "#6dae43",
+                      },
+                      {
+                        stars: 2,
+                        count:
+                          profile?.providerProfile?.providerRating
+                            ?.providerRatingCount?.two || 0,
+                        bgColor: "#21c2ce",
+                      },
+                      {
+                        stars: 1,
+                        count:
+                          profile?.providerProfile?.providerRating
+                            ?.providerRatingCount?.one || 0,
+                        bgColor: "#ab47bc",
+                      },
                     ]}
                     totalReviews={5}
                   />
@@ -905,7 +782,10 @@ const Home = (props) => {
         </ScrollView>
       </View>
       <Modal
-        onBackdropPress={() => setVisible(false)}
+        onBackdropPress={() => {
+          setVisible(false);
+          setSelectedItem();
+        }}
         isVisible={isVisible}
         backdropOpacity={0.5}
         style={{
@@ -943,7 +823,10 @@ const Home = (props) => {
             </Text>
             <TouchableOpacity
               hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-              onPress={() => setVisible(false)}
+              onPress={() => {
+                setVisible(false);
+                setSelectedItem();
+              }}
             >
               <BlackCross />
             </TouchableOpacity>
@@ -978,7 +861,11 @@ const Home = (props) => {
         </View>
       </Modal>
       <Modal
-        onBackdropPress={() => setAttendedModal(false)}
+        onBackdropPress={() => {
+          setAttendedModal(false);
+          setSelectedItem();
+          setOtpInput("");
+        }}
         isVisible={attendedModal}
         backdropOpacity={0.5}
         style={{
@@ -1018,10 +905,7 @@ const Home = (props) => {
             />
 
             <View style={{ paddingTop: moderateScale(20) }}>
-              <Button
-                onPress={() => handleAttended()}
-                title="Attended"
-              ></Button>
+              <Button onPress={handleAttended} title="Attended" />
             </View>
           </View>
         </View>
@@ -1362,6 +1246,13 @@ const Home = (props) => {
           />
         </ScrollView>
       </Modal>
+      {loading && (
+        <View style={styles.loadingView}>
+          <View style={styles.loadingBox}>
+            <ActivityIndicator color={THEMES.colors.white} />
+          </View>
+        </View>
+      )}
     </LinearGradient>
   );
 };
@@ -1663,6 +1554,24 @@ const styles = StyleSheet.create({
   disabledSlot: {
     backgroundColor: "#f0f0f0", // Gray background for disabled slots
     borderColor: "#d0d0d0",
+  },
+  loadingView: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingBox: {
+    width: 70,
+    height: 70,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "transparent",
+    borderRadius: 10,
+    backgroundColor: THEMES.colors.cyan,
+    borderWidth: 1,
   },
 });
 

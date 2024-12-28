@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -28,7 +28,7 @@ import {
   setLoggedInMoodule,
   validateServiceProfile,
 } from "../../utils/userUtils";
-import { LoginModules } from "../../constants/enums";
+import { AppointmentStatus, LoginModules } from "../../constants/enums";
 import { useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import Strings from "../../constants/strings";
@@ -36,7 +36,6 @@ import { showToast, validArray } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
 import { getUpcomingAppointments } from "../../redux-store/actions/auth";
 import moment from "moment";
-import { STATUSES } from "../Account/myBookings";
 import { getBase64Obj } from "../../utils/documentUtils";
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -80,12 +79,6 @@ const ParentHome = (props) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const { loggedInModule, guestUser } = useSelector((state) => state?.register);
   const profile = useSelector((state) => state?.commonReducer);
-  // console.log("🚀 ~ ParentHome ~ profile:", profile);
-
-  const paymentCompleted = useMemo(
-    () => profile?.parentProfie?.subscription?.status === "active",
-    [profile?.parentProfie?.subscription]
-  );
 
   useEffect(() => {
     if (isFocused) {
@@ -107,8 +100,8 @@ const ParentHome = (props) => {
         let output = res?.data?.data;
         output = output.filter((it) => {
           return (
-            it?.status === STATUSES.scheduled ||
-            it?.status === STATUSES.rescheduled
+            it?.status === AppointmentStatus.scheduled ||
+            it?.status === AppointmentStatus.rescheduled
           );
         });
         setAppointmentData(validArray(output) ? output : []);

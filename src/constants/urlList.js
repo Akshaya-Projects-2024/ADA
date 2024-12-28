@@ -35,4 +35,5 @@ export const urlList = {
   rescheduleAppointment: "appointment/reschedule",
   completeAppointment: "appointment/complete",
   getUpcomingAppointments: "appointment/getupcoming",
+  providerDashboardSlotsData: "appointment/timeslotwithstatus",
 };

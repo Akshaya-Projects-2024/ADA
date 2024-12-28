@@ -181,14 +181,6 @@ const MyAccount = (props) => {
                   </Text>
                 ) : null}
               </View>
-
-              {/* <Text style={styles.premiumMemberText}>
-                {guestUser ||
-                (!profileStatus?.flag &&
-                  profileStatus?.navigateTo === "paymentsSubscription")
-                  ? Strings.guestUser
-                  : Strings.premiumMemmber}
-              </Text> */}
             </View>
             <View style={styles.padding14}>
               <View style={styles.contentView}>

@@ -6,3 +6,11 @@ export const ApprovalStatus = {
   rejected: 3,
   approved: 4,
 };
+
+export const AppointmentStatus = {
+  pending: "pending",
+  scheduled: "scheduled",
+  completed: "completed",
+  cancelled: "cancelled",
+  rescheduled: "rescheduled",
+};

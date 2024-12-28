@@ -1,29 +1,29 @@
-import React, { useState, useRef, useMemo, useEffect } from "react";
+import React, {
+  useState,
+  useRef,
+  useMemo,
+  useEffect,
+  useCallback,
+} from "react";
 import {
   View,
   Text,
   FlatList,
   StatusBar,
   StyleSheet,
-  Image,
   Pressable,
   TouchableOpacity,
   Alert,
   ActivityIndicator,
 } from "react-native";
 import Filter from "../../assets/svg/listFilter.svg";
-import Check from "../../assets/svg/check.svg";
-import Cross from "../../assets/svg/redCross.svg";
 import BlackCross from "../../assets/svg/cross.svg";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
 import Header from "../../components/Header";
 import FilterModal from "../../components/FilterModal";
 import Modal from "react-native-modal";
 import { moderateScale } from "react-native-size-matters";
-import CancelAppointment from "../Appointment/cancelAppointment";
-import RescheduleAppointment from "../Appointment/rescheduleAppointment";
 import Button from "../../components/Button";
 import InputField from "../../components/InputField";
 import { showToast, validArray } from "../../utils/utils";
@@ -33,115 +33,17 @@ import {
   getAllAppointment,
 } from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
-import { DOCUMENT_TYPES } from "./uploadImagesDocs";
-import { getBase64Obj } from "../../utils/documentUtils";
-import moment from "moment";
 import { useIsFocused } from "@react-navigation/native";
+import AppointmentCard from "../../components/AppointmentCard";
+import moment from "moment";
 
-const Data = [
-  {
-    id: 1,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh1",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: false,
-  },
-  {
-    id: 2,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: false,
-  },
-  {
-    id: 3,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: true,
-  },
-  {
-    id: 4,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: false,
-  },
-  {
-    id: 5,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: false,
-  },
-  {
-    id: 6,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: true,
-  },
-  {
-    id: 7,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: false,
-  },
-  {
-    id: 8,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: false,
-  },
-  {
-    id: 9,
-    profile: "../../assets/images/profileImg.png",
-    name: "Rajneesh",
-    visitType: "Home visit",
-    category: "Basic Obedience",
-    visitDay: "Today",
-    time: "5:30 PM",
-    isSeduled: true,
-  },
-];
-export const STATUSES = {
-  pending: "pending",
-  scheduled: "scheduled",
-  completed: "completed",
-  cancelled: "cancelled",
-  rescheduled: "rescheduled",
-};
 const MyBookings = ({ navigation, route }) => {
   const routeFrom = route?.params?.route;
+  const isToday = route?.params?.isToday;
   const focus = useIsFocused();
   const menuRef = useRef(null);
   const [data, setData] = useState([]);
+  const [filetedData, setFiletedData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -152,7 +54,7 @@ const MyBookings = ({ navigation, route }) => {
     height: 0,
   });
   const [isVisible, setVisible] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState("Daily");
+  const [selectedFilter, setSelectedFilter] = useState();
   const [attendedModal, setAttendedModal] = useState(false);
   const [otpInput, setOtpInput] = useState();
 
@@ -167,16 +69,31 @@ const MyBookings = ({ navigation, route }) => {
     } else {
       initData();
     }
-  }, [focus]);
+  }, [focus, initData]);
+
+  useEffect(() => {
+    if (selectedFilter === "Daily" || isToday) {
+      const today = moment().format("YYYY-MM-DD");
+      const output = data?.filter((it) => {
+        return it?.appointment_date === today;
+      });
+      setFiletedData(output || []);
+    } else {
+      setFiletedData(data || []);
+    }
+    setLoading(false);
+  }, [data, selectedFilter, isToday]);
 
   const handleFilterSelect = (filter) => {
     setSelectedFilter(filter);
     setModalVisible(false);
   };
+
   const modalHeight = useMemo(
     () => menuPosition?.x + menuPosition?.height + menuPosition?.height / 2,
     [menuPosition?.height, menuPosition?.x]
   );
+
   const modalWidth = useMemo(
     () => menuPosition?.y + menuPosition?.width - menuPosition?.width / 2,
     [menuPosition?.width, menuPosition?.y]
@@ -188,7 +105,7 @@ const MyBookings = ({ navigation, route }) => {
     });
   };
 
-  const initData = async () => {
+  const initData = useCallback(async () => {
     try {
       setLoading(true);
       const userId = await decryptService("userId");
@@ -206,34 +123,11 @@ const MyBookings = ({ navigation, route }) => {
           setData([]);
         }
       }
-      setLoading(false);
     } catch (error) {
       setLoading(false);
       showToast("error", error?.message);
     }
-  };
-
-  // const handleCancel = (id) => {
-  //   setData((prevData) =>
-  //     prevData.map((item) =>
-  //       item.id === id
-  //         ? { ...item, isCanceled: true, isConfirmed: false }
-  //         : item
-  //     )
-  //   );
-  //   setSelectedItemId(id);
-  // };
-
-  // const handleConfirm = (id) => {
-  //   setData((prevData) =>
-  //     prevData.map((item) =>
-  //       item.id === id
-  //         ? { ...item, isConfirmed: true, isCanceled: false }
-  //         : item
-  //     )
-  //   );
-  //   setSelectedItemId(id);
-  // };
+  }, [routeFrom]);
 
   const handleAttended = async () => {
     try {
@@ -263,26 +157,6 @@ const MyBookings = ({ navigation, route }) => {
       setLoading(false);
       showToast("error", error?.message);
     }
-    // if (selectedAttendedId && otpInput) {
-    //   setData((prevData) =>
-    //     prevData.map((item) =>
-    //       item.id === selectedAttendedId
-    //         ? {
-    //             ...item,
-    //             isAttended: true,
-    //             isCanceled: false,
-    //             isConfirmed: false,
-    //           }
-    //         : item
-    //     )
-    //   );
-    //   // setSelectedItemId(selectedAttendedId);
-    //   setAttendedModal(false);
-    //   setSelectedAttendedId("");
-    //   setOtpInput("");
-    // } else {
-    //   return showToast("error", "Please enter OTP first!");
-    // }
   };
 
   const confirm = async (appointment) => {
@@ -332,301 +206,15 @@ const MyBookings = ({ navigation, route }) => {
   };
 
   const renderItem = ({ item }) => {
-    const petImage = item?.petdetails?.documents?.find(
-      (it) => it?.documenttype === "photo"
-    );
-    let itemBackgroundColor = THEMES.colors.white;
-    if (item?.status === STATUSES.cancelled) {
-      itemBackgroundColor = "#fee9e9";
-    } else if (item?.status === STATUSES.scheduled) {
-      itemBackgroundColor = "#f0ffe6";
-    } else if (item?.status === STATUSES.rescheduled) {
-      itemBackgroundColor = "#feefd4";
-    } else if (item?.status === STATUSES.completed) {
-      itemBackgroundColor = "#d6f2f5";
-    }
-    let itemtextColor = THEMES.colors.black;
-    if (item?.status === STATUSES.cancelled) {
-      itemtextColor = "#F4511E";
-    } else if (item?.status === STATUSES.scheduled) {
-      itemtextColor = "#6DAE43";
-    } else if (item?.status === STATUSES.rescheduled) {
-      itemtextColor = "#FD9F00";
-    } else if (item?.status === STATUSES.completed) {
-      itemtextColor = "#02bac7";
-    }
     return (
-      <Pressable
-        onPress={() => {
-          setSelectedItem(item);
-          navigation.navigate("appointmentDetail");
-        }}
-        style={[styles.flatlistView, { backgroundColor: itemBackgroundColor }]}
-      >
-        {item?.status === STATUSES.pending ? (
-          <View style={styles.tagView}>
-            <Text style={styles.tagText}>New</Text>
-          </View>
-        ) : null}
-
-        <View style={styles.flatlistContent}>
-          <View style={styles.flatListRow}>
-            <View style={styles.flatListImgView}>
-              <View
-                style={{
-                  width: 35,
-                  height: 35,
-                  borderRadius: 35 / 2,
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "#fffff",
-                }}
-              >
-                <Image
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 32 / 2,
-                  }}
-                  source={
-                    petImage?.url
-                      ? getBase64Obj(petImage?.url)
-                      : require("../../assets/images/profileImg.png")
-                  }
-                />
-              </View>
-              <View
-                style={{
-                  width: 35,
-                  height: 35,
-                  borderRadius: 35 / 2,
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <Image
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 32 / 2,
-                  }}
-                  source={require("../../assets/images/profileImg.png")}
-                />
-              </View>
-            </View>
-
-            <View
-              style={{
-                marginHorizontal: moderateScale(8),
-                paddingVertical: moderateScale(5),
-                flex: 1,
-              }}
-            >
-              <Text
-                style={[styles.name]}
-              >{`${item?.parentdetails?.name} & ${item?.petdetails?.name}`}</Text>
-              <View style={styles.flatListNameRow}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingVertical: moderateScale(1),
-                  }}
-                >
-                  <Text
-                    style={[
-                      styles.profileTypeText,
-                      { paddingRight: moderateScale(3) },
-                    ]}
-                  >
-                    {item?.servicedetails?.service}
-                  </Text>
-                  {/* <Text style={styles.profileTypeText}>|</Text>
-                  <Text
-                    style={[
-                      styles.profileTypeText,
-                      ,
-                      { paddingLeft: moderateScale(3) },
-                    ]}
-                  >
-                    {item.visitType}
-                  </Text> */}
-                </View>
-              </View>
-              <View style={styles.flatListNameRow}>
-                <View style={{ flexDirection: "row" }}>
-                  <Text
-                    style={[
-                      styles.visitTypeText,
-                      {
-                        marginRight: moderateScale(5),
-                        textDecorationLine: item.isSeduled
-                          ? "line-through"
-                          : "none",
-                      },
-                    ]}
-                  >
-                    {moment(item?.appointment_date)?.format("Do MMM")}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.visitTypeText,
-                      {
-                        marginRight: moderateScale(5),
-                        textDecorationLine: item.isSeduled
-                          ? "line-through"
-                          : "none",
-                      },
-                    ]}
-                  >
-                    |
-                  </Text>
-                  <Text
-                    style={[
-                      styles.visitTypeText,
-                      {
-                        textDecorationLine: item.isSeduled
-                          ? "line-through"
-                          : "none",
-                      },
-                    ]}
-                  >
-                    {item?.start_time}
-                  </Text>
-                </View>
-                {/* {item.isSeduled && (
-                  <Text style={styles.visitTypeText}>26th JUN @ 11:00 AM</Text>
-                )} */}
-              </View>
-              {routeFrom && routeFrom === "parentAccount" && item?.otp ? (
-                <Text style={styles.otp}>{`OTP: ${item?.otp}`}</Text>
-              ) : null}
-            </View>
-          </View>
-          {routeFrom && routeFrom === "parentAccount" ? null : item?.status ===
-            STATUSES.pending ? (
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Pressable
-                onPress={() => {
-                  setSelectedItem(item);
-                  setVisible(true);
-                }}
-              >
-                <Cross width={24} height={24} />
-              </Pressable>
-              <Pressable
-                style={{ marginLeft: moderateScale(12) }}
-                onPress={() => handleOnConfirm(item)}
-              >
-                <Check width={24} height={24} />
-              </Pressable>
-            </View>
-          ) : null}
-          {item?.status === STATUSES.cancelled ? (
-            <Text style={[(styles.statusText, { color: itemtextColor })]}>
-              Cancelled
-            </Text>
-          ) : null}
-          {routeFrom && routeFrom === "parentAccount" ? null : item?.status ===
-            STATUSES.scheduled ? (
-            <TouchableOpacity
-              onPress={() => {
-                setSelectedItem(item);
-                setAttendedModal(true);
-              }}
-              style={{
-                borderRadius: 8,
-                borderBottomStartRadius: 0,
-                borderWidth: 1,
-                paddingHorizontal: moderateScale(12),
-                paddingVertical: moderateScale(6),
-                borderColor: "#6DAE43",
-              }}
-            >
-              <Text style={(styles.statusText, { color: itemtextColor })}>
-                Confirm
-              </Text>
-            </TouchableOpacity>
-          ) : null}
-          {item?.status === STATUSES.rescheduled ? (
-            <Text
-              style={
-                (styles.statusText,
-                {
-                  color: itemtextColor,
-                })
-              }
-            >
-              Rescheduled
-            </Text>
-          ) : null}
-          {item?.status === STATUSES.completed ? (
-            <Text style={(styles.statusText, { color: itemtextColor })}>
-              Attended
-            </Text>
-          ) : null}
-          {/* <View>
-            {item.isCanceled ? (
-              <Text style={[(styles.statusText, { color: itemtextColor })]}>
-                Canceled
-              </Text>
-            ) : item.isConfirmed ? (
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedAttendedId(item.id);
-                  setAttendedModal(true);
-                }}
-                style={{
-                  borderRadius: 8,
-                  borderBottomStartRadius: 0,
-                  borderWidth: 1,
-                  paddingHorizontal: moderateScale(12),
-                  paddingVertical: moderateScale(6),
-                  borderColor: "#6DAE43",
-                }}
-              >
-                <Text style={(styles.statusText, { color: itemtextColor })}>
-                  Confirm
-                </Text>
-              </TouchableOpacity>
-            ) : item.isAttended ? (
-              <Text style={(styles.statusText, { color: itemtextColor })}>
-                Attended
-              </Text>
-            ) : item.isSeduled ? (
-              <Text
-                style={
-                  (styles.statusText,
-                  {
-                    color: itemtextColor,
-                  })
-                }
-              >
-                Rescheduled
-              </Text>
-            ) : (
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Pressable onPress={() => setVisible(true)}>
-                  <Cross width={24} height={24} />
-                </Pressable>
-                <Pressable
-                  style={{ marginLeft: moderateScale(12) }}
-                  onPress={() => handleOnConfirm(item.id)}
-                >
-                  <Check width={24} height={24} />
-                </Pressable>
-              </View>
-            )}
-          </View> */}
-        </View>
-      </Pressable>
+      <AppointmentCard
+        handleOnConfirm={handleOnConfirm}
+        item={item}
+        routeFrom={routeFrom}
+        setAttendedModal={setAttendedModal}
+        setSelectedItem={setSelectedItem}
+        setVisible={setVisible}
+      />
     );
   };
 
@@ -647,7 +235,7 @@ const MyBookings = ({ navigation, route }) => {
       />
       <View style={styles.mainView}>
         <FlatList
-          data={data}
+          data={validArray(filetedData) ? filetedData : data}
           showsVerticalScrollIndicator={false}
           bounces={false}
           renderItem={renderItem}
