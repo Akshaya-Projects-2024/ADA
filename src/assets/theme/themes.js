@@ -54,6 +54,7 @@ export const THEMES = {
     persimmon: "#FF6F4D",
     adoptionPink: "#ed65a5",
     bookedSlot: "#ffc7b7",
+    backdropColor: "#00000099",
   },
   fontFamily: {
     regular: "Inter-Regular",

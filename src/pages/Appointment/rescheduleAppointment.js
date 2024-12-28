@@ -20,6 +20,7 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import moment from "moment";
 import { rescheduleAppointment } from "../../redux-store/actions/auth";
 import { showToast } from "../../utils/utils";
+import { contextValue } from "../../components/Loader";
 
 const RescheduleAppointment = ({ navigation, route }) => {
   const selectedItem = route?.params?.selectedItem;
@@ -29,7 +30,6 @@ const RescheduleAppointment = ({ navigation, route }) => {
   const [isDateVisible, setDateVisibility] = useState(false);
   const [time, setTime] = useState();
   const [date, selectedDate] = useState();
-  const [loading, setLoading] = useState(false);
   const [reason, setReason] = useState("");
 
   useEffect(() => {
@@ -80,7 +80,7 @@ const RescheduleAppointment = ({ navigation, route }) => {
 
   const onSubmit = async () => {
     try {
-      setLoading(true);
+      contextValue?.setLoader(true);
       if (!date) {
         throw new Error("Please select valid date");
       } else if (!time) {
@@ -104,9 +104,9 @@ const RescheduleAppointment = ({ navigation, route }) => {
           navigation.goBack();
         }
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
@@ -228,13 +228,6 @@ const RescheduleAppointment = ({ navigation, route }) => {
         onConfirm={handleDateConfirm}
         onCancel={hideDatePickerCancel}
       />
-      {loading && (
-        <View style={styles.loadingView}>
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={THEMES.colors.white} />
-          </View>
-        </View>
-      )}
     </View>
   );
 };

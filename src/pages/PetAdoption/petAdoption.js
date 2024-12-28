@@ -25,10 +25,10 @@ import { getBase64Obj } from "../../utils/documentUtils";
 import CrossIcon from "../../assets/svg/CrossIcon";
 import { useSelector } from "react-redux";
 import { LoginModules } from "../../constants/enums";
+import { contextValue } from "../../components/Loader";
 
 const PetAdoption = (props) => {
   const { colors, fontFamily, fonts } = THEMES;
-  const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [petCategories, setPetCategories] = useState([]);
@@ -52,7 +52,7 @@ const PetAdoption = (props) => {
   }, [data, filterCategory]);
 
   const initData = async () => {
-    setLoading(true);
+    contextValue?.setLoader(true);
     try {
       const userId = await decryptService("userId");
       const params = {
@@ -70,10 +70,10 @@ const PetAdoption = (props) => {
           setPetCategories([Strings.clear, ...result]);
         }
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
       console.log("🚀 ~ initData ~ error:", error);
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
@@ -334,13 +334,6 @@ const PetAdoption = (props) => {
           />
         </View>
       </View>
-      {loading && (
-        <View style={styles.loadingView}>
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={THEMES.colors.white} />
-          </View>
-        </View>
-      )}
     </View>
   );
 };

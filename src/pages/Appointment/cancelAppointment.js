@@ -15,11 +15,11 @@ import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import { showToast } from "../../utils/utils";
 import { cancelAppointment } from "../../redux-store/actions/auth";
+import { contextValue } from "../../components/Loader";
 
 const CancelAppointment = ({ navigation, route }) => {
   const selectedItem = route?.params?.selectedItem;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [reason, setReason] = useState("");
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const CancelAppointment = ({ navigation, route }) => {
 
   const onCancel = async () => {
     try {
-      setLoading(true);
+      contextValue?.setLoader(true);
       if (!reason) {
         throw new Error("Please provide valid reason");
       } else {
@@ -60,9 +60,9 @@ const CancelAppointment = ({ navigation, route }) => {
           navigation.goBack();
         }
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
@@ -95,13 +95,6 @@ const CancelAppointment = ({ navigation, route }) => {
           </View>
         )}
       </View>
-      {loading && (
-        <View style={styles.loadingView}>
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={THEMES.colors.white} />
-          </View>
-        </View>
-      )}
     </View>
   );
 };

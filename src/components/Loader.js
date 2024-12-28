@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from "react";
 import Lottie from "lottie-react-native";
 import { Image, Pressable, StyleSheet, View } from "react-native";
 import { ms } from "react-native-size-matters";
+import { THEMES } from "../assets/theme/themes";
 let contextValue;
 const Loader = ({ children }) => {
   const [loading, setLoading] = useState(false);
@@ -30,7 +31,7 @@ const Loader = ({ children }) => {
             style={{ width: ms(100), height: ms(100) }}
           />
           <Image
-            style={{ width: ms(75), height: ms(75), position: "absolute" }}
+            style={styles.iconStyle}
             source={require("../assets/images/roundIcon.png")}
           />
         </Pressable>
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
     left: 0,
     height: "100%",
     width: "100%",
-    backgroundColor: "#00000099",
+    backgroundColor: THEMES.colors.backdropColor,
     justifyContent: "center",
     alignItems: "center",
     zIndex: 1,
@@ -55,6 +56,7 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
+  iconStyle: { width: ms(75), height: ms(75), position: "absolute" },
 });
 export { contextValue };
 export default Loader;

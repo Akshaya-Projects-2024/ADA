@@ -16,17 +16,17 @@ import Button from "../../components/Button";
 import { checkLogin } from "../../redux-store/actions/auth";
 import { encryptService } from "../../utils/storageFunc";
 import { showToast } from "../../utils/utils";
+import { contextValue } from "../../components/Loader";
 
 const SignIn = (props) => {
   const [inputValue, setInputValue] = useState(""); //a@yopmail.com //9769487604 //"jogayex376@bawsny.com" //cicocaj728@evusd.com
-  const [loading, setLoading] = useState(false);
 
   const onSubmit = async () => {
     if (!inputValue) {
       showToast("error", "Please enter Mobile number or Email Id");
     } else {
       try {
-        setLoading(true);
+        contextValue?.setLoader(true);
         Keyboard.dismiss();
         const deviceId = await getUniqueId();
         await encryptService("deviceId", deviceId);
@@ -40,16 +40,16 @@ const SignIn = (props) => {
           showToast("success", res?.data?.message);
           setTimeout(() => {
             props.navigation.navigate("otpScreen", { loginValue: inputValue });
-            setLoading(false);
+            contextValue?.setLoader(false);
             setInputValue("");
           }, 500);
         } else {
-          setLoading(false);
+          contextValue?.setLoader(false);
           setInputValue("");
           showToast("error", res?.data?.message);
         }
       } catch (error) {
-        setLoading(false);
+        contextValue?.setLoader(false);
         setInputValue("");
         showToast("error", "Something went wrong!!!");
       }
@@ -76,14 +76,6 @@ const SignIn = (props) => {
         </View>
         <Button onPress={() => onSubmit()} title={Strings.signWithOtp} />
       </View>
-
-      {loading && (
-        <View style={styles.loadingView}>
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={THEMES.colors.white} />
-          </View>
-        </View>
-      )}
     </View>
   );
 };

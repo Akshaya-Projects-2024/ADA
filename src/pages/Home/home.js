@@ -51,6 +51,7 @@ import {
   providerDashboardSlotsData,
 } from "../../redux-store/actions/auth";
 import { contextValue } from "../../components/Loader";
+import Dialog from "../../components/Dialog";
 
 const afterTimeSlots = [
   { time: "09:00", disabled: false, enabled: true },
@@ -110,6 +111,7 @@ const Home = (props) => {
   const [totalBookedSlots, setTotalBookedSlots] = useState(0);
   const { loggedInModule, guestUser } = useSelector((state) => state?.register);
   const profile = useSelector((state) => state?.commonReducer);
+  const [appointmentConfirm, setAppointmentConfirm] = useState(false);
 
   const paymentCompleted = useMemo(
     () =>
@@ -125,6 +127,12 @@ const Home = (props) => {
     if (isFocused) {
       initData();
       dispatch(setLoggedInMoodule(LoginModules.provider));
+    } else {
+      setVisible(false);
+      setAttendedModal(false);
+      setAppointmentConfirm(false);
+      setOtpInput("");
+      setSelectedItem();
     }
   }, [isFocused, dispatch, initData]);
 
@@ -245,12 +253,12 @@ const Home = (props) => {
   const renderItem = ({ item }) => {
     return (
       <AppointmentCard
-        handleOnConfirm={handleOnConfirm}
         item={item}
         routeFrom={"myprofile"}
         setAttendedModal={setAttendedModal}
         setSelectedItem={setSelectedItem}
         setVisible={setVisible}
+        setAppointmentConfirm={setAppointmentConfirm}
       />
     );
   };
@@ -275,36 +283,6 @@ const Home = (props) => {
     );
   };
 
-  const handleAttended = async () => {
-    try {
-      contextValue?.setLoader(true);
-      if (!selectedItem) {
-        throw new Error("Please select the appointment!");
-      } else if (!otpInput) {
-        throw new Error("Please enter OTP first!");
-      } else {
-        const params = {
-          appointment_id: selectedItem?.appointment_id,
-          parent_id: selectedItem?.parentdetails?.userid,
-          provider_id: selectedItem?.provider_id,
-          otp: otpInput,
-        };
-        const res = await completeAppointment(params);
-        if (res?.status === 200) {
-          setVisible(false);
-          setAttendedModal(false);
-          setOtpInput("");
-          setSelectedItem();
-          initData();
-        }
-      }
-      contextValue?.setLoader(false);
-    } catch (error) {
-      contextValue?.setLoader(false);
-      showToast("error", error?.message);
-    }
-  };
-
   const selectTimeSlot = (time) => {
     if (!time.disabled) {
       setSelectedSlot(time.time);
@@ -315,54 +293,6 @@ const Home = (props) => {
     if (!time.disabled) {
       setSelectedAfternoonSlot(time.time);
     }
-  };
-
-  const confirm = async (appointment) => {
-    try {
-      contextValue?.setLoader(true);
-      const params = {
-        appointment_id: appointment?.appointment_id,
-        parent_id: appointment?.parentdetails?.userid,
-        provider_id: appointment?.provider_id,
-      };
-      const res = await confirmAppointment(params);
-      if (res?.status === 200) {
-        initData();
-      }
-      contextValue?.setLoader(false);
-    } catch (error) {
-      contextValue?.setLoader(false);
-      showToast("error", error?.message);
-    }
-  };
-
-  const handleOnConfirm = (appointment) => {
-    Alert.alert(
-      "",
-      "Are you sure you want to confirm this appointment?",
-      [
-        {
-          text: "No",
-          style: "cancel",
-        },
-        { text: "Yes", onPress: () => confirm(appointment) },
-      ],
-      { cancelable: false }
-    );
-  };
-
-  const onCancel = () => {
-    setVisible(false);
-    setTimeout(() => {
-      props.navigation.navigate("cancelAppointment");
-    }, 500);
-  };
-
-  const onReschedule = () => {
-    setVisible(false);
-    setTimeout(() => {
-      props.navigation.navigate("rescheduleAppointment");
-    }, 500);
   };
 
   const hideDatePickerCancel = () => {
@@ -415,6 +345,97 @@ const Home = (props) => {
     props.navigation.navigate("myBookings", {
       route: "myprofile",
       isToday: true,
+    });
+  };
+
+  const handleAttended = async () => {
+    try {
+      contextValue?.setLoader(true);
+      if (!selectedItem) {
+        throw new Error("Please select the appointment!");
+      } else if (!otpInput) {
+        throw new Error("Please enter OTP first!");
+      } else {
+        const params = {
+          appointment_id: selectedItem?.appointment_id,
+          parent_id: selectedItem?.parentdetails?.userid,
+          provider_id: selectedItem?.provider_id,
+          otp: otpInput,
+        };
+        const res = await completeAppointment(params);
+        if (res?.status === 200) {
+          setVisible(false);
+          setAttendedModal(false);
+          setAppointmentConfirm(false);
+          setOtpInput("");
+          setSelectedItem();
+          initData();
+        }
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {
+      contextValue?.setLoader(false);
+      showToast("error", error?.message);
+    }
+  };
+
+  const confirm = async () => {
+    try {
+      contextValue?.setLoader(true);
+      if (!selectedItem) {
+        throw new Error("Please select the appointment!");
+      } else {
+        const params = {
+          appointment_id: selectedItem?.appointment_id,
+          parent_id: selectedItem?.parentdetails?.userid,
+          provider_id: selectedItem?.provider_id,
+        };
+        const res = await confirmAppointment(params);
+        if (res?.status === 200) {
+          setVisible(false);
+          setAttendedModal(false);
+          setAppointmentConfirm(false);
+          setOtpInput("");
+          setSelectedItem();
+          initData();
+        }
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {
+      contextValue?.setLoader(false);
+      showToast("error", error?.message);
+    }
+  };
+
+  const onAppointmentClose = () => {
+    setAppointmentConfirm(false);
+    setSelectedItem();
+  };
+
+  const handleOnConfirm = (appointment) => {
+    Alert.alert(
+      "",
+      "Are you sure you want to confirm this appointment?",
+      [
+        {
+          text: "No",
+          style: "cancel",
+        },
+        { text: "Yes", onPress: () => confirm(appointment) },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const onCancel = () => {
+    props.navigation.navigate("cancelAppointment", {
+      selectedItem: selectedItem,
+    });
+  };
+
+  const onReschedule = () => {
+    props.navigation.navigate("rescheduleAppointment", {
+      selectedItem: selectedItem,
     });
   };
 
@@ -1247,13 +1268,15 @@ const Home = (props) => {
           />
         </ScrollView>
       </Modal>
-      {contextValue?.loading && (
-        <View style={styles.loadingView}>
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={THEMES.colors.white} />
-          </View>
-        </View>
-      )}
+      <Dialog
+        flag={appointmentConfirm}
+        description={Strings.confirmAppointmentMessage}
+        leftButtonText="No"
+        rightButtonText="Yes"
+        leftButtonPressed={onAppointmentClose}
+        rightButtonPressed={confirm}
+        onClose={onAppointmentClose}
+      />
     </LinearGradient>
   );
 };

@@ -20,7 +20,7 @@ const AppointmentCard = ({
   item,
   setSelectedItem,
   routeFrom,
-  handleOnConfirm,
+  setAppointmentConfirm,
   setVisible,
   setAttendedModal,
 }) => {
@@ -170,7 +170,10 @@ const AppointmentCard = ({
             </Pressable>
             <Pressable
               style={{ marginLeft: moderateScale(12) }}
-              onPress={() => handleOnConfirm(item)}
+              onPress={() => {
+                setSelectedItem(item);
+                setAppointmentConfirm(true);
+              }}
             >
               <Check width={24} height={24} />
             </Pressable>

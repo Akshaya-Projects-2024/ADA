@@ -36,6 +36,9 @@ import { decryptService } from "../../utils/storageFunc";
 import { useIsFocused } from "@react-navigation/native";
 import AppointmentCard from "../../components/AppointmentCard";
 import moment from "moment";
+import Dialog from "../../components/Dialog";
+import { contextValue } from "../../components/Loader";
+import EmptyView from "../../components/EmptyView";
 
 const MyBookings = ({ navigation, route }) => {
   const routeFrom = route?.params?.route;
@@ -44,7 +47,6 @@ const MyBookings = ({ navigation, route }) => {
   const menuRef = useRef(null);
   const [data, setData] = useState([]);
   const [filetedData, setFiletedData] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState({
@@ -56,6 +58,7 @@ const MyBookings = ({ navigation, route }) => {
   const [isVisible, setVisible] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState();
   const [attendedModal, setAttendedModal] = useState(false);
+  const [appointmentConfirm, setAppointmentConfirm] = useState(false);
   const [otpInput, setOtpInput] = useState();
 
   const filterOptions = ["Daily", "Weekly", "Monthly", "Custom"];
@@ -64,6 +67,7 @@ const MyBookings = ({ navigation, route }) => {
     if (!focus) {
       setVisible(false);
       setAttendedModal(false);
+      setAppointmentConfirm(false);
       setOtpInput("");
       setSelectedItem();
     } else {
@@ -81,7 +85,7 @@ const MyBookings = ({ navigation, route }) => {
     } else {
       setFiletedData(data || []);
     }
-    setLoading(false);
+    contextValue?.setLoader(false);
   }, [data, selectedFilter, isToday]);
 
   const handleFilterSelect = (filter) => {
@@ -107,7 +111,7 @@ const MyBookings = ({ navigation, route }) => {
 
   const initData = useCallback(async () => {
     try {
-      setLoading(true);
+      contextValue?.setLoader(true);
       const userId = await decryptService("userId");
       const params = {
         userid: userId,
@@ -124,14 +128,14 @@ const MyBookings = ({ navigation, route }) => {
         }
       }
     } catch (error) {
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   }, [routeFrom]);
 
   const handleAttended = async () => {
     try {
-      setLoading(true);
+      contextValue?.setLoader(true);
       if (!selectedItem) {
         throw new Error("Please select the appointment!");
       } else if (!otpInput) {
@@ -147,50 +151,50 @@ const MyBookings = ({ navigation, route }) => {
         if (res?.status === 200) {
           setVisible(false);
           setAttendedModal(false);
+          setAppointmentConfirm(false);
           setOtpInput("");
           setSelectedItem();
           initData();
         }
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
 
-  const confirm = async (appointment) => {
+  const confirm = async () => {
     try {
-      setLoading(true);
-      const params = {
-        appointment_id: appointment?.appointment_id,
-        parent_id: appointment?.parentdetails?.userid,
-        provider_id: appointment?.provider_id,
-      };
-      const res = await confirmAppointment(params);
-      if (res?.status === 200) {
-        initData();
+      contextValue?.setLoader(true);
+      if (!selectedItem) {
+        throw new Error("Please select the appointment!");
+      } else {
+        const params = {
+          appointment_id: selectedItem?.appointment_id,
+          parent_id: selectedItem?.parentdetails?.userid,
+          provider_id: selectedItem?.provider_id,
+        };
+        const res = await confirmAppointment(params);
+        if (res?.status === 200) {
+          setVisible(false);
+          setAttendedModal(false);
+          setAppointmentConfirm(false);
+          setOtpInput("");
+          setSelectedItem();
+          initData();
+        }
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
 
-  const handleOnConfirm = (appointment) => {
-    Alert.alert(
-      "",
-      "Are you sure you want to confirm this appointment?",
-      [
-        {
-          text: "No",
-          style: "cancel",
-        },
-        { text: "Yes", onPress: () => confirm(appointment) },
-      ],
-      { cancelable: false }
-    );
+  const onAppointmentClose = () => {
+    setAppointmentConfirm(false);
+    setSelectedItem();
   };
 
   const onCancel = () => {
@@ -208,12 +212,12 @@ const MyBookings = ({ navigation, route }) => {
   const renderItem = ({ item }) => {
     return (
       <AppointmentCard
-        handleOnConfirm={handleOnConfirm}
         item={item}
         routeFrom={routeFrom}
         setAttendedModal={setAttendedModal}
         setSelectedItem={setSelectedItem}
         setVisible={setVisible}
+        setAppointmentConfirm={setAppointmentConfirm}
       />
     );
   };
@@ -264,6 +268,8 @@ const MyBookings = ({ navigation, route }) => {
             </Pressable>
           )}
           keyExtractor={(item, index) => index.toString()}
+          ListEmptyComponent={EmptyView}
+          contentContainerStyle={{ flexGrow: 1 }}
         />
       </FilterModal>
       <Modal
@@ -395,13 +401,15 @@ const MyBookings = ({ navigation, route }) => {
           </View>
         </View>
       </Modal>
-      {loading && (
-        <View style={styles.loadingView}>
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={THEMES.colors.white} />
-          </View>
-        </View>
-      )}
+      <Dialog
+        flag={appointmentConfirm}
+        description={Strings.confirmAppointmentMessage}
+        leftButtonText="No"
+        rightButtonText="Yes"
+        leftButtonPressed={onAppointmentClose}
+        rightButtonPressed={confirm}
+        onClose={onAppointmentClose}
+      />
     </View>
   );
 };

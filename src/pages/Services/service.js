@@ -22,38 +22,12 @@ import { decryptService } from "../../utils/storageFunc";
 import { getProviderByService } from "../../redux-store/actions/auth";
 import { showToast, validArray } from "../../utils/utils";
 import { getBase64Obj } from "../../utils/documentUtils";
-
-const Data = [
-  {
-    id: 1,
-    name: "Dr. Shreeram Laghu",
-    type: "Services Provided  | 12 Years exp",
-    rating: 2.4,
-  },
-  {
-    id: 2,
-    name: "Dr. Shreeram Laghu",
-    type: "Services Provided  | 12 Years exp",
-    rating: 4.4,
-  },
-  {
-    id: 3,
-    name: "Dr. Shreeram Laghu",
-    type: "Services Provided  | 12 Years exp",
-    rating: 5.0,
-  },
-  {
-    id: 4,
-    name: "Dr. Shreeram Laghu",
-    type: "Services Provided  | 12 Years exp",
-    rating: 1.4,
-  },
-];
+import { contextValue } from "../../components/Loader";
+import EmptyView from "../../components/EmptyView";
 
 const Service = ({ navigation, route }) => {
   const selectedService = route?.params?.selectedService;
   const [searchText, setSearchText] = useState("");
-  const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -61,6 +35,7 @@ const Service = ({ navigation, route }) => {
   }, []);
 
   const initData = async () => {
+    contextValue?.setLoader(true);
     try {
       const userId = await decryptService("userId");
       const params = {
@@ -74,10 +49,10 @@ const Service = ({ navigation, route }) => {
           setData(output);
         }
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
       console.log("🚀 ~ initData ~ error:", error);
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
@@ -302,14 +277,9 @@ const Service = ({ navigation, route }) => {
         showsVerticalScrollIndicator={false}
         bounces={false}
         renderItem={renderItem}
+        ListEmptyComponent={EmptyView}
+        contentContainerStyle={{ flexGrow: 1 }}
       />
-      {loading && (
-        <View style={styles.loadingView}>
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={THEMES.colors.white} />
-          </View>
-        </View>
-      )}
     </View>
   );
 };

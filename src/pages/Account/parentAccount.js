@@ -136,7 +136,8 @@ const ParentAccount = (props) => {
     >
       <StatusBar backgroundColor={"#f8f4f4"} />
       <Header
-        customIcon={<SwitchIcon />}
+        // customIcon={<SwitchIcon />}
+        showBack
         title={Strings.myAccount}
         showSearch
         bgColor="transparent"

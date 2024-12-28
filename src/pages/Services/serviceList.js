@@ -6,55 +6,29 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  Image,
   StatusBar,
-  ActivityIndicator,
 } from "react-native";
-import Trainer from "../../assets/svg/trainer.svg";
-import Walker from "../../assets/svg/walker.svg";
-import Behaviourist from "../../assets/svg/behaviour.svg";
-
-import Groomer from "../../assets/svg/groomer.svg";
-import Therapist from "../../assets/svg/therapist.svg";
-import Communicator from "../../assets/svg/communicator.svg";
-import Nurtitionist from "../../assets/svg/nurtitionist.svg";
 
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
 import { moderateScale } from "react-native-size-matters";
 import Strings from "../../constants/strings";
 import { showToast, validArray } from "../../utils/utils";
-import { decryptService } from "../../utils/storageFunc";
 import { getServices } from "../../redux-store/actions/auth";
-import { getBase64Obj } from "../../utils/documentUtils";
 import { SvgUri } from "react-native-svg";
+import { contextValue } from "../../components/Loader";
+import EmptyView from "../../components/EmptyView";
 const { width } = Dimensions.get("window");
-
-// Mock data for icons and labels
-// const services = [
-//   { id: 1, title: "Trainer", icon: <Trainer /> },
-//   { id: 2, title: "Behaviourist", icon: <Behaviourist /> },
-//   { id: 3, title: "Pet Walker", icon: <Walker /> },
-//   { id: 4, title: "Groomer", icon: <Groomer /> },
-//   { id: 5, title: "Animal therapist", icon: <Therapist /> },
-//   { id: 6, title: "Nutritionist", icon: <Nurtitionist /> },
-//   { id: 7, title: "Restaurants", icon: <Groomer /> },
-//   { id: 8, title: "Fresh Food", icon: <Groomer /> },
-//   { id: 9, title: "Vets-Hospitals", icon: <Groomer /> },
-//   { id: 10, title: "Pet NGO", icon: <Groomer /> },
-//   { id: 11, title: "Boarding/Pet Sitter", icon: <Groomer /> },
-//   { id: 12, title: "Animal Communicator", icon: <Communicator /> },
-// ];
 
 const ServiceList = (props) => {
   const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     initData();
   }, []);
 
   const initData = async () => {
+    contextValue?.setLoader(true);
     try {
       const params = {
         service: "",
@@ -66,10 +40,10 @@ const ServiceList = (props) => {
           setServices(output);
         }
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
       console.log("🚀 ~ initData ~ error:", error);
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
@@ -114,15 +88,9 @@ const ServiceList = (props) => {
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={EmptyView}
         />
       </View>
-      {loading && (
-        <View style={styles.loadingView}>
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={THEMES.colors.white} />
-          </View>
-        </View>
-      )}
     </View>
   );
 };
@@ -133,6 +101,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEMES.colors.bgColor,
   },
   listContent: {
+    flexGrow: 1,
     paddingVertical: 10, // Padding for the entire FlatList
   },
   row: {

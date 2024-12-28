@@ -102,8 +102,6 @@ const Strings = {
   sendRequest: "Send request",
   to: "To",
   from: "From",
-  cancelAppointmentMessage:
-    "Are you sure you want to confirm this appointment?",
   am: "AM",
   pm: "PM",
   hhmm: "HH:MM",
@@ -136,6 +134,9 @@ const Strings = {
   dailySession: "Daily Session",
   startDate: "Start Date",
   endDate: "End Date",
+  areYouSure: "Are you sure?",
+  confirmAppointmentMessage:
+    "Are you sure you want to confirm this appointment?",
 };
 
 export default Strings;

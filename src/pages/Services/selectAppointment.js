@@ -29,6 +29,7 @@ import {
 import { decryptService } from "../../utils/storageFunc";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useSelector } from "react-redux";
+import { contextValue } from "../../components/Loader";
 
 const SESSION_TYPE = { oneTime: "one_time", recursive: "recursive" };
 
@@ -49,7 +50,6 @@ const SelectAppointment = ({ navigation, route }) => {
   const [startDateVisible, setStartDateVisible] = useState(false);
   const [endDateVisible, setEndDateVisible] = useState(false);
   const [timeSlots, setTimeSlots] = useState({});
-  const [loading, setLoading] = useState(false);
   const profile = useSelector((state) => state?.commonReducer);
 
   const memorizedSlots = useMemo(() => {
@@ -117,7 +117,7 @@ const SelectAppointment = ({ navigation, route }) => {
 
   const getSessionData = useCallback(async () => {
     try {
-      setLoading(true);
+      contextValue?.setLoader(true);
       const userId = await decryptService("userId");
       const params = {
         userid: userId,
@@ -139,16 +139,16 @@ const SelectAppointment = ({ navigation, route }) => {
         }
         setTimeSlots(data);
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   }, [endDate, selectedProvider?.profile?.providerBusiness?.userid, startDate]);
 
   const handleSubmit = async () => {
     try {
-      setLoading(true);
+      contextValue?.setLoader(true);
       if (!selectedProvider?.profile?.providerBusiness?.userid) {
         throw new Error("Invalid Provider! Please select valid provider");
       } else if (!selectedService?.code) {
@@ -194,9 +194,9 @@ const SelectAppointment = ({ navigation, route }) => {
           });
         }
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
@@ -656,13 +656,6 @@ const SelectAppointment = ({ navigation, route }) => {
         onCancel={hideEndDatePicker}
         minimumDate={startDate || new Date()}
       />
-      {loading && (
-        <View style={styles.loadingView}>
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={THEMES.colors.white} />
-          </View>
-        </View>
-      )}
     </View>
   );
 };

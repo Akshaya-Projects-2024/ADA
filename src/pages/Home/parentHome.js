@@ -37,6 +37,7 @@ import { decryptService } from "../../utils/storageFunc";
 import { getUpcomingAppointments } from "../../redux-store/actions/auth";
 import moment from "moment";
 import { getBase64Obj } from "../../utils/documentUtils";
+import { contextValue } from "../../components/Loader";
 const { width: screenWidth } = Dimensions.get("window");
 
 const services = [
@@ -74,7 +75,6 @@ const { width } = Dimensions.get("window");
 const ParentHome = (props) => {
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
-  const [loading, setLoading] = useState(false);
   const [appointmentData, setAppointmentData] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const { loggedInModule, guestUser } = useSelector((state) => state?.register);
@@ -89,7 +89,7 @@ const ParentHome = (props) => {
 
   const initData = async () => {
     try {
-      setLoading(true);
+      contextValue?.setLoader(true);
       const userId = await decryptService("userId");
       const params = {
         userid: userId,
@@ -106,9 +106,9 @@ const ParentHome = (props) => {
         });
         setAppointmentData(validArray(output) ? output : []);
       }
-      setLoading(false);
+      contextValue?.setLoader(false);
     } catch (error) {
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
@@ -593,13 +593,6 @@ const ParentHome = (props) => {
           />
         </View>
       </ScrollView>
-      {loading && (
-        <View style={styles.loadingView}>
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={THEMES.colors.white} />
-          </View>
-        </View>
-      )}
     </View>
   );
 };

@@ -6,12 +6,12 @@ Tasks => Provider
              5) Mobile OTP
 
 
-    Krunal=> 1) Appointment Card-Integrate new api 
-             2) Upcoming appointment carousel- integrate api 
-             3) Today's appointment will redirect to myBookings with today's date filter
-             4) Update splash with new loader
-             5) Client Review
-             6) Create dialog according to the figma
-             7) Empty view for the app
-             8) Service hard coded screen has to be worked on
-             9) Appontment creation when we are asking user to pick start/end date dont allow to select particular date. All dates will be selected by default
+    Krunal=> 1) Appointment Card-Integrate new api - DONE
+             2) Upcoming appointment carousel- integrate api - DONE
+             3) Today's appointment will redirect to myBookings with today's date filter - DONE
+             4) Update splash with new loader - DONE
+             5) Client Review - DONE
+             6) Create dialog according to the figma - DONE
+             7) Empty view for the app - DONE
+             8) Service hard coded screen has to be worked on - DONE
+             9) Appontment creation when we are asking user to pick start/end date dont allow to select particular date. All dates will be selected by default - TODO for later

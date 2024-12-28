@@ -4,7 +4,14 @@ import { moderateScale } from "react-native-size-matters";
 import { THEMES } from "../assets/theme/themes";
 
 const Button = (props) => {
-  const { title, onlyBorder, onPress, bgColor, textColor } = props;
+  const {
+    title,
+    onlyBorder,
+    onPress,
+    bgColor,
+    textColor,
+    isFlex = false,
+  } = props;
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -18,6 +25,7 @@ const Button = (props) => {
             : THEMES.colors.cyan,
           borderColor: onlyBorder ? THEMES.colors.cyan : null,
           borderWidth: onlyBorder ? 1.5 : 0,
+          ...(isFlex ? { flex: 1 } : {}),
         },
       ]}
     >

@@ -40,6 +40,7 @@ import {
 } from "../../redux-store/actions/auth";
 import { getAdoptionCategory } from "../../redux-store/actions/commonApis";
 import { DOCUMENT_TYPES } from "../Account/uploadImagesDocs";
+import { contextValue } from "../../components/Loader";
 
 const categoryData = [
   { id: "1", label: "Training" },
@@ -50,7 +51,6 @@ const categoryData = [
 
 const AddAdoption = (props) => {
   const { navigation } = props;
-  const [loading, setLoading] = useState(false);
   const [breed, setBreed] = useState();
   const [age, setAge] = useState();
   const [location, setLocation] = useState();
@@ -166,7 +166,7 @@ const AddAdoption = (props) => {
       } else if (!agree) {
         showToast("error", "Please select terms and conditions");
       } else {
-        setLoading(true);
+        contextValue?.setLoader(true);
         const userId = await decryptService("userId");
         const params = {
           category: selectedCategory[0]?.label,
@@ -188,11 +188,11 @@ const AddAdoption = (props) => {
           showToast("success", "Data Added Successfully");
           navigation.goBack();
         }
-        setLoading(false);
+        contextValue?.setLoader(false);
       }
     } catch (error) {
       console.log("🚀 ~ initData ~ error:", error);
-      setLoading(false);
+      contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
@@ -644,13 +644,6 @@ const AddAdoption = (props) => {
         onConfirm={handleDateConfirm}
         onCancel={hideDatePickerCancel}
       />
-      {loading && (
-        <View style={styles.loadingView}>
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={THEMES.colors.white} />
-          </View>
-        </View>
-      )}
     </View>
   );
 };

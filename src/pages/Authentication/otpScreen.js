@@ -32,13 +32,13 @@ import {
   validateParentProfile,
   validateServiceProfile,
 } from "../../utils/userUtils";
+import { contextValue } from "../../components/Loader";
 
 const OtpScreen = (props) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef([]);
   const value = props.route.params.loginValue;
   const [isMobileNumber, setIsMobileNumber] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [isRefresh, setIsRefresh] = useState(false);
   const dispatch = useDispatch();
 
@@ -115,7 +115,7 @@ const OtpScreen = (props) => {
 
   const apiCall = async (otpValue) => {
     try {
-      setLoading(true);
+      contextValue?.setLoader(true);
       Keyboard.dismiss();
       const currentPosition = await getCurrentLocation();
       const deviceId = await decryptService("deviceId");
@@ -147,7 +147,7 @@ const OtpScreen = (props) => {
         const response = await getProfile(obj);
         if (response?.data?.status_code == 200) {
           showToast("success", res?.data?.message);
-          setLoading(false);
+          contextValue?.setLoader(false);
           setOtp(["", "", "", "", "", ""]);
           // dispatch(saveRegisterData(response?.data?.data)); No need
           dispatch(dispatchUserData(response?.data?.data));
@@ -217,12 +217,12 @@ const OtpScreen = (props) => {
         }
       } else {
         showToast("error", res?.data?.message);
-        setLoading(false);
+        contextValue?.setLoader(false);
         setOtp(["", "", "", "", "", ""]);
       }
     } catch (error) {
       showToast("error", "Something went wrong!!!");
-      setLoading(false);
+      contextValue?.setLoader(false);
       setOtp(["", "", "", "", "", ""]);
     }
   };
@@ -251,7 +251,7 @@ const OtpScreen = (props) => {
 
   const resendOtp = async () => {
     try {
-      setLoading(true);
+      contextValue?.setLoader(true);
       const deviceId = await decryptService("deviceId", deviceId);
       const postData = {
         UserId: value,
@@ -261,9 +261,9 @@ const OtpScreen = (props) => {
       if (res?.data?.status_code == 200) {
         showToast("success", res?.data?.message);
         setIsRefresh(!isRefresh);
-        setLoading(false);
+        contextValue?.setLoader(false);
       } else {
-        setLoading(false);
+        contextValue?.setLoader(false);
         showToast("error", res?.data?.message);
       }
     } catch (error) {
@@ -381,13 +381,6 @@ const OtpScreen = (props) => {
             </Text>
           </View>
         </ScrollView>
-        {loading && (
-          <View style={styles.loadingView}>
-            <View style={styles.loadingBox}>
-              <ActivityIndicator color={THEMES.colors.white} />
-            </View>
-          </View>
-        )}
       </ImageBackground>
     </View>
   );

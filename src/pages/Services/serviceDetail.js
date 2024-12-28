@@ -18,11 +18,17 @@ import Share from "../../assets/svg/share.svg";
 import Bookmark from "../../assets/svg/bookmark.svg";
 import RightArrow from "../../assets/svg/arrowRight.svg";
 import Button from "../../components/Button";
+import { getBase64Obj } from "../../utils/documentUtils";
+import { validArray } from "../../utils/utils";
 
 const Data = ["Vaccinations", "Document 1", "Document 2", "Document 3"];
 
 const ServiceDetail = ({ navigation, route }) => {
   const selectedProvider = route?.params?.selectedProvider;
+  console.log(
+    "🚀 ~ ServiceDetail ~ selectedProvider:",
+    selectedProvider?.profile?.providerRating
+  );
   const selectedService = route?.params?.selectedService;
   return (
     <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
@@ -71,7 +77,16 @@ const ServiceDetail = ({ navigation, route }) => {
               width: 97,
               borderRadius: 12,
             }}
-          />
+          >
+            <Image
+              style={{
+                width: 55,
+                height: 55,
+                borderRadius: 55 / 2,
+              }}
+              source={getBase64Obj(selectedProvider?.photo)}
+            />
+          </View>
           <View style={{ paddingLeft: moderateScale(19), width: "80%" }}>
             <Text
               numberOfLines={1}
@@ -81,9 +96,9 @@ const ServiceDetail = ({ navigation, route }) => {
                 color: THEMES.colors.black,
               }}
             >
-              Dr. Shreeram Laghu
+              {selectedProvider?.profile?.providerBusiness?.name}
             </Text>
-            <Text
+            {/* <Text
               numberOfLines={1}
               style={{
                 fontFamily: THEMES.fontFamily.medium,
@@ -92,7 +107,7 @@ const ServiceDetail = ({ navigation, route }) => {
               }}
             >
               Degree, Profession name
-            </Text>
+            </Text> */}
             <Text
               numberOfLines={1}
               style={{
@@ -102,7 +117,12 @@ const ServiceDetail = ({ navigation, route }) => {
                 color: THEMES.colors.black,
               }}
             >
-              ₹ 1000/Per session
+              {`₹ ${
+                selectedProvider?.profile?.sessionRateDetails[0]
+                  ?.sessioncharges ||
+                selectedProvider?.profile?.monthcharges[0]?.sessioncharges ||
+                "0.00"
+              }/Per session`}
             </Text>
           </View>
         </View>
@@ -155,7 +175,7 @@ const ServiceDetail = ({ navigation, route }) => {
                     fontSize: THEMES.fonts.font12,
                   }}
                 >
-                  12 Years
+                  {`${selectedProvider?.profile?.providerBusiness?.experience} Years`}
                 </Text>
               </View>
               <View
@@ -186,7 +206,7 @@ const ServiceDetail = ({ navigation, route }) => {
                     fontSize: THEMES.fonts.font12,
                   }}
                 >
-                  4.3
+                  {selectedProvider?.profile?.providerRating?.rating}
                 </Text>
               </View>
               <View
@@ -217,7 +237,7 @@ const ServiceDetail = ({ navigation, route }) => {
                     fontSize: THEMES.fonts.font12,
                   }}
                 >
-                  98%
+                  0%
                 </Text>
               </View>
             </View>
@@ -226,7 +246,6 @@ const ServiceDetail = ({ navigation, route }) => {
           <View
             style={{
               flex: 1,
-              backgroundColor: "#fff",
               borderTopRightRadius: 70,
               padding: moderateScale(23),
               backgroundColor: "#FFFDF5",
@@ -249,8 +268,7 @@ const ServiceDetail = ({ navigation, route }) => {
                 paddingTop: moderateScale(3),
               }}
             >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              {selectedProvider?.profile?.providerBusiness?.description}
             </Text>
 
             <View
@@ -272,7 +290,7 @@ const ServiceDetail = ({ navigation, route }) => {
                     fontSize: THEMES.fonts.font14,
                   }}
                 >
-                  2,5485 Reviews
+                  {`${selectedProvider?.profile?.providerRating?.totalratingcount} Reviews`}
                 </Text>
                 <Text
                   style={{
@@ -292,8 +310,12 @@ const ServiceDetail = ({ navigation, route }) => {
                   paddingTop: moderateScale(3),
                 }}
               >
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                {validArray(
+                  selectedProvider?.profile?.providerRating?.highestReview
+                )
+                  ? selectedProvider?.profile?.providerRating?.highestReview[0]
+                      ?.remark
+                  : ""}
               </Text>
             </View>
 
@@ -336,8 +358,7 @@ const ServiceDetail = ({ navigation, route }) => {
                   paddingTop: moderateScale(3),
                 }}
               >
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                {selectedProvider?.profile?.providerContact?.address}
               </Text>
             </View>
             <View style={styles.medicalDocView}>
