@@ -232,6 +232,7 @@ const Home = (props) => {
             color: "#FD9F00",
           },
         ]);
+        setTotalBookedSlots(confirmedAppointments);
         setSlotsData(output);
       }
       setLoading(false);
@@ -597,7 +598,7 @@ const Home = (props) => {
                         fontSize: THEMES.fonts.font14,
                       }}
                     >
-                      {`${countData?.length || 0}/${slotsData?.length || 0}`}
+                      {`${totalBookedSlots || 0}/${slotsData?.length || 0}`}
                     </Text>
                     <Text
                       style={{
