@@ -244,6 +244,8 @@ const MyBookings = ({ navigation, route }) => {
           bounces={false}
           renderItem={renderItem}
           keyExtractor={(item) => item?.appointment_id?.toString()}
+          ListEmptyComponent={EmptyView}
+          contentContainerStyle={{ flexGrow: 1 }}
         />
       </View>
       <FilterModal

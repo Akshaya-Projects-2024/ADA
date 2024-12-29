@@ -28,7 +28,7 @@ import RazorpayCheckout from "react-native-razorpay";
 import { getProfile } from "../../redux-store/actions/auth";
 import { dispatchUserData } from "../../redux-store/actions/registerAction";
 import { validateServiceProfile } from "../../utils/userUtils";
-import { showAlert, validArray, validObject } from "../../utils/utils";
+import { validArray, validObject } from "../../utils/utils";
 import SubscriptionError from "./subscriptionError";
 
 const PaymentsSubscription = (props) => {
@@ -160,7 +160,6 @@ const PaymentsSubscription = (props) => {
   ]);
 
   const navigateToHome = async () => {
-    await fetchUserProfile();
     props.navigation.reset({
       index: 0,
       routes: [
@@ -209,6 +208,7 @@ const PaymentsSubscription = (props) => {
         };
         const acknowledgeResponse = await acknowledgeSubscription(params);
         if (acknowledgeResponse?.status === 200) {
+          await fetchUserProfile();
           setSubscription(true);
         }
       }
@@ -462,7 +462,7 @@ const PaymentsSubscription = (props) => {
           {profile?.providerProfile?.subscription?.subscriptioncode &&
           profile?.providerProfile?.subscription?.status === "active" ? null : (
             <View style={[styles.btnView, { paddingTop: moderateScale(20) }]}>
-              <Button onPress={() => handlePayment()} title={Strings.payNow} />
+              <Button onPress={handlePayment} title={Strings.payNow} />
             </View>
           )}
         </View>
