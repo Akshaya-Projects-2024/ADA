@@ -112,16 +112,25 @@ const Home = (props) => {
   const { loggedInModule, guestUser } = useSelector((state) => state?.register);
   const profile = useSelector((state) => state?.commonReducer);
   const [appointmentConfirm, setAppointmentConfirm] = useState(false);
+  const [paymentModal, setPaymentModal] = useState(false);
 
-  const paymentCompleted = useMemo(
-    () =>
+  const paymentCompleted = useMemo(() => {
+    if (
       profile?.providerProfile?.subscription?.status === "active" &&
-      profile?.logindetails?.isprovider === ApprovalStatus.approved,
-    [
-      profile?.logindetails?.isprovider,
-      profile?.providerProfile?.subscription?.status,
-    ]
-  );
+      profile?.logindetails?.isprovider === ApprovalStatus.approved
+    ) {
+      return { flag: true };
+    } else if (
+      profile?.providerProfile?.subscription?.status === "active" &&
+      profile?.logindetails?.isprovider !== ApprovalStatus.approved
+    ) {
+      return { flag: false, message: Strings.approvaltError };
+    }
+    return { flag: false, message: Strings.paymentError };
+  }, [
+    profile?.logindetails?.isprovider,
+    profile?.providerProfile?.subscription?.status,
+  ]);
 
   useEffect(() => {
     if (isFocused) {
@@ -131,6 +140,7 @@ const Home = (props) => {
       setVisible(false);
       setAttendedModal(false);
       setAppointmentConfirm(false);
+      setPaymentModal(false);
       setOtpInput("");
       setSelectedItem();
     }
@@ -330,14 +340,10 @@ const Home = (props) => {
   };
 
   const handlePremiumActionPressed = (premiumAction) => {
-    if (paymentCompleted) {
+    if (paymentCompleted?.flag) {
       premiumAction();
     } else {
-      showPaymentAlert(() => {
-        props.navigation.navigate("auth", {
-          screen: "paymentsSubscription",
-        });
-      });
+      setPaymentModal(true);
     }
   };
 
@@ -1276,6 +1282,24 @@ const Home = (props) => {
         leftButtonPressed={onAppointmentClose}
         rightButtonPressed={confirm}
         onClose={onAppointmentClose}
+      />
+      <Dialog
+        flag={paymentModal}
+        title={Strings.attention}
+        description={paymentCompleted?.message}
+        leftButtonText="Cancel"
+        rightButtonText="OK"
+        leftButtonPressed={() => {
+          setPaymentModal(false);
+        }}
+        rightButtonPressed={() => {
+          props.navigation.navigate("auth", {
+            screen: "paymentsSubscription",
+          });
+        }}
+        onClose={() => {
+          setPaymentModal(false);
+        }}
       />
     </LinearGradient>
   );
