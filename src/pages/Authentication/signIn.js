@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ImageBackground,
   Keyboard,
+  StatusBar,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
@@ -16,10 +17,12 @@ import { checkLogin } from "../../redux-store/actions/auth";
 import { encryptService } from "../../utils/storageFunc";
 import { showToast } from "../../utils/utils";
 import { contextValue } from "../../components/Loader";
+import { dispathGuestUser } from "../../redux-store/actions/userActions";
+import { useDispatch } from "react-redux";
 
 const SignIn = (props) => {
   const [inputValue, setInputValue] = useState(""); //a@yopmail.com //9769487604 //"jogayex376@bawsny.com" //cicocaj728@evusd.com
-
+  const dispatch = useDispatch();
   const onSubmit = async () => {
     if (!inputValue) {
       showToast("error", "Please enter Mobile number or Email Id");
@@ -54,14 +57,35 @@ const SignIn = (props) => {
     }
   };
 
+  const onLaterPressed = () => {
+    dispatch(dispathGuestUser(true));
+    setTimeout(() => {
+      props.navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: "auth",
+            state: {
+              routes: [
+                {
+                  name: "home",
+                },
+              ],
+            },
+          },
+        ],
+      });
+    });
+  };
+
   return (
     <View style={styles.container}>
+      <StatusBar backgroundColor="transparent" translucent />
       <ImageBackground
         source={require("../../assets/images/signin.jpeg")}
         resizeMode="cover"
         style={styles.imgBackground}
       />
-
       <View style={styles.contentView}>
         <Text style={styles.signInText}>{Strings.signIn}</Text>
         <View style={styles.inputStyle}>
@@ -72,7 +96,11 @@ const SignIn = (props) => {
             onChange={setInputValue}
           />
         </View>
-        <Button onPress={() => onSubmit()} title={Strings.signWithOtp} />
+        <Button onPress={onSubmit} title={Strings.signWithOtp} />
+        <View style={{ flex: 1 }} />
+        <View style={{ marginVertical: moderateScale(23) }}>
+          <Button onPress={null} title={Strings.skip} onlyBorder />
+        </View>
       </View>
     </View>
   );
@@ -87,17 +115,16 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    height: 415,
   },
   contentView: {
-    backgroundColor: "#fff",
-    alignSelf: "flex-end",
+    backgroundColor: THEMES.colors.bgColor,
     paddingHorizontal: moderateScale(17),
     width: "100%",
-    borderTopLeftRadius: 39,
-    borderTopRightRadius: 39,
+    borderTopLeftRadius: moderateScale(39),
+    borderTopRightRadius: moderateScale(39),
     flex: 1,
-    paddingTop: moderateScale(61),
+    marginTop: -moderateScale(39),
+    paddingTop: moderateScale(65),
   },
   signInText: {
     fontFamily: THEMES.fontFamily.bold,
