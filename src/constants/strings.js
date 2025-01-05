@@ -139,6 +139,17 @@ const Strings = {
   areYouSure: "Are you sure?",
   confirmAppointmentMessage:
     "Are you sure you want to confirm this appointment?",
+  welcome: "Welcome",
+  experienced: "Experienced",
+  allInOne: "Your All-In-One",
+  introText2: "Experienced & Hand-Picked Professionals",
+  introText3: "Pet Care Hub",
+  introDes1:
+    "We're dedicated to providing top-priority, personalized care for you and your beloved pet with the highest level of professionalism.",
+  introDes2:
+    "Our expert, hand-picked team ensures the best care for your pet. Trust us for their well-being and happiness.",
+  introDes3:
+    "Effortlessly connect with top pet professionals—all in one place, just a tap away!",
 };
 
 export default Strings;

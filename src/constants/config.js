@@ -1,3 +1,3 @@
 export const config = {
-  baseUrl: "https://register.uat.advikapetworld.com/v1",
+  baseUrl: "https://smart.uat.advikapetworld.com/v1",
 };

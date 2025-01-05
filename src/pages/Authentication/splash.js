@@ -1,6 +1,12 @@
 import { useIsFocused } from "@react-navigation/native";
-import React, { useCallback, useEffect } from "react";
-import { Image, StyleSheet, useWindowDimensions, View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import {
+  Image,
+  StatusBar,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { decryptService } from "../../utils/storageFunc";
 import { getProfile } from "../../redux-store/actions/auth";
 import {
@@ -17,14 +23,41 @@ import {
 import { LoginModules } from "../../constants/enums";
 
 const Splash = (props) => {
-  const { width, height } = useWindowDimensions();
+  const timeoutRef = useRef();
+  const { width } = useWindowDimensions();
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
 
+  const bannerHeight = useMemo(() => {
+    const newHeight = Math.floor((width / 1440) * 3200);
+    return newHeight;
+  }, [width]);
+
+  const delay = useCallback(
+    async (func) => {
+      const firstBootCompleted = await decryptService("firstBootCompleted");
+      if (firstBootCompleted) {
+        if (timeoutRef?.current) {
+          clearTimeout(timeoutRef.current);
+        }
+        timeoutRef.current = setTimeout(func, 1500);
+      } else {
+        timeoutRef.current = setTimeout(
+          () =>
+            props?.navigation.navigate("intro", {
+              func: func,
+            }),
+          1500
+        );
+      }
+    },
+    [props?.navigation]
+  );
+
   useEffect(() => {
     if (isFocused) {
-      checkIfUserExits();
       dispatch(getServiceProviderRole());
+      checkIfUserExits();
     }
   }, [isFocused, checkIfUserExits, dispatch]);
 
@@ -55,11 +88,40 @@ const Splash = (props) => {
       const validProviderProfile = validateServiceProfile(userData); //pass true as an argument for testing purpose till payment part is done
       if (validProfile?.flag && validProviderProfile?.flag) {
         if (loggedInModule && loggedInModule === LoginModules.parent) {
-          props.navigation.reset({
-            index: 0,
-            routes: [{ name: "petParentAppStack" }],
-          });
+          delay(() =>
+            props.navigation.reset({
+              index: 0,
+              routes: [{ name: "petParentAppStack" }],
+            })
+          );
         } else {
+          delay(() =>
+            props.navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "auth",
+                  state: {
+                    routes: [
+                      {
+                        name: "home",
+                      },
+                    ],
+                  },
+                },
+              ],
+            })
+          );
+        }
+      } else if (
+        !validProfile?.flag &&
+        !validProfile?.partiallyCompleted &&
+        !validProviderProfile?.flag &&
+        !validProviderProfile?.partiallyCompleted
+      ) {
+        delay(() => props?.navigation.replace("auth"));
+      } else if (validProviderProfile?.flag) {
+        delay(() =>
           props.navigation.reset({
             index: 0,
             routes: [
@@ -74,62 +136,50 @@ const Splash = (props) => {
                 },
               },
             ],
-          });
-        }
-      } else if (
-        !validProfile?.flag &&
-        !validProfile?.partiallyCompleted &&
-        !validProviderProfile?.flag &&
-        !validProviderProfile?.partiallyCompleted
-      ) {
-        props?.navigation.replace("auth");
-      } else if (validProviderProfile?.flag) {
-        props.navigation.reset({
-          index: 0,
-          routes: [
-            {
-              name: "auth",
-              state: {
-                routes: [
-                  {
-                    name: "home",
-                  },
-                ],
-              },
-            },
-          ],
-        });
+          })
+        );
       } else if (validProfile?.flag) {
-        props.navigation.reset({
-          index: 0,
-          routes: [{ name: "petParentAppStack" }],
-        });
+        delay(() =>
+          props.navigation.reset({
+            index: 0,
+            routes: [{ name: "petParentAppStack" }],
+          })
+        );
       } else if (
         !validProviderProfile?.flag &&
         validProviderProfile?.partiallyCompleted
       ) {
         showToast("error", "Please complete your registration");
-        props.navigation.navigate("auth", {
-          screen: validProviderProfile?.navigateTo,
-        });
+        delay(() =>
+          props.navigation.navigate("auth", {
+            screen: validProviderProfile?.navigateTo,
+          })
+        );
       } else if (!validProfile?.flag && validProfile?.partiallyCompleted) {
-        props.navigation.navigate(validProfile?.navigateTo, {
-          route: "parentAccount",
-        });
+        delay(() =>
+          props.navigation.navigate(validProfile?.navigateTo, {
+            route: "parentAccount",
+          })
+        );
       } else {
-        props?.navigation.replace("auth");
+        delay(() => props?.navigation.replace("auth"));
       }
     } else {
-      props?.navigation.replace("app");
+      delay(() => props?.navigation.replace("app"));
     }
-  }, [initData, props.navigation]);
+  }, [delay, initData, props.navigation]);
 
   return (
     <View style={styles.flex}>
+      <StatusBar
+        translucent
+        backgroundColor={"transparent"}
+        barStyle={"dark-content"}
+      />
       <Image
         style={StyleSheet.flatten([
           styles.absolute,
-          { width: width, height: height },
+          { width: width, height: bannerHeight },
         ])}
         source={require("../../assets/images/Splash.png")}
       />

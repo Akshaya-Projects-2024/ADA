@@ -9,7 +9,7 @@ import {
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
 import { getUniqueId } from "react-native-device-info";
-import { moderateScale, s } from "react-native-size-matters";
+import { moderateScale } from "react-native-size-matters";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import { checkLogin } from "../../redux-store/actions/auth";

@@ -76,6 +76,10 @@
     {
       "path": "src/assets/fonts/Inter-V.ttf",
       "sha1": "03f5c0ff412bc0aac7ef2c1e19edcbdd9b06a609"
+    },
+    {
+      "path": "src/assets/fonts/MeowScript-Regular.ttf",
+      "sha1": "ac5e2720fec8fc75d9bd322dd71bb55432d1f53b"
     }
   ]
 }

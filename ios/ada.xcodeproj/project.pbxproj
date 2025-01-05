@@ -33,6 +33,7 @@
 		CA8964DA6CF3435585B6B79C /* Inter-V.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6C451C692DB649DC9E15D076 /* Inter-V.ttf */; };
 		CE89864F53D54394A2F19EBF /* Inter-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = CA88E047032A40BA893E1700 /* Inter-BoldItalic.otf */; };
 		E23F864CC8B44B3EAFA17868 /* Inter-BlackItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = A7400A1D56E1408091C5CC43 /* Inter-BlackItalic.otf */; };
+		97E486D95C5A44138778B742 /* MeowScript-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 83A0C0C56BE943E991B4B4BE /* MeowScript-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +83,7 @@
 		D3062A04A0724D1795A8F3DA /* Inter-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Light.otf"; path = "../src/assets/fonts/Inter-Light.otf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F3232276979845659C64A58D /* Inter-ExtraLight.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-ExtraLight.otf"; path = "../src/assets/fonts/Inter-ExtraLight.otf"; sourceTree = "<group>"; };
+		83A0C0C56BE943E991B4B4BE /* MeowScript-Regular.ttf */ = {isa = PBXFileReference; name = "MeowScript-Regular.ttf"; path = "../src/assets/fonts/MeowScript-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -198,6 +200,7 @@
 				C481A883B324485A941997E0 /* Inter-Thin.otf */,
 				CC97CBA5ABAD4270B7DEE3DB /* Inter-ThinItalic.otf */,
 				6C451C692DB649DC9E15D076 /* Inter-V.ttf */,
+				83A0C0C56BE943E991B4B4BE /* MeowScript-Regular.ttf */,
 			);
 			name = Resources;
 			path = "";
@@ -328,6 +331,7 @@
 				9D9E410815A14CFEB3E0343D /* Inter-Thin.otf in Resources */,
 				0FC16AD879BA45059FA600ED /* Inter-ThinItalic.otf in Resources */,
 				CA8964DA6CF3435585B6B79C /* Inter-V.ttf in Resources */,
+				97E486D95C5A44138778B742 /* MeowScript-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

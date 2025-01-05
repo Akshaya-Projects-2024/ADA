@@ -55,6 +55,7 @@ export const THEMES = {
     adoptionPink: "#ed65a5",
     bookedSlot: "#ffc7b7",
     backdropColor: "#00000099",
+    outrageousPink: "#EC559C",
   },
   fontFamily: {
     regular: "Inter-Regular",
@@ -63,6 +64,7 @@ export const THEMES = {
     light: "Inter-Light",
     bold: "Inter-Bold",
     extraBold: "Inter-ExtraBold",
+    meow: "MeowScript-Regular",
   },
   fonts: {
     font8: moderateScale(8),
@@ -77,5 +79,6 @@ export const THEMES = {
     font24: moderateScale(24),
     font32: moderateScale(32),
     font13: moderateScale(13),
+    font52: moderateScale(52),
   },
 };

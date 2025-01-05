@@ -1,3 +1,4 @@
+import React from "react";
 import { StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -20,6 +21,7 @@ import Feedback from "../pages/CommonPages/feedback";
 import MyBookings from "../pages/Account/myBookings";
 import SelectAppointment from "../pages/Services/selectAppointment";
 import AppointmentDetail from "../pages/Appointment/appointmentDetail";
+import IntroScreens from "../pages/Authentication/IntroScreens";
 
 const Stack = createStackNavigator();
 
@@ -48,7 +50,11 @@ const Routes = (props) => {
           component={Splash}
           options={navOptionHandler}
         />
-
+        <Stack.Screen
+          name="intro"
+          component={IntroScreens}
+          options={navOptionHandler}
+        />
         <Stack.Screen
           name="auth"
           component={AuthStack}
