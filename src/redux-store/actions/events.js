@@ -1,13 +1,9 @@
-import authApi from "../../auth/authApi";
+import Api from "../../api/Api";
 import { urlList } from "../../constants/urlList";
 
 export const createEvent = async (params) => {
   try {
-    const res = await authApi({
-      method: "post",
-      url: urlList.registerEvents,
-      data: params,
-    });
+    const res = await Api.POST(urlList.registerEvents, params);
     if (!res || res?.data?.error || res?.data?.errorCode) {
       throw new Error(
         res?.data?.message || res?.data?.error || "Something went wrong!"

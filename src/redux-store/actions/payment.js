@@ -1,14 +1,9 @@
 import Api from "../../api/Api";
-import authApi from "../../auth/authApi";
 import { urlList } from "../../constants/urlList";
 
 export const getSubscriptionPlan = async (params) => {
   try {
-    const res = await authApi({
-      method: "post",
-      url: urlList.subscriptionplan,
-      data: params,
-    });
+    const res = await Api.POST(urlList.subscriptionplan, params);
     if (!res || res?.data?.error || res?.data?.errorCode) {
       throw new Error(
         res?.data?.message || res?.data?.error || "Something went wrong!"

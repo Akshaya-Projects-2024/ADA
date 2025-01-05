@@ -1,14 +1,9 @@
-import authApi from "../../auth/authApi";
+import Api from "../../api/Api";
 import { urlList } from "../../constants/urlList";
 
 export const createTopic = async (params) => {
-  console.log("ww", params)
   try {
-    const res = await authApi({
-      method: "post",
-      url: urlList.createTopic,
-      data: params,
-    });
+    const res = await Api.POST(urlList.createTopic, params);
     if (!res || res?.data?.error || res?.data?.errorCode) {
       throw new Error(
         res?.data?.message || res?.data?.error || "Something went wrong!"
@@ -25,11 +20,7 @@ export const createTopic = async (params) => {
 
 export const getMyTopics = async (params) => {
   try {
-    const res = await authApi({
-      method: "post",
-      url: urlList.getTopics,
-      data: params,
-    });
+    const res = await Api.POST(urlList.getTopics, params);
     if (!res || res?.data?.error || res?.data?.errorCode) {
       throw new Error(
         res?.data?.message || res?.data?.error || "Something went wrong!"
@@ -43,4 +34,3 @@ export const getMyTopics = async (params) => {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
-

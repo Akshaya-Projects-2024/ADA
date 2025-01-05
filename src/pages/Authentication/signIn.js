@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ImageBackground,
   Keyboard,
-  ActivityIndicator,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
@@ -34,7 +33,6 @@ const SignIn = (props) => {
           UserId: inputValue,
           Deviceid: deviceId,
         };
-
         const res = await checkLogin(postData);
         if (res?.data?.status_code == 200) {
           showToast("success", res?.data?.message);
