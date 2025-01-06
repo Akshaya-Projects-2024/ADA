@@ -32,7 +32,7 @@ export const verifyOtp = async (obj) => {
     }
     throw new Error("Something went wrong!");
   } catch (error) {
-    console.log("verifyOtp Error! ", error);
+    console.log("verifyOtp Error! ", error?.message);
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };

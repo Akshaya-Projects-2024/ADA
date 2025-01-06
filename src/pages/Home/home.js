@@ -9,6 +9,7 @@ import {
   Alert,
   Dimensions,
   ActivityIndicator,
+  StatusBar,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Bell from "../../assets/svg/bell.svg";
@@ -52,6 +53,7 @@ import {
 } from "../../redux-store/actions/auth";
 import { contextValue } from "../../components/Loader";
 import Dialog from "../../components/Dialog";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const afterTimeSlots = [
   { time: "09:00", disabled: false, enabled: true },
@@ -76,6 +78,7 @@ const categories = [
 ];
 
 const Home = (props) => {
+  const { top } = useSafeAreaInsets();
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
   const [selectedValue, setSelectedValue] = useState();
@@ -339,7 +342,7 @@ const Home = (props) => {
     }
   };
 
-  const handlePremiumActionPressed = (premiumAction) => {
+  const handlePremiumActionPressed = (premiumAction, message) => {
     if (paymentCompleted?.flag) {
       premiumAction();
     } else {
@@ -451,7 +454,12 @@ const Home = (props) => {
       colors={["#f6fbf4", "#d0f1f8", "#f0f9f6"]}
       style={{ flex: 1 }}
     >
-      <View style={{ flex: 1 }}>
+      <StatusBar
+        backgroundColor="transparent"
+        translucent
+        barStyle={"dark-content"}
+      />
+      <View style={{ flex: 1, paddingTop: moderateScale(top) }}>
         <ScrollView
           bounces={false}
           showsHorizontalScrollIndicator={false}
@@ -563,9 +571,10 @@ const Home = (props) => {
                 <TouchableOpacity
                   hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
                   onPress={() =>
-                    handlePremiumActionPressed(() =>
-                      setAppointmentVisible(true)
-                    )
+                    handlePremiumActionPressed(() => {
+                      setAppointmentVisible(true);
+                      Strings.appointmentError;
+                    })
                   }
                   style={{
                     width: 30,
@@ -689,7 +698,7 @@ const Home = (props) => {
                       fontSize: THEMES.fonts.font10,
                     }}
                   >
-                    {countData?.length || 0}
+                    {slotsData?.length || 0}
                   </Text>
                   <Text
                     style={{

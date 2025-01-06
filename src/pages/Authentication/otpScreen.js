@@ -13,7 +13,7 @@ import {
   PermissionsAndroid,
   Alert,
 } from "react-native";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, ms } from "react-native-size-matters";
 
 import Header from "../../components/Header";
 import Api from "../../api/Api";
@@ -33,8 +33,10 @@ import {
   validateServiceProfile,
 } from "../../utils/userUtils";
 import { contextValue } from "../../components/Loader";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const OtpScreen = (props) => {
+  const { top } = useSafeAreaInsets();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef([]);
   const value = props.route.params.loginValue;
@@ -98,7 +100,7 @@ const OtpScreen = (props) => {
         console.log("not granted");
       }
     } catch (error) {
-      console.warn("error", error);
+      console.log("error", error);
     }
   };
 
@@ -221,7 +223,7 @@ const OtpScreen = (props) => {
         setOtp(["", "", "", "", "", ""]);
       }
     } catch (error) {
-      showToast("error", "Something went wrong!!!");
+      showToast("error", error?.message || "Something went wrong!!!");
       contextValue?.setLoader(false);
       setOtp(["", "", "", "", "", ""]);
     }
@@ -267,26 +269,23 @@ const OtpScreen = (props) => {
         showToast("error", res?.data?.message);
       }
     } catch (error) {
-      showToast("error", error);
+      showToast("error", error?.message || "Something went wrong!!!");
     }
   };
 
   return (
     <View style={styles.container}>
+      <StatusBar
+        backgroundColor="transparent"
+        translucent
+        barStyle={"dark-content"}
+      />
       <ImageBackground
         source={require("../../assets/images/bgImage.png")}
         resizeMode="cover"
-        style={{ flex: 1 }}
+        style={{ flex: 1, paddingTop: moderateScale(top) }}
       >
-        <StatusBar backgroundColor={THEMES.colors.white} />
-
-        <View
-          style={{
-            flex: 1,
-          }}
-        >
-          <Header title={""} showBack bgColor="transparent" />
-        </View>
+        <Header title={""} showBack bgColor="transparent" />
         <ScrollView
           keyboardShouldPersistTaps="handled"
           showsHorizontalScrollIndicator={false}
@@ -296,6 +295,7 @@ const OtpScreen = (props) => {
             style={{
               flex: 1,
               paddingHorizontal: moderateScale(30),
+              marginTop: "30%",
             }}
           >
             <Text
@@ -389,7 +389,6 @@ const OtpScreen = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: THEMES.colors.white,
   },
   title: {
     fontSize: 24,

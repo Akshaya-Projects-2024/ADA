@@ -16,8 +16,10 @@ import Modal from "react-native-modal";
 import Cross from "../../assets/svg/cross.svg";
 import { useDispatch } from "react-redux";
 import { dispathGuestUser } from "../../redux-store/actions/userActions";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const RoleSelection = (props) => {
+  const { top } = useSafeAreaInsets();
   const dispatch = useDispatch();
   const [selected, setSelected] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -53,24 +55,29 @@ const RoleSelection = (props) => {
 
   return (
     <View style={styles.container}>
+      <StatusBar
+        backgroundColor="transparent"
+        translucent
+        barStyle={"dark-content"}
+      />
       <ImageBackground
         source={require("../../assets/images/bgImage.png")}
         resizeMode="cover"
-        style={{ flex: 1 }}
+        style={{ flex: 1, paddingTop: moderateScale(top) }}
       >
-        <StatusBar backgroundColor={THEMES.colors.white} />
         <View
           style={{
             alignItems: "center",
-            justifyContent: "center",
             flex: 1,
+            marginTop: "35%",
           }}
         >
           <Text
+            key={`moderateScale_${selected}`}
             style={{
               color: THEMES.colors.black,
               fontFamily: THEMES.fontFamily.bold,
-              fontSize: THEMES.fonts.font20,
+              fontSize: THEMES.fonts.font24,
               textAlign: "center",
               paddingHorizontal: moderateScale(45),
             }}
@@ -81,7 +88,7 @@ const RoleSelection = (props) => {
             style={{
               color: THEMES.colors.black,
               fontFamily: THEMES.fontFamily.regular,
-              fontSize: THEMES.fonts.font14,
+              fontSize: THEMES.fonts.font18,
               textAlign: "center",
               paddingTop: moderateScale(25),
               paddingHorizontal: moderateScale(45),
@@ -93,7 +100,7 @@ const RoleSelection = (props) => {
             style={{
               color: THEMES.colors.black,
               fontFamily: THEMES.fontFamily.regular,
-              fontSize: THEMES.fonts.font14,
+              fontSize: THEMES.fonts.font18,
               textAlign: "center",
               paddingTop: moderateScale(1),
               paddingHorizontal: moderateScale(45),
@@ -118,8 +125,8 @@ const RoleSelection = (props) => {
             >
               <Image
                 style={{
-                  width: 112,
-                  height: 112,
+                  width: moderateScale(112),
+                  height: moderateScale(112),
                   borderRadius: 10,
                   borderWidth: 1,
                   borderColor: "#CFD3D4",
@@ -130,8 +137,8 @@ const RoleSelection = (props) => {
                 <>
                   <View
                     style={{
-                      width: 112,
-                      height: 112,
+                      width: moderateScale(112),
+                      height: moderateScale(112),
                       borderRadius: 10,
                       backgroundColor: "#0b7e5a",
                       opacity: 0.7,
@@ -142,8 +149,8 @@ const RoleSelection = (props) => {
                   />
                   <View
                     style={{
-                      width: 112,
-                      height: 112,
+                      width: moderateScale(112),
+                      height: moderateScale(112),
                       borderRadius: 10,
                       position: "absolute",
                       alignItems: "center",
@@ -159,7 +166,7 @@ const RoleSelection = (props) => {
                 style={{
                   color: THEMES.colors.black,
                   fontFamily: THEMES.fontFamily.semiBold,
-                  fontSize: THEMES.fonts.font12,
+                  fontSize: THEMES.fonts.font14,
                   textAlign: "center",
                   paddingTop: moderateScale(20),
                 }}
@@ -176,8 +183,8 @@ const RoleSelection = (props) => {
             >
               <Image
                 style={{
-                  width: 112,
-                  height: 112,
+                  width: moderateScale(112),
+                  height: moderateScale(112),
                   borderRadius: 10,
                   borderWidth: 1,
                   borderColor: "#CFD3D4",
@@ -189,8 +196,8 @@ const RoleSelection = (props) => {
                 <>
                   <View
                     style={{
-                      width: 112,
-                      height: 112,
+                      width: moderateScale(112),
+                      height: moderateScale(112),
                       borderRadius: 10,
                       backgroundColor: "#0b7e5a",
                       opacity: 0.7,
@@ -201,8 +208,8 @@ const RoleSelection = (props) => {
                   />
                   <View
                     style={{
-                      width: 112,
-                      height: 112,
+                      width: moderateScale(112),
+                      height: moderateScale(112),
                       borderRadius: 10,
                       position: "absolute",
                       alignItems: "center",
@@ -218,7 +225,7 @@ const RoleSelection = (props) => {
                 style={{
                   color: THEMES.colors.black,
                   fontFamily: THEMES.fontFamily.semiBold,
-                  fontSize: THEMES.fonts.font12,
+                  fontSize: THEMES.fonts.font14,
                   textAlign: "center",
                   paddingTop: moderateScale(20),
                 }}

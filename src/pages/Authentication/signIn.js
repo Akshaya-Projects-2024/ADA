@@ -38,6 +38,10 @@ const SignIn = (props) => {
         };
         const res = await checkLogin(postData);
         if (res?.data?.status_code == 200) {
+          console.log(
+            "🚀 ~ onSubmit ~  res?.data?.message:",
+            res?.data?.message
+          );
           showToast("success", res?.data?.message);
           setTimeout(() => {
             props.navigation.navigate("otpScreen", { loginValue: inputValue });
@@ -52,7 +56,7 @@ const SignIn = (props) => {
       } catch (error) {
         contextValue?.setLoader(false);
         setInputValue("");
-        showToast("error", "Something went wrong!!!");
+        showToast("error", error?.message || "Something went wrong!!!");
       }
     }
   };
@@ -97,8 +101,8 @@ const SignIn = (props) => {
           />
         </View>
         <Button onPress={onSubmit} title={Strings.signWithOtp} />
-        <View style={{ flex: 1 }} />
-        <View style={{ marginVertical: moderateScale(23) }}>
+        <View style={styles.skipButtonContainer} />
+        <View style={styles.skipButton}>
           <Button onPress={null} title={Strings.skip} onlyBorder />
         </View>
       </View>
@@ -157,6 +161,8 @@ const styles = StyleSheet.create({
     backgroundColor: THEMES.colors.cyan,
     borderWidth: 1,
   },
+  skipButtonContainer: { flex: 1 },
+  skipButton: { marginVertical: moderateScale(23) },
 });
 
 export default SignIn;

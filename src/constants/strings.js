@@ -127,6 +127,8 @@ const Strings = {
   myPetProfile: "My Pet Profile",
   paymentError:
     "Your payment is not completed. Please complete payment to access full potential of the app",
+  appointmentError:
+    "Complete your Registration and Subscribe to the app to create new appoitements.",
   approvaltError:
     "Your profile is under verification. Please wait for approval",
   attention: "Attention!",

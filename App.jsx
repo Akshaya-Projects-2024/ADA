@@ -19,6 +19,7 @@ import { decryptService, encryptService } from "./src/utils/storageFunc";
 import { getCurrentLocation } from "./src/utils/geolocationUtils";
 import { refreshToken } from "./src/redux-store/actions/auth";
 import Loader from "./src/components/Loader";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const store = configureStore();
 
@@ -79,16 +80,18 @@ function App() {
   }, [initInterceptors, initHeaders]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Provider store={store}>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <Loader>
-            <Routes />
-          </Loader>
-          <Toast />
-        </GestureHandlerRootView>
-      </Provider>
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Provider store={store}>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <Loader>
+              <Routes />
+            </Loader>
+            <Toast />
+          </GestureHandlerRootView>
+        </Provider>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
