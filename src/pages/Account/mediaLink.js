@@ -69,30 +69,36 @@ const MediaLink = (props) => {
   };
 
   const onSubmit = async () => {
-    try {
-      const userId = await decryptService("userId");
-      const postData = {
-        userid: userId,
-        onlinelink: link,
-        instagram: instaLink,
-        facebook: fbLink,
-        website: weblink,
-        ...(MediaLinks?.id ? { id: MediaLinks?.id } : {}),
-      };
-      const res = await saveMediaLinks(postData);
-      if (res?.status == 200) {
-        showToast("success", "You have been registered successfully!!!");
-        props.navigation.reset({
-          index: 0,
-          routes: [{ name: "paymentsSubscription" }],
-        });
-      } else {
-        showToast("error", res?.data?.message);
+    if (link && instaLink && fbLink && weblink) {
+      try {
+        const userId = await decryptService("userId");
+        const postData = {
+          userid: userId,
+          onlinelink: link,
+          instagram: instaLink,
+          facebook: fbLink,
+          website: weblink,
+          ...(MediaLinks?.id ? { id: MediaLinks?.id } : {}),
+        };
+        const res = await saveMediaLinks(postData);
+        if (res?.status == 200) {
+          showToast("success", "You have been registered successfully!!!");
+        } else {
+          showToast("error", res?.data?.message);
+        }
+      } catch (error) {
+        console.log("error", error);
+        showToast("error", "Something went wrong!!!");
       }
-    } catch (error) {
-      console.log("error", error);
-      showToast("error", "Something went wrong!!!");
     }
+    navigateToHome();
+  };
+
+  const navigateToHome = () => {
+    props.navigation.reset({
+      index: 0,
+      routes: [{ name: "paymentsSubscription" }],
+    });
   };
 
   return (

@@ -181,7 +181,7 @@ const PaymentsSubscription = (props) => {
     try {
       const userData = await getUserData();
       const options = {
-        image: "https://i.imgur.com/3g7nmJC.png",
+        image: "https://i.imgur.com/3g7nmJC.png", //roundIcon.png
         currency: subscriptionDetails?.currency,
         key: "rzp_test_PECnHmfOdkRLhw", // Replace with your Razorpay Key ID
         amount: subscriptionDetails?.amount,
@@ -459,12 +459,22 @@ const PaymentsSubscription = (props) => {
                 {Strings.viewBreakup}
               </Text>
             </View> */}
-          {profile?.providerProfile?.subscription?.subscriptioncode &&
-          profile?.providerProfile?.subscription?.status === "active" ? null : (
-            <View style={[styles.btnView, { paddingTop: moderateScale(20) }]}>
-              <Button onPress={handlePayment} title={Strings.payNow} />
-            </View>
-          )}
+          <View style={[styles.btnView, { paddingTop: moderateScale(20) }]}>
+            <Button
+              onPress={
+                profile?.providerProfile?.subscription?.subscriptioncode &&
+                profile?.providerProfile?.subscription?.status === "active"
+                  ? handleSubscriptionSuccess
+                  : handlePayment
+              }
+              title={
+                profile?.providerProfile?.subscription?.subscriptioncode &&
+                profile?.providerProfile?.subscription?.status === "active"
+                  ? Strings.goToDashboard
+                  : Strings.payNow
+              }
+            />
+          </View>
         </View>
         <Modal
           isVisible={isModalVisible}

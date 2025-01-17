@@ -37,7 +37,11 @@ export const validateParentProfile = (userData) => {
   return { flag: true, partiallyCompleted: true };
 };
 
-export const validateServiceProfile = (userData, excludePayment = false) => {
+export const validateServiceProfile = (
+  userData,
+  excludePayment = false,
+  includeOptional = false
+) => {
   if (
     !userData?.providerProfile?.providerBusiness?.name ||
     !validArray(userData?.providerProfile?.providerBusiness?.services) ||
@@ -64,8 +68,9 @@ export const validateServiceProfile = (userData, excludePayment = false) => {
     };
   }
   if (
-    !validArray(userData?.providerProfile?.providerDocument) ||
-    !validateDocuments(userData?.providerProfile?.providerDocument)
+    includeOptional &&
+    (!validArray(userData?.providerProfile?.providerDocument) ||
+      !validateDocuments(userData?.providerProfile?.providerDocument))
   ) {
     return {
       flag: false,
@@ -101,10 +106,11 @@ export const validateServiceProfile = (userData, excludePayment = false) => {
     };
   }
   if (
-    !userData?.providerProfile?.MediaLinks?.facebook ||
-    !userData?.providerProfile?.MediaLinks?.instagram ||
-    !userData?.providerProfile?.MediaLinks?.onlinelink ||
-    !userData?.providerProfile?.MediaLinks?.website
+    includeOptional &&
+    (!userData?.providerProfile?.MediaLinks?.facebook ||
+      !userData?.providerProfile?.MediaLinks?.instagram ||
+      !userData?.providerProfile?.MediaLinks?.onlinelink ||
+      !userData?.providerProfile?.MediaLinks?.website)
   ) {
     return { flag: false, navigateTo: "mediaLink", partiallyCompleted: true };
   }
@@ -201,6 +207,7 @@ const validateDocuments = (docs) => {
   const doc = docs?.some((it) => it?.documenttype === DOCUMENT_TYPES.document);
   const image = docs?.some((it) => it?.documenttype === DOCUMENT_TYPES.image);
   const logo = docs?.some((it) => it?.documenttype === DOCUMENT_TYPES.logo);
+  console.log(doc && image && logo, doc, image, logo);
   return doc && image && logo;
 };
 

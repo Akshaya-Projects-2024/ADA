@@ -38,10 +38,6 @@ const SignIn = (props) => {
         };
         const res = await checkLogin(postData);
         if (res?.data?.status_code == 200) {
-          console.log(
-            "🚀 ~ onSubmit ~  res?.data?.message:",
-            res?.data?.message
-          );
           showToast("success", res?.data?.message);
           setTimeout(() => {
             props.navigation.navigate("otpScreen", { loginValue: inputValue });

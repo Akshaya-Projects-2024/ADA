@@ -79,7 +79,7 @@ const MyAccount = (props) => {
   );
 
   const profileStatus = useMemo(() => {
-    const validProviderProfile = validateServiceProfile(profile);
+    const validProviderProfile = validateServiceProfile(profile, false, true);
     return validProviderProfile;
   }, [profile]);
 

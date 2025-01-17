@@ -152,6 +152,7 @@ const Strings = {
     "Our expert, hand-picked team ensures the best care for your pet. Trust us for their well-being and happiness.",
   introDes3:
     "Effortlessly connect with top pet professionals—all in one place, just a tap away!",
+  goToDashboard: "Let's Go",
 };
 
 export default Strings;
