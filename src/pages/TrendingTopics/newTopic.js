@@ -23,6 +23,7 @@ import { decryptService } from "../../utils/storageFunc";
 import { useSelector } from "react-redux";
 import { goBack } from "../../navigations/rootNavigationRef";
 import { RichEditor, RichToolbar } from "react-native-pell-rich-editor";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const NewTopic = () => {
   const [visible, setVisible] = useState(false);
@@ -105,6 +106,7 @@ const NewTopic = () => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
@@ -210,7 +212,7 @@ const NewTopic = () => {
             <RichEditor
               ref={richText}
               style={styles.editor}
-              placeholder="Start typing your HTML here..."
+              placeholder="Write your Blog here"
               initialContentHTML={blog}
               onChange={setBlog}
             />
@@ -246,6 +248,7 @@ const NewTopic = () => {
         </View>
       )}
     </View>
+    </SafeAreaView>
   );
 };
 

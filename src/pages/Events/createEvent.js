@@ -31,6 +31,7 @@ import { decryptService } from "../../utils/storageFunc";
 import { createEvent } from "../../redux-store/actions/events";
 import { showToast } from "../../utils/utils";
 import { goBack } from "../../navigations/rootNavigationRef";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const CreateEvent = () => {
   const [isStartTimeModalVisible, setStartTimeModalVisible] = useState(false);
@@ -145,6 +146,7 @@ const CreateEvent = () => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
@@ -432,6 +434,7 @@ const CreateEvent = () => {
         handleSelectedImage={(image) => handlePosterImages(image)}
       />
     </View>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({

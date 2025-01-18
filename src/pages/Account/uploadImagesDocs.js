@@ -25,6 +25,7 @@ import {
 } from "../../redux-store/actions/auth";
 import { useSelector } from "react-redux";
 import { showToast } from "../../utils/utils";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export const DOCUMENT_TYPES = {
   image: "businessImg",
@@ -218,6 +219,7 @@ const UploadImagesDocs = (props) => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={Strings.uploadImagesDoc} showBack bgColor="transparent" />
@@ -415,6 +417,7 @@ const UploadImagesDocs = (props) => {
         />
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

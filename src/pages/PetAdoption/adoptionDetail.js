@@ -11,10 +11,12 @@ import { THEMES } from "../../assets/theme/themes";
 import { moderateScale } from "react-native-size-matters";
 import { ScrollView } from "react-native-gesture-handler";
 import Back from "../../assets/svg/back.svg";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const AdoptionDetail = (props) => {
   const selectedAdotpionData = props.route.params.selectedData;
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <ImageBackground
         source={{ uri: selectedAdotpionData?.document?.url }}
@@ -113,6 +115,7 @@ const AdoptionDetail = (props) => {
         </View>
       </ImageBackground>
     </View>
+    </SafeAreaView>
   );
 };
 

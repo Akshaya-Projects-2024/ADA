@@ -20,6 +20,7 @@ import { saveMediaLinks } from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
 import { showToast } from "../../utils/utils";
 import { useSelector } from "react-redux";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const MediaLink = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -102,6 +103,7 @@ const MediaLink = (props) => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={Strings.mediaLinks} showBack bgColor="transparent" />
@@ -217,6 +219,7 @@ const MediaLink = (props) => {
         )}
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

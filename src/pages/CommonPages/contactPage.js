@@ -17,9 +17,11 @@ import Strings from "../../constants/strings";
 import Whatsup from "../../assets/svg/whatsup.svg";
 import Mail from "../../assets/svg/mail.svg";
 import ClipBoard from "../../assets/svg/clipboardPen.svg";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const ContactPage = (props) => {
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
@@ -170,6 +172,7 @@ const ContactPage = (props) => {
         </View>
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

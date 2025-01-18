@@ -714,17 +714,23 @@ const Home = (props) => {
               </View>
             </View>
           </View>
+          <View
+            style={{
+              paddingTop: appointmentData?.length !== 0 ? moderateScale(35) : 0,
+            }}
+          >
+            {appointmentData?.length !== 0 && (
+              <Text
+                style={{
+                  color: "#000",
+                  fontFamily: THEMES.fontFamily.semiBold,
+                  fontSize: THEMES.fonts.font14,
+                }}
+              >
+                Next Appointment
+              </Text>
+            )}
 
-          <View style={{ paddingTop: moderateScale(35) }}>
-            <Text
-              style={{
-                color: "#000",
-                fontFamily: THEMES.fontFamily.semiBold,
-                fontSize: THEMES.fonts.font14,
-              }}
-            >
-              Next Appointment
-            </Text>
             <View
               style={{
                 paddingTop: moderateScale(9),

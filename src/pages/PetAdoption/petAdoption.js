@@ -26,6 +26,7 @@ import CrossIcon from "../../assets/svg/CrossIcon";
 import { useSelector } from "react-redux";
 import { LoginModules } from "../../constants/enums";
 import { contextValue } from "../../components/Loader";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const PetAdoption = (props) => {
   const { colors, fontFamily, fonts } = THEMES;
@@ -161,12 +162,13 @@ const PetAdoption = (props) => {
   };
   return (
     <View style={styles.container}>
+       <SafeAreaView style={{flex:1}}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
-        showBack
+        noBack
         title={Strings.petAdoption}
         bgColor="transparent"
-        fontColor={THEMES.colors.black}
+        fontColor={"#ed65a5"}
       />
       <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
         <View
@@ -334,6 +336,7 @@ const PetAdoption = (props) => {
           />
         </View>
       </View>
+      </SafeAreaView>
     </View>
   );
 };

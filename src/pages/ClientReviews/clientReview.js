@@ -17,6 +17,7 @@ import StarRating from 'react-native-star-rating';
 import Modal from 'react-native-modal';
 import InputField from '../../components/InputField';
 import Button from '../../components/Button';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Data = [
   {
@@ -196,6 +197,7 @@ const ClientReview = () => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
@@ -269,6 +271,7 @@ const ClientReview = () => {
         </View>
       </Modal>
     </View>
+    </SafeAreaView>
   );
 };
 

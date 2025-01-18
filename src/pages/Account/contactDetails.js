@@ -18,6 +18,7 @@ import { saveContactDetails } from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
 import { useSelector } from "react-redux";
 import { showToast } from "../../utils/utils";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const ContactDetails = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -108,6 +109,7 @@ const ContactDetails = (props) => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={Strings.contactDetails} showBack bgColor="transparent" />
@@ -194,6 +196,7 @@ const ContactDetails = (props) => {
         )}
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

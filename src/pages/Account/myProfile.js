@@ -13,6 +13,7 @@ import RightArrow from "../../assets/svg/rightArrow.svg";
 import { moderateScale } from "react-native-size-matters";
 import { useSelector } from "react-redux";
 import { validateCompleteServiceProfile } from "../../utils/userUtils";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const MyProfile = (props) => {
   const { guestUser } = useSelector(({ register }) => register);
@@ -47,6 +48,7 @@ const MyProfile = (props) => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={Strings.myProfile} showBack bgColor="transparent" />
@@ -101,6 +103,7 @@ const MyProfile = (props) => {
         </View>
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

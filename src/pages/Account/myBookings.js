@@ -39,6 +39,7 @@ import moment from "moment";
 import Dialog from "../../components/Dialog";
 import { contextValue } from "../../components/Loader";
 import EmptyView from "../../components/EmptyView";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const MyBookings = ({ navigation, route }) => {
   const routeFrom = route?.params?.route;
@@ -222,197 +223,207 @@ const MyBookings = ({ navigation, route }) => {
     );
   };
 
-  return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header
-        title={Strings.appointments}
-        showBack
-        bgColor="transparent"
-        right={
-          <View ref={menuRef} onLayout={handleModalLayout}>
-            <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
-              <Filter />
-            </TouchableOpacity>
-          </View>
-        }
-      />
-      <View style={styles.mainView}>
-        <FlatList
-          data={validArray(filetedData) ? filetedData : data}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          renderItem={renderItem}
-          keyExtractor={(item) => item?.appointment_id?.toString()}
-          ListEmptyComponent={EmptyView}
-          contentContainerStyle={{ flexGrow: 1 }}
-        />
+  const EmptyContentView = () => {
+    return (
+      <View style={{ flex:0.85, justifyContent: "center", alignItems: "center" }} >
+        <Text style={{color:'#000', fontSize: moderateScale(16), fontWeight: 500}}>No scheduled apointments.</Text>
       </View>
-      <FilterModal
-        isModalVisible={modalVisible}
-        top={modalHeight}
-        right={modalWidth}
-        onPressClose={() => setModalVisible(false)}
-      >
-        <FlatList
-          data={filterOptions}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          renderItem={({ item }) => (
-            <Pressable
-              onPress={() => handleFilterSelect(item)}
-              style={[
-                styles.filterOption,
-                item === selectedFilter && styles.selectedFilterOption,
-              ]}
-            >
-              <Text style={styles.filterOptionText}>{item}</Text>
-            </Pressable>
-          )}
-          keyExtractor={(item, index) => index.toString()}
-          ListEmptyComponent={EmptyView}
-          contentContainerStyle={{ flexGrow: 1 }}
+    );
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header
+          title={Strings.appointments}
+          showBack
+          bgColor="transparent"
+          right={
+            <View ref={menuRef} onLayout={handleModalLayout}>
+              <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
+                <Filter />
+              </TouchableOpacity>
+            </View>
+          }
         />
-      </FilterModal>
-      <Modal
-        onBackdropPress={() => {
-          setVisible(false);
-          setSelectedItem();
-        }}
-        isVisible={isVisible}
-        backdropOpacity={0.5}
-        style={{
-          margin: 0,
-          borderRadius: 16,
-          flex: 1,
-        }}
-      >
-        <View
+        <View style={styles.mainView}>
+          <FlatList
+            data={validArray(filetedData) ? filetedData : data}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+            renderItem={renderItem}
+            keyExtractor={(item) => item?.appointment_id?.toString()}
+            ListEmptyComponent={EmptyContentView}
+            contentContainerStyle={{ flexGrow: 1 }}
+          />
+        </View>
+        <FilterModal
+          isModalVisible={modalVisible}
+          top={modalHeight}
+          right={modalWidth}
+          onPressClose={() => setModalVisible(false)}
+        >
+          <FlatList
+            data={filterOptions}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() => handleFilterSelect(item)}
+                style={[
+                  styles.filterOption,
+                  item === selectedFilter && styles.selectedFilterOption,
+                ]}
+              >
+                <Text style={styles.filterOptionText}>{item}</Text>
+              </Pressable>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+            ListEmptyComponent={EmptyView}
+            contentContainerStyle={{ flexGrow: 1 }}
+          />
+        </FilterModal>
+        <Modal
+          onBackdropPress={() => {
+            setVisible(false);
+            setSelectedItem();
+          }}
+          isVisible={isVisible}
+          backdropOpacity={0.5}
           style={{
-            backgroundColor: THEMES.colors.bgColor,
-            paddingVertical: moderateScale(24),
-            paddingHorizontal: moderateScale(24),
+            margin: 0,
             borderRadius: 16,
-            marginHorizontal: moderateScale(30),
+            flex: 1,
           }}
         >
           <View
             style={{
-              justifyContent: "space-between",
-              flexDirection: "row",
+              backgroundColor: THEMES.colors.bgColor,
+              paddingVertical: moderateScale(24),
+              paddingHorizontal: moderateScale(24),
+              borderRadius: 16,
+              marginHorizontal: moderateScale(30),
+            }}
+          >
+            <View
+              style={{
+                justifyContent: "space-between",
+                flexDirection: "row",
+              }}
+            >
+              <Text
+                numberOfLines={2}
+                style={{
+                  color: THEMES.colors.black,
+                  fontFamily: THEMES.fontFamily.bold,
+                  fontSize: THEMES.fonts.font16,
+                  width: "70%",
+                  lineHeight: moderateScale(24),
+                }}
+              >
+                Need to Change Your Plans?
+              </Text>
+              <TouchableOpacity
+                hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
+                onPress={() => {
+                  setVisible(false);
+                  setSelectedItem();
+                }}
+              >
+                <BlackCross />
+              </TouchableOpacity>
+            </View>
+            <Text
+              style={{
+                color: THEMES.colors.black,
+                fontFamily: THEMES.fontFamily.regular,
+                fontSize: THEMES.fonts.font14,
+                paddingTop: moderateScale(16),
+                lineHeight: moderateScale(20),
+              }}
+            >
+              Do you want to cancel the appointment, or would you like to
+              reschedule it instead?
+            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingTop: moderateScale(31),
+              }}
+            >
+              <View style={{ width: "45%" }}>
+                <Button onlyBorder title="Cancel" onPress={() => onCancel()} />
+              </View>
+              <View style={{ width: "45%" }}>
+                <Button title="Reschedule" onPress={() => onReschedule()} />
+              </View>
+            </View>
+          </View>
+        </Modal>
+        <Modal
+          onBackdropPress={() => {
+            setAttendedModal(false);
+            setSelectedItem();
+            setOtpInput("");
+          }}
+          isVisible={attendedModal}
+          backdropOpacity={0.5}
+          style={{
+            margin: 0,
+            borderRadius: 16,
+            flex: 1,
+            justifyContent: "flex-end",
+          }}
+        >
+          <View
+            style={{
+              borderTopRightRadius: 49,
+              paddingVertical: moderateScale(20),
+              backgroundColor: THEMES.colors.white,
             }}
           >
             <Text
-              numberOfLines={2}
               style={{
                 color: THEMES.colors.black,
-                fontFamily: THEMES.fontFamily.bold,
-                fontSize: THEMES.fonts.font16,
-                width: "70%",
-                lineHeight: moderateScale(24),
+                paddingHorizontal: moderateScale(31),
+                fontFamily: THEMES.fontFamily.semiBold,
               }}
             >
-              Need to Change Your Plans?
+              Enter OTP to confirm
             </Text>
-            <TouchableOpacity
-              hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-              onPress={() => {
-                setVisible(false);
-                setSelectedItem();
+            <View
+              style={{
+                paddingTop: moderateScale(36),
+                marginHorizontal: moderateScale(24),
               }}
             >
-              <BlackCross />
-            </TouchableOpacity>
-          </View>
-          <Text
-            style={{
-              color: THEMES.colors.black,
-              fontFamily: THEMES.fontFamily.regular,
-              fontSize: THEMES.fonts.font14,
-              paddingTop: moderateScale(16),
-              lineHeight: moderateScale(20),
-            }}
-          >
-            Do you want to cancel the appointment, or would you like to
-            reschedule it instead?
-          </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              paddingTop: moderateScale(31),
-            }}
-          >
-            <View style={{ width: "45%" }}>
-              <Button onlyBorder title="Cancel" onPress={() => onCancel()} />
-            </View>
-            <View style={{ width: "45%" }}>
-              <Button title="Reschedule" onPress={() => onReschedule()} />
-            </View>
-          </View>
-        </View>
-      </Modal>
-      <Modal
-        onBackdropPress={() => {
-          setAttendedModal(false);
-          setSelectedItem();
-          setOtpInput("");
-        }}
-        isVisible={attendedModal}
-        backdropOpacity={0.5}
-        style={{
-          margin: 0,
-          borderRadius: 16,
-          flex: 1,
-          justifyContent: "flex-end",
-        }}
-      >
-        <View
-          style={{
-            borderTopRightRadius: 49,
-            paddingVertical: moderateScale(20),
-            backgroundColor: THEMES.colors.white,
-          }}
-        >
-          <Text
-            style={{
-              color: THEMES.colors.black,
-              paddingHorizontal: moderateScale(31),
-              fontFamily: THEMES.fontFamily.semiBold,
-            }}
-          >
-            Enter OTP to confirm
-          </Text>
-          <View
-            style={{
-              paddingTop: moderateScale(36),
-              marginHorizontal: moderateScale(24),
-            }}
-          >
-            <InputField
-              label={"Enter otp"}
-              placeholderText={"Enter otp"}
-              value={otpInput}
-              onChange={setOtpInput}
-            />
+              <InputField
+                label={"Enter otp"}
+                placeholderText={"Enter otp"}
+                value={otpInput}
+                onChange={setOtpInput}
+              />
 
-            <View style={{ paddingTop: moderateScale(20) }}>
-              <Button onPress={handleAttended} title="Attended" />
+              <View style={{ paddingTop: moderateScale(20) }}>
+                <Button onPress={handleAttended} title="Attended" />
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
-      <Dialog
-        flag={appointmentConfirm}
-        description={Strings.confirmAppointmentMessage}
-        leftButtonText="No"
-        rightButtonText="Yes"
-        leftButtonPressed={onAppointmentClose}
-        rightButtonPressed={confirm}
-        onClose={onAppointmentClose}
-      />
-    </View>
+        </Modal>
+        <Dialog
+          flag={appointmentConfirm}
+          description={Strings.confirmAppointmentMessage}
+          leftButtonText="No"
+          rightButtonText="Yes"
+          leftButtonPressed={onAppointmentClose}
+          rightButtonPressed={confirm}
+          onClose={onAppointmentClose}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({

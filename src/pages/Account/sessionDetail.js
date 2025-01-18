@@ -25,6 +25,7 @@ import { decryptService } from "../../utils/storageFunc";
 import { showToast, validArray } from "../../utils/utils";
 import { useSelector } from "react-redux";
 import ModalDropdown from "../../components/ModalDropdown";
+import { SafeAreaView } from "react-native-safe-area-context";
 const SESSION_AVAILABILITY = {
   home: "Home Visit",
   center: "At Center Service",
@@ -249,6 +250,7 @@ const SessionDetail = (props) => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={Strings.sessionDetails} showBack bgColor="transparent" />
@@ -447,6 +449,7 @@ const SessionDetail = (props) => {
         </ScrollView>
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

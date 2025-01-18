@@ -18,6 +18,7 @@ import { THEMES } from "../../assets/theme/themes";
 import { decryptService } from "../../utils/storageFunc";
 import { showToast } from "../../utils/utils";
 import { saveSessionDetails } from "../../redux-store/actions/auth";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const WorkingHours = (props) => {
   const route = props?.route?.params?.route;
@@ -181,6 +182,7 @@ const WorkingHours = (props) => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={"Working Days & TIme"} showBack bgColor="transparent" />
@@ -226,6 +228,7 @@ const WorkingHours = (props) => {
         </ScrollView>
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

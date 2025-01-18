@@ -19,13 +19,15 @@ import Mail from "../../assets/svg/mail.svg";
 import ClipBoard from "../../assets/svg/clipboardPen.svg";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Feedback = (props) => {
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
-        title={"Write to us"}
+        title={"Feedback"}
         showBack
         bgColor="transparent"
         fontColor="#000"
@@ -60,6 +62,7 @@ const Feedback = (props) => {
         <Button title="Submit"></Button>
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

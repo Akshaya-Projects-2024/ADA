@@ -25,6 +25,7 @@ import {
   showToast,
   validArray,
 } from "../../utils/utils";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const businessName = [
   { id: "1", label: "ADV Solutions" },
@@ -159,6 +160,7 @@ const BusinessDetail = (props) => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={Strings.businessDetail} showBack bgColor="transparent" />
@@ -242,6 +244,7 @@ const BusinessDetail = (props) => {
         )}
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

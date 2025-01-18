@@ -20,6 +20,7 @@ import { moderateScale } from "react-native-size-matters";
 import Checked from "../../assets/svg/checked.svg";
 import UnChecked from "../../assets/svg/unchecked.svg";
 import Button from "../../components/Button";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Predefined order of days
 const days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
@@ -120,6 +121,7 @@ const MarkHoliday = () => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
@@ -304,6 +306,7 @@ const MarkHoliday = () => {
         onCancel={hideDatePicker}
       />
     </View>
+    </SafeAreaView>
   );
 };
 

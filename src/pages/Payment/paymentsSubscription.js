@@ -30,6 +30,7 @@ import { dispatchUserData } from "../../redux-store/actions/registerAction";
 import { validateServiceProfile } from "../../utils/userUtils";
 import { validArray, validObject } from "../../utils/utils";
 import SubscriptionError from "./subscriptionError";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const PaymentsSubscription = (props) => {
   const dispatch = useDispatch();
@@ -207,6 +208,7 @@ const PaymentsSubscription = (props) => {
           },
         };
         const acknowledgeResponse = await acknowledgeSubscription(params);
+        console.log("ac", acknowledgeResponse)
         if (acknowledgeResponse?.status === 200) {
           await fetchUserProfile();
           setSubscription(true);
@@ -282,6 +284,7 @@ const PaymentsSubscription = (props) => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
@@ -531,6 +534,7 @@ const PaymentsSubscription = (props) => {
         )}
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

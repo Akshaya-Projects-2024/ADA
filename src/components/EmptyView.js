@@ -20,7 +20,7 @@ export default EmptyView;
 
 const styles = StyleSheet.create({
   flex: {
-    flex: 1,
+    flex: 0.8,
     justifyContent: "center",
     alignItems: "center",
   },

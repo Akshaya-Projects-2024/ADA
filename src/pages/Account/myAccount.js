@@ -31,6 +31,7 @@ import {
   validateServiceProfile,
 } from "../../utils/userUtils";
 import { useSelector } from "react-redux";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const MenuItem = ({
   bgColor,
@@ -131,6 +132,7 @@ const MyAccount = (props) => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <LinearGradient
       locations={[0, 0.5, 0.6]}
       colors={[
@@ -301,6 +303,7 @@ const MyAccount = (props) => {
         </View>
       </ScrollView>
     </LinearGradient>
+    </SafeAreaView>
   );
 };
 

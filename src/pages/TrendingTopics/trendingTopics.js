@@ -21,6 +21,7 @@ import { decryptService } from "../../utils/storageFunc";
 import { getMyTopics } from "../../redux-store/actions/topics";
 import { useIsFocused } from "@react-navigation/native";
 import { getBase64Obj } from "../../utils/documentUtils";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Data = [
   {
@@ -217,157 +218,164 @@ const TrendingTopics = (props) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header
-        title={Strings.trendingTopics}
-        bgColor="transparent"
-        fontColor={THEMES.colors.black}
-      />
+      <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header
+          title={Strings.trendingTopics}
+          bgColor="transparent"
+          fontColor={"#fda208"}
+          noBack
+        />
 
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          style={{ flex: 1 }}
-          bounces={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-        >
-          <View
-            style={{
-              paddingTop: moderateScale(13),
-              paddingHorizontal: moderateScale(20),
-            }}
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            style={{ flex: 1 }}
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
           >
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
+                paddingTop: moderateScale(13),
+                paddingHorizontal: moderateScale(20),
               }}
             >
-              <View style={{ width: "87%" }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <View style={{ width: "87%" }}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      props.navigation.navigate("auth", {
+                        screen: "search",
+                      })
+                    }
+                    style={{
+                      padding: moderateScale(8),
+                      borderRadius: 25,
+                      borderWidth: 1.5,
+                      backgroundColor: "#f5f5f5",
+                      borderColor: "#bebebd",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Search />
+                    <Text
+                      style={{
+                        paddingLeft: moderateScale(8),
+                        fontSize: THEMES.fonts.font12,
+                        color: THEMES.colors.darkGrey,
+                      }}
+                    >
+                      Search
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
                 <TouchableOpacity
                   onPress={() =>
                     props.navigation.navigate("auth", {
-                      screen: "search",
+                      screen: "newTopic",
                     })
                   }
                   style={{
-                    padding: moderateScale(8),
-                    borderRadius: 25,
-                    borderWidth: 1.5,
-                    backgroundColor: "#f5f5f5",
-                    borderColor: "#bebebd",
-                    flexDirection: "row",
+                    backgroundColor: THEMES.colors.cyan,
+                    padding: moderateScale(11),
                     alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: moderateScale(8),
+                    borderBottomLeftRadius: moderateScale(0),
                   }}
                 >
-                  <Search />
-                  <Text
-                    style={{
-                      paddingLeft: moderateScale(8),
-                      fontSize: THEMES.fonts.font12,
-                      color: THEMES.colors.darkGrey,
-                    }}
-                  >
-                    Search
-                  </Text>
+                  <Plus stroke={"#fff"} />
                 </TouchableOpacity>
               </View>
+              {topicList?.length > 5 && (
+                <View style={{ paddingTop: moderateScale(15) }}>
+                  <Text
+                    style={{
+                      fontFamily: THEMES.fontFamily.semiBold,
+                      fontSize: THEMES.fonts.font14,
+                      color: THEMES.colors.black,
+                    }}
+                  >
+                    Find Out What’s Trending
+                  </Text>
+                </View>
+              )}
 
-              <TouchableOpacity
-                onPress={() =>
-                  props.navigation.navigate("auth", {
-                    screen: "newTopic",
-                  })
-                }
-                style={{
-                  backgroundColor: THEMES.colors.cyan,
-                  padding: moderateScale(11),
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: moderateScale(8),
-                  borderBottomLeftRadius: moderateScale(0),
-                }}
-              >
-                <Plus stroke={"#fff"} />
-              </TouchableOpacity>
-            </View>
-            {topicList?.length > 5 && (
               <View style={{ paddingTop: moderateScale(15) }}>
-                <Text
-                  style={{
-                    fontFamily: THEMES.fontFamily.semiBold,
-                    fontSize: THEMES.fonts.font14,
-                    color: THEMES.colors.black,
-                  }}
-                >
-                  Find Out What’s Trending
-                </Text>
+                <FlatList
+                  showsHorizontalScrollIndicator={false}
+                  data={trendingTopics}
+                  horizontal={true}
+                  showsVerticalScrollIndicator={false}
+                  bounces={false}
+                  renderItem={renderItem}
+                  keyExtractor={(item) => item.id}
+                  ListHeaderComponent={() =>
+                    topicList?.length > 5 ? (
+                      <Text style={{ textAlign: "center" }}>
+                        The list is empty
+                      </Text>
+                    ) : null
+                  }
+                />
               </View>
-            )}
+              {topicList?.length > 5 && (
+                <>
+                  <View
+                    style={{
+                      paddingTop: moderateScale(20),
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <View style={{ width: "65%" }}>
+                      <Text
+                        style={{
+                          fontFamily: THEMES.fontFamily.semiBold,
+                          fontSize: THEMES.fonts.font14,
+                          color: THEMES.colors.black,
+                        }}
+                      >
+                        Explore More Topis
+                      </Text>
+                    </View>
 
-            <View style={{ paddingTop: moderateScale(15) }}>
-              <FlatList
-                showsHorizontalScrollIndicator={false}
-                data={trendingTopics}
-                horizontal={true}
-                showsVerticalScrollIndicator={false}
-                bounces={false}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                ListHeaderComponent={() => (topicList?.length > 5 ? 
-                  <Text style={{ textAlign: 'center',}}>The list is empty</Text>  
-                  : null)}
-              />
-            </View>
-            {topicList?.length > 5 && (
-              <>
-                <View
-                  style={{
-                    paddingTop: moderateScale(20),
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View style={{ width: "65%" }}>
-                    <Text
-                      style={{
-                        fontFamily: THEMES.fontFamily.semiBold,
-                        fontSize: THEMES.fonts.font14,
-                        color: THEMES.colors.black,
-                      }}
-                    >
-                      Explore More Topis
-                    </Text>
+                    <View style={{ width: "35%" }}>
+                      <DropDown
+                        width={130}
+                        dropdownData={[
+                          { label: "Most Recent", value: "1" },
+                          { label: "Most Relevant", value: "2" },
+                          { label: "Filter by Service", value: "3" },
+                        ]}
+                      />
+                    </View>
                   </View>
 
-                  <View style={{ width: "35%" }}>
-                    <DropDown
-                      width={130}
-                      dropdownData={[
-                        { label: "Most Recent", value: "1" },
-                        { label: "Most Relevant", value: "2" },
-                        { label: "Filter by Service", value: "3" },
-                      ]}
+                  <View>
+                    <FlatList
+                      showsVerticalScrollIndicator={false}
+                      data={topicList}
+                      bounces={false}
+                      renderItem={renderDataItem}
+                      keyExtractor={(item) => item.id}
                     />
                   </View>
-                </View>
-
-                <View>
-                  <FlatList
-                    showsVerticalScrollIndicator={false}
-                    data={topicList}
-                    bounces={false}
-                    renderItem={renderDataItem}
-                    keyExtractor={(item) => item.id}
-                  />
-                </View>
-              </>
-            )}
-          </View>
-        </ScrollView>
-      </View>
+                </>
+              )}
+            </View>
+          </ScrollView>
+        </View>
+      </SafeAreaView>
     </View>
   );
 };

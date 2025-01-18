@@ -15,6 +15,7 @@ import Header from "../../components/Header";
 import { moderateScale } from "react-native-size-matters";
 import Strings from "../../constants/strings";
 import SearchIcon from "../../assets/svg/search.svg";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Chip = ({ item, onPress, selected }) => {
   return (
@@ -132,6 +133,7 @@ const Search = () => {
 
   return (
     <View style={styles.container}>
+       <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
         showBack
@@ -160,6 +162,7 @@ const Search = () => {
           <TextInput
             style={styles.searchBar}
             placeholder="Search..."
+            placeholderTextColor={"#000"}
             value={searchText}
             onChangeText={handleSearchChange}
           />
@@ -216,6 +219,7 @@ const Search = () => {
           contentContainerStyle={styles.chipContainer}
         />
       </View>
+      </SafeAreaView>
     </View>
   );
 };
