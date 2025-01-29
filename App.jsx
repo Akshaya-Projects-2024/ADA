@@ -27,7 +27,6 @@ function App() {
   const initInterceptors = useCallback(() => {
     axios.interceptors?.response?.use(
       async (response) => {
-        console.log("🚀 ~ response:", response.config.url, response);
         const originalRequest = response.config;
         if (response?.status === 403 && !originalRequest._retry) {
           originalRequest._retry = true;

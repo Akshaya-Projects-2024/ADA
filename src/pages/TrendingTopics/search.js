@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -16,6 +16,11 @@ import { moderateScale } from "react-native-size-matters";
 import Strings from "../../constants/strings";
 import SearchIcon from "../../assets/svg/search.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { contextValue } from "../../components/Loader";
+import { search } from "../../redux-store/actions/auth";
+import { decryptService } from "../../utils/storageFunc";
+import { useDebounce } from "../../hooks/useDebounce";
+import { showToast, validArray } from "../../utils/utils";
 
 const Chip = ({ item, onPress, selected }) => {
   return (
@@ -81,21 +86,37 @@ const SearchedChip = ({ item, onPress, selected }) => {
 const Search = () => {
   const { colors, fontFamily, fonts } = THEMES;
 
-  const [data, setData] = useState([
-    { id: "1", label: "Tricks", trending: true },
-    { id: "2", label: "Pet Food", trending: true },
-    { id: "3", label: "Pet Toys", trending: true },
-    { id: "4", label: "Pet Stores", trending: true },
-    { id: "5", label: "Kittens", trending: true },
-    { id: "6", label: "Pet Adoption", trending: false },
-    { id: "7", label: "Pet House", trending: false },
-    { id: "8", label: "Pet Doctor", trending: false },
-    { id: "9", label: "Pet Boarding Centers", trending: false },
-  ]);
+  const [data, setData] = useState([]);
 
   const [searchText, setSearchText] = useState("");
   const [selectedChips, setSelectedChips] = useState([]);
   const [recentSearches, setRecentSearches] = useState([]);
+  const searchQuery = useDebounce(searchText);
+
+  useEffect(() => {
+    initData();
+  }, [searchQuery]);
+
+  const initData = async () => {
+    try {
+      contextValue?.setLoader(true);
+      const userId = await decryptService("userId");
+      const params = {
+        userId: userId,
+        searchtype: "topics",
+        keyword: searchQuery,
+      };
+      const res = await search(params);
+      const response = res?.data?.data;
+      if (validArray(response)) {
+        setData(response);
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {
+      contextValue?.setLoader(false);
+      showToast("error", error?.message);
+    }
+  };
 
   // Handle search input change
   const handleSearchChange = (text) => {
@@ -126,99 +147,100 @@ const Search = () => {
   };
 
   // Filter trending topics and recent searches
-  const trendingTopics = data.filter((item) => item.trending);
-  const filteredData = data.filter((item) =>
-    item.label.toLowerCase().includes(searchText.toLowerCase())
-  );
+  // const trendingTopics = data.filter((item) => item.trending);
+  // const filteredData = data.filter((item) =>
+  //   item.label.toLowerCase().includes(searchText.toLowerCase())
+  // );
 
   return (
     <View style={styles.container}>
-       <SafeAreaView style={{ flex: 1 }}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header
-        showBack
-        title={"Search"}
-        bgColor="transparent"
-        fontColor={THEMES.colors.black}
-      />
-      <View style={{ paddingHorizontal: moderateScale(20) }}>
-        <View
-          style={{
-            flexDirection: "row",
-            paddingHorizontal: moderateScale(8),
-            borderColor: "#bebebd",
-            borderWidth: 1.5,
-            borderRadius: 25,
-            marginBottom: 16,
-            backgroundColor: "#f5f5f5",
-            elevation: 1,
-            alignItems: "center",
-          }}
-        >
-          <View style={{ paddingRight: 10 }}>
-            <SearchIcon />
+      <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header
+          showBack
+          title={"Search"}
+          bgColor="transparent"
+          fontColor={THEMES.colors.black}
+        />
+        <View style={{ paddingHorizontal: moderateScale(20) }}>
+          <View
+            style={{
+              flexDirection: "row",
+              paddingHorizontal: moderateScale(8),
+              borderColor: "#bebebd",
+              borderWidth: 1.5,
+              borderRadius: 25,
+              marginBottom: 16,
+              backgroundColor: "#f5f5f5",
+              elevation: 1,
+              alignItems: "center",
+            }}
+          >
+            <View style={{ paddingRight: 10 }}>
+              <SearchIcon />
+            </View>
+
+            <TextInput
+              style={styles.searchBar}
+              placeholder="Search..."
+              placeholderTextColor={"#000"}
+              value={searchText}
+              onChangeText={handleSearchChange}
+            />
           </View>
 
-          <TextInput
-            style={styles.searchBar}
-            placeholder="Search..."
-            placeholderTextColor={"#000"}
-            value={searchText}
-            onChangeText={handleSearchChange}
-          />
-        </View>
+          {/* TODO Show search results only when searchText is not empty */}
+          {/* {searchText !== "" && (
+            <FlatList
+              data={filteredData}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <Chip
+                  item={item}
+                  onPress={handleChipPress}
+                  selected={selectedChips.includes(item.id)}
+                />
+              )}
+              contentContainerStyle={styles.chipContainer}
+            />
+          )} */}
 
-        {/* Show search results only when searchText is not empty */}
-        {searchText !== "" && (
-          <FlatList
-            data={filteredData}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.selectTimeText}>Trending Topics</Text>
+          </View>
+          {/* TODO */}
+          {/* <FlatList
+            data={trendingTopics}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <Chip
+              <TrendingChip
                 item={item}
                 onPress={handleChipPress}
                 selected={selectedChips.includes(item.id)}
               />
             )}
             contentContainerStyle={styles.chipContainer}
+          /> */}
+
+          <View style={styles.sectionHeader}>
+            <Text style={styles.selectTimeText}>Recent Searches</Text>
+            <Pressable onPress={clearRecentSearches}>
+              <Text style={styles.sameTimeForDayText}>Clear</Text>
+            </Pressable>
+          </View>
+          <FlatList
+            data={recentSearches}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <SearchedChip
+                item={item}
+                // onPress={handleChipPress}
+                // selected={selectedChips.includes(item.id)}
+              />
+            )}
+            contentContainerStyle={styles.chipContainer}
           />
-        )}
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.selectTimeText}>Trending Topics</Text>
         </View>
-        <FlatList
-          data={trendingTopics}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TrendingChip
-              item={item}
-              onPress={handleChipPress}
-              selected={selectedChips.includes(item.id)}
-            />
-          )}
-          contentContainerStyle={styles.chipContainer}
-        />
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.selectTimeText}>Recent Searches</Text>
-          <Pressable onPress={clearRecentSearches}>
-            <Text style={styles.sameTimeForDayText}>Clear</Text>
-          </Pressable>
-        </View>
-        <FlatList
-          data={recentSearches}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <SearchedChip
-              item={item}
-              // onPress={handleChipPress}
-              // selected={selectedChips.includes(item.id)}
-            />
-          )}
-          contentContainerStyle={styles.chipContainer}
-        />
-      </View>
       </SafeAreaView>
     </View>
   );

@@ -53,7 +53,9 @@ const TrendingTopics = (props) => {
   const [topicList, setTopicList] = useState();
 
   useEffect(() => {
-    initData();
+    if (isFocused) {
+      initData();
+    }
   }, [isFocused]);
 
   const initData = async () => {
@@ -309,24 +311,23 @@ const TrendingTopics = (props) => {
                 </View>
               )}
 
-              <View style={{ paddingTop: moderateScale(15) }}>
-                <FlatList
-                  showsHorizontalScrollIndicator={false}
-                  data={trendingTopics}
-                  horizontal={true}
-                  showsVerticalScrollIndicator={false}
-                  bounces={false}
-                  renderItem={renderItem}
-                  keyExtractor={(item) => item.id}
-                  ListHeaderComponent={() =>
-                    topicList?.length > 5 ? (
-                      <Text style={{ textAlign: "center" }}>
-                        The list is empty
-                      </Text>
-                    ) : null
-                  }
-                />
-              </View>
+              <FlatList
+                showsHorizontalScrollIndicator={false}
+                data={trendingTopics}
+                horizontal={true}
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id}
+                ListHeaderComponent={() =>
+                  topicList?.length > 5 ? (
+                    <Text style={{ textAlign: "center" }}>
+                      The list is empty
+                    </Text>
+                  ) : null
+                }
+                style={{ paddingTop: moderateScale(15) }}
+              />
               {topicList?.length > 5 && (
                 <>
                   <View
