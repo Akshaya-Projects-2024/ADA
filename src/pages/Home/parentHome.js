@@ -8,7 +8,6 @@ import {
   StyleSheet,
   Dimensions,
   FlatList,
-  ActivityIndicator,
 } from "react-native";
 import Carousel from "react-native-snap-carousel";
 import { THEMES } from "../../assets/theme/themes";
@@ -33,12 +32,11 @@ import { useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import Strings from "../../constants/strings";
 import { showToast, validArray } from "../../utils/utils";
-import { decryptService, encryptService } from "../../utils/storageFunc";
+import { decryptService } from "../../utils/storageFunc";
 import { getUpcomingAppointments } from "../../redux-store/actions/auth";
 import moment from "moment";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { contextValue } from "../../components/Loader";
-import { getNotificationToken } from "../../utils/pushNotificationUtils";
 const { width: screenWidth } = Dimensions.get("window");
 
 const services = [
@@ -90,12 +88,6 @@ const ParentHome = (props) => {
 
   const initData = async () => {
     try {
-      let fcmToken = await decryptService("@fcmToken");
-      if (!fcmToken) {
-        fcmToken = await getNotificationToken();
-        await encryptService("@fcmToken", fcmToken);
-      }
-      console.log("🚀 ~ initData ~ newFcmToken:", fcmToken);
       contextValue?.setLoader(true);
       const userId = await decryptService("userId");
       const params = {

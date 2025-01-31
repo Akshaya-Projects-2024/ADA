@@ -34,6 +34,7 @@ import {
 } from "../../utils/userUtils";
 import { contextValue } from "../../components/Loader";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { getNotificationToken } from "../../utils/pushNotificationUtils";
 
 const OtpScreen = (props) => {
   const { top } = useSafeAreaInsets();
@@ -121,12 +122,17 @@ const OtpScreen = (props) => {
       Keyboard.dismiss();
       const currentPosition = await getCurrentLocation();
       const deviceId = await decryptService("deviceId");
+      let fcmToken = await decryptService("@fcmToken");
+      if (!fcmToken) {
+        fcmToken = await getNotificationToken();
+        await encryptService("@fcmToken", fcmToken);
+      }
       const postData = {
         UserId: value,
         Deviceid: deviceId,
         Otp: otpValue.join(""),
         type: "login",
-        sessionId: "localsession",
+        sessionId: fcmToken,
         latitude: currentPosition?.coords?.latitude
           ? currentPosition?.coords?.latitude?.toString()
           : "0",

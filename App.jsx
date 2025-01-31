@@ -21,7 +21,10 @@ import { refreshToken } from "./src/redux-store/actions/auth";
 import Loader from "./src/components/Loader";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { requestNotificationPermission } from "./src/utils/permissionUtils";
-import { createNotificationChannel } from "./src/utils/pushNotificationUtils";
+import {
+  createNotificationChannel,
+  getNotificationToken,
+} from "./src/utils/pushNotificationUtils";
 
 const store = configureStore();
 
@@ -36,10 +39,15 @@ function App() {
           const token = await decryptService("tokenId");
           const deviceId = await decryptService("deviceId");
           const currentPosition = await getCurrentLocation();
+          let fcmToken = await decryptService("@fcmToken");
+          if (!fcmToken) {
+            fcmToken = await getNotificationToken();
+            await encryptService("@fcmToken", fcmToken);
+          }
           const params = {
             token: token,
             Deviceid: deviceId,
-            sessionId: "localsession1", // hard coded value, we have send firebase fcm
+            sessionId: fcmToken,
             latitude: currentPosition?.coords?.latitude
               ? currentPosition?.coords?.latitude?.toString()
               : "0",

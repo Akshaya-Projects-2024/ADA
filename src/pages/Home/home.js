@@ -8,7 +8,6 @@ import {
   ScrollView,
   Alert,
   Dimensions,
-  ActivityIndicator,
   StatusBar,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
@@ -30,7 +29,7 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import moment from "moment";
 import Strings from "../../constants/strings";
 import Calendars from "../../assets/svg/calendar.svg";
-import { showPaymentAlert, showToast, validArray } from "../../utils/utils";
+import { showToast, validArray } from "../../utils/utils";
 import Toggle from "../../components/Toggle";
 import { useIsFocused } from "@react-navigation/native";
 import {
@@ -44,7 +43,7 @@ import {
 } from "../../constants/enums";
 import { useDispatch, useSelector } from "react-redux";
 import AppointmentCard from "../../components/AppointmentCard";
-import { decryptService, encryptService } from "../../utils/storageFunc";
+import { decryptService } from "../../utils/storageFunc";
 import {
   completeAppointment,
   confirmAppointment,
@@ -54,7 +53,6 @@ import {
 import { contextValue } from "../../components/Loader";
 import Dialog from "../../components/Dialog";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { getNotificationToken } from "../../utils/pushNotificationUtils";
 
 const afterTimeSlots = [
   { time: "09:00", disabled: false, enabled: true },
@@ -165,13 +163,6 @@ const Home = (props) => {
   };
 
   const initData = useCallback(async () => {
-    let fcmToken = await decryptService("@fcmToken");
-    if (!fcmToken) {
-      fcmToken = await getNotificationToken();
-      await encryptService("@fcmToken", fcmToken);
-    }
-    console.log("🚀 ~ initData ~ newFcmToken:", fcmToken);
-
     contextValue?.setLoader(true);
     getAppointmentData();
     getSlotsData();
