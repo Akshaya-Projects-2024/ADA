@@ -44,7 +44,7 @@ import {
 } from "../../constants/enums";
 import { useDispatch, useSelector } from "react-redux";
 import AppointmentCard from "../../components/AppointmentCard";
-import { decryptService } from "../../utils/storageFunc";
+import { decryptService, encryptService } from "../../utils/storageFunc";
 import {
   completeAppointment,
   confirmAppointment,
@@ -54,6 +54,7 @@ import {
 import { contextValue } from "../../components/Loader";
 import Dialog from "../../components/Dialog";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { getNotificationToken } from "../../utils/pushNotificationUtils";
 
 const afterTimeSlots = [
   { time: "09:00", disabled: false, enabled: true },
@@ -164,6 +165,13 @@ const Home = (props) => {
   };
 
   const initData = useCallback(async () => {
+    let fcmToken = await decryptService("@fcmToken");
+    if (!fcmToken) {
+      fcmToken = await getNotificationToken();
+      await encryptService("@fcmToken", fcmToken);
+    }
+    console.log("🚀 ~ initData ~ newFcmToken:", fcmToken);
+
     contextValue?.setLoader(true);
     getAppointmentData();
     getSlotsData();

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -22,6 +22,9 @@ import MyBookings from "../pages/Account/myBookings";
 import SelectAppointment from "../pages/Services/selectAppointment";
 import AppointmentDetail from "../pages/Appointment/appointmentDetail";
 import IntroScreens from "../pages/Authentication/IntroScreens";
+import messaging from "@react-native-firebase/messaging";
+import PushNotification from "react-native-push-notification";
+import { showNotification } from "../utils/pushNotificationUtils";
 
 const Stack = createStackNavigator();
 
@@ -31,6 +34,47 @@ const navOptionHandler = () => ({
 });
 
 const Routes = (props) => {
+  const onMessage = async (notification) => {
+    console.log("🚀 ~ onMessage ~ notification:", notification);
+    try {
+      if (notification && notification?.data) {
+        showNotification(notification);
+      }
+    } catch (error) {
+      console.log("onMessage:notificationAction Error: ", error);
+    }
+  };
+
+  const notificationAction = async (notification) => {
+    console.log("🚀 ~ notificationAction ~ notification:", notification);
+    try {
+      if (notification?.data) {
+        // TODO DO YOUR WORK HERE
+      }
+    } catch (error) {
+      console.log("notificationAction Error: ", error);
+    }
+  };
+  useEffect(() => {
+    const unsubscribeMessaging = messaging().onMessage(onMessage);
+    const unsubscribeMessagingOpen =
+      messaging().onNotificationOpenedApp(notificationAction);
+    PushNotification.popInitialNotification(notificationAction);
+    PushNotification.configure({
+      onNotification: function (notification) {
+        if (notification.userInteraction) {
+          notificationAction(notification);
+        }
+      },
+      popInitialNotification: true,
+      requestPermissions: true,
+    });
+
+    return () => {
+      unsubscribeMessaging();
+      unsubscribeMessagingOpen();
+    };
+  }, []);
   return (
     <NavigationContainer
       ref={navigationRef}

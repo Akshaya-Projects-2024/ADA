@@ -20,6 +20,8 @@ import { getCurrentLocation } from "./src/utils/geolocationUtils";
 import { refreshToken } from "./src/redux-store/actions/auth";
 import Loader from "./src/components/Loader";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { requestNotificationPermission } from "./src/utils/permissionUtils";
+import { createNotificationChannel } from "./src/utils/pushNotificationUtils";
 
 const store = configureStore();
 
@@ -73,9 +75,18 @@ function App() {
     Api.defaultHeader(header);
   }, []);
 
+  const initPermissions = async () => {
+    const permission = await requestNotificationPermission();
+    if (permission) {
+      const op = await createNotificationChannel();
+      console.log("🚀 ~ initPermissions ~ op:", op);
+    }
+  };
+
   useEffect(() => {
     initHeaders();
     initInterceptors();
+    initPermissions();
   }, [initInterceptors, initHeaders]);
 
   return (

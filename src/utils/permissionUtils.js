@@ -25,4 +25,30 @@ const requestLocationPermission = () => {
     }
   });
 };
-export { requestLocationPermission };
+
+const requestNotificationPermission = () => {
+  return new Promise(async (res) => {
+    try {
+      if (Platform.Version >= 33) {
+        const permission = PERMISSIONS.ANDROID.POST_NOTIFICATIONS;
+        const granted = await request(permission, {
+          title: "Notification",
+          message: "We require permission to push notification",
+          buttonNeutral: "Ask Me Later",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK",
+        });
+        if (granted === RESULTS.GRANTED) {
+          res(true);
+        } else {
+          res(false);
+        }
+      } else {
+        res(true);
+      }
+    } catch (err) {
+      res(false);
+    }
+  });
+};
+export { requestLocationPermission, requestNotificationPermission };

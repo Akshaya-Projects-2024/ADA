@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1081490605138",
+    "project_id": "ada-the-pet-app",
+    "storage_bucket": "ada-the-pet-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081490605138:android:23d8b8fa87fbede5bc4b8b",
+        "android_client_info": {
+          "package_name": "com.ada"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjz9BiGIwRDgiTLNAwFWpxg6xUMUzRZWY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
