@@ -85,3 +85,9 @@ For reference to navigating provider home with existing stack
 props.navigation.navigate("auth", {
 screen: "home",
 });
+
+# dummy jsk
+
+wJynk7IJ6ibyJh5
+prod_alias
+ada-prod.jks
