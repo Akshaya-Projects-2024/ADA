@@ -19,7 +19,7 @@ import { contextValue } from "../../components/Loader";
 import { search } from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
 import { useDebounce } from "../../hooks/useDebounce";
-import { showToast, validArray } from "../../utils/utils";
+import { findDifferenceByDays, showToast, validArray } from "../../utils/utils";
 import { getBase64Obj } from "../../utils/documentUtils";
 
 const Chip = ({ item, onPress, selected }) => {
@@ -103,6 +103,9 @@ const TopicsCard = ({ item, onPress }) => {
         <Text style={styles.titleStyle}>{item?.Subject}</Text>
         <View style={styles.authorContainer}>
           <Text style={styles.authorStyle}>{item?.Author}</Text>
+          <Text style={styles.dateStyle}>
+            {`${findDifferenceByDays(item?.Createdon)}d`}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -224,26 +227,6 @@ const Search = ({ navigation }) => {
             />
           </View>
 
-          {validArray(data) ? (
-            <FlatList
-              data={data}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <TopicsCard item={item} onPress={handleCardPressed} />
-              )}
-              contentContainerStyle={styles.topicsContainer}
-            />
-          ) : Array.isArray(data) && data?.length <= 0 ? (
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text>No data found!</Text>
-            </View>
-          ) : null}
-
           {/* TODO Show search results only when searchText is not empty */}
           {/* {searchText !== "" && (
             <FlatList
@@ -296,6 +279,20 @@ const Search = ({ navigation }) => {
             contentContainerStyle={styles.chipContainer}
           />*/}
         </View>
+        {validArray(data) ? (
+          <FlatList
+            data={data}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TopicsCard item={item} onPress={handleCardPressed} />
+            )}
+            contentContainerStyle={styles.topicsContainer}
+          />
+        ) : Array.isArray(data) && data?.length <= 0 ? (
+          <View style={styles.emptyView}>
+            <Text>No data found!</Text>
+          </View>
+        ) : null}
       </SafeAreaView>
     </View>
   );
@@ -379,7 +376,11 @@ const styles = StyleSheet.create({
     color: "#323232",
     fontSize: THEMES.fonts.font14,
   },
-  topicsContainer: { flexGrow: 1 },
+  topicsContainer: {
+    flexGrow: 1,
+    marginHorizontal: ms(20),
+    paddingBottom: ms(5),
+  },
   topicsCard: {
     backgroundColor: THEMES.colors.white,
     borderRadius: ms(12),
@@ -390,17 +391,31 @@ const styles = StyleSheet.create({
     padding: ms(15),
   },
   coverImage: { borderRadius: ms(24) },
-  contentContainer: { marginLeft: ms(15) },
+  contentContainer: { flex: 1, marginLeft: ms(15) },
   titleStyle: {
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
     fontWeight: "600",
   },
-  authorContainer: { marginTop: ms(5), flexDirection: "row" },
+  authorContainer: {
+    marginTop: ms(5),
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   authorStyle: {
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.topicAuthorText,
     fontWeight: "500",
+  },
+  dateStyle: {
+    fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.dateColor,
+    fontWeight: "500",
+  },
+  emptyView: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

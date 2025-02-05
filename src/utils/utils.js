@@ -2,6 +2,8 @@ import { Alert } from "react-native";
 import Toast from "react-native-toast-message";
 import Strings from "../constants/strings";
 
+const DAY_MULTIPLIER = 1000 * 60 * 60 * 24;
+
 const showToast = (type, message) => {
   Toast.show({
     type: type,
@@ -59,6 +61,15 @@ const formatServiceExperience = (years) => {
   return years ? [{ id: years, label: `${years} Years` }] : [];
 };
 
+const findDifferenceByDays = (date) => {
+  const presentDate = new Date();
+  const result = Math.round(
+    (presentDate.getTime() - new Date(date).getTime()) / DAY_MULTIPLIER
+  );
+  const difference = result.toFixed(0);
+  return difference || "";
+};
+
 export {
   showToast,
   validObject,
@@ -67,4 +78,5 @@ export {
   formatServiceExperience,
   showAlert,
   showPaymentAlert,
+  findDifferenceByDays,
 };

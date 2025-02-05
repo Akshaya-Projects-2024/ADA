@@ -1,20 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
   Image,
-  StatusBar,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Keyboard,
   Dimensions,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import { moderateScale, s } from "react-native-size-matters";
 import Back from "../../assets/svg/back.svg";
 import Share from "../../assets/svg/share.svg";
-import Button from "../../components/Button";
 import RenderHTML from "react-native-render-html";
 import { useWindowDimensions } from "react-native";
 import moment from "moment";
