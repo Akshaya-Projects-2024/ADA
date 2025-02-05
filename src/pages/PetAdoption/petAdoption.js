@@ -10,12 +10,12 @@ import {
   ScrollView,
   ActivityIndicator,
   Pressable,
+  TextInput,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
 import Strings from "../../constants/strings";
-import { moderateScale } from "react-native-size-matters";
-import Search from "../../assets/svg/search.svg";
+import { moderateScale, ms } from "react-native-size-matters";
 import Plus from "../../assets/svg/plus.svg";
 import { getAdoption } from "../../redux-store/actions/auth";
 import { showToast, validArray } from "../../utils/utils";
@@ -27,15 +27,18 @@ import { useSelector } from "react-redux";
 import { LoginModules } from "../../constants/enums";
 import { contextValue } from "../../components/Loader";
 import { SafeAreaView } from "react-native-safe-area-context";
+import SearchIcon from "../../assets/svg/search.svg";
+import { useDebounce } from "../../hooks/useDebounce";
 
 const PetAdoption = (props) => {
-  const { colors, fontFamily, fonts } = THEMES;
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [petCategories, setPetCategories] = useState([]);
   const [filterCategory, setFilterCategory] = useState("");
   const isFocused = useIsFocused();
   const { loggedInModule, guestUser } = useSelector((state) => state?.register);
+  const [searchText, setSearchText] = useState("");
+  const searchQuery = useDebounce(searchText);
 
   useEffect(() => {
     if (isFocused) {
@@ -51,6 +54,17 @@ const PetAdoption = (props) => {
       setFilteredData(validArray(filteredPets) ? filteredPets : []);
     }
   }, [data, filterCategory]);
+
+  useEffect(() => {
+    if (validArray(data) && searchQuery) {
+      const filteredPets = data?.filter((it) => {
+        return it?.name
+          ?.toLowerCase()
+          ?.includes(searchQuery?.trim()?.toLowerCase());
+      });
+      setFilteredData(validArray(filteredPets) ? filteredPets : []);
+    }
+  }, [data, searchQuery]);
 
   const initData = async () => {
     contextValue?.setLoader(true);
@@ -77,6 +91,11 @@ const PetAdoption = (props) => {
       contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
+  };
+
+  const handleSearchChange = (text) => {
+    setFilterCategory();
+    setSearchText(text);
   };
 
   const renderItem = ({ item }) => {
@@ -162,76 +181,101 @@ const PetAdoption = (props) => {
   };
   return (
     <View style={styles.container}>
-       <SafeAreaView style={{flex:1}}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header
-        noBack
-        title={Strings.petAdoption}
-        bgColor="transparent"
-        fontColor={"#ed65a5"}
-      />
-      <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <View style={{ flex: 1 }}>
-            <TouchableOpacity
-              onPress={() =>
-                props.navigation.navigate("auth", {
-                  screen: "search",
-                })
-              }
-              style={{
-                padding: moderateScale(8),
-                borderRadius: 25,
-                borderWidth: 1.5,
-                backgroundColor: "#f5f5f5",
-                borderColor: "#bebebd",
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Search />
-              <Text
+      <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header
+          noBack
+          title={Strings.petAdoption}
+          bgColor="transparent"
+          fontColor={"#ed65a5"}
+        />
+        <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <View
                 style={{
-                  paddingLeft: moderateScale(8),
-                  fontSize: THEMES.fonts.font12,
-                  color: THEMES.colors.darkGrey,
+                  flexDirection: "row",
+                  paddingHorizontal: moderateScale(8),
+                  borderColor: "#bebebd",
+                  borderWidth: 1.5,
+                  borderRadius: 25,
+                  marginBottom: ms(5),
+                  backgroundColor: "#f5f5f5",
+                  elevation: 1,
+                  alignItems: "center",
                 }}
               >
-                Search
-              </Text>
-            </TouchableOpacity>
-          </View>
+                <View style={{ paddingRight: 10 }}>
+                  <SearchIcon />
+                </View>
 
-          {loggedInModule === LoginModules.parent && !guestUser ? (
-            <TouchableOpacity
-              onPress={() =>
-                props.navigation.navigate("auth", {
-                  screen: "addAdoption",
-                })
-              }
-              style={{
-                marginLeft: moderateScale(13),
-                backgroundColor: THEMES.colors.white,
-                padding: moderateScale(11),
-                alignItems: "center",
-                justifyContent: "center",
-                borderColor: "#EC559C",
-                borderWidth: 1,
-                borderRadius: moderateScale(8),
-                borderBottomLeftRadius: moderateScale(0),
-              }}
-            >
-              <Plus stroke={"#EC559C"} />
-            </TouchableOpacity>
-          ) : null}
-        </View>
-        {/* <View
+                <TextInput
+                  style={styles.searchBar}
+                  placeholder="Search..."
+                  placeholderTextColor={"#000"}
+                  value={searchText}
+                  onChangeText={handleSearchChange}
+                />
+              </View>
+              {/* <TouchableOpacity
+                onPress={() =>
+                  props.navigation.navigate("auth", {
+                    screen: "search",
+                  })
+                }
+                style={{
+                  padding: moderateScale(8),
+                  borderRadius: 25,
+                  borderWidth: 1.5,
+                  backgroundColor: "#f5f5f5",
+                  borderColor: "#bebebd",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Search />
+                <Text
+                  style={{
+                    paddingLeft: moderateScale(8),
+                    fontSize: THEMES.fonts.font12,
+                    color: THEMES.colors.darkGrey,
+                  }}
+                >
+                  Search
+                </Text>
+              </TouchableOpacity> */}
+            </View>
+
+            {loggedInModule === LoginModules.parent && !guestUser ? (
+              <TouchableOpacity
+                onPress={() =>
+                  props.navigation.navigate("auth", {
+                    screen: "addAdoption",
+                  })
+                }
+                style={{
+                  marginLeft: moderateScale(13),
+                  backgroundColor: THEMES.colors.white,
+                  padding: moderateScale(11),
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderColor: "#EC559C",
+                  borderWidth: 1,
+                  borderRadius: moderateScale(8),
+                  borderBottomLeftRadius: moderateScale(0),
+                }}
+              >
+                <Plus stroke={"#EC559C"} />
+              </TouchableOpacity>
+            ) : null}
+          </View>
+          {/* <View
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -264,78 +308,79 @@ const PetAdoption = (props) => {
             </View>
           </View>
         </View> */}
-        <View
-          style={{ paddingVertical: moderateScale(28), flexDirection: "row" }}
-        >
-          <ScrollView
-            horizontal={true}
-            style={{ flex: 1 }}
-            bounces={false}
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
+          <View
+            style={{ paddingVertical: moderateScale(28), flexDirection: "row" }}
           >
-            {petCategories?.map((item, index) => {
-              return (
-                <Pressable
-                  key={`${item}_${index}`}
-                  onPress={() => {
-                    setFilterCategory(item);
-                  }}
-                  style={{
-                    paddingHorizontal: moderateScale(12),
-                    marginLeft: index === 0 ? 0 : moderateScale(10),
-                    paddingVertical: moderateScale(6),
-                    borderWidth: 1,
-                    borderColor:
-                      index === 0
-                        ? THEMES.colors.red
-                        : filterCategory === item
-                        ? THEMES.colors.adoptionPink
-                        : THEMES.colors.silver,
-                    borderRadius: 20,
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  {index === 0 ? (
-                    <View style={styles.iconStyle}>
-                      <CrossIcon
-                        width={moderateScale(15)}
-                        height={moderateScale(15)}
-                        color={THEMES.colors.red}
-                      />
-                    </View>
-                  ) : null}
-                  <Text
+            <ScrollView
+              horizontal={true}
+              style={{ flex: 1 }}
+              bounces={false}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+            >
+              {petCategories?.map((item, index) => {
+                return (
+                  <Pressable
+                    key={`${item}_${index}`}
+                    onPress={() => {
+                      setSearchText("");
+                      setFilterCategory(item);
+                    }}
                     style={{
-                      fontFamily: THEMES.fontFamily.semiBold,
-                      color:
+                      paddingHorizontal: moderateScale(12),
+                      marginLeft: index === 0 ? 0 : moderateScale(10),
+                      paddingVertical: moderateScale(6),
+                      borderWidth: 1,
+                      borderColor:
                         index === 0
                           ? THEMES.colors.red
                           : filterCategory === item
                           ? THEMES.colors.adoptionPink
-                          : THEMES.colors.black,
-                      fontSize: THEMES.fonts.font12,
+                          : THEMES.colors.silver,
+                      borderRadius: 20,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                     }}
                   >
-                    {item}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
+                    {index === 0 ? (
+                      <View style={styles.iconStyle}>
+                        <CrossIcon
+                          width={moderateScale(15)}
+                          height={moderateScale(15)}
+                          color={THEMES.colors.red}
+                        />
+                      </View>
+                    ) : null}
+                    <Text
+                      style={{
+                        fontFamily: THEMES.fontFamily.semiBold,
+                        color:
+                          index === 0
+                            ? THEMES.colors.red
+                            : filterCategory === item
+                            ? THEMES.colors.adoptionPink
+                            : THEMES.colors.black,
+                        fontSize: THEMES.fonts.font12,
+                      }}
+                    >
+                      {item}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
+          <View style={{ flex: 1 }}>
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              data={validArray(filteredData) ? filteredData : data}
+              bounces={false}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+            />
+          </View>
         </View>
-        <View style={{ flex: 1 }}>
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            data={validArray(filteredData) ? filteredData : data}
-            bounces={false}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-          />
-        </View>
-      </View>
       </SafeAreaView>
     </View>
   );
@@ -368,6 +413,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginRight: moderateScale(5),
+  },
+  searchBar: {
+    height: 42,
+    flex: 1,
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.darkGrey,
   },
 });
 

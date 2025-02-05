@@ -24,7 +24,7 @@ const TrendDetail = (props) => {
   const data = props.route.params.selectedData;
 
   const calculateReadTime = (content) => {
-    const words = content.trim().split(/\s+/).length; // Count words
+    const words = content?.trim()?.split(/\s+/).length; // Count words
     const readingSpeed = 200; // Words per minute
     const minutes = Math.ceil(words / readingSpeed); // Calculate minutes
     return `${minutes} min read`;
@@ -37,7 +37,10 @@ const TrendDetail = (props) => {
   return (
     <View style={styles.container}>
       <View style={styles.imgStyle}>
-        <Image style={styles.imgStyle} source={{ uri: data.cover }} />
+        <Image
+          style={styles.imgStyle}
+          source={{ uri: data?.cover || data?.Cover }}
+        />
       </View>
       <View style={styles.headerView}>
         <TouchableOpacity
@@ -56,9 +59,11 @@ const TrendDetail = (props) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.contentView}>
-          <Text style={styles.timeText}>{calculateReadTime(data.blog)}</Text>
+          <Text style={styles.timeText}>
+            {calculateReadTime(data?.blog || data?.Blog)}
+          </Text>
           <View style={{ paddingTop: moderateScale(4) }}>
-            <Text style={styles.titleText}>{data.subject}</Text>
+            <Text style={styles.titleText}>{data?.subject}</Text>
           </View>
           <View style={styles.profileView}>
             <View style={styles.profile}>
@@ -68,13 +73,14 @@ const TrendDetail = (props) => {
               />
             </View>
             <Text style={styles.profileName}>
-              {data.author} , {formatDate(data.createdon)}
+              {data?.author || data?.Author} ,{" "}
+              {formatDate(data?.createdon || data?.Createdon)}
             </Text>
           </View>
           <View style={{ paddingTop: moderateScale(20) }}>
             <RenderHTML
               contentWidth={width}
-              source={{ html: data.blog }}
+              source={{ html: data?.blog || data?.Blog }}
               baseStyle={styles.descriptionText}
             />
           </View>
