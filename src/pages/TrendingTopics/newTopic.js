@@ -85,10 +85,10 @@ const NewTopic = () => {
         let obj = {
           id: 0,
           subject: title,
-          Blog: blog,
+          blog: blog,
           userId: userId,
           cover: photo?.fileData,
-          Author:
+          author:
             profileData?.providerBusiness?.name ||
             profileData?.parentContact?.name,
         };

@@ -97,14 +97,16 @@ const TopicsCard = ({ item, onPress }) => {
         height={ms(48)}
         width={ms(48)}
         style={styles.coverImage}
-        source={getBase64Obj(item?.Cover)}
+        source={getBase64Obj(item?.cover)}
       />
       <View style={styles.contentContainer}>
-        <Text style={styles.titleStyle}>{item?.Subject}</Text>
+        <Text style={styles.titleStyle}>{item?.subject}</Text>
         <View style={styles.authorContainer}>
-          <Text style={styles.authorStyle}>{item?.Author}</Text>
+          <Text style={styles.authorStyle}>{item?.author}</Text>
           <Text style={styles.dateStyle}>
-            {`${findDifferenceByDays(item?.Createdon)}d`}
+            {`${findDifferenceByDays(item?.createdon)}` > 50
+              ? "Few days ago"
+              : `${findDifferenceByDays(item?.createdon)}d`}
           </Text>
         </View>
       </View>

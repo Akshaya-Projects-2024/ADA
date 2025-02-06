@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -15,10 +15,24 @@ import Share from "../../assets/svg/share.svg";
 import RenderHTML from "react-native-render-html";
 import { useWindowDimensions } from "react-native";
 import moment from "moment";
+import { useSelector } from "react-redux";
+import ProfileDummy from "../../assets/svg/user.svg";
 
 const TrendDetail = (props) => {
   const { width } = useWindowDimensions();
+  const [profileImg, setProfileImg] = useState();
   const data = props.route.params.selectedData;
+  const { providerProfile, profileData } = useSelector(
+    ({ commonReducer }) => commonReducer
+  );
+
+  useEffect(() => {
+    if (Boolean(profileData)) {
+      if (profileData?.providerDocument?.[0]?.url) {
+        setProfileImg(profileData?.providerDocument?.[0]?.url);
+      }
+    }
+  }, [profileData]);
 
   const calculateReadTime = (content) => {
     const words = content?.trim()?.split(/\s+/).length; // Count words
@@ -64,17 +78,26 @@ const TrendDetail = (props) => {
           </View>
           <View style={styles.profileView}>
             <View style={styles.profile}>
-              <Image
-                style={styles.profile}
-                source={require("../../assets/images/profileImg.png")}
-              />
+              {Boolean(profileImg) ? (
+                <Image
+                  resizeMode="contain"
+                  style={styles.profile}
+                  source={{
+                    uri: profileImg,
+                  }}
+                />
+              ) : (
+                <View style={[styles.profile,{borderWidth:1, alignItems:'center', justifyContent:'center'}]}>
+                  <ProfileDummy width={25}/>
+                </View>
+              )}
             </View>
             <Text style={styles.profileName}>
               {data?.author || data?.Author} ,{" "}
               {formatDate(data?.createdon || data?.Createdon)}
             </Text>
           </View>
-          <View style={{ paddingTop: moderateScale(20) }}>
+          <View style={{ paddingTop: moderateScale(10) }}>
             <RenderHTML
               contentWidth={width}
               source={{ html: data?.blog || data?.Blog }}

@@ -21,7 +21,7 @@ import { dispathGuestUser } from "../../redux-store/actions/userActions";
 import { useDispatch } from "react-redux";
 
 const SignIn = (props) => {
-  const [inputValue, setInputValue] = useState(""); //a@yopmail.com //9769487604 //"jogayex376@bawsny.com" //cicocaj728@evusd.com
+  const [inputValue, setInputValue] = useState("rebaxas819@shouxs.com"); //a@yopmail.com //9769487604 //"jogayex376@bawsny.com" //cicocaj728@evusd.com
   const dispatch = useDispatch();
   const onSubmit = async () => {
     if (!inputValue) {
@@ -97,10 +97,10 @@ const SignIn = (props) => {
           />
         </View>
         <Button onPress={onSubmit} title={Strings.signWithOtp} />
-        <View style={styles.skipButtonContainer} />
-        <View style={styles.skipButton}>
+        {/* <View style={styles.skipButtonContainer} /> */}
+        {/* <View style={styles.skipButton}>
           <Button onPress={null} title={Strings.skip} onlyBorder />
-        </View>
+        </View> */}
       </View>
     </View>
   );
