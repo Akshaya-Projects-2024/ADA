@@ -7,20 +7,20 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
-  Pressable,
+  Image,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
-import { moderateScale } from "react-native-size-matters";
-import Strings from "../../constants/strings";
+import { moderateScale, ms } from "react-native-size-matters";
 import SearchIcon from "../../assets/svg/search.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
 import { search } from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
 import { useDebounce } from "../../hooks/useDebounce";
-import { showToast, validArray } from "../../utils/utils";
+import { findDifferenceByDays, showToast, validArray } from "../../utils/utils";
+import { getBase64Obj } from "../../utils/documentUtils";
 
 const Chip = ({ item, onPress, selected }) => {
   return (
@@ -63,6 +63,7 @@ const TrendingChip = ({ item, onPress, selected }) => {
     </TouchableOpacity>
   );
 };
+
 const SearchedChip = ({ item, onPress, selected }) => {
   return (
     <TouchableOpacity style={styles.chip}>
@@ -83,10 +84,38 @@ const SearchedChip = ({ item, onPress, selected }) => {
     </TouchableOpacity>
   );
 };
-const Search = () => {
+
+const TopicsCard = ({ item, onPress }) => {
+  return (
+    <TouchableOpacity
+      style={styles.topicsCard}
+      onPress={() => {
+        onPress(item);
+      }}
+    >
+      <Image
+        height={ms(48)}
+        width={ms(48)}
+        style={styles.coverImage}
+        source={getBase64Obj(item?.Cover)}
+      />
+      <View style={styles.contentContainer}>
+        <Text style={styles.titleStyle}>{item?.Subject}</Text>
+        <View style={styles.authorContainer}>
+          <Text style={styles.authorStyle}>{item?.Author}</Text>
+          <Text style={styles.dateStyle}>
+            {`${findDifferenceByDays(item?.Createdon)}d`}
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const Search = ({ navigation }) => {
   const { colors, fontFamily, fonts } = THEMES;
 
-  const [data, setData] = useState([]);
+  const [data, setData] = useState();
 
   const [searchText, setSearchText] = useState("");
   const [selectedChips, setSelectedChips] = useState([]);
@@ -94,12 +123,15 @@ const Search = () => {
   const searchQuery = useDebounce(searchText);
 
   useEffect(() => {
+    contextValue?.setLoader(true);
+  }, []);
+
+  useEffect(() => {
     initData();
   }, [searchQuery]);
 
   const initData = async () => {
     try {
-      contextValue?.setLoader(true);
       const userId = await decryptService("userId");
       const params = {
         userId: userId,
@@ -110,9 +142,12 @@ const Search = () => {
       const response = res?.data?.data;
       if (validArray(response)) {
         setData(response);
+      } else {
+        setData([]);
       }
       contextValue?.setLoader(false);
     } catch (error) {
+      setData([]);
       contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
@@ -146,6 +181,9 @@ const Search = () => {
     setRecentSearches([]);
   };
 
+  const handleCardPressed = (item) => {
+    navigation.navigate("trendDetail", { selectedData: item });
+  };
   // Filter trending topics and recent searches
   // const trendingTopics = data.filter((item) => item.trending);
   // const filteredData = data.filter((item) =>
@@ -170,7 +208,7 @@ const Search = () => {
               borderColor: "#bebebd",
               borderWidth: 1.5,
               borderRadius: 25,
-              marginBottom: 16,
+              marginBottom: ms(5),
               backgroundColor: "#f5f5f5",
               elevation: 1,
               alignItems: "center",
@@ -203,7 +241,7 @@ const Search = () => {
               )}
               contentContainerStyle={styles.chipContainer}
             />
-          )} */}
+          )} 
 
           <View style={styles.sectionHeader}>
             <Text style={styles.selectTimeText}>Trending Topics</Text>
@@ -221,8 +259,8 @@ const Search = () => {
             )}
             contentContainerStyle={styles.chipContainer}
           /> */}
-
-          <View style={styles.sectionHeader}>
+          {/* TODO */}
+          {/* <View style={styles.sectionHeader}>
             <Text style={styles.selectTimeText}>Recent Searches</Text>
             <Pressable onPress={clearRecentSearches}>
               <Text style={styles.sameTimeForDayText}>Clear</Text>
@@ -239,8 +277,22 @@ const Search = () => {
               />
             )}
             contentContainerStyle={styles.chipContainer}
-          />
+          />*/}
         </View>
+        {validArray(data) ? (
+          <FlatList
+            data={data}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TopicsCard item={item} onPress={handleCardPressed} />
+            )}
+            contentContainerStyle={styles.topicsContainer}
+          />
+        ) : Array.isArray(data) && data?.length <= 0 ? (
+          <View style={styles.emptyView}>
+            <Text>No data found!</Text>
+          </View>
+        ) : null}
       </SafeAreaView>
     </View>
   );
@@ -323,6 +375,47 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.medium,
     color: "#323232",
     fontSize: THEMES.fonts.font14,
+  },
+  topicsContainer: {
+    flexGrow: 1,
+    marginHorizontal: ms(20),
+    paddingBottom: ms(5),
+  },
+  topicsCard: {
+    backgroundColor: THEMES.colors.white,
+    borderRadius: ms(12),
+    borderWidth: ms(1),
+    borderColor: THEMES.colors.searchBorderColor,
+    marginVertical: ms(5),
+    flexDirection: "row",
+    padding: ms(15),
+  },
+  coverImage: { borderRadius: ms(24) },
+  contentContainer: { flex: 1, marginLeft: ms(15) },
+  titleStyle: {
+    fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.black,
+    fontWeight: "600",
+  },
+  authorContainer: {
+    marginTop: ms(5),
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  authorStyle: {
+    fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.topicAuthorText,
+    fontWeight: "500",
+  },
+  dateStyle: {
+    fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.dateColor,
+    fontWeight: "500",
+  },
+  emptyView: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

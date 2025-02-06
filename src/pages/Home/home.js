@@ -341,7 +341,7 @@ const Home = (props) => {
     }
   };
 
-  const handlePremiumActionPressed = (premiumAction, message) => {
+  const handlePremiumActionPressed = (premiumAction) => {
     if (paymentCompleted?.flag) {
       premiumAction();
     } else {
@@ -1307,9 +1307,13 @@ const Home = (props) => {
           setPaymentModal(false);
         }}
         rightButtonPressed={() => {
-          props.navigation.navigate("auth", {
-            screen: "paymentsSubscription",
-          });
+          if (profile?.providerProfile?.subscription?.status === "active") {
+            setPaymentModal(false);
+          } else {
+            props.navigation.navigate("auth", {
+              screen: "paymentsSubscription",
+            });
+          }
         }}
         onClose={() => {
           setPaymentModal(false);

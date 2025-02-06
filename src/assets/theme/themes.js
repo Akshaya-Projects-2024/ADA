@@ -56,6 +56,9 @@ export const THEMES = {
     bookedSlot: "#ffc7b7",
     backdropColor: "#00000099",
     outrageousPink: "#EC559C",
+    searchBorderColor: "#0000001F",
+    topicAuthorText: "#323232",
+    dateColor: "#0000008F",
   },
   fontFamily: {
     regular: "Inter-Regular",
