@@ -28,7 +28,7 @@ import RazorpayCheckout from "react-native-razorpay";
 import { getProfile } from "../../redux-store/actions/auth";
 import { dispatchUserData } from "../../redux-store/actions/registerAction";
 import { validateServiceProfile } from "../../utils/userUtils";
-import { validArray, validObject } from "../../utils/utils";
+import { calculateDiscount, validArray, validObject } from "../../utils/utils";
 import SubscriptionError from "./subscriptionError";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -122,9 +122,11 @@ const PaymentsSubscription = (props) => {
       const res = await getSubscriptionPlan(obj);
       if (res.status === 200) {
         const outputArray = res?.data?.data;
+        console.log(outputArray)
         if (validArray(outputArray)) {
           let selectedSub = {};
           setSubscriptionData(outputArray);
+          setSubscriptionDetails(outputArray[0])
           if (
             profile?.providerProfile?.subscription?.subscriptioncode &&
             profile?.providerProfile?.subscription?.status === "active"
@@ -185,15 +187,15 @@ const PaymentsSubscription = (props) => {
         image: "https://i.imgur.com/3g7nmJC.png", //roundIcon.png
         currency: subscriptionDetails?.currency,
         key: "rzp_test_PECnHmfOdkRLhw", // Replace with your Razorpay Key ID
-        amount: subscriptionDetails?.amount,
+        amount: calculateDiscount(subscriptionDetails?.amount, selectedCard?.flatdiscount),
         name: "ADA",
         order_id: subscriptionDetails?.id, //Replace this with an order_id created using Orders API.
         theme: { color: "#53a20e" },
       };
+      console.log("options",options,subscriptionDetails)
       const paymentResponse = await RazorpayCheckout.open({
         ...options,
       });
-
       if (
         paymentResponse?.razorpay_order_id &&
         paymentResponse?.razorpay_payment_id &&
@@ -208,7 +210,6 @@ const PaymentsSubscription = (props) => {
           },
         };
         const acknowledgeResponse = await acknowledgeSubscription(params);
-        console.log("ac", acknowledgeResponse)
         if (acknowledgeResponse?.status === 200) {
           await fetchUserProfile();
           setSubscription(true);
@@ -299,7 +300,7 @@ const PaymentsSubscription = (props) => {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
-          <View style={styles.paymentDetailsView}>
+          {/* <View style={styles.paymentDetailsView}>
             <TouchableOpacity
               onPress={() => props.navigation.navigate("paymentDetails")}
               style={styles.paymentDetailsBtn}
@@ -309,7 +310,7 @@ const PaymentsSubscription = (props) => {
               </Text>
               <ArrowRight />
             </TouchableOpacity>
-          </View>
+          </View> */}
           <Text style={styles.joinTheFunText}>{Strings.joinTheFun}</Text>
 
           <View style={styles.rowContainer}>
@@ -447,7 +448,7 @@ const PaymentsSubscription = (props) => {
             marginBottom: moderateScale(20),
           }}
         >
-          {subscriptionDetails?.amoun ? (
+          {subscriptionDetails?.amount ? (
             <View style={styles.subscriptionView}>
               <Text style={styles.subscriptionText}>
                 {Strings.subscriptionCost}:{" "}
@@ -457,11 +458,11 @@ const PaymentsSubscription = (props) => {
               </Text>
             </View>
           ) : null}
-          {/* <View style={{ paddingTop: moderateScale(7) }}>
+          <View style={{ paddingTop: moderateScale(7) }}>
               <Text onPress={toggleModal} style={styles.viewBreakupText}>
                 {Strings.viewBreakup}
               </Text>
-            </View> */}
+            </View>
           <View style={[styles.btnView, { paddingTop: moderateScale(20) }]}>
             <Button
               onPress={
@@ -492,14 +493,13 @@ const PaymentsSubscription = (props) => {
                 {Strings.subscriptionCost}:
               </Text>
               <Text numberOfLines={1} style={styles.subscriptionPrice}>
-                ₹ XXX
+                ₹ {subscriptionDetails?.amount}
               </Text>
             </View>
-
             <View style={styles.TaxView}>
-              <Text style={styles.TaxText}>{Strings.tax}:</Text>
+              <Text style={styles.TaxText}>Discount:</Text>
               <Text numberOfLines={1} style={styles.TaxPrice}>
-                ₹ XXX
+                {selectedCard?.flatdiscount} %
               </Text>
             </View>
             <View
@@ -509,7 +509,7 @@ const PaymentsSubscription = (props) => {
             <View style={styles.totalRow}>
               <Text style={styles.totalText}>{Strings.total}:</Text>
               <Text numberOfLines={1} style={styles.totalPrice}>
-                ₹ XXX
+                ₹ {calculateDiscount(subscriptionDetails?.amount, selectedCard?.flatdiscount)}
               </Text>
             </View>
             <View
@@ -621,6 +621,7 @@ const styles = StyleSheet.create({
     color: THEMES.colors.black,
     fontSize: THEMES.fonts.font14,
     textAlign: "center",
+    paddingTop: moderateScale(30)
   },
   gradientRow: {
     flex: 1,

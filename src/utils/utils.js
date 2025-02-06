@@ -59,6 +59,11 @@ const formatServiceExperience = (years) => {
   return years ? [{ id: years, label: `${years} Years` }] : [];
 };
 
+const calculateDiscount = (originalPrice, discountPercent) => {
+  if (!originalPrice || !discountPercent) return 0;
+  return originalPrice - (originalPrice * discountPercent) / 100;
+};
+
 export {
   showToast,
   validObject,
@@ -67,4 +72,5 @@ export {
   formatServiceExperience,
   showAlert,
   showPaymentAlert,
+  calculateDiscount
 };
