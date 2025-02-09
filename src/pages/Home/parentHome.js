@@ -448,6 +448,7 @@ const ParentHome = (props) => {
                 color: "#EC407A",
                 fontFamily: THEMES.fontFamily.bold,
                 fontSize: THEMES.fonts.font20,
+                textAlign: "center",
               }}
             >
               {`Hi ${

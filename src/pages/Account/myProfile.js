@@ -48,61 +48,61 @@ const MyProfile = (props) => {
   };
 
   return (
-    <SafeAreaView style={{flex:1}}>
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header title={Strings.myProfile} showBack bgColor="transparent" />
-      <View style={styles.padding32}>
-        <View style={styles.cardView}>
-          {renderItem(
-            Strings.businessDetails,
-            "",
-            "businessDetail",
-            Strings.businessDescription,
-            guestUser ||
-              (!profileStatus?.flag &&
-                profileStatus?.modules?.includes("businessDetail"))
-          )}
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header title={Strings.myProfile} showBack bgColor="transparent" />
+        <View style={styles.padding32}>
+          <View style={styles.cardView}>
+            {renderItem(
+              Strings.businessDetails,
+              "",
+              "businessDetail",
+              Strings.businessDescription,
+              guestUser ||
+                (!profileStatus?.flag &&
+                  profileStatus?.modules?.includes("businessDetail"))
+            )}
 
-          {renderItem(
-            Strings.contactDetails,
-            "",
-            "contactDetails",
-            Strings.contactDescription,
-            guestUser ||
-              (!profileStatus?.flag &&
-                profileStatus?.modules?.includes("contactDetails"))
-          )}
-          {renderItem(
-            Strings.uploadImages,
-            "",
-            "uploadImagesDocs",
-            Strings.uploadImagesDescription,
-            guestUser ||
-              (!profileStatus?.flag &&
-                profileStatus?.modules?.includes("uploadImagesDocs"))
-          )}
-          {renderItem(
-            Strings.sessionDetails,
-            "",
-            "sessionDetail",
-            Strings.sessionDescriptions,
-            guestUser ||
-              (!profileStatus?.flag &&
-                profileStatus?.modules?.includes("sessionDetail"))
-          )}
-          {renderItem(
-            Strings.mediaLinks,
-            "addBottom",
-            "mediaLink",
-            Strings.mediaDescription,
-            guestUser ||
-              (!profileStatus?.flag &&
-                profileStatus?.modules?.includes("mediaLink"))
-          )}
+            {renderItem(
+              Strings.contactDetails,
+              "",
+              "contactDetails",
+              Strings.contactDescription,
+              guestUser ||
+                (!profileStatus?.flag &&
+                  profileStatus?.modules?.includes("contactDetails"))
+            )}
+            {renderItem(
+              Strings.uploadImages,
+              "",
+              "uploadImagesDocs",
+              Strings.uploadImagesDescription,
+              guestUser ||
+                (!profileStatus?.flag &&
+                  profileStatus?.modules?.includes("uploadImagesDocs"))
+            )}
+            {renderItem(
+              Strings.sessionDetails,
+              "",
+              "sessionDetail",
+              Strings.sessionDescriptions,
+              guestUser ||
+                (!profileStatus?.flag &&
+                  profileStatus?.modules?.includes("sessionDetail"))
+            )}
+            {renderItem(
+              Strings.mediaLinks,
+              "addBottom",
+              "mediaLink",
+              Strings.mediaDescription,
+              guestUser ||
+                (!profileStatus?.flag &&
+                  profileStatus?.modules?.includes("mediaLink"))
+            )}
+          </View>
         </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 };

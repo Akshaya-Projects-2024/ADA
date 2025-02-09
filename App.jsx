@@ -34,8 +34,8 @@ function App() {
       async (response) => {
         const originalRequest = response.config;
         if (response?.status === 403 && !originalRequest._retry) {
+          // console.log("🚀 ~ response 403:", response);
           originalRequest._retry = true;
-          // Try to refresh the token
           const token = await decryptService("tokenId");
           const deviceId = await decryptService("deviceId");
           const currentPosition = await getCurrentLocation();
@@ -66,10 +66,12 @@ function App() {
           }
           return response;
         } else {
+          // console.log("🚀 ~ response:", response);
           return response;
         }
       },
       (error) => {
+        // console.log("🚀 ~ error:", error);
         return error;
       }
     );
