@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -35,6 +35,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileDummy from "../../assets/svg/user.svg";
 import Toggle from "../../components/Toggle";
 import { LoginModules } from "../../constants/enums";
+import { getContactDetails } from "../../redux-store/actions/commonApis";
+
 
 const MenuItem = ({
   bgColor,
@@ -72,6 +74,8 @@ const MenuItem = ({
 const MyAccount = (props) => {
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const profile = useSelector((state) => state?.commonReducer);
+
+
   const profileServices = useMemo(
     () =>
       profile?.providerProfile?.providerBusiness?.services?.reduce(

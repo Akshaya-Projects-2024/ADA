@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
   Image,
   StyleSheet,
   TouchableOpacity,
-  ImageBackground,
   StatusBar,
+  Linking,
+  Alert
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import { moderateScale } from "react-native-size-matters";
@@ -18,8 +19,36 @@ import Whatsup from "../../assets/svg/whatsup.svg";
 import Mail from "../../assets/svg/mail.svg";
 import ClipBoard from "../../assets/svg/clipboardPen.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getContactDetails } from "../../redux-store/actions/commonApis";
 
 const ContactPage = (props) => {
+  const [mobileNo, setMobileNo] = useState()
+
+  useEffect(() => {
+    getContactApi();
+  }, []);
+
+  const getContactApi = async () => {
+    let res = await getContactDetails();
+    if (Boolean(res)) {
+      setMobileNo(res?.mobilenumber)
+    }
+  };
+
+  const openWhatsApp = () => {
+    const url = `whatsapp://send?phone=${`+91${mobileNo}`}&text=${encodeURIComponent("Hello, how can I help you?")}`;
+    console.log("url", url)
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (supported) {
+          return Linking.openURL(url);
+        } else {
+          Alert.alert("WhatsApp is not installed on your device.");
+        }
+      })
+      .catch((err) => console.error("An error occurred", err));
+  };
+
   return (
     <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
@@ -57,7 +86,8 @@ const ContactPage = (props) => {
             justifyContent: "space-between",
           }}
         >
-          <View
+          <TouchableOpacity
+            onPress={()=>openWhatsApp()}
             style={{
               width: "45%",
               height: 150,
@@ -92,7 +122,7 @@ const ContactPage = (props) => {
             >
               Chat with us
             </Text>
-          </View>
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => props.navigation.navigate("writeUs")}
             style={{

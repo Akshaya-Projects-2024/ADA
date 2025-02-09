@@ -21,6 +21,7 @@ import moment from "moment";
 import { rescheduleAppointment } from "../../redux-store/actions/auth";
 import { showToast } from "../../utils/utils";
 import { contextValue } from "../../components/Loader";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const RescheduleAppointment = ({ navigation, route }) => {
   const selectedItem = route?.params?.selectedItem;
@@ -111,6 +112,7 @@ const RescheduleAppointment = ({ navigation, route }) => {
     }
   };
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
@@ -229,6 +231,7 @@ const RescheduleAppointment = ({ navigation, route }) => {
         onCancel={hideDatePickerCancel}
       />
     </View>
+    </SafeAreaView>
   );
 };
 

@@ -23,6 +23,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { findDifferenceByDays } from "../../utils/utils";
+import { contextValue } from "../../components/Loader";
 
 const TrendingTopics = (props) => {
   const { colors, fontFamily, fonts } = THEMES;
@@ -37,6 +38,7 @@ const TrendingTopics = (props) => {
   }, [isFocused]);
 
   const initData = async () => {
+    contextValue?.setLoader(true);
     let obj = {
       userId: await decryptService("userId"),
       searchtype: "topics",
@@ -52,6 +54,7 @@ const TrendingTopics = (props) => {
         setTopicList(dataArray);
       }
     }
+    contextValue?.setLoader(false);
   };
 
   const renderItem = ({ item, index }) => {
