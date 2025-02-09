@@ -37,4 +37,7 @@ export const urlList = {
   getUpcomingAppointments: "appointment/getupcoming",
   providerDashboardSlotsData: "appointment/timeslotwithstatus",
   search: "global/search",
+  contactPage: "feedback/getcontactusdetails",
+  writeUs: "feedback/addwritetous",
+  feedback: "feedback/addFeedback",
 };

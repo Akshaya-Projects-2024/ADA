@@ -16,6 +16,7 @@ import Button from "../../components/Button";
 import { showToast } from "../../utils/utils";
 import { cancelAppointment } from "../../redux-store/actions/auth";
 import { contextValue } from "../../components/Loader";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 const CancelAppointment = ({ navigation, route }) => {
   const selectedItem = route?.params?.selectedItem;
@@ -68,6 +69,8 @@ const CancelAppointment = ({ navigation, route }) => {
   };
 
   return (
+
+   <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
@@ -96,6 +99,7 @@ const CancelAppointment = ({ navigation, route }) => {
         )}
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
