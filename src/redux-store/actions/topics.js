@@ -20,7 +20,7 @@ export const createTopic = async (params) => {
 
 export const getMyTopics = async (params) => {
   try {
-    const res = await Api.POST(urlList.getTopics, params);
+    const res = await Api.POST(urlList.search, params);
     if (!res || res?.data?.error || res?.data?.errorCode) {
       throw new Error(
         res?.data?.message || res?.data?.error || "Something went wrong!"

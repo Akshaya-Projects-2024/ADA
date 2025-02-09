@@ -24,6 +24,7 @@ import { useSelector } from "react-redux";
 import { goBack } from "../../navigations/rootNavigationRef";
 import { RichEditor, RichToolbar } from "react-native-pell-rich-editor";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { contextValue } from "../../components/Loader";
 
 const NewTopic = () => {
   const [visible, setVisible] = useState(false);
@@ -81,6 +82,7 @@ const NewTopic = () => {
       showToast("error", "Please enter blog");
     } else {
       try {
+        contextValue?.setLoader(true);
         const userId = await decryptService("userId");
         let obj = {
           id: 0,
@@ -94,12 +96,15 @@ const NewTopic = () => {
         };
         let res = await createTopic(obj);
         if (res?.status == 200) {
+          contextValue?.setLoader(false);
           showToast("success", "Topic created successfully!!!");
           goBack();
         } else {
+          contextValue?.setLoader(false);
           showToast("error", "Something went wrong!!!");
         }
       } catch (error) {
+        contextValue?.setLoader(false);
         console.log("error", error);
       }
     }

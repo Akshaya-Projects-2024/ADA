@@ -100,7 +100,7 @@ const TopicsCard = ({ item, onPress }) => {
         source={getBase64Obj(item?.cover)}
       />
       <View style={styles.contentContainer}>
-        <Text style={styles.titleStyle}>{item?.subject}</Text>
+        <Text numberOfLines={2} style={styles.titleStyle}>{item?.subject}</Text>
         <View style={styles.authorContainer}>
           <Text style={styles.authorStyle}>{item?.author}</Text>
           <Text style={styles.dateStyle}>
@@ -309,7 +309,8 @@ const styles = StyleSheet.create({
     height: 42,
     flex: 1,
     fontSize: THEMES.fonts.font12,
-    color: THEMES.colors.darkGrey,
+    color: THEMES.colors.black,
+    fontFamily:"Inter-SemiBold"
   },
   chipContainer: {
     flexDirection: "row",
@@ -390,7 +391,7 @@ const styles = StyleSheet.create({
     borderColor: THEMES.colors.searchBorderColor,
     marginVertical: ms(5),
     flexDirection: "row",
-    padding: ms(15),
+    padding: ms(10),
   },
   coverImage: { borderRadius: ms(24) },
   contentContainer: { flex: 1, marginLeft: ms(15) },
@@ -411,7 +412,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   dateStyle: {
-    fontSize: THEMES.fonts.font14,
+    fontSize: THEMES.fonts.font12,
     color: THEMES.colors.dateColor,
     fontWeight: "500",
   },

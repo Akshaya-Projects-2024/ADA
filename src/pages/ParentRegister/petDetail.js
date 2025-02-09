@@ -29,6 +29,7 @@ import { BREEDS } from "../../constants/mockData";
 import { showToast, validArray } from "../../utils/utils";
 import { savePetDetails } from "../../redux-store/actions/auth";
 import { useSelector } from "react-redux";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const petType = [
   { id: "1", label: "Cat" },
@@ -256,6 +257,7 @@ const PetDetail = (props) => {
   };
 
   return (
+   <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={"Pet details"} showBack bgColor="transparent" />
@@ -629,6 +631,7 @@ const PetDetail = (props) => {
         </View>
       </Modal>
     </View>
+    </SafeAreaView>
   );
 };
 

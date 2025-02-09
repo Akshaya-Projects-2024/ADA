@@ -7,6 +7,7 @@ import {
   Keyboard,
   TouchableOpacity,
   Image,
+
 } from "react-native";
 import Strings from "../../constants/strings";
 import { THEMES } from "../../assets/theme/themes";
@@ -27,6 +28,7 @@ import {
 import { showToast } from "../../utils/utils";
 import { useSelector } from "react-redux";
 import { getCurrentLocation } from "../../utils/geolocationUtils";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const ParentDetails = (props) => {
   const route = props?.route?.params?.route;
@@ -167,6 +169,7 @@ const ParentDetails = (props) => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header title={"Parent details"} showBack bgColor="transparent" />
@@ -317,6 +320,7 @@ const ParentDetails = (props) => {
         />
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

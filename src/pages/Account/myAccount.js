@@ -32,6 +32,7 @@ import {
 } from "../../utils/userUtils";
 import { useSelector } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ProfileDummy from "../../assets/svg/user.svg";
 
 const MenuItem = ({
   bgColor,
@@ -84,6 +85,8 @@ const MyAccount = (props) => {
     return validProviderProfile;
   }, [profile]);
 
+
+
   const renderItem = (
     bgColor,
     icon,
@@ -132,177 +135,198 @@ const MyAccount = (props) => {
   };
 
   return (
-    <SafeAreaView style={{flex:1}}>
-    <LinearGradient
-      locations={[0, 0.5, 0.6]}
-      colors={[
-        THEMES.colors.iceBerg,
-        THEMES.colors.panache,
-        THEMES.colors.bgColor,
-      ]}
-      style={{ flex: 1 }}
-    >
-      <StatusBar backgroundColor={THEMES.colors.lightCyan} />
-      <Header
-        // customIcon={<SwitchIcon />}
-        showBack
-        title={Strings.myAccount}
-        showSearch
-        bgColor="transparent"
-      />
-      <ScrollView
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={{ flex: 1 }}>
+      <LinearGradient
+        locations={[0, 0.5, 0.6]}
+        colors={[
+          THEMES.colors.iceBerg,
+          THEMES.colors.panache,
+          THEMES.colors.bgColor,
+        ]}
         style={{ flex: 1 }}
       >
-        <View style={styles.container}>
-          <View>
-            <View style={styles.profileView}>
-              <Image
-                style={styles.profile}
-                source={require("../../assets/images/profileImg.png")}
-              />
-            </View>
-            <View style={styles.badgeView}>
-              <BadgeCheck />
-            </View>
-            <View style={styles.nameView}>
-              <Text style={styles.nameText}>
-                {guestUser
-                  ? Strings.guest
-                  : profile?.providerProfile?.providerBusiness?.name}
-              </Text>
-              <View style={{ alignItems: "center", width: "80%" }}>
-                {profileServices ? (
-                  <Text
-                    numberOfLines={2}
-                    style={[styles.roleText, { textAlign: "center" }]}
+        <StatusBar backgroundColor={THEMES.colors.lightCyan} />
+        <Header
+          // customIcon={<SwitchIcon />}
+          showBack
+          title={Strings.myAccount}
+          // showSearch
+          bgColor="transparent"
+        />
+
+        <ScrollView
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1 }}
+        >
+          <View style={styles.container}>
+            <View>
+              <View style={styles.profileView}>
+                {Boolean(
+                  profile?.providerProfile?.providerDocument?.[0]?.url
+                ) ? (
+                  <Image
+                    resizeMode="contain"
+                    style={styles.profile}
+                    source={{
+                      uri: profile?.providerProfile?.providerDocument?.[0]?.url,
+                    }}
+                  />
+                ) : (
+                  <View
+                    style={[
+                      styles.profile,
+                      {
+                        borderWidth: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      },
+                    ]}
                   >
-                    {profileServices}
-                  </Text>
-                ) : null}
-              </View>
-            </View>
-            <View style={styles.padding14}>
-              <View style={styles.contentView}>
-                {renderItem(
-                  THEMES.colors.lightCyan,
-                  <ProfileImg />,
-                  Strings.myProfile,
-                  "",
-                  "myProfile",
-                  guestUser ||
-                    (!profileStatus?.flag &&
-                      profileStatus?.navigateTo !== "paymentsSubscription")
-                )}
-                {renderItem(
-                  THEMES.colors.cornFlowerBlue,
-                  <Badge />,
-                  Strings.paymentSubScription,
-                  "",
-                  "paymentsSubscription",
-                  guestUser ||
-                    (!profileStatus?.flag &&
-                      profileStatus?.navigateTo === "paymentsSubscription")
-                )}
-                {renderItem(
-                  THEMES.colors.sandyBeach,
-                  <BottomOpenCheck stroke={THEMES.colors.california} />,
-                  Strings.myBookings,
-                  "",
-                  "myBookings"
-                )}
-                {renderItem(
-                  THEMES.colors.sandyBeach,
-                  <BottomOpenCheck stroke={THEMES.colors.california} />,
-                  Strings.markHoliday,
-                  "",
-                  "markHoliday"
-                )}
-                {renderItem(
-                  THEMES.colors.hawkesBlue,
-                  <Star />,
-                  Strings.clientReviews,
-                  "addBottom",
-                  "clientReview"
+                    <ProfileDummy width={40} />
+                  </View>
                 )}
               </View>
-            </View>
-            <View style={styles.padding12}>
-              <View style={styles.contentView}>
-                <MenuItem
-                  bgColor={THEMES.colors.cherub}
-                  icon={<Users />}
-                  title={Strings.registerAsParent}
-                  showPending={false}
-                  onPress={onParentClick}
-                  addBottom={"addBottom"}
-                />
+              <View style={styles.badgeView}>
+                <BadgeCheck />
               </View>
-            </View>
+              <View style={styles.nameView}>
+                <Text style={styles.nameText}>
+                  {guestUser
+                    ? Strings.guest
+                    : profile?.providerProfile?.providerBusiness?.name}
+                </Text>
+                <View style={{ alignItems: "center", width: "80%" }}>
+                  {profileServices ? (
+                    <Text
+                      numberOfLines={2}
+                      style={[styles.roleText, { textAlign: "center" }]}
+                    >
+                      {profileServices}
+                    </Text>
+                  ) : null}
+                </View>
+              </View>
+              <View style={styles.padding14}>
+                <View style={styles.contentView}>
+                  {renderItem(
+                    THEMES.colors.lightCyan,
+                    <ProfileImg />,
+                    Strings.myProfile,
+                    "",
+                    "myProfile",
+                    guestUser ||
+                      (!profileStatus?.flag &&
+                        profileStatus?.navigateTo !== "paymentsSubscription")
+                  )}
+                  {renderItem(
+                    THEMES.colors.cornFlowerBlue,
+                    <Badge />,
+                    Strings.paymentSubScription,
+                    "",
+                    "paymentsSubscription",
+                    guestUser ||
+                      (!profileStatus?.flag &&
+                        profileStatus?.navigateTo === "paymentsSubscription")
+                  )}
+                  {renderItem(
+                    THEMES.colors.sandyBeach,
+                    <BottomOpenCheck stroke={THEMES.colors.california} />,
+                    Strings.myBookings,
+                    "",
+                    "myBookings"
+                  )}
+                  {renderItem(
+                    THEMES.colors.sandyBeach,
+                    <BottomOpenCheck stroke={THEMES.colors.california} />,
+                    Strings.markHoliday,
+                    "",
+                    "markHoliday"
+                  )}
+                  {renderItem(
+                    THEMES.colors.hawkesBlue,
+                    <Star />,
+                    Strings.clientReviews,
+                    "addBottom",
+                    "clientReview"
+                  )}
+                </View>
+              </View>
+              <View style={styles.padding12}>
+                <View style={styles.contentView}>
+                  <MenuItem
+                    bgColor={THEMES.colors.cherub}
+                    icon={<Users />}
+                    title={Strings.registerAsParent}
+                    showPending={false}
+                    onPress={onParentClick}
+                    addBottom={"addBottom"}
+                  />
+                </View>
+              </View>
 
-            <View style={styles.padding12}>
-              <View style={styles.contentView}>
-                {renderItem(
-                  THEMES.colors.gallery,
-                  <Refresh />,
-                  Strings.refundCancellationPolicy,
-                  "",
-                  "commonScreen"
-                )}
+              <View style={styles.padding12}>
+                <View style={styles.contentView}>
+                  {renderItem(
+                    THEMES.colors.gallery,
+                    <Refresh />,
+                    Strings.refundCancellationPolicy,
+                    "",
+                    "commonScreen"
+                  )}
 
-                {renderItem(
-                  THEMES.colors.zanah,
-                  <Document />,
-                  Strings.privacyPolicy,
-                  "addbottom",
-                  "commonScreen"
-                )}
+                  {renderItem(
+                    THEMES.colors.zanah,
+                    <Document />,
+                    Strings.privacyPolicy,
+                    "addbottom",
+                    "commonScreen"
+                  )}
+                </View>
               </View>
-            </View>
 
-            <View style={styles.padding12}>
-              <View style={styles.contentView}>
-                {renderItem(
-                  THEMES.colors.hawkesBlue,
-                  <ContactUs />,
-                  Strings.contactUs,
-                  "",
-                  "contactPage"
-                )}
-                {renderItem(
-                  THEMES.colors.wispPink,
-                  <AboutUs />,
-                  Strings.aboutUs,
-                  "addBottom",
-                  "commonScreen"
-                )}
+              <View style={styles.padding12}>
+                <View style={styles.contentView}>
+                  {renderItem(
+                    THEMES.colors.hawkesBlue,
+                    <ContactUs />,
+                    Strings.contactUs,
+                    "",
+                    "contactPage"
+                  )}
+                  {renderItem(
+                    THEMES.colors.wispPink,
+                    <AboutUs />,
+                    Strings.aboutUs,
+                    "addBottom",
+                    "commonScreen"
+                  )}
+                </View>
               </View>
-            </View>
 
-            <View style={styles.padding12}>
-              <View style={styles.contentView}>
-                {renderItem(
-                  THEMES.colors.cosmos,
-                  <Delete />,
-                  Strings.deleteAccount,
-                  "",
-                  "commonScreen"
-                )}
-                {renderItem(
-                  THEMES.colors.peach,
-                  <Logout />,
-                  Strings.logout,
-                  "addBottom",
-                  "commonScreen"
-                )}
+              <View style={styles.padding12}>
+                <View style={styles.contentView}>
+                  {renderItem(
+                    THEMES.colors.cosmos,
+                    <Delete />,
+                    Strings.deleteAccount,
+                    "",
+                    "commonScreen"
+                  )}
+                  {renderItem(
+                    THEMES.colors.peach,
+                    <Logout />,
+                    Strings.logout,
+                    "addBottom",
+                    "commonScreen"
+                  )}
+                </View>
               </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
-    </LinearGradient>
+        </ScrollView>
+      </LinearGradient>
     </SafeAreaView>
   );
 };

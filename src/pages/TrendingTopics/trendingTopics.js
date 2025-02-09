@@ -12,7 +12,7 @@ import {
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
 import Strings from "../../constants/strings";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, ms } from "react-native-size-matters";
 import Search from "../../assets/svg/search.svg";
 import Plus from "../../assets/svg/plus.svg";
 import DropDown from "../../components/DropDown";
@@ -22,29 +22,7 @@ import { getMyTopics } from "../../redux-store/actions/topics";
 import { useIsFocused } from "@react-navigation/native";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const Data = [
-  {
-    id: 1,
-    title: "Home Remedies for Tick Removal",
-    name: "Kartik Kumar",
-  },
-  {
-    id: 2,
-    title: "Problems Faced by Pets due to Ticks.",
-    name: "Soni Kapoor",
-  },
-  {
-    id: 3,
-    title: "Home Remedies for Tick Removal",
-    name: "Kartik Kumar",
-  },
-  {
-    id: 4,
-    title: "Problems Faced by Pets due to Ticks.",
-    name: "Soni Kapoor",
-  },
-];
+import { findDifferenceByDays } from "../../utils/utils";
 
 const TrendingTopics = (props) => {
   const { colors, fontFamily, fonts } = THEMES;
@@ -61,14 +39,16 @@ const TrendingTopics = (props) => {
   const initData = async () => {
     let obj = {
       userId: await decryptService("userId"),
+      searchtype: "topics",
+      keyword: "",
     };
     let res = await getMyTopics(obj);
     if (res?.data?.data) {
       let dataArray = res?.data?.data;
-      if (dataArray.length < 5) {
-        const firstFiveObjects = dataArray.slice(0, 5);
-        setTrendingTopics(firstFiveObjects);
-      } else {
+      console.log(dataArray.length);
+      const firstFiveObjects = dataArray.slice(0, 5);
+      setTrendingTopics(firstFiveObjects);
+      if (dataArray.length > 5) {
         setTopicList(dataArray);
       }
     }
@@ -138,85 +118,119 @@ const TrendingTopics = (props) => {
     );
   };
 
-  const renderDataItem = ({ item, index }) => {
+  const renderDataItem = ({ item, onPress }) => {
     return (
       <TouchableOpacity
-        onPress={() => props.navigation.navigate("trendDetail")}
-        style={{
-          borderWidth: 1,
-          borderColor: "#ddd",
-          shadowColor: THEMES.colors.lightGrey,
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.8,
-          shadowRadius: 2,
-          elevation: 5,
-          overflow: "hidden",
-          borderRadius: 12,
-          marginBottom: moderateScale(10),
-          backgroundColor: THEMES.colors.white,
-          paddingVertical: moderateScale(13),
-          paddingHorizontal: moderateScale(15),
-          flexDirection: "row",
-          alignItems: "center",
-        }}
+        onPress={() =>
+          props.navigation.navigate("trendDetail", { selectedData: item })
+        }
+        style={styles.topicsCard}
       >
-        <View
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: 48 / 2,
-            borderWidth: 1,
-            borderColor: "transparent",
-          }}
-        >
-          <Image
-            source={require("../../assets/images/dogImg.png")}
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 48 / 2,
-              borderWidth: 1,
-              borderColor: "transparent",
-            }}
-          />
-        </View>
-        <View style={{ marginHorizontal: moderateScale(15) }}>
-          <Text
-            style={{
-              color: THEMES.colors.black,
-              fontFamily: THEMES.fontFamily.semiBold,
-              fontSize: THEMES.fonts.font14,
-              width: "80%",
-              lineHeight: 24,
-            }}
-          >
-            {item.subject}
+        <Image
+          height={ms(48)}
+          width={ms(48)}
+          style={styles.coverImage}
+          source={getBase64Obj(item?.cover)}
+        />
+        <View style={styles.contentContainer}>
+          <Text numberOfLines={2} style={styles.titleStyle}>
+            {item?.subject}
           </Text>
-          <View style={{ width: "100%" }}>
-            <Text
-              style={{
-                color: THEMES.colors.darkGrey,
-                fontFamily: THEMES.fontFamily.regular,
-                fontSize: THEMES.fonts.font14,
-              }}
-            >
-              {item.author}
+          <View style={styles.authorContainer}>
+            <Text style={styles.authorStyle}>{item?.author}</Text>
+            <Text style={styles.dateStyle}>
+              {`${findDifferenceByDays(item?.createdon)}` > 50
+                ? "Few days ago"
+                : `${findDifferenceByDays(item?.createdon)}d`}
             </Text>
-
-            {/* <Text
-              style={{
-                color: THEMES.colors.darkGrey,
-                fontFamily: THEMES.fontFamily.regular,
-                fontSize: THEMES.fonts.font14,
-              }}
-            >
-              1d
-            </Text> */}
           </View>
         </View>
       </TouchableOpacity>
     );
   };
+
+  // const renderDataItem = ({ item, index }) => {
+  //   return (
+  //     <TouchableOpacity
+  //       onPress={() =>
+  //         props.navigation.navigate("trendDetail", { selectedData: item })
+  //       }
+  //       style={{
+  //         borderWidth: 1,
+  //         borderColor: "#ddd",
+  //         shadowColor: THEMES.colors.lightGrey,
+  //         shadowOffset: { width: 0, height: 2 },
+  //         shadowOpacity: 0.8,
+  //         shadowRadius: 2,
+  //         elevation: 5,
+  //         overflow: "hidden",
+  //         borderRadius: 12,
+  //         marginBottom: moderateScale(10),
+  //         backgroundColor: THEMES.colors.white,
+  //         paddingVertical: moderateScale(13),
+  //         paddingHorizontal: moderateScale(15),
+  //         flexDirection: "row",
+  //         alignItems: "center",
+  //         backgroundColor:'red',
+  //         flex:1
+  //       }}
+  //     >
+  //       <View
+  //         style={{
+  //           width: 48,
+  //           height: 48,
+  //           borderRadius: 48 / 2,
+  //           borderWidth: 1,
+  //           borderColor: "transparent",
+  //         }}
+  //       >
+  //         <Image
+  //           source={{ uri: item.cover }}
+  //           style={{
+  //             width: 48,
+  //             height: 48,
+  //             borderRadius: 48 / 2,
+  //             borderWidth: 1,
+  //             borderColor: "transparent",
+  //           }}
+  //         />
+  //       </View>
+  //       <View style={{ marginHorizontal: moderateScale(15) }}>
+  //         <Text
+  //           style={{
+  //             color: THEMES.colors.black,
+  //             fontFamily: THEMES.fontFamily.semiBold,
+  //             fontSize: THEMES.fonts.font14,
+  //             lineHeight: 24,
+  //           }}
+  //         >
+  //           {item.subject}
+  //         </Text>
+  //         <View style={{ width: "100%" }}>
+  //           <Text
+  //             style={{
+  //               color: THEMES.colors.darkGrey,
+  //               fontFamily: THEMES.fontFamily.regular,
+  //               fontSize: THEMES.fonts.font14,
+  //             }}
+  //           >
+  //             {item.author}
+  //           </Text>
+
+  //           {/* <Text
+  //             style={{
+  //               color: THEMES.colors.darkGrey,
+  //               fontFamily: THEMES.fontFamily.regular,
+  //               fontSize: THEMES.fonts.font14,
+  //             }}
+  //           >
+  //             1d
+  //           </Text> */}
+  //         </View>
+  //       </View>
+  //     </TouchableOpacity>
+  //   );
+  // };
 
   return (
     <View style={styles.container}>
@@ -319,18 +333,11 @@ const TrendingTopics = (props) => {
                 bounces={false}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id}
-                ListHeaderComponent={() =>
-                  topicList?.length > 5 ? (
-                    <Text style={{ textAlign: "center" }}>
-                      The list is empty
-                    </Text>
-                  ) : null
-                }
                 style={{ paddingTop: moderateScale(15) }}
               />
               {topicList?.length > 5 && (
                 <>
-                  <View
+                  <View 
                     style={{
                       paddingTop: moderateScale(20),
                       flexDirection: "row",
@@ -338,7 +345,7 @@ const TrendingTopics = (props) => {
                       justifyContent: "space-between",
                     }}
                   >
-                    <View style={{ width: "65%" }}>
+                    <View style={{ width: "65%", paddingBottom:moderateScale(20) }}>
                       <Text
                         style={{
                           fontFamily: THEMES.fontFamily.semiBold,
@@ -350,7 +357,7 @@ const TrendingTopics = (props) => {
                       </Text>
                     </View>
 
-                    <View style={{ width: "35%" }}>
+                    {/* <View style={{ width: "35%" }}>
                       <DropDown
                         width={130}
                         dropdownData={[
@@ -359,7 +366,7 @@ const TrendingTopics = (props) => {
                           { label: "Filter by Service", value: "3" },
                         ]}
                       />
-                    </View>
+                    </View> */}
                   </View>
 
                   <View>
@@ -418,6 +425,38 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#323232",
     marginTop: 5,
+  },
+  topicsCard: {
+    backgroundColor: THEMES.colors.white,
+    borderRadius: ms(12),
+    borderWidth: ms(1),
+    borderColor: THEMES.colors.searchBorderColor,
+    marginVertical: ms(5),
+    flexDirection: "row",
+    padding: ms(10),
+  },
+  coverImage: { borderRadius: ms(24) },
+  contentContainer: { flex: 1, marginLeft: ms(15) },
+  titleStyle: {
+    fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.black,
+    fontWeight: "600",
+  },
+  authorContainer: {
+    marginTop: ms(5),
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  authorStyle: {
+    fontSize: THEMES.fonts.font14,
+    color: THEMES.colors.topicAuthorText,
+    fontWeight: "500",
+  },
+  dateStyle: {
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.dateColor,
+    fontWeight: "500",
   },
 });
 

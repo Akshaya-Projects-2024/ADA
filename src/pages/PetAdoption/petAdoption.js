@@ -29,6 +29,7 @@ import { contextValue } from "../../components/Loader";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchIcon from "../../assets/svg/search.svg";
 import { useDebounce } from "../../hooks/useDebounce";
+import ProfileDummy from "../../assets/svg/user.svg";
 
 const PetAdoption = (props) => {
   const [data, setData] = useState([]);
@@ -99,6 +100,7 @@ const PetAdoption = (props) => {
   };
 
   const renderItem = ({ item }) => {
+    console.log("item?.document?.url", item?.document?.url);
     return (
       <TouchableOpacity
         onPress={() =>
@@ -136,22 +138,28 @@ const PetAdoption = (props) => {
             borderColor: "transparent",
           }}
         >
-          <Image
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 48 / 2,
-              borderWidth: 1,
-              borderColor: "transparent",
-            }}
-            resizeMode="contain"
-            source={
-              item?.document?.url
-                ? getBase64Obj(item?.document?.url)
-                : require("../../assets/images/dogImg.png")
-            }
-          />
-          {/* <Image source={require("../../assets/images/dogImg.png")} /> */}
+          {Boolean(item?.document?.url) ? (
+            <Image
+              resizeMode="contain"
+              style={{ width: 48, height: 48, borderRadius: 48 / 2 }}
+              source={{
+                uri: item?.document?.url,
+              }}
+            />
+          ) : (
+            <View
+              style={{
+                borderWidth: 1,
+                alignItems: "center",
+                justifyContent: "center",
+                width: 48,
+                height: 48,
+                borderRadius: 48 / 2,
+              }}
+            >
+              <ProfileDummy width={30} />
+            </View>
+          )}
         </View>
         <View style={{ marginHorizontal: moderateScale(15), width: "80%" }}>
           <Text
