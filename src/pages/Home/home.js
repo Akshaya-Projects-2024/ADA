@@ -111,6 +111,7 @@ const Home = (props) => {
   const [countData, setCountData] = useState([]);
   const [slotsData, setSlotsData] = useState([]);
   const [totalBookedSlots, setTotalBookedSlots] = useState(0);
+  const [totalSlots, setTotalSlots] = useState(0);
   const { loggedInModule, guestUser } = useSelector((state) => state?.register);
   const profile = useSelector((state) => state?.commonReducer);
   const [appointmentConfirm, setAppointmentConfirm] = useState(false);
@@ -253,6 +254,12 @@ const Home = (props) => {
           },
         ]);
         setTotalBookedSlots(confirmedAppointments);
+        setTotalSlots(
+          confirmedAppointments +
+            attendedAppointments +
+            canceledAppointments +
+            rescheduledAppointments
+        );
         setSlotsData(output);
       }
       contextValue?.setLoader(false);
@@ -495,6 +502,7 @@ const Home = (props) => {
                   color: THEMES.colors.cyan,
                   fontFamily: THEMES.fontFamily.bold,
                   fontSize: THEMES.fonts.font20,
+                  textAlign: "center",
                 }}
               >
                 {`Hi ${
@@ -697,7 +705,7 @@ const Home = (props) => {
                       fontSize: THEMES.fonts.font10,
                     }}
                   >
-                    {slotsData?.length || 0}
+                    {totalSlots || 0}
                   </Text>
                   <Text
                     style={{

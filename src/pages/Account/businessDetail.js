@@ -160,90 +160,90 @@ const BusinessDetail = (props) => {
   };
 
   return (
-    <SafeAreaView style={{flex:1}}>
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header title={Strings.businessDetail} showBack bgColor="transparent" />
-      {route !== "myprofile" && (
-        <View
-          style={{
-            borderTopWidth: 1,
-            borderTopColor: "#B8B8B8",
-            borderBottomColor: "#B8B8B8",
-            borderBottomWidth: 1,
-            backgroundColor: "#fff",
-          }}
-        >
-          <Stepper currentStep={1} totalSteps={6} />
-        </View>
-      )}
-
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          style={{ flex: 1 }}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-        >
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header title={Strings.businessDetail} showBack bgColor="transparent" />
+        {route !== "myprofile" && (
           <View
             style={{
-              paddingTop: route !== "myprofile" ? 18 : 30,
-              marginHorizontal: moderateScale(20),
+              borderTopWidth: 1,
+              borderTopColor: "#B8B8B8",
+              borderBottomColor: "#B8B8B8",
+              borderBottomWidth: 1,
+              backgroundColor: "#fff",
             }}
           >
-            <InputField
-              label={"Business name/Person name*"}
-              placeholderText={"Enter name"}
-              value={businessValue}
-              onChange={setBusinessValue}
-            />
-          </View>
-
-          <View style={{ paddingTop: moderateScale(16) }}>
-            <ModalDropdown
-              placeholder="Service provider Role*"
-              data={serviceProviderRole}
-              title={"Select service role"}
-              setSelectedValue={setServiceProviderValue}
-              selectedValue={selectedServiceProvider}
-              multiSelect={true}
-            />
-          </View>
-
-          <View style={{ paddingTop: moderateScale(16) }}>
-            <ModalDropdown
-              placeholder="Years of Experience"
-              data={experienceData}
-              title={"Select experience"}
-              setSelectedValue={setSelectedExperience}
-              selectedValue={selectedExperience}
-            />
-          </View>
-          <View
-            style={{
-              paddingTop: moderateScale(16),
-              marginHorizontal: moderateScale(20),
-            }}
-          >
-            <InputField
-              label={"About Info /Description*"}
-              placeholderText={"Write the about info/description"}
-              multiline
-              value={description}
-              onChange={setDescription}
-            />
-          </View>
-        </ScrollView>
-        {!isKeyboardVisible && (
-          <View style={styles.submitButton}>
-            <Button
-              title={route !== "myprofile" ? Strings.next : Strings.submit}
-              onPress={() => onSubmit()}
-            />
+            <Stepper currentStep={1} totalSteps={6} />
           </View>
         )}
+
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            style={{ flex: 1 }}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            <View
+              style={{
+                paddingTop: route !== "myprofile" ? 18 : 30,
+                marginHorizontal: moderateScale(20),
+              }}
+            >
+              <InputField
+                label={"Business name/Person name*"}
+                placeholderText={"Enter name"}
+                value={businessValue}
+                onChange={setBusinessValue}
+              />
+            </View>
+
+            <View style={{ paddingTop: moderateScale(16) }}>
+              <ModalDropdown
+                placeholder="Service provider Role*"
+                data={serviceProviderRole}
+                title={"Select service role"}
+                setSelectedValue={setServiceProviderValue}
+                selectedValue={selectedServiceProvider}
+                multiSelect={true}
+              />
+            </View>
+
+            <View style={{ paddingTop: moderateScale(16) }}>
+              <ModalDropdown
+                placeholder="Years of Experience"
+                data={experienceData}
+                title={"Select experience"}
+                setSelectedValue={setSelectedExperience}
+                selectedValue={selectedExperience}
+              />
+            </View>
+            <View
+              style={{
+                paddingTop: moderateScale(16),
+                marginHorizontal: moderateScale(20),
+              }}
+            >
+              <InputField
+                label={"About Info /Description*"}
+                placeholderText={"Write the about info/description"}
+                multiline
+                value={description}
+                onChange={setDescription}
+              />
+            </View>
+          </ScrollView>
+          {!isKeyboardVisible && (
+            <View style={styles.submitButton}>
+              <Button
+                title={route !== "myprofile" ? Strings.next : Strings.submit}
+                onPress={() => onSubmit()}
+              />
+            </View>
+          )}
+        </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 };

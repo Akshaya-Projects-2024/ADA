@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
-  ActivityIndicator,
   Pressable,
   TextInput,
 } from "react-native";
@@ -57,7 +56,7 @@ const PetAdoption = (props) => {
   }, [data, filterCategory]);
 
   useEffect(() => {
-    if (validArray(data) && searchQuery) {
+    if (validArray(data)) {
       const filteredPets = data?.filter((it) => {
         return it?.name
           ?.toLowerCase()
@@ -341,7 +340,7 @@ const PetAdoption = (props) => {
                       borderWidth: 1,
                       borderColor:
                         index === 0
-                          ? THEMES.colors.red
+                          ? THEMES.colors.silver
                           : filterCategory === item
                           ? THEMES.colors.adoptionPink
                           : THEMES.colors.silver,
@@ -356,7 +355,7 @@ const PetAdoption = (props) => {
                         <CrossIcon
                           width={moderateScale(15)}
                           height={moderateScale(15)}
-                          color={THEMES.colors.red}
+                          color={THEMES.colors.black}
                         />
                       </View>
                     ) : null}
@@ -365,7 +364,7 @@ const PetAdoption = (props) => {
                         fontFamily: THEMES.fontFamily.semiBold,
                         color:
                           index === 0
-                            ? THEMES.colors.red
+                            ? THEMES.colors.black
                             : filterCategory === item
                             ? THEMES.colors.adoptionPink
                             : THEMES.colors.black,

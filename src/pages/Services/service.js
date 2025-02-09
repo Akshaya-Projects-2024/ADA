@@ -24,6 +24,7 @@ import { showToast, validArray } from "../../utils/utils";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { contextValue } from "../../components/Loader";
 import EmptyView from "../../components/EmptyView";
+import ProviderFallback from "../../assets/svg/ProviderFallback";
 
 const Service = ({ navigation, route }) => {
   const selectedService = route?.params?.selectedService;
@@ -96,38 +97,39 @@ const Service = ({ navigation, route }) => {
           <View
             style={{ flexDirection: "row", alignItems: "center", width: "70%" }}
           >
-            <View style={{ width: 55, height: 55 }}>
+            {item?.photo ? (
               <View
-                style={{
-                  width: 55,
-                  height: 55,
-                  borderRadius: 55 / 2,
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "#fffff",
-                }}
+                style={{ width: moderateScale(55), height: moderateScale(55) }}
               >
-                <Image
+                <View
                   style={{
-                    width: 55,
-                    height: 55,
-                    borderRadius: 55 / 2,
+                    width: moderateScale(55),
+                    height: moderateScale(55),
+                    borderRadius: moderateScale(55) / 2,
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "#fffff",
                   }}
-                  source={getBase64Obj(item?.photo)}
-                />
-                {/* <Image
-                  style={{
-                    width: 55,
-                    height: 55,
-                    borderRadius: 55 / 2,
-                  }}
-                  source={require("../../assets/images/profileImg.png")}
-                /> */}
+                >
+                  <Image
+                    style={{
+                      width: moderateScale(55),
+                      height: moderateScale(55),
+                      borderRadius: moderateScale(55) / 2,
+                    }}
+                    source={getBase64Obj(item?.photo)}
+                  />
+                </View>
               </View>
-            </View>
+            ) : (
+              <ProviderFallback
+                width={moderateScale(55)}
+                height={moderateScale(55)}
+              />
+            )}
             <View style={{ paddingLeft: moderateScale(12) }}>
               <Text
                 numberOfLines={1}
