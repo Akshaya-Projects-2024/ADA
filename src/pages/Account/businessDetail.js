@@ -26,6 +26,7 @@ import {
   validArray,
 } from "../../utils/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { StackActions } from "@react-navigation/native";
 
 const businessName = [
   { id: "1", label: "ADV Solutions" },
@@ -146,10 +147,14 @@ const BusinessDetail = (props) => {
         };
         const res = await saveBusinessDetails(postData);
         if (res?.data?.status_code == 200) {
-          props.navigation.navigate(
-            "contactDetails",
-            route ? { route: route } : {}
-          );
+          if (route === "myprofile") {
+            props.navigation.dispatch(StackActions.pop(1));
+          } else {
+            props.navigation.navigate(
+              "contactDetails",
+              route ? { route: route } : {}
+            );
+          }
         } else {
           showToast("error", res?.data?.message);
         }

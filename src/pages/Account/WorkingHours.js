@@ -19,6 +19,7 @@ import { decryptService } from "../../utils/storageFunc";
 import { showToast } from "../../utils/utils";
 import { saveSessionDetails } from "../../redux-store/actions/auth";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { StackActions } from "@react-navigation/native";
 
 const WorkingHours = (props) => {
   const route = props?.route?.params?.route;
@@ -170,7 +171,14 @@ const WorkingHours = (props) => {
         };
         const response = await saveSessionDetails(pramas);
         if (response?.data?.status_code == 200) {
-          props.navigation.navigate("mediaLink", route ? { route: route } : {});
+          if (route === "myprofile") {
+            props.navigation.dispatch(StackActions.pop(2));
+          } else {
+            props.navigation.navigate(
+              "mediaLink",
+              route ? { route: route } : {}
+            );
+          }
         } else {
           showToast("error", response?.data?.message);
         }
@@ -182,52 +190,52 @@ const WorkingHours = (props) => {
   };
 
   return (
-    <SafeAreaView style={{flex:1}}>
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header title={"Working Days & TIme"} showBack bgColor="transparent" />
-      {route !== "myprofile" && (
-        <View
-          style={{
-            borderTopWidth: 1,
-            borderTopColor: "#B8B8B8",
-            borderBottomColor: "#B8B8B8",
-            borderBottomWidth: 1,
-            backgroundColor: "#fff",
-          }}
-        >
-          <Stepper currentStep={5} totalSteps={6} />
-        </View>
-      )}
-      <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
-        <ScrollView
-          style={{ flex: 1 }}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-        >
-          <TimeTracker
-            times={times}
-            setTimes={setTimes}
-            selectedForAll={selectedForAll}
-            setSelectedForAll={setSelectedForAll}
-            selectedShiftType={selectedShiftType}
-            setSelectedShiftType={setSelectedShiftType}
-          />
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header title={"Working Days & TIme"} showBack bgColor="transparent" />
+        {route !== "myprofile" && (
           <View
             style={{
-              paddingBottom: moderateScale(25),
-              paddingTop: moderateScale(30),
+              borderTopWidth: 1,
+              borderTopColor: "#B8B8B8",
+              borderBottomColor: "#B8B8B8",
+              borderBottomWidth: 1,
+              backgroundColor: "#fff",
             }}
           >
-            <Button
-              title={route !== "myprofile" ? Strings.next : Strings.submit}
-              onPress={onSubmit}
-            />
+            <Stepper currentStep={5} totalSteps={6} />
           </View>
-        </ScrollView>
+        )}
+        <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
+          <ScrollView
+            style={{ flex: 1 }}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            <TimeTracker
+              times={times}
+              setTimes={setTimes}
+              selectedForAll={selectedForAll}
+              setSelectedForAll={setSelectedForAll}
+              selectedShiftType={selectedShiftType}
+              setSelectedShiftType={setSelectedShiftType}
+            />
+            <View
+              style={{
+                paddingBottom: moderateScale(25),
+                paddingTop: moderateScale(30),
+              }}
+            >
+              <Button
+                title={route !== "myprofile" ? Strings.next : Strings.submit}
+                onPress={onSubmit}
+              />
+            </View>
+          </ScrollView>
+        </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 };

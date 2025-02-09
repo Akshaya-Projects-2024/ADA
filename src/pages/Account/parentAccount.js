@@ -11,7 +11,6 @@ import {
 import { THEMES } from "../../assets/theme/themes";
 import LinearGradient from "react-native-linear-gradient";
 import Header from "../../components/Header";
-import SwitchIcon from "../../assets/svg/switch.svg";
 import BadgeCheck from "../../assets/svg/badge.svg";
 import ProfileImg from "../../assets/svg/profile.svg";
 import RightArrow from "../../assets/svg/rightArrow.svg";
@@ -33,6 +32,10 @@ import {
   validateParentProfile,
   validateServiceProfile,
 } from "../../utils/userUtils";
+import ProfileDummy from "../../assets/svg/user.svg";
+import Toggle from "../../components/Toggle";
+import { LoginModules } from "../../constants/enums";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const MenuItem = ({
   bgColor,
@@ -69,7 +72,7 @@ const MenuItem = ({
 };
 
 const ParentAccount = (props) => {
-  const { guestUser } = useSelector(({ register }) => register);
+  const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const profile = useSelector((state) => state?.commonReducer);
 
   const renderItem = (
@@ -123,6 +126,32 @@ const ParentAccount = (props) => {
     }
   };
 
+  const switchProfile = () => {
+    const validProviderProfile = validateServiceProfile(profile);
+    if (validProviderProfile?.flag) {
+      props.navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: "auth",
+            state: {
+              routes: [
+                {
+                  name: "home",
+                },
+              ],
+            },
+          },
+        ],
+      });
+    } else {
+      props.navigation.navigate("auth", {
+        screen: validProviderProfile?.navigateTo,
+        params: { route: "myprofile" },
+      });
+    }
+  };
+
   const profileStatus = useMemo(() => {
     const validParentProfile = validateParentProfile(profile);
     return validParentProfile?.flag;
@@ -134,99 +163,126 @@ const ParentAccount = (props) => {
       colors={["#f7f2f2", "#f5e0e4", "#fff7f2"]}
       style={{ flex: 1 }}
     >
-      <StatusBar backgroundColor={"#f8f4f4"} />
-      <Header
-        // customIcon={<SwitchIcon />}
-        showBack
-        title={Strings.myAccount}
-        showSearch
-        bgColor="transparent"
-      />
-      <ScrollView
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        style={{ flex: 1 }}
-      >
-        <View style={styles.container}>
-          <View>
-            <View style={styles.profileView}>
-              <Image
-                style={styles.profile}
-                source={require("../../assets/images/profileImg.png")}
-              />
-            </View>
-            <View style={styles.badgeView}>
-              <BadgeCheck />
-            </View>
-            <View style={styles.nameView}>
-              <Text style={styles.nameText}>
-                {guestUser
-                  ? Strings.guest
-                  : profile?.parentProfie?.parentContact?.name}
-              </Text>
-              <Text style={styles.premiumMemberText}>
-                {guestUser ? Strings.guestUser : Strings.premiumMemmber}
-              </Text>
-            </View>
-            <View style={styles.padding14}>
-              <View style={styles.contentView}>
-                <MenuItem
-                  bgColor={THEMES.colors.lightCyan}
-                  icon={<ProfileImg />}
-                  title={Strings.myProfile}
-                  showPending={guestUser || !profileStatus}
-                  onPress={() =>
-                    props.navigation.navigate("parentDetails", {
-                      route: "parentAccount",
-                    })
-                  }
-                />
-                <MenuItem
-                  bgColor={THEMES.colors.zanah}
-                  icon={<PawPrint />}
-                  title={Strings.myPetProfile}
-                  showPending={guestUser || !profileStatus}
-                  onPress={() =>
-                    props.navigation.navigate("petDetail", {
-                      route: "parentAccount",
-                    })
-                  }
-                />
-                <MenuItem
-                  bgColor={THEMES.colors.hawkesBlue}
-                  icon={<Activity />}
-                  title={"Activity tracker"}
-                  showPending={false}
-                  onPress={() =>
-                    props.navigation.navigate("petDetail", {
-                      route: "parentAccount",
-                    })
-                  }
-                  addBottom={"addBottom"}
-                />
+      <SafeAreaView style={{ flex: 1 }}>
+        <Header
+          customIcon={
+            <Toggle
+              state={loggedInModule === LoginModules.provider}
+              onPress={switchProfile}
+            />
+          }
+          // showBack
+          title={Strings.myAccount}
+          showSearch
+          bgColor="transparent"
+        />
+        <StatusBar
+          backgroundColor="transparent"
+          translucent
+          barStyle={"dark-content"}
+        />
+        <ScrollView
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1 }}
+        >
+          <View style={styles.container}>
+            <View>
+              <View style={styles.profileView}>
+                {profile?.logindetails?.parentphoto ? (
+                  <Image
+                    style={styles.profile}
+                    source={{
+                      uri: profile?.logindetails?.parentphoto,
+                    }}
+                  />
+                ) : (
+                  <View
+                    style={[
+                      styles.profile,
+                      {
+                        borderWidth: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      },
+                    ]}
+                  >
+                    <ProfileDummy width={40} />
+                  </View>
+                )}
               </View>
-            </View>
+              <View style={styles.badgeView}>
+                <BadgeCheck />
+              </View>
+              <View style={styles.nameView}>
+                <Text style={styles.nameText}>
+                  {guestUser
+                    ? Strings.guest
+                    : profile?.parentProfie?.parentContact?.name}
+                </Text>
+                <Text style={styles.premiumMemberText}>
+                  {guestUser ? Strings.guestUser : Strings.premiumMemmber}
+                </Text>
+              </View>
+              <View style={styles.padding14}>
+                <View style={styles.contentView}>
+                  <MenuItem
+                    bgColor={THEMES.colors.lightCyan}
+                    icon={<ProfileImg />}
+                    title={Strings.myProfile}
+                    showPending={guestUser || !profileStatus}
+                    onPress={() =>
+                      props.navigation.navigate("parentDetails", {
+                        route: "parentAccount",
+                      })
+                    }
+                  />
+                  <MenuItem
+                    bgColor={THEMES.colors.zanah}
+                    icon={<PawPrint />}
+                    title={Strings.myPetProfile}
+                    showPending={guestUser || !profileStatus}
+                    onPress={() =>
+                      props.navigation.navigate("petDetail", {
+                        route: "parentAccount",
+                      })
+                    }
+                  />
+                  <MenuItem
+                    bgColor={THEMES.colors.hawkesBlue}
+                    icon={<Activity />}
+                    title={"Activity tracker"}
+                    showPending={false}
+                    onPress={() =>
+                      props.navigation.navigate("petDetail", {
+                        route: "parentAccount",
+                      })
+                    }
+                    addBottom={"addBottom"}
+                  />
+                </View>
+              </View>
 
-            <View style={styles.padding12}>
-              <View style={styles.contentView}>
-                {renderItem(
-                  THEMES.colors.sandyBeach,
-                  <BottomOpenCheck stroke={THEMES.colors.california} />,
-                  Strings.myBookings,
-                  "",
-                  "myBookings"
-                )}
-                {renderItem(
-                  THEMES.colors.hawkesBlue,
-                  <Star />,
-                  "Reviews",
-                  "addBottom",
-                  "clientReview"
-                )}
+              <View style={styles.padding12}>
+                <View style={styles.contentView}>
+                  {renderItem(
+                    THEMES.colors.sandyBeach,
+                    <BottomOpenCheck stroke={THEMES.colors.california} />,
+                    Strings.myBookings,
+                    "",
+                    "myBookings"
+                  )}
+                  {renderItem(
+                    THEMES.colors.hawkesBlue,
+                    <Star />,
+                    "Reviews",
+                    "addBottom",
+                    "clientReview"
+                  )}
+                </View>
               </View>
-            </View>
-            {/* 
+              {/* 
             <View style={styles.padding12}>
               <View style={styles.contentView}>
                 {renderItem(
@@ -239,78 +295,79 @@ const ParentAccount = (props) => {
               </View>
             </View> */}
 
-            <View style={styles.padding12}>
-              <View style={styles.contentView}>
-                <MenuItem
-                  bgColor={THEMES.colors.cherub}
-                  icon={<Users />}
-                  title={"Register as a Service provider"}
-                  showPending={false}
-                  onPress={onProviderClick}
-                  addBottom={"addBottom"}
-                />
+              <View style={styles.padding12}>
+                <View style={styles.contentView}>
+                  <MenuItem
+                    bgColor={THEMES.colors.cherub}
+                    icon={<Users />}
+                    title={"Register as a Service provider"}
+                    showPending={false}
+                    onPress={onProviderClick}
+                    addBottom={"addBottom"}
+                  />
+                </View>
               </View>
-            </View>
 
-            <View style={styles.padding12}>
-              <View style={styles.contentView}>
-                {renderItem(
-                  THEMES.colors.gallery,
-                  <Refresh />,
-                  Strings.refundCancellationPolicy,
-                  "",
-                  "commonScreen"
-                )}
-                {renderItem(
-                  THEMES.colors.zanah,
-                  <Document />,
-                  Strings.privacyPolicy,
-                  "addbottom",
-                  "commonScreen"
-                )}
+              <View style={styles.padding12}>
+                <View style={styles.contentView}>
+                  {renderItem(
+                    THEMES.colors.gallery,
+                    <Refresh />,
+                    Strings.refundCancellationPolicy,
+                    "",
+                    "commonScreen"
+                  )}
+                  {renderItem(
+                    THEMES.colors.zanah,
+                    <Document />,
+                    Strings.privacyPolicy,
+                    "addbottom",
+                    "commonScreen"
+                  )}
+                </View>
               </View>
-            </View>
 
-            <View style={styles.padding12}>
-              <View style={styles.contentView}>
-                {renderItem(
-                  THEMES.colors.hawkesBlue,
-                  <ContactUs />,
-                  Strings.contactUs,
-                  "",
-                  "contactPage"
-                )}
-                {renderItem(
-                  THEMES.colors.wispPink,
-                  <AboutUs />,
-                  Strings.aboutUs,
-                  "addBottom",
-                  "commonScreen"
-                )}
+              <View style={styles.padding12}>
+                <View style={styles.contentView}>
+                  {renderItem(
+                    THEMES.colors.hawkesBlue,
+                    <ContactUs />,
+                    Strings.contactUs,
+                    "",
+                    "contactPage"
+                  )}
+                  {renderItem(
+                    THEMES.colors.wispPink,
+                    <AboutUs />,
+                    Strings.aboutUs,
+                    "addBottom",
+                    "commonScreen"
+                  )}
+                </View>
               </View>
-            </View>
 
-            <View style={styles.padding12}>
-              <View style={styles.contentView}>
-                {renderItem(
-                  THEMES.colors.cosmos,
-                  <Delete />,
-                  Strings.deleteAccount,
-                  "",
-                  "commonScreen"
-                )}
-                {renderItem(
-                  THEMES.colors.peach,
-                  <Logout />,
-                  Strings.logout,
-                  "addBottom",
-                  "commonScreen"
-                )}
+              <View style={styles.padding12}>
+                <View style={styles.contentView}>
+                  {renderItem(
+                    THEMES.colors.cosmos,
+                    <Delete />,
+                    Strings.deleteAccount,
+                    "",
+                    "commonScreen"
+                  )}
+                  {renderItem(
+                    THEMES.colors.peach,
+                    <Logout />,
+                    Strings.logout,
+                    "addBottom",
+                    "commonScreen"
+                  )}
+                </View>
               </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </SafeAreaView>
     </LinearGradient>
   );
 };

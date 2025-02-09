@@ -63,7 +63,7 @@ const Strings = {
   fullDay: "Full Day",
   twoShiftInADay: "Two Shifts in a Day",
   selectTime: "Select Time*",
-  sameTimeForDay: "Same time for all day",
+  sameTimeForDay: "Same time for all days",
   firstHalf: "First Half",
   secondHalf: "Second Half",
   start: "Start",
@@ -127,10 +127,14 @@ const Strings = {
   myPetProfile: "My Pet Profile",
   paymentError:
     "Your payment is not completed. Please complete payment to access full potential of the app",
+  paymentErrorForAdoption:
+    "Hey, To get details of Pet please get subcription plan",
   appointmentError:
     "Complete your Registration and Subscribe to the app to create new appoitements.",
   approvaltError:
     "Your profile is under verification. Please wait for approval",
+  approvaltErrorForDashboard:
+    "Complete your Registration and Subscribe to the app to create new appoitements.",
   attention: "Attention!",
   clear: "Clear",
   services: "Services",

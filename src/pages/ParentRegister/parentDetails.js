@@ -7,7 +7,6 @@ import {
   Keyboard,
   TouchableOpacity,
   Image,
-
 } from "react-native";
 import Strings from "../../constants/strings";
 import { THEMES } from "../../assets/theme/themes";
@@ -29,22 +28,30 @@ import { showToast } from "../../utils/utils";
 import { useSelector } from "react-redux";
 import { getCurrentLocation } from "../../utils/geolocationUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { StackActions } from "@react-navigation/native";
 
 const ParentDetails = (props) => {
   const route = props?.route?.params?.route;
+  const { parentProfie, providerProfile, logindetails } = useSelector(
+    (state) => state?.commonReducer
+  );
+
+  const { parentContact } = parentProfie;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [parentImg, setParentImg] = useState([]);
+  const [parentImg, setParentImg] = useState();
 
   const [parentName, setParentName] = useState();
   const [description, setDescription] = useState();
-  const [mobileNumber, setMobileNumber] = useState();
+  const [mobileNumber, setMobileNumber] = useState(
+    providerProfile?.providerContact?.mobile || undefined
+  );
   const [location, setLocation] = useState();
   const [address, setAddress] = useState();
-  const [emailId, setEmailId] = useState();
+  const [emailId, setEmailId] = useState(
+    providerProfile?.providerContact?.email || undefined
+  );
   const [pinCode, setPincode] = useState();
-  const { parentProfie } = useSelector((state) => state?.commonReducer);
-  const { parentContact } = parentProfie;
 
   useEffect(() => {
     initData();
@@ -86,6 +93,9 @@ const ParentDetails = (props) => {
     if (parentContact?.pin) {
       setPincode(parentContact?.pin);
     }
+    if (logindetails?.parentphoto) {
+      setParentImg(logindetails?.parentphoto);
+    }
   };
 
   const handleLogo = async (image) => {
@@ -122,7 +132,7 @@ const ParentDetails = (props) => {
   };
 
   const onSubmit = async () => {
-    if (!parentImg.length) {
+    if (!parentImg) {
       showToast("error", "Please upload parent profile picture");
     } else if (!parentName) {
       showToast("error", "Please enter your parent name");
@@ -158,7 +168,14 @@ const ParentDetails = (props) => {
         };
         const res = await saveParentDetails(postData);
         if (res?.data?.status_code == 200) {
-          props.navigation.navigate("petDetail", route ? { route: route } : {});
+          if (route === "parentAccount") {
+            props.navigation.dispatch(StackActions.pop(1));
+          } else {
+            props.navigation.navigate(
+              "petDetail",
+              route ? { route: route } : {}
+            );
+          }
         } else {
           showToast("error", res?.data?.message);
         }
@@ -169,157 +186,159 @@ const ParentDetails = (props) => {
   };
 
   return (
-    <SafeAreaView style={{flex:1}}>
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header title={"Parent details"} showBack bgColor="transparent" />
-      {route !== "parentAccount" && (
-        <View
-          style={{
-            borderTopWidth: 1,
-            borderTopColor: "#B8B8B8",
-            borderBottomColor: "#B8B8B8",
-            borderBottomWidth: 1,
-            backgroundColor: "#fff",
-          }}
-        >
-          <Stepper currentStep={1} totalSteps={2} />
-        </View>
-      )}
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          style={{ flex: 1 }}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-        >
-          <View style={{ alignSelf: "center", paddingTop: moderateScale(32) }}>
-            <View
-              style={{
-                width: 100,
-                height: 100,
-                borderRadius: 50,
-                backgroundColor: "#ddd",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {parentImg.length ? (
-                <Image
-                  style={{
-                    width: 100,
-                    height: 100,
-                    borderRadius: 50,
-                    backgroundColor: "#ddd",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                  resizeMode="contain"
-                  source={getBase64Obj(parentImg)}
-                />
-              ) : (
-                <User />
-              )}
-            </View>
-            {/* Edit Icon */}
-            <TouchableOpacity
-              onPress={() => setVisible(true)}
-              style={{
-                position: "absolute",
-                bottom: 5,
-                right: 5,
-                backgroundColor: "#00ACC1",
-                borderRadius: 20,
-                padding: 5,
-              }}
-            >
-              <Pencil />
-            </TouchableOpacity>
-          </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header title={"Parent details"} showBack bgColor="transparent" />
+        {route !== "parentAccount" && (
           <View
             style={{
-              alignSelf: "center",
-              paddingTop: moderateScale(32),
-              paddingHorizontal: moderateScale(20),
+              borderTopWidth: 1,
+              borderTopColor: "#B8B8B8",
+              borderBottomColor: "#B8B8B8",
+              borderBottomWidth: 1,
+              backgroundColor: "#fff",
             }}
           >
-            <InputField
-              label={"Parent Name*"}
-              placeholderText={"Enter parent name"}
-              value={parentName}
-              onChange={setParentName}
-            />
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <InputField
-                label={"About Parent*"}
-                placeholderText={"Enter description"}
-                multiline
-                value={description}
-                onChange={setDescription}
-              />
-            </View>
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <InputField
-                maxLength={10}
-                keyboardType="phone-pad"
-                label={"Mobile number*"}
-                placeholderText={"Enter mobile number"}
-                value={mobileNumber}
-                onChange={setMobileNumber}
-              />
-            </View>
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <InputField
-                label={"Email ID*"}
-                placeholderText={"Enter email id"}
-                value={emailId}
-                onChange={setEmailId}
-              />
-            </View>
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <InputField
-                label={"Address*"}
-                placeholderText={"Enter your address"}
-                multiline
-                value={address}
-                onChange={setAddress}
-              />
-            </View>
-
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <InputField
-                label={Strings.location}
-                placeholderText={Strings.enterLocation}
-                rightIcon={<Location stroke={THEMES.colors.darkGrey} />}
-              />
-            </View>
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <InputField
-                maxLength={6}
-                keyboardType="phone-pad"
-                label={"ZIP/Postal code*"}
-                placeholderText={"Enter zip or postal code"}
-                value={pinCode}
-                onChange={setPincode}
-              />
+            <Stepper currentStep={1} totalSteps={2} />
+          </View>
+        )}
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            style={{ flex: 1 }}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            <View
+              style={{ alignSelf: "center", paddingTop: moderateScale(32) }}
+            >
+              <View
+                style={{
+                  width: 100,
+                  height: 100,
+                  borderRadius: 50,
+                  backgroundColor: "#ddd",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {parentImg ? (
+                  <Image
+                    style={{
+                      width: 100,
+                      height: 100,
+                      borderRadius: 50,
+                      backgroundColor: "#ddd",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                    resizeMode="contain"
+                    source={getBase64Obj(parentImg)}
+                  />
+                ) : (
+                  <User />
+                )}
+              </View>
+              {/* Edit Icon */}
+              <TouchableOpacity
+                onPress={() => setVisible(true)}
+                style={{
+                  position: "absolute",
+                  bottom: 5,
+                  right: 5,
+                  backgroundColor: "#00ACC1",
+                  borderRadius: 20,
+                  padding: 5,
+                }}
+              >
+                <Pencil />
+              </TouchableOpacity>
             </View>
             <View
               style={{
-                paddingTop: moderateScale(16),
-                paddingBottom: moderateScale(24),
+                alignSelf: "center",
+                paddingTop: moderateScale(32),
+                paddingHorizontal: moderateScale(20),
               }}
             >
-              <Button title="Next" onPress={() => onSubmit()} />
+              <InputField
+                label={"Parent Name*"}
+                placeholderText={"Enter parent name"}
+                value={parentName}
+                onChange={setParentName}
+              />
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <InputField
+                  label={"About Parent*"}
+                  placeholderText={"Enter description"}
+                  multiline
+                  value={description}
+                  onChange={setDescription}
+                />
+              </View>
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <InputField
+                  maxLength={10}
+                  keyboardType="phone-pad"
+                  label={"Mobile number*"}
+                  placeholderText={"Enter mobile number"}
+                  value={mobileNumber}
+                  onChange={setMobileNumber}
+                />
+              </View>
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <InputField
+                  label={"Email ID*"}
+                  placeholderText={"Enter email id"}
+                  value={emailId}
+                  onChange={setEmailId}
+                />
+              </View>
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <InputField
+                  label={"Address*"}
+                  placeholderText={"Enter your address"}
+                  multiline
+                  value={address}
+                  onChange={setAddress}
+                />
+              </View>
+
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <InputField
+                  label={Strings.location}
+                  placeholderText={Strings.enterLocation}
+                  rightIcon={<Location stroke={THEMES.colors.darkGrey} />}
+                />
+              </View>
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <InputField
+                  maxLength={6}
+                  keyboardType="phone-pad"
+                  label={"ZIP/Postal code*"}
+                  placeholderText={"Enter zip or postal code"}
+                  value={pinCode}
+                  onChange={setPincode}
+                />
+              </View>
+              <View
+                style={{
+                  paddingTop: moderateScale(16),
+                  paddingBottom: moderateScale(24),
+                }}
+              >
+                <Button title="Next" onPress={() => onSubmit()} />
+              </View>
             </View>
-          </View>
-        </ScrollView>
-        <UploadImageModal
-          isVisible={visible}
-          onClose={() => setVisible(false)}
-          handleSelectedImage={(image) => handleLogo(image)}
-        />
+          </ScrollView>
+          <UploadImageModal
+            isVisible={visible}
+            onClose={() => setVisible(false)}
+            handleSelectedImage={(image) => handleLogo(image)}
+          />
+        </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 };

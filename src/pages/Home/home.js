@@ -1317,6 +1317,8 @@ const Home = (props) => {
         rightButtonPressed={() => {
           if (profile?.providerProfile?.subscription?.status === "active") {
             setPaymentModal(false);
+          } else if (guestUser) {
+            props?.navigation.replace("auth");
           } else {
             props.navigation.navigate("auth", {
               screen: "paymentsSubscription",
