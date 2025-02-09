@@ -250,205 +250,205 @@ const SessionDetail = (props) => {
   };
 
   return (
-    <SafeAreaView style={{flex:1}}>
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header title={Strings.sessionDetails} showBack bgColor="transparent" />
-      {route !== "myprofile" && (
-        <View
-          style={{
-            borderTopWidth: 1,
-            borderTopColor: "#B8B8B8",
-            borderBottomColor: "#B8B8B8",
-            borderBottomWidth: 1,
-            backgroundColor: "#fff",
-          }}
-        >
-          <Stepper currentStep={4} totalSteps={6} />
-        </View>
-      )}
-      <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
-        <ScrollView
-          style={styles.flex}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-        >
-          <View
-            style={[
-              styles.contentView,
-              { paddingTop: route !== "myprofile" ? 18 : 30 },
-            ]}
-          >
-            <Text style={styles.availableText}>
-              {Strings.howYouWillBeAvailable}{" "}
-            </Text>
-          </View>
-          <View style={styles.contentValueView}>
-            <CheckBox
-              checkedImage={<Checked />}
-              unCheckedImage={<UnChecked />}
-              onClick={() => setHomeVisit(!homeVisit)}
-              isChecked={homeVisit}
-              style={styles.flex}
-              rightTextStyle={{
-                color: THEMES.colors.black,
-                fontSize: THEMES.fonts.font12,
-                fontFamily: THEMES.fontFamily.semiBold,
-              }}
-              rightText={SESSION_AVAILABILITY.home}
-            />
-            <CheckBox
-              checkedImage={<Checked />}
-              unCheckedImage={<UnChecked />}
-              onClick={() => setCenterService(!centerService)}
-              isChecked={centerService}
-              style={styles.flex}
-              rightText={SESSION_AVAILABILITY.center}
-              rightTextStyle={{
-                color: THEMES.colors.black,
-                fontSize: THEMES.fonts.font12,
-                fontFamily: THEMES.fontFamily.semiBold,
-              }}
-            />
-          </View>
-          <View style={{ paddingTop: moderateScale(25) }}>
-            <CheckBox
-              checkedImage={<Checked />}
-              unCheckedImage={<UnChecked />}
-              onClick={() => setOnlineConsultation(!onlineConsultation)}
-              isChecked={onlineConsultation}
-              style={styles.flex}
-              rightTextStyle={{
-                color: THEMES.colors.black,
-                fontSize: THEMES.fonts.font12,
-                fontFamily: THEMES.fontFamily.semiBold,
-              }}
-              rightText={SESSION_AVAILABILITY.online}
-            />
-          </View>
-          <View style={styles.contentView}>
-            <Text style={styles.availableText}>
-              {Strings.howYouWillBeAvailable}{" "}
-            </Text>
-          </View>
-          <View style={styles.contentValueView}>
-            <CheckBox
-              checkedImage={<Checked />}
-              unCheckedImage={<UnChecked />}
-              onClick={() => setPerSession(!perSession)}
-              isChecked={perSession}
-              style={styles.flex}
-              rightTextStyle={{
-                color: THEMES.colors.black,
-                fontSize: THEMES.fonts.font12,
-                fontFamily: THEMES.fontFamily.semiBold,
-              }}
-              rightText={"Per Session"}
-            />
-            <CheckBox
-              checkedImage={<Checked />}
-              unCheckedImage={<UnChecked />}
-              onClick={() => setPerMonth(!perMonth)}
-              isChecked={perMonth}
-              style={styles.flex}
-              rightText={"Per Month"}
-              rightTextStyle={{
-                color: THEMES.colors.black,
-                fontSize: THEMES.fonts.font12,
-                fontFamily: THEMES.fontFamily.semiBold,
-              }}
-            />
-          </View>
-          {perSession && (
-            <>
-              <View style={styles.contentView}>
-                <Text style={styles.availableText}>
-                  {Strings.perSessionCharges}{" "}
-                </Text>
-              </View>
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <ModalDropdown
-                  placeholder="Service provider Role*"
-                  data={serviceProviderRole}
-                  title={"Select service role"}
-                  setSelectedValue={setServiceProviderValue}
-                  selectedValue={selectedServiceProvider}
-                  noPadding
-                />
-              </View>
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  keyboardType="phone-pad"
-                  label={Strings.chargesPerSession}
-                  placeholderText={Strings.enterPrice}
-                  value={sessionCharges}
-                  onChange={setSessionCharges}
-                />
-              </View>
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  keyboardType="phone-pad"
-                  label={Strings.perDaySessionInMin}
-                  placeholderText={Strings.perDaySession}
-                  value={sessionTime}
-                  onChange={setSessionTime}
-                />
-              </View>
-            </>
-          )}
-          {perMonth && (
-            <>
-              <View style={styles.contentView}>
-                <Text style={styles.availableText}>
-                  {Strings.perMonthSession}{" "}
-                </Text>
-              </View>
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <ModalDropdown
-                  placeholder="Service provider Role*"
-                  data={serviceProviderRole}
-                  title={"Select service role"}
-                  setSelectedValue={setServiceProviderMonthValue}
-                  selectedValue={selectedServiceMonthProvider}
-                  noPadding
-                />
-              </View>
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  keyboardType="phone-pad"
-                  label={Strings.chargesPerSession}
-                  placeholderText={Strings.enterPrice}
-                  value={monthCharges}
-                  onChange={setMonthCharges}
-                />
-              </View>
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  keyboardType="phone-pad"
-                  label={Strings.perDaySessionInMin}
-                  placeholderText={Strings.perDaySession}
-                  value={monthTime}
-                  onChange={setMonthTime}
-                />
-              </View>
-            </>
-          )}
-
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header title={Strings.sessionDetails} showBack bgColor="transparent" />
+        {route !== "myprofile" && (
           <View
             style={{
-              paddingBottom: moderateScale(25),
-              paddingTop: moderateScale(30),
+              borderTopWidth: 1,
+              borderTopColor: "#B8B8B8",
+              borderBottomColor: "#B8B8B8",
+              borderBottomWidth: 1,
+              backgroundColor: "#fff",
             }}
           >
-            <Button
-              title={route !== "myprofile" ? Strings.next : Strings.submit}
-              onPress={onSubmit}
-            />
+            <Stepper currentStep={4} totalSteps={6} />
           </View>
-        </ScrollView>
+        )}
+        <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
+          <ScrollView
+            style={styles.flex}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            <View
+              style={[
+                styles.contentView,
+                { paddingTop: route !== "myprofile" ? 18 : 30 },
+              ]}
+            >
+              <Text style={styles.availableText}>
+                {Strings.howYouWillBeAvailable}{" "}
+              </Text>
+            </View>
+            <View style={styles.contentValueView}>
+              <CheckBox
+                checkedImage={<Checked />}
+                unCheckedImage={<UnChecked />}
+                onClick={() => setHomeVisit(!homeVisit)}
+                isChecked={homeVisit}
+                style={styles.flex}
+                rightTextStyle={{
+                  color: THEMES.colors.black,
+                  fontSize: THEMES.fonts.font12,
+                  fontFamily: THEMES.fontFamily.semiBold,
+                }}
+                rightText={SESSION_AVAILABILITY.home}
+              />
+              <CheckBox
+                checkedImage={<Checked />}
+                unCheckedImage={<UnChecked />}
+                onClick={() => setCenterService(!centerService)}
+                isChecked={centerService}
+                style={styles.flex}
+                rightText={SESSION_AVAILABILITY.center}
+                rightTextStyle={{
+                  color: THEMES.colors.black,
+                  fontSize: THEMES.fonts.font12,
+                  fontFamily: THEMES.fontFamily.semiBold,
+                }}
+              />
+            </View>
+            <View style={{ paddingTop: moderateScale(25) }}>
+              <CheckBox
+                checkedImage={<Checked />}
+                unCheckedImage={<UnChecked />}
+                onClick={() => setOnlineConsultation(!onlineConsultation)}
+                isChecked={onlineConsultation}
+                style={styles.flex}
+                rightTextStyle={{
+                  color: THEMES.colors.black,
+                  fontSize: THEMES.fonts.font12,
+                  fontFamily: THEMES.fontFamily.semiBold,
+                }}
+                rightText={SESSION_AVAILABILITY.online}
+              />
+            </View>
+            <View style={styles.contentView}>
+              <Text style={styles.availableText}>
+                {Strings.howYouWillBeAvailable}{" "}
+              </Text>
+            </View>
+            <View style={styles.contentValueView}>
+              <CheckBox
+                checkedImage={<Checked />}
+                unCheckedImage={<UnChecked />}
+                onClick={() => setPerSession(!perSession)}
+                isChecked={perSession}
+                style={styles.flex}
+                rightTextStyle={{
+                  color: THEMES.colors.black,
+                  fontSize: THEMES.fonts.font12,
+                  fontFamily: THEMES.fontFamily.semiBold,
+                }}
+                rightText={"Per Session"}
+              />
+              <CheckBox
+                checkedImage={<Checked />}
+                unCheckedImage={<UnChecked />}
+                onClick={() => setPerMonth(!perMonth)}
+                isChecked={perMonth}
+                style={styles.flex}
+                rightText={"Per Month"}
+                rightTextStyle={{
+                  color: THEMES.colors.black,
+                  fontSize: THEMES.fonts.font12,
+                  fontFamily: THEMES.fontFamily.semiBold,
+                }}
+              />
+            </View>
+            {perSession && (
+              <>
+                <View style={styles.contentView}>
+                  <Text style={styles.availableText}>
+                    {Strings.perSessionCharges}{" "}
+                  </Text>
+                </View>
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <ModalDropdown
+                    placeholder="Service provider Role*"
+                    data={serviceProviderRole}
+                    title={"Select service role"}
+                    setSelectedValue={setServiceProviderValue}
+                    selectedValue={selectedServiceProvider}
+                    noPadding
+                  />
+                </View>
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <InputField
+                    keyboardType="phone-pad"
+                    label={Strings.chargesPerSession}
+                    placeholderText={Strings.enterPrice}
+                    value={sessionCharges}
+                    onChange={setSessionCharges}
+                  />
+                </View>
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <InputField
+                    keyboardType="phone-pad"
+                    label={Strings.perDaySessionInMin}
+                    placeholderText={Strings.perDaySession}
+                    value={sessionTime}
+                    onChange={setSessionTime}
+                  />
+                </View>
+              </>
+            )}
+            {perMonth && (
+              <>
+                <View style={styles.contentView}>
+                  <Text style={styles.availableText}>
+                    {Strings.perMonthSession}{" "}
+                  </Text>
+                </View>
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <ModalDropdown
+                    placeholder="Service provider Role*"
+                    data={serviceProviderRole}
+                    title={"Select service role"}
+                    setSelectedValue={setServiceProviderMonthValue}
+                    selectedValue={selectedServiceMonthProvider}
+                    noPadding
+                  />
+                </View>
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <InputField
+                    keyboardType="phone-pad"
+                    label={Strings.chargesPerSession}
+                    placeholderText={Strings.enterPrice}
+                    value={monthCharges}
+                    onChange={setMonthCharges}
+                  />
+                </View>
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <InputField
+                    keyboardType="phone-pad"
+                    label={Strings.perDaySessionInMin}
+                    placeholderText={Strings.perDaySession}
+                    value={monthTime}
+                    onChange={setMonthTime}
+                  />
+                </View>
+              </>
+            )}
+
+            <View
+              style={{
+                paddingBottom: moderateScale(25),
+                paddingTop: moderateScale(30),
+              }}
+            >
+              <Button
+                title={route !== "myprofile" ? Strings.next : Strings.submit}
+                onPress={onSubmit}
+              />
+            </View>
+          </ScrollView>
+        </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 };

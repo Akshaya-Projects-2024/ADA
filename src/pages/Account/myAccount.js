@@ -33,7 +33,10 @@ import {
 import { useSelector } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileDummy from "../../assets/svg/user.svg";
+import Toggle from "../../components/Toggle";
+import { LoginModules } from "../../constants/enums";
 import { getContactDetails } from "../../redux-store/actions/commonApis";
+
 
 const MenuItem = ({
   bgColor,
@@ -69,7 +72,7 @@ const MenuItem = ({
 };
 
 const MyAccount = (props) => {
-  const { guestUser } = useSelector(({ register }) => register);
+  const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const profile = useSelector((state) => state?.commonReducer);
 
 
@@ -87,8 +90,6 @@ const MyAccount = (props) => {
     const validProviderProfile = validateServiceProfile(profile, false, true);
     return validProviderProfile;
   }, [profile]);
-
-
 
   const renderItem = (
     bgColor,
@@ -137,26 +138,49 @@ const MyAccount = (props) => {
     }
   };
 
+  const switchProfile = () => {
+    const validParentProfile = validateParentProfile(profile);
+    if (validParentProfile?.flag) {
+      props.navigation.reset({
+        index: 0,
+        routes: [{ name: "petParentAppStack" }],
+      });
+    } else {
+      props.navigation.navigate(validParentProfile?.navigateTo, {
+        route: "parentAccount",
+      });
+    }
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <LinearGradient
-        locations={[0, 0.5, 0.6]}
-        colors={[
-          THEMES.colors.iceBerg,
-          THEMES.colors.panache,
-          THEMES.colors.bgColor,
-        ]}
-        style={{ flex: 1 }}
-      >
-        <StatusBar backgroundColor={THEMES.colors.lightCyan} />
+    <LinearGradient
+      locations={[0, 0.5, 0.6]}
+      colors={[
+        THEMES.colors.iceBerg,
+        THEMES.colors.panache,
+        THEMES.colors.bgColor,
+      ]}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        {/* <StatusBar backgroundColor={THEMES.colors.lightCyan} /> */}
         <Header
-          // customIcon={<SwitchIcon />}
-          showBack
+          customIcon={
+            <Toggle
+              state={loggedInModule === LoginModules.provider}
+              onPress={switchProfile}
+            />
+          }
+          // showBack
           title={Strings.myAccount}
           // showSearch
           bgColor="transparent"
         />
-
+        <StatusBar
+          backgroundColor="transparent"
+          translucent
+          barStyle={"dark-content"}
+        />
         <ScrollView
           bounces={false}
           showsHorizontalScrollIndicator={false}
@@ -166,9 +190,7 @@ const MyAccount = (props) => {
           <View style={styles.container}>
             <View>
               <View style={styles.profileView}>
-                {Boolean(
-                  profile?.providerProfile?.providerDocument?.[0]?.url
-                ) ? (
+                {profile?.providerProfile?.providerDocument?.[0]?.url ? (
                   <Image
                     resizeMode="contain"
                     style={styles.profile}
@@ -329,8 +351,8 @@ const MyAccount = (props) => {
             </View>
           </View>
         </ScrollView>
-      </LinearGradient>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 

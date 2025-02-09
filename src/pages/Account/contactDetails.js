@@ -19,6 +19,7 @@ import { decryptService } from "../../utils/storageFunc";
 import { useSelector } from "react-redux";
 import { showToast } from "../../utils/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { StackActions } from "@react-navigation/native";
 
 const ContactDetails = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -95,10 +96,14 @@ const ContactDetails = (props) => {
         };
         const res = await saveContactDetails(postData);
         if (res?.data?.status_code == 200) {
-          props.navigation.navigate(
-            "uploadImagesDocs",
-            route ? { route: route } : {}
-          );
+          if (route === "myprofile") {
+            props.navigation.dispatch(StackActions.pop(1));
+          } else {
+            props.navigation.navigate(
+              "uploadImagesDocs",
+              route ? { route: route } : {}
+            );
+          }
         } else {
           showToast("error", res?.data?.message);
         }
@@ -109,93 +114,93 @@ const ContactDetails = (props) => {
   };
 
   return (
-    <SafeAreaView style={{flex:1}}>
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header title={Strings.contactDetails} showBack bgColor="transparent" />
-      {route !== "myprofile" && (
-        <View
-          style={{
-            borderTopWidth: 1,
-            borderTopColor: "#B8B8B8",
-            borderBottomColor: "#B8B8B8",
-            borderBottomWidth: 1,
-            backgroundColor: "#fff",
-          }}
-        >
-          <Stepper currentStep={2} totalSteps={6} />
-        </View>
-      )}
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          style={{ flex: 1 }}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-        >
-          <View style={{ paddingHorizontal: moderateScale(20) }}>
-            <View
-              style={{
-                paddingTop: moderateScale(route !== "myprofile" ? 18 : 30),
-              }}
-            >
-              <InputField
-                maxLength={10}
-                keyboardType="phone-pad"
-                label={Strings.mobileNo}
-                placeholderText={Strings.enterMobileNo}
-                value={mobileNo}
-                onChange={setMobileNo}
-              />
-            </View>
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <InputField
-                label={Strings.emailId}
-                placeholderText={Strings.enterEmailId}
-                value={emailId}
-                onChange={setEmailId}
-              />
-            </View>
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <InputField
-                label={Strings.address}
-                placeholderText={Strings.enterAddress}
-                multiline={true}
-                value={address}
-                onChange={setAddress}
-              />
-            </View>
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <InputField
-                label={Strings.location}
-                placeholderText={Strings.enterLocation}
-                rightIcon={<Location stroke={THEMES.colors.darkGrey} />}
-                value={location}
-                onChange={setLocation}
-              />
-            </View>
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <InputField
-                maxLength={6}
-                keyboardType="phone-pad"
-                label={Strings.postalCode}
-                placeholderText={Strings.enterPostalCode}
-                value={postalCode}
-                onChange={setPostalCode}
-              />
-            </View>
-          </View>
-        </ScrollView>
-        {!isKeyboardVisible && (
-          <View style={styles.submitButton}>
-            <Button
-              title={route !== "myprofile" ? Strings.next : Strings.submit}
-              onPress={() => onSubmit()}
-            />
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header title={Strings.contactDetails} showBack bgColor="transparent" />
+        {route !== "myprofile" && (
+          <View
+            style={{
+              borderTopWidth: 1,
+              borderTopColor: "#B8B8B8",
+              borderBottomColor: "#B8B8B8",
+              borderBottomWidth: 1,
+              backgroundColor: "#fff",
+            }}
+          >
+            <Stepper currentStep={2} totalSteps={6} />
           </View>
         )}
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            style={{ flex: 1 }}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            <View style={{ paddingHorizontal: moderateScale(20) }}>
+              <View
+                style={{
+                  paddingTop: moderateScale(route !== "myprofile" ? 18 : 30),
+                }}
+              >
+                <InputField
+                  maxLength={10}
+                  keyboardType="phone-pad"
+                  label={Strings.mobileNo}
+                  placeholderText={Strings.enterMobileNo}
+                  value={mobileNo}
+                  onChange={setMobileNo}
+                />
+              </View>
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <InputField
+                  label={Strings.emailId}
+                  placeholderText={Strings.enterEmailId}
+                  value={emailId}
+                  onChange={setEmailId}
+                />
+              </View>
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <InputField
+                  label={Strings.address}
+                  placeholderText={Strings.enterAddress}
+                  multiline={true}
+                  value={address}
+                  onChange={setAddress}
+                />
+              </View>
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <InputField
+                  label={Strings.location}
+                  placeholderText={Strings.enterLocation}
+                  rightIcon={<Location stroke={THEMES.colors.darkGrey} />}
+                  value={location}
+                  onChange={setLocation}
+                />
+              </View>
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <InputField
+                  maxLength={6}
+                  keyboardType="phone-pad"
+                  label={Strings.postalCode}
+                  placeholderText={Strings.enterPostalCode}
+                  value={postalCode}
+                  onChange={setPostalCode}
+                />
+              </View>
+            </View>
+          </ScrollView>
+          {!isKeyboardVisible && (
+            <View style={styles.submitButton}>
+              <Button
+                title={route !== "myprofile" ? Strings.next : Strings.submit}
+                onPress={() => onSubmit()}
+              />
+            </View>
+          )}
+        </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 };

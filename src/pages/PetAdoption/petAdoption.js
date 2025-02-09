@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -23,12 +23,13 @@ import { useIsFocused } from "@react-navigation/native";
 import { getBase64Obj } from "../../utils/documentUtils";
 import CrossIcon from "../../assets/svg/CrossIcon";
 import { useSelector } from "react-redux";
-import { LoginModules } from "../../constants/enums";
+import { ApprovalStatus, LoginModules } from "../../constants/enums";
 import { contextValue } from "../../components/Loader";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SearchIcon from "../../assets/svg/search.svg";
 import { useDebounce } from "../../hooks/useDebounce";
 import ProfileDummy from "../../assets/svg/user.svg";
+import Dialog from "../../components/Dialog";
 
 const PetAdoption = (props) => {
   const [data, setData] = useState([]);
@@ -38,7 +39,27 @@ const PetAdoption = (props) => {
   const isFocused = useIsFocused();
   const { loggedInModule, guestUser } = useSelector((state) => state?.register);
   const [searchText, setSearchText] = useState("");
+  const [paymentModal, setPaymentModal] = useState(false);
   const searchQuery = useDebounce(searchText);
+  const profile = useSelector((state) => state?.commonReducer);
+
+  const paymentCompleted = useMemo(() => {
+    if (
+      profile?.providerProfile?.subscription?.status === "active" &&
+      profile?.logindetails?.isprovider === ApprovalStatus.approved
+    ) {
+      return { flag: true };
+    } else if (
+      profile?.providerProfile?.subscription?.status === "active" &&
+      profile?.logindetails?.isprovider !== ApprovalStatus.approved
+    ) {
+      return { flag: false, message: Strings.approvaltError };
+    }
+    return { flag: false, message: Strings.paymentErrorForAdoption };
+  }, [
+    profile?.logindetails?.isprovider,
+    profile?.providerProfile?.subscription?.status,
+  ]);
 
   useEffect(() => {
     if (isFocused) {
@@ -98,18 +119,23 @@ const PetAdoption = (props) => {
     setSearchText(text);
   };
 
+  const handlePremiumActionPressed = (item) => {
+    if (loggedInModule === LoginModules.parent || paymentCompleted?.flag) {
+      props.navigation.navigate("auth", {
+        screen: "adoptionDetail",
+        params: {
+          selectedData: item,
+        },
+      });
+    } else {
+      setPaymentModal(true);
+    }
+  };
+
   const renderItem = ({ item }) => {
-    console.log("item?.document?.url", item?.document?.url);
     return (
       <TouchableOpacity
-        onPress={() =>
-          props.navigation.navigate("auth", {
-            screen: "adoptionDetail",
-            params: {
-              selectedData: item,
-            },
-          })
-        }
+        onPress={() => handlePremiumActionPressed(item)}
         style={{
           borderWidth: 1,
           borderColor: "#ddd",
@@ -389,6 +415,30 @@ const PetAdoption = (props) => {
           </View>
         </View>
       </SafeAreaView>
+      <Dialog
+        flag={paymentModal}
+        title={Strings.attention}
+        description={paymentCompleted?.message}
+        leftButtonText="Cancel"
+        rightButtonText="OK"
+        leftButtonPressed={() => {
+          setPaymentModal(false);
+        }}
+        rightButtonPressed={() => {
+          if (profile?.providerProfile?.subscription?.status === "active") {
+            setPaymentModal(false);
+          } else if (guestUser) {
+            props?.navigation.replace("auth");
+          } else {
+            props.navigation.navigate("auth", {
+              screen: "paymentsSubscription",
+            });
+          }
+        }}
+        onClose={() => {
+          setPaymentModal(false);
+        }}
+      />
     </View>
   );
 };

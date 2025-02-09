@@ -21,6 +21,7 @@ import { decryptService } from "../../utils/storageFunc";
 import { showToast } from "../../utils/utils";
 import { useSelector } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { StackActions } from "@react-navigation/native";
 
 const MediaLink = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -92,133 +93,141 @@ const MediaLink = (props) => {
         showToast("error", "Something went wrong!!!");
       }
     }
-    navigateToHome();
+    handleNavigation();
   };
 
-  const navigateToHome = () => {
-    props.navigation.reset({
-      index: 0,
-      routes: [{ name: "paymentsSubscription" }],
-    });
+  const handleNavigation = () => {
+    if (route === "myprofile") {
+      props.navigation.dispatch(StackActions.pop(1));
+    } else {
+      props.navigation.reset({
+        index: 0,
+        routes: [{ name: "paymentsSubscription" }],
+      });
+    }
   };
 
   return (
-    <SafeAreaView style={{flex:1}}>
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header title={Strings.mediaLinks} showBack bgColor="transparent" />
-      {route !== "myprofile" && (
-        <View
-          style={{
-            borderTopWidth: 1,
-            borderTopColor: "#B8B8B8",
-            borderBottomColor: "#B8B8B8",
-            borderBottomWidth: 1,
-            backgroundColor: "#fff",
-          }}
-        >
-          <Stepper currentStep={6} totalSteps={6} />
-        </View>
-      )}
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          style={{ flex: 1 }}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-        >
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header title={Strings.mediaLinks} showBack bgColor="transparent" />
+        {route !== "myprofile" && (
           <View
-            style={[
-              styles.headerView,
-              { paddingTop: route !== "myprofile" ? 18 : 30 },
-            ]}
+            style={{
+              borderTopWidth: 1,
+              borderTopColor: "#B8B8B8",
+              borderBottomColor: "#B8B8B8",
+              borderBottomWidth: 1,
+              backgroundColor: "#fff",
+            }}
           >
-            <Text style={styles.headerText}>{Strings.onlineConsultation}</Text>
-          </View>
-
-          <View style={styles.contentView}>
-            <View style={styles.w20}>
-              <Image
-                resizeMode="contain"
-                source={require("../../assets/images/addLink.png")}
-              />
-            </View>
-            <View style={styles.w80}>
-              <InputField
-                label={Strings.addLink}
-                placeholderText={Strings.pasteLink}
-                rightIcon={<ClipboardPaste stroke={THEMES.colors.darkGrey} />}
-                value={link}
-                onChange={setLink}
-              />
-            </View>
-          </View>
-
-          <View style={styles.secondContentHeading}>
-            <Text style={styles.secondContent}>{Strings.socialMediaLink}</Text>
-          </View>
-
-          <View style={styles.secondImgView}>
-            <View style={styles.w20}>
-              <Image
-                resizeMode="contain"
-                source={require("../../assets/images/instagram.png")}
-              />
-            </View>
-            <View style={styles.w80}>
-              <InputField
-                label={Strings.instaLink}
-                placeholderText={Strings.pasteLink}
-                rightIcon={<ClipboardPaste stroke={THEMES.colors.red} />}
-                value={instaLink}
-                onChange={setInstaLink}
-              />
-            </View>
-          </View>
-
-          <View style={styles.secondaryContentView}>
-            <View style={styles.w20}>
-              <Image
-                resizeMode="contain"
-                source={require("../../assets/images/facebook.png")}
-              />
-            </View>
-            <View style={styles.w80}>
-              <InputField
-                label={Strings.fbLink}
-                placeholderText={Strings.pasteLink}
-                rightIcon={<ClipboardPaste stroke={THEMES.colors.darkGrey} />}
-                value={fbLink}
-                onChange={setFbLink}
-              />
-            </View>
-          </View>
-
-          <View style={styles.secondaryContentView}>
-            <View style={styles.w20}>
-              <Image
-                resizeMode="contain"
-                source={require("../../assets/images/websiteLink.png")}
-              />
-            </View>
-            <View style={styles.w80}>
-              <InputField
-                label={Strings.websiteLink}
-                placeholderText={Strings.pasteLink}
-                rightIcon={<ClipboardPaste stroke={THEMES.colors.darkGrey} />}
-                value={weblink}
-                onChange={setWebLink}
-              />
-            </View>
-          </View>
-        </ScrollView>
-        {!isKeyboardVisible && (
-          <View style={styles.submitButton}>
-            <Button title={Strings.submit} onPress={() => onSubmit()} />
+            <Stepper currentStep={6} totalSteps={6} />
           </View>
         )}
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            style={{ flex: 1 }}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+          >
+            <View
+              style={[
+                styles.headerView,
+                { paddingTop: route !== "myprofile" ? 18 : 30 },
+              ]}
+            >
+              <Text style={styles.headerText}>
+                {Strings.onlineConsultation}
+              </Text>
+            </View>
+
+            <View style={styles.contentView}>
+              <View style={styles.w20}>
+                <Image
+                  resizeMode="contain"
+                  source={require("../../assets/images/addLink.png")}
+                />
+              </View>
+              <View style={styles.w80}>
+                <InputField
+                  label={Strings.addLink}
+                  placeholderText={Strings.pasteLink}
+                  rightIcon={<ClipboardPaste stroke={THEMES.colors.darkGrey} />}
+                  value={link}
+                  onChange={setLink}
+                />
+              </View>
+            </View>
+
+            <View style={styles.secondContentHeading}>
+              <Text style={styles.secondContent}>
+                {Strings.socialMediaLink}
+              </Text>
+            </View>
+
+            <View style={styles.secondImgView}>
+              <View style={styles.w20}>
+                <Image
+                  resizeMode="contain"
+                  source={require("../../assets/images/instagram.png")}
+                />
+              </View>
+              <View style={styles.w80}>
+                <InputField
+                  label={Strings.instaLink}
+                  placeholderText={Strings.pasteLink}
+                  rightIcon={<ClipboardPaste stroke={THEMES.colors.red} />}
+                  value={instaLink}
+                  onChange={setInstaLink}
+                />
+              </View>
+            </View>
+
+            <View style={styles.secondaryContentView}>
+              <View style={styles.w20}>
+                <Image
+                  resizeMode="contain"
+                  source={require("../../assets/images/facebook.png")}
+                />
+              </View>
+              <View style={styles.w80}>
+                <InputField
+                  label={Strings.fbLink}
+                  placeholderText={Strings.pasteLink}
+                  rightIcon={<ClipboardPaste stroke={THEMES.colors.darkGrey} />}
+                  value={fbLink}
+                  onChange={setFbLink}
+                />
+              </View>
+            </View>
+
+            <View style={styles.secondaryContentView}>
+              <View style={styles.w20}>
+                <Image
+                  resizeMode="contain"
+                  source={require("../../assets/images/websiteLink.png")}
+                />
+              </View>
+              <View style={styles.w80}>
+                <InputField
+                  label={Strings.websiteLink}
+                  placeholderText={Strings.pasteLink}
+                  rightIcon={<ClipboardPaste stroke={THEMES.colors.darkGrey} />}
+                  value={weblink}
+                  onChange={setWebLink}
+                />
+              </View>
+            </View>
+          </ScrollView>
+          {!isKeyboardVisible && (
+            <View style={styles.submitButton}>
+              <Button title={Strings.submit} onPress={() => onSubmit()} />
+            </View>
+          )}
+        </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 };

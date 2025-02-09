@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Dimensions,
   FlatList,
+  StatusBar,
 } from "react-native";
 import Carousel from "react-native-snap-carousel";
 import { THEMES } from "../../assets/theme/themes";
@@ -37,6 +38,7 @@ import { getUpcomingAppointments } from "../../redux-store/actions/auth";
 import moment from "moment";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { contextValue } from "../../components/Loader";
+import { SafeAreaView } from "react-native-safe-area-context";
 const { width: screenWidth } = Dimensions.get("window");
 
 const services = [
@@ -410,7 +412,12 @@ const ParentHome = (props) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
+      <StatusBar
+        backgroundColor="transparent"
+        translucent
+        barStyle={"dark-content"}
+      />
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
@@ -593,7 +600,7 @@ const ParentHome = (props) => {
           />
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

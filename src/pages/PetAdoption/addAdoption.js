@@ -278,7 +278,6 @@ const AddAdoption = (props) => {
     <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
       <StatusBar backgroundColor={THEMES.colors.white} />
       <Header title="Add Pet Adoption" fontColor="#000" showBack />
-
       <ScrollView style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
         <View
           style={{
