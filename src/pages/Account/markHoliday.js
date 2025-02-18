@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Pressable,
+  useWindowDimensions,
 } from "react-native";
 import moment from "moment";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -21,13 +22,20 @@ import UnChecked from "../../assets/svg/unchecked.svg";
 import Button from "../../components/Button";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
-import { getHolidayData } from "../../redux-store/actions/auth";
+import {
+  getHolidayData,
+  getWeeklyHolidayData,
+  setHolidayData,
+  setWeeklyHolidayData,
+} from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
 import { DAYS } from "../../components/TimeTracker";
-import { showToast } from "../../utils/utils";
+import { showToast, validArray } from "../../utils/utils";
 import InputField from "../../components/InputField";
 import Calender from "../../assets/svg/calendar_event.svg";
 import ClockSvg from "../../assets/svg/ClockSvg";
+import Dialog from "../../components/Dialog";
+import { useIsFocused } from "@react-navigation/native";
 
 const SingleSelectCheckBox = ({ title, onPress, mode }) => {
   return (
@@ -41,10 +49,15 @@ const SingleSelectCheckBox = ({ title, onPress, mode }) => {
     </Pressable>
   );
 };
-
+const WHOLE_DAY = { start: "10:00 AM", end: "07:00 PM" };
+const EMPTY_DAY = { start: "", end: "" };
+const WEEKLY = "everyWeek";
+const ONE_DAY = "oneDay";
 const MarkHoliday = () => {
+  const isFocused = useIsFocused();
+  const { width } = useWindowDimensions();
   const [holidayDays, setHolidayDays] = useState([]); // Initially, no holidays are selected
-  const [holidayType, setHolidayType] = useState("oneDay");
+  const [holidayType, setHolidayType] = useState(ONE_DAY);
   const [applyForAllDays, setApplyForAllDays] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [pickerDay, setPickerDay] = useState(null);
@@ -59,10 +72,30 @@ const MarkHoliday = () => {
   const [endTime, setEndTime] = useState(null);
   const [startTimeVisible, setStartTimeVisible] = useState(false);
   const [endTimeVisible, setEndTimeVisible] = useState(false);
+  const [confirmModal, setConfirmModal] = useState(false);
 
   useEffect(() => {
-    initData();
-  }, []);
+    if (isFocused) {
+      initData();
+    } else {
+      setConfirmModal(false);
+      setEndTimeVisible(false);
+      setStartTimeVisible(false);
+      setEndTime();
+      setStartTime();
+      setEndDateVisible(false);
+      setStartDateVisible(false);
+      setEndDate();
+      setStartDate();
+      setTimes([]);
+      setPickerType(null);
+      setPickerDay(null);
+      setDatePickerVisibility(false);
+      setApplyForAllDays(false);
+      setHolidayType(ONE_DAY);
+      setHolidayDays([]);
+    }
+  }, [isFocused]);
 
   const initData = async () => {
     contextValue?.setLoader(true);
@@ -71,8 +104,12 @@ const MarkHoliday = () => {
       const userId = await decryptService("userId");
       const params = { provider_id: userId };
       const res = await getHolidayData(params);
+      const res2 = await getWeeklyHolidayData(params);
       if (res?.status === 200) {
-        // console.log("🚀 ~ initData ~ res:", res?.data?.data);
+        console.log("🚀 ~ initData ~ res:", res?.data?.data);
+      }
+      if (res2?.status === 200) {
+        console.log("🚀 ~ initData ~ res2:", res2?.data?.data);
       }
       const currentDay = new Date().getDay();
       const removedData = daysz.slice(currentDay - 1);
@@ -106,7 +143,7 @@ const MarkHoliday = () => {
   };
 
   const handleConfirm = (date) => {
-    const formattedTime = moment(date).format("HH:mm A");
+    const formattedTime = moment(date).format("hh:mm A");
     handleTimeChange(pickerDay, pickerType, formattedTime);
     hideDatePicker();
   };
@@ -122,7 +159,7 @@ const MarkHoliday = () => {
   };
 
   const handleStartTime = (date) => {
-    const formattedDate = moment(date).format("HH:mm");
+    const formattedDate = moment(date).format("hh:mm A");
     setStartTime(formattedDate);
     hideStartTime();
   };
@@ -142,7 +179,7 @@ const MarkHoliday = () => {
   };
 
   const handleEndTime = (date) => {
-    const formattedDate = moment(date).format("HH:mm");
+    const formattedDate = moment(date).format("hh:mm A");
     setEndTime(formattedDate);
     hideEndTime();
   };
@@ -163,98 +200,111 @@ const MarkHoliday = () => {
 
   const toggleDay = (day) => {
     const temp = [...times];
-    const op = [...holidayDays];
+    const selected = [...holidayDays];
     const selectedDay = times?.findIndex((it) => it.label === day.label);
+    const shiftValue = applyForAllDays ? WHOLE_DAY : EMPTY_DAY;
     temp[selectedDay] = {
       ...day,
       selected: !day?.selected,
-      ...(day?.selected ? { start: "", end: "" } : {}),
+      ...(!day?.selected ? shiftValue : {}),
     };
-    const selectedDayOp = op?.findIndex((it) => it.label === day.label);
+    const selectedLongDay = selected?.findIndex((it) => it.label === day.label);
     if (temp[selectedDay].selected) {
-      op.push(temp[selectedDay]);
+      selected.push(temp[selectedDay]);
     } else {
-      op.splice(selectedDayOp, 1);
+      selected.splice(selectedLongDay, 1);
     }
     setTimes(temp);
-    setHolidayDays(op);
-    // setHolidayDays((prevHolidayDays) => {
-    //   const updatedDays = prevHolidayDays.includes(day)
-    //     ? prevHolidayDays.filter((d) => d !== day) // Remove day if it was a holiday
-    //     : [...prevHolidayDays, day]; // Add day as a holiday
-
-    //   // Sort updatedDays according to predefined order in days array
-    //   const sortedDays = updatedDays.sort(
-    //     (a, b) => times?.indexOf(a) - times?.indexOf(b)
-    //   );
-
-    //   // Apply default times if "All Day" is enabled
-    //   if (applyForAllDays) {
-    //     setTimes((prevTimes) => {
-    //       const updatedTimes = { ...prevTimes };
-    //       sortedDays.forEach((selectedDay) => {
-    //         updatedTimes[selectedDay] = { start: "10:00 AM", end: "07:00 PM" };
-    //       });
-    //       return updatedTimes;
-    //     });
-    //   }
-
-    //   return sortedDays;
-    // });
+    setHolidayDays(selected);
   };
 
-  const handleToggleAllDay = () => {
-    setApplyForAllDays((preValue) => {
-      return !preValue;
-    });
-
-    //   // Apply default times to all selected days if "All Day" is enabled
-    //   if (!applyForAllDays) {
-    //     setTimes((prevTimes) => {
-    //       const updatedTimes = { ...prevTimes };
-    //       holidayDays.forEach((day) => {
-    //         updatedTimes[day] = { start: "10:00 AM", end: "07:00 PM" };
-    //       });
-    //       return updatedTimes;
-    //     });
-    //   }
+  const handleToggleAllDay = (value) => {
+    contextValue?.setLoader(true);
+    setApplyForAllDays(value);
+    const temp = [];
+    for (let index = 0; index < holidayDays.length; index++) {
+      const element = holidayDays[index];
+      element.start = "10:00 AM";
+      element.end = "07:00 PM";
+      temp.push(element);
+    }
+    setHolidayDays(temp);
+    contextValue?.setLoader(false);
   };
 
-  const onSubmit = async () => {
-    try {
-      contextValue?.setLoader(true);
-      const userId = await decryptService("userId");
-      const holidayParams = {
+  const validateLongHoliday = (userId) => {
+    if (startDate && endDate && startTime && endTime) {
+      const longHolidayParams = {
         provider_id: userId,
         start_date: startDate,
         end_date: endDate,
         start_time: startTime,
         end_time: endTime,
-        isfullday: applyForAllDays,
+        isfullday: applyForAllDays ? 1 : 0,
         notes: "Scheduled maintenance",
       };
-      const longHolidayParams = {
+      return longHolidayParams;
+    }
+    return false;
+  };
+
+  const validateWeeklyHoliday = (userId) => {
+    if (validArray(holidayDays)) {
+      const weeklyHolidayData = [];
+      for (let index = 0; index < holidayDays?.length; index++) {
+        const element = holidayDays[index];
+        if (element?.value && element?.start && element?.end) {
+          const op = {
+            day_of_week: element?.value,
+            start_time: moment(element?.start, "hh:mm A").format("HH:mm"),
+            end_time: moment(element?.end, "hh:mm A").format("HH:mm"),
+            is_available: "false",
+          };
+          weeklyHolidayData.push(op);
+        } else {
+          return false;
+        }
+      }
+      const weeklyHolidayParams = {
         provider_id: userId,
         note: "Holiday schedule for provider",
-        weeklyholiday: [
-          {
-            day_of_week: "Monday",
-            start_time: "09:00",
-            end_time: "17:00",
-            is_available: false,
-          },
-          {
-            day_of_week: "Wednesday",
-            start_time: "10:00",
-            end_time: "16:00",
-            is_available: false,
-          },
-        ],
+        weeklyholiday: weeklyHolidayData,
       };
+      return weeklyHolidayParams;
+    }
+    return false;
+  };
+
+  const onSubmit = async () => {
+    try {
+      const promises = [];
+      contextValue?.setLoader(true);
+      const userId = await decryptService("userId");
+      const promise1 = validateLongHoliday(userId);
+      const promise2 = validateWeeklyHoliday(userId);
+      if (!promise1 && !promise2) {
+        throw new Error(Strings.holidayError);
+      }
+      if (promise1) {
+        promises.push(setHolidayData(promise1));
+      }
+      if (promise2) {
+        promises.push(setWeeklyHolidayData(promise2));
+      }
+      const output = await Promise.allSettled(promises);
+      output.forEach((element) => {
+        if (element.status === "fulfilled") {
+          showToast("success", element?.value?.data?.data || "Success");
+        } else if (element.status === "rejected") {
+          throw new Error(element?.reason?.message);
+        }
+      });
       contextValue?.setLoader(false);
+      setConfirmModal(false);
     } catch (error) {
       contextValue?.setLoader(false);
       showToast("error", error?.message || "Something went wrong");
+      setConfirmModal(false);
     }
   };
 
@@ -277,14 +327,14 @@ const MarkHoliday = () => {
           >
             <View style={styles.radioButtonsContainer}>
               <SingleSelectCheckBox
-                mode={holidayType === "oneDay"}
+                mode={holidayType === ONE_DAY}
                 title={"One Day"}
-                onPress={() => setHolidayType("oneDay")}
+                onPress={() => setHolidayType(ONE_DAY)}
               />
               <SingleSelectCheckBox
-                mode={holidayType === "everyWeek"}
+                mode={holidayType === WEEKLY}
                 title={"Every Week"}
-                onPress={() => setHolidayType("everyWeek")}
+                onPress={() => setHolidayType(WEEKLY)}
               />
             </View>
             <Text style={styles.workingDayText}>Select day</Text>
@@ -330,7 +380,12 @@ const MarkHoliday = () => {
               }}
             >
               <Text style={styles.selectTimeText}>{Strings.selectTime}</Text>
-              <Pressable style={styles.rowSameDay} onPress={handleToggleAllDay}>
+              <Pressable
+                style={styles.rowSameDay}
+                onPress={() => {
+                  handleToggleAllDay(!applyForAllDays);
+                }}
+              >
                 <Text style={styles.sameTimeForDayText}>All Day</Text>
                 {applyForAllDays ? <SwitchOn /> : <SwitchOff />}
               </Pressable>
@@ -463,7 +518,7 @@ const MarkHoliday = () => {
                   }}
                 >
                   <InputField
-                    label={Strings.startDate}
+                    label={Strings.selectDate2}
                     placeholderText={"--"}
                     value={startDate ?? null}
                     rightIcon={<Calender />}
@@ -496,6 +551,7 @@ const MarkHoliday = () => {
                   flexDirection: "row",
                   flex: 1,
                   gap: moderateScale(10),
+                  marginBottom: moderateScale(70),
                 }}
               >
                 <Text
@@ -519,7 +575,7 @@ const MarkHoliday = () => {
                   }}
                 >
                   <InputField
-                    label={Strings.startDate}
+                    label={Strings.selectDate2}
                     placeholderText={"--"}
                     value={endDate ?? null}
                     rightIcon={<Calender />}
@@ -547,16 +603,22 @@ const MarkHoliday = () => {
                   />
                 </Pressable>
               </View>
-              {holidayDays?.length > 0 ||
-                (startDate && startTime && endDate && endTime && (
-                  <View style={styles.submitButton}>
-                    <Button title={Strings.submit} onPress={onSubmit} />
-                  </View>
-                ))}
             </View>
           </ScrollView>
         </View>
-
+        {holidayDays?.length > 0 ||
+        (startDate && startTime && endDate && endTime) ? (
+          <View
+            style={[styles.submitButton, { width: width - moderateScale(20) }]}
+          >
+            <Button
+              title={Strings.submit}
+              onPress={() => {
+                setConfirmModal(true);
+              }}
+            />
+          </View>
+        ) : null}
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
           mode="time"
@@ -589,6 +651,20 @@ const MarkHoliday = () => {
           mode="time"
           onConfirm={handleEndTime}
           onCancel={hideEndTime}
+        />
+        <Dialog
+          flag={confirmModal}
+          title={Strings.cancelAppointmentsTitle}
+          description={Strings.cancelAppointmentsDescription}
+          leftButtonText="Close"
+          rightButtonText="Cancel"
+          leftButtonPressed={() => {
+            setConfirmModal(false);
+          }}
+          rightButtonPressed={onSubmit}
+          onClose={() => {
+            setConfirmModal(false);
+          }}
         />
       </View>
     </SafeAreaView>
@@ -718,9 +794,10 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.medium,
   },
   submitButton: {
-    width: "100%",
     alignSelf: "center",
-    marginVertical: moderateScale(20),
+    marginBottom: moderateScale(10),
+    position: "absolute",
+    bottom: 0,
   },
   startDateInput: {
     flex: 1,

@@ -107,6 +107,7 @@ const Strings = {
   hhmm: "HH:MM",
   ddMMYYYY: "DD/MM/YYYY",
   selectDate: "Select Date*",
+  selectDate2: "Select Date",
   trendingTopics: "Trending Topics",
   newTopic: "New Topic",
   subject: "Subject*",
@@ -160,6 +161,10 @@ const Strings = {
   longHoliday: "Long Holiday",
   end: "End",
   time: "Time",
+  holidayError: "Please provide valid data for weekly/long holidays",
+  cancelAppointmentsTitle: "✨ Do You Want to Cancel Appointments? ✨",
+  cancelAppointmentsDescription:
+    "All appointments scheduled on the selected holiday will be automatically canceled.",
 };
 
 export default Strings;

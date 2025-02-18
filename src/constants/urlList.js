@@ -37,6 +37,7 @@ export const urlList = {
   getUpcomingAppointments: "appointment/getupcoming",
   providerDashboardSlotsData: "appointment/timeslotwithstatus",
   getHoliday: "appointment/getholiday",
+  getWeeklyHoliday: "appointment/getweeklyholiday",
   setHoliday: "appointment/holiday",
   setWeeklyHoliday: "appointment/weeklyholiday",
   search: "global/search",

@@ -559,6 +559,24 @@ export const getHolidayData = async (params) => {
   }
 };
 
+export const getWeeklyHolidayData = async (params) => {
+  try {
+    const res = await Api.POST(urlList.getWeeklyHoliday, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("getWeeklyHolidayData Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
 export const setHolidayData = async (params) => {
   try {
     const res = await Api.POST(urlList.setHoliday, params);
