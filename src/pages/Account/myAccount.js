@@ -36,7 +36,7 @@ import ProfileDummy from "../../assets/svg/user.svg";
 import Toggle from "../../components/Toggle";
 import { LoginModules } from "../../constants/enums";
 import { getContactDetails } from "../../redux-store/actions/commonApis";
-
+import HolidayMenuIcon from "../../assets/svg/HolidayMenuIcon";
 
 const MenuItem = ({
   bgColor,
@@ -74,7 +74,6 @@ const MenuItem = ({
 const MyAccount = (props) => {
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const profile = useSelector((state) => state?.commonReducer);
-
 
   const profileServices = useMemo(
     () =>
@@ -264,7 +263,7 @@ const MyAccount = (props) => {
                   )}
                   {renderItem(
                     THEMES.colors.sandyBeach,
-                    <BottomOpenCheck stroke={THEMES.colors.california} />,
+                    <HolidayMenuIcon />,
                     Strings.markHoliday,
                     "",
                     "markHoliday"

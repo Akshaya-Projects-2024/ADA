@@ -157,6 +157,9 @@ const Strings = {
   introDes3:
     "Effortlessly connect with top pet professionals—all in one place, just a tap away!",
   goToDashboard: "Let's Go",
+  longHoliday: "Long Holiday",
+  end: "End",
+  time: "Time",
 };
 
 export default Strings;

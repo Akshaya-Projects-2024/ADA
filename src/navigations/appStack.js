@@ -35,8 +35,6 @@ const AppStack = () => (
       component={OtpScreen}
       options={navOptionHandler}
     />
-
-   
   </AppStacks.Navigator>
 );
 

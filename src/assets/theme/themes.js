@@ -59,6 +59,7 @@ export const THEMES = {
     searchBorderColor: "#0000001F",
     topicAuthorText: "#323232",
     dateColor: "#0000008F",
+    svgColor: "#5E6366",
   },
   fontFamily: {
     regular: "Inter-Regular",
