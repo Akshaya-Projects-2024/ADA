@@ -41,13 +41,9 @@ import {
 import { getAdoptionCategory } from "../../redux-store/actions/commonApis";
 import { DOCUMENT_TYPES } from "../Account/uploadImagesDocs";
 import { contextValue } from "../../components/Loader";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-const categoryData = [
-  { id: "1", label: "Training" },
-  { id: "2", label: "ABC" },
-  { id: "3", label: "XYZ" },
-  { id: "4", label: "MNO" },
-];
+
 
 const AddAdoption = (props) => {
   const { navigation } = props;
@@ -275,6 +271,7 @@ const AddAdoption = (props) => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
       <StatusBar backgroundColor={THEMES.colors.white} />
       <Header title="Add Pet Adoption" fontColor="#000" showBack />
@@ -644,6 +641,7 @@ const AddAdoption = (props) => {
         onCancel={hideDatePickerCancel}
       />
     </View>
+    </SafeAreaView>
   );
 };
 

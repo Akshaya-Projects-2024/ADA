@@ -18,6 +18,7 @@ import { getServices } from "../../redux-store/actions/auth";
 import { SvgUri } from "react-native-svg";
 import { contextValue } from "../../components/Loader";
 import EmptyView from "../../components/EmptyView";
+import { SafeAreaView } from "react-native-safe-area-context";
 const { width } = Dimensions.get("window");
 
 const ServiceList = (props) => {
@@ -65,6 +66,8 @@ const ServiceList = (props) => {
   };
 
   return (
+
+    <SafeAreaView style={{ flex: 1 }}>
     <View style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
@@ -92,6 +95,7 @@ const ServiceList = (props) => {
         />
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

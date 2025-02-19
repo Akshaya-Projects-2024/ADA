@@ -65,7 +65,6 @@ const MyBookings = ({ navigation, route }) => {
   const filterOptions = ["Daily", "Weekly", "Monthly", "Custom"];
 
   useEffect(() => {
-
     if (!focus) {
       setVisible(false);
       setAttendedModal(false);

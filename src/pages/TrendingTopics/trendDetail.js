@@ -17,6 +17,7 @@ import { useWindowDimensions } from "react-native";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import ProfileDummy from "../../assets/svg/user.svg";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const TrendDetail = (props) => {
   const { width } = useWindowDimensions();
@@ -46,6 +47,7 @@ const TrendDetail = (props) => {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
     <View style={styles.container}>
       <View style={styles.imgStyle}>
         <Image
@@ -107,6 +109,7 @@ const TrendDetail = (props) => {
         </View>
       </ScrollView>
     </View>
+    </SafeAreaView>
   );
 };
 

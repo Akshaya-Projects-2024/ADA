@@ -61,7 +61,7 @@ const AppointmentCard = ({
     <Pressable
       onPress={() => {
         setSelectedItem(item);
-        navigation.navigate("appointmentDetail");
+        navigation.navigate("appointmentDetail", { selectedItem: item });
       }}
       style={[styles.flatlistView, { backgroundColor: itemBackgroundColor }]}
     >
@@ -96,7 +96,7 @@ const AppointmentCard = ({
           </View>
           <View style={styles.nameText}>
             <Text
-              style={styles.name}
+              style={[styles.name,{textTransform:'capitalize'}]}
             >{`${item?.parentdetails?.name} & ${item?.petdetails?.name}`}</Text>
             <View style={styles.flatListNameRow}>
               <View style={styles.serviceText}>

@@ -25,6 +25,7 @@ import { getBase64Obj } from "../../utils/documentUtils";
 import { contextValue } from "../../components/Loader";
 import EmptyView from "../../components/EmptyView";
 import ProviderFallback from "../../assets/svg/ProviderFallback";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Service = ({ navigation, route }) => {
   const selectedService = route?.params?.selectedService;
@@ -198,7 +199,9 @@ const Service = ({ navigation, route }) => {
     );
   };
 
+
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
       <StatusBar backgroundColor={THEMES.colors.white} />
       <Header
@@ -283,6 +286,7 @@ const Service = ({ navigation, route }) => {
         contentContainerStyle={{ flexGrow: 1 }}
       />
     </View>
+    </SafeAreaView>
   );
 };
 

@@ -31,6 +31,7 @@ import { validateServiceProfile } from "../../utils/userUtils";
 import { calculateDiscount, validArray, validObject } from "../../utils/utils";
 import SubscriptionError from "./subscriptionError";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { contextValue } from "../../components/Loader";
 
 const PaymentsSubscription = (props) => {
   const dispatch = useDispatch();
@@ -114,6 +115,7 @@ const PaymentsSubscription = (props) => {
 
   const initData = useCallback(async () => {
     try {
+      contextValue?.setLoader(true)
       const token = await decryptService("accessToken");
       const obj = {
         userId: await decryptService("userId"),
@@ -153,8 +155,10 @@ const PaymentsSubscription = (props) => {
           }
           setSelectedCard(selectedSub);
         }
+        contextValue?.setLoader(false)
       }
     } catch (error) {
+      contextValue?.setLoader(false)
       console.log("🚀 ~ initData ~ error:", error?.message);
     }
   }, [

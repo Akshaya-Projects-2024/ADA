@@ -118,6 +118,7 @@ const Home = (props) => {
   const [paymentModal, setPaymentModal] = useState(false);
 
   const paymentCompleted = useMemo(() => {
+    console.log(profile?.providerProfile?.subscription?.status, profile?.logindetails?.isprovider)
     if (
       profile?.providerProfile?.subscription?.status === "active" &&
       profile?.logindetails?.isprovider === ApprovalStatus.approved
@@ -773,7 +774,7 @@ const Home = (props) => {
             </Text>
           </View>
           <View>
-            <View style={styles.headerView}>
+            <TouchableOpacity activeOpacity={1}   onPress={()=>props.navigation.navigate('clientReview')} style={styles.headerView}>
               <View style={styles.headerRow}>
                 <View style={styles.w25}>
                   <Text style={styles.reviewCount}>
@@ -827,7 +828,7 @@ const Home = (props) => {
                   />
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>

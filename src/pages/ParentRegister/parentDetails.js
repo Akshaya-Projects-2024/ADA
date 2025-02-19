@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   ScrollView,
@@ -21,20 +21,23 @@ import Location from "../../assets/svg/location.svg";
 import UploadImageModal from "../../components/UploadImageModal";
 import { decryptService } from "../../utils/storageFunc";
 import {
+  getProfile,
   saveParentDetails,
   uploadParentDocument,
 } from "../../redux-store/actions/auth";
 import { showToast } from "../../utils/utils";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getCurrentLocation } from "../../utils/geolocationUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
+import { dispatchUserData } from "../../redux-store/actions/registerAction";
 
 const ParentDetails = (props) => {
   const route = props?.route?.params?.route;
   const { parentProfie, providerProfile, logindetails } = useSelector(
     (state) => state?.commonReducer
   );
+  const dispatch = useDispatch();
 
   const { parentContact } = parentProfie;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -131,6 +134,25 @@ const ParentDetails = (props) => {
     }
   };
 
+  const fetchProfileData = useCallback(() => {
+    return new Promise(async (resolve) => {
+      try {
+        const obj = {
+          userid: await decryptService("userId"),
+        };
+        const response = await getProfile(obj);
+        if (response?.status === 200) {
+          dispatch(dispatchUserData(response?.data?.data));
+        }
+        console.log("res", response?.data?.data);
+        resolve(response?.data?.data ? response?.data?.data : false);
+      } catch (error) {
+        console.log("err111", error);
+        resolve(false);
+      }
+    });
+  });
+
   const onSubmit = async () => {
     if (!parentImg) {
       showToast("error", "Please upload parent profile picture");
@@ -167,6 +189,7 @@ const ParentDetails = (props) => {
           ...(parentContact?.id ? { id: parentContact?.id } : {}),
         };
         const res = await saveParentDetails(postData);
+        fetchProfileData();
         if (res?.data?.status_code == 200) {
           if (route === "parentAccount") {
             props.navigation.dispatch(StackActions.pop(1));
@@ -305,13 +328,15 @@ const ParentDetails = (props) => {
                 />
               </View>
 
-              <View style={{ paddingTop: moderateScale(16) }}>
+              {/* <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
                   label={Strings.location}
                   placeholderText={Strings.enterLocation}
                   rightIcon={<Location stroke={THEMES.colors.darkGrey} />}
+                    value={address}
+                  onChange={setAddress}
                 />
-              </View>
+              </View> */}
               <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
                   maxLength={6}

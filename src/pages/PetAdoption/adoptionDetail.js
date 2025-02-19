@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
+  Linking,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import { moderateScale } from "react-native-size-matters";
@@ -13,7 +14,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import Back from "../../assets/svg/back.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileDummy from "../../assets/svg/user.svg";
-
+import Call from "../../assets/svg/phoneCall.svg";
 
 const AdoptionDetail = (props) => {
   const selectedAdotpionData = props.route.params.selectedData;
@@ -130,9 +131,21 @@ const AdoptionDetail = (props) => {
                         {selectedAdotpionData?.parentname} -{" "}
                         {selectedAdotpionData?.parentlocation}
                       </Text>
+                      <View style={styles.rowDetail}>
                       <Text style={styles.mobileNoText}>
                         {selectedAdotpionData?.contactnumber}
                       </Text>
+                      <TouchableOpacity
+                        style={{marginHorizontal:moderateScale(10)}}
+                          onPress={() =>
+                            Linking.openURL(
+                              `tel:${selectedAdotpionData?.contactnumber}`
+                            )
+                          }
+                        >
+                          <Call />
+                        </TouchableOpacity>
+                        </View>
                     </View>
                   </View>
                 </View>
@@ -392,6 +405,11 @@ const styles = StyleSheet.create({
     color: THEMES.colors.blue,
     fontFamily: THEMES.fontFamily.regular,
     fontSize: THEMES.fonts.font12,
+  },
+  rowDetail: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: moderateScale(5),
   },
 });
 export default AdoptionDetail;

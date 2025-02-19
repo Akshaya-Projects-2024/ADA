@@ -309,8 +309,8 @@ const CreateEvent = () => {
           </View>
           <View style={styles.pt16}>
             <InputField
-              label={"Select whom to send"}
-              placeholderText={"Select"}
+              label={"Whom to send"}
+              placeholderText={"Enter"}
               // rightIcon={<ArrowDown stroke={THEMES.colors.darkGrey} />}
               value={audience}
               onChange={setAudience}

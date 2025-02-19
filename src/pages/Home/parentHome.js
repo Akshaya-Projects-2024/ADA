@@ -34,11 +34,16 @@ import { useDispatch, useSelector } from "react-redux";
 import Strings from "../../constants/strings";
 import { showToast, validArray } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
-import { getUpcomingAppointments } from "../../redux-store/actions/auth";
+import {
+  getServices,
+  getUpcomingAppointments,
+} from "../../redux-store/actions/auth";
 import moment from "moment";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { contextValue } from "../../components/Loader";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getMyTopics } from "../../redux-store/actions/topics";
+import { SvgUri } from "react-native-svg";
 const { width: screenWidth } = Dimensions.get("window");
 
 const services = [
@@ -46,29 +51,6 @@ const services = [
   { id: 2, title: "Behaviourist", icon: <Behaviourist /> },
   { id: 3, title: "Pet Walker", icon: <Walker /> },
   { id: 4, title: "Groomer", icon: <Groomer /> },
-];
-
-const Data = [
-  {
-    id: 1,
-    title: "Home Remedies for Tick Removal",
-    name: "Kartik Kumar",
-  },
-  {
-    id: 2,
-    title: "Problems Faced by Pets due to Ticks.",
-    name: "Soni Kapoor",
-  },
-  {
-    id: 3,
-    title: "Home Remedies for Tick Removal",
-    name: "Kartik Kumar",
-  },
-  {
-    id: 4,
-    title: "Problems Faced by Pets due to Ticks.",
-    name: "Soni Kapoor",
-  },
 ];
 
 const { width } = Dimensions.get("window");
@@ -80,17 +62,61 @@ const ParentHome = (props) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const { loggedInModule, guestUser } = useSelector((state) => state?.register);
   const profile = useSelector((state) => state?.commonReducer);
+  const [serviceListData, setServiceData] = useState([]);
+  const [trendingTopics, setTrendingTopics] = useState([]);
+
 
   useEffect(() => {
     if (isFocused) {
+      getTrendingTopics();
+      getServiceList();
       initData();
       dispatch(setLoggedInMoodule(LoginModules.parent));
     }
   }, [isFocused, dispatch]);
 
+  const getServiceList = async () => {
+    contextValue?.setLoader(true);
+    try {
+      const params = {
+        service: "",
+      };
+      const response = await getServices(params);
+      if (response?.status === 200) {
+        const output = response?.data?.data;
+        if (validArray(output)) {
+          const firstFour = output?.slice(0, 4);
+          setServiceData(firstFour);
+        }
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {
+      console.log("🚀 ~ initData ~ error:", error);
+      contextValue?.setLoader(false);
+      showToast("error", error?.message);
+    }
+  };
+
+  const getTrendingTopics = async () => {
+    contextValue?.setLoader(true);
+    let obj = {
+      userId: await decryptService("userId"),
+      searchtype: "topics",
+      keyword: "",
+    };
+    let res = await getMyTopics(obj);
+    if (res?.data?.data) {
+      let dataArray = res?.data?.data;
+      const firstFiveObjects = dataArray?.slice(0, 5);
+      setTrendingTopics(firstFiveObjects);
+    }
+    contextValue?.setLoader(false);
+  };
+
   const initData = async () => {
     try {
       contextValue?.setLoader(true);
+      
       const userId = await decryptService("userId");
       const params = {
         userid: userId,
@@ -107,6 +133,7 @@ const ParentHome = (props) => {
         });
         setAppointmentData(validArray(output) ? output : []);
       }
+
       contextValue?.setLoader(false);
     } catch (error) {
       contextValue?.setLoader(false);
@@ -117,7 +144,9 @@ const ParentHome = (props) => {
   const renderTrendingItem = ({ item, index }) => {
     return (
       <TouchableOpacity
-        onPress={() => props.navigation.navigate("trendDetail")}
+        onPress={() =>
+          props.navigation.navigate("trendDetail", { selectedData: item })
+        }
         style={{ flexDirection: "column" }}
       >
         <View
@@ -127,9 +156,11 @@ const ParentHome = (props) => {
           ]}
         >
           <Image
-            resizeMode="cover"
-            source={require("../../assets/images/dogImg.png")}
-            style={{ width: "100%" }}
+            source={{ uri: item.cover }}
+            style={{
+              width: "100%",
+              height: Dimensions.get("window").height * 0.3,
+            }}
           />
         </View>
         <View
@@ -154,7 +185,7 @@ const ParentHome = (props) => {
               paddingVertical: moderateScale(8),
             }}
           >
-            Home Remedies for Tick Removal
+            {item?.subject}
           </Text>
           <Text
             numberOfLines={2}
@@ -167,7 +198,7 @@ const ParentHome = (props) => {
               paddingBottom: moderateScale(5),
             }}
           >
-            Kartik Kumar
+            {item?.author}
           </Text>
         </View>
       </TouchableOpacity>
@@ -474,7 +505,9 @@ const ParentHome = (props) => {
           >
             <Bell />
             <Event
-              onPress={() => props.navigation.navigate("createEvent")}
+              onPress={() =>
+                props.navigation.navigate("auth", { screen: "createEvent" })
+              }
               style={{ marginLeft: moderateScale(17) }}
             />
           </View>
@@ -559,46 +592,57 @@ const ParentHome = (props) => {
             justifyContent: "center",
           }}
         >
-          {services.map((item, index) => {
-            const Icon = item.icon;
-            return (
-              <TouchableOpacity
-                key={`${item?.id}_${index}`}
-                style={styles.itemContainer}
-              >
-                <View style={styles.iconContainer}>{Icon}</View>
-                <Text style={styles.itemText}>{item.title}</Text>
-              </TouchableOpacity>
-            );
-          })}
+          {Boolean(serviceListData) && serviceListData?.length ?
+            serviceListData?.map((item, index) => {
+              return (
+                <TouchableOpacity
+                  style={styles.itemContainer}
+                  onPress={() =>
+                    props.navigation.navigate("service", {
+                      selectedService: item,
+                    })
+                  }
+                >
+                  <View style={styles.iconContainer}>
+                    <SvgUri width={35} height={35} uri={item?.logo} />
+                  </View>
+                  <Text numberOfLines={1} style={styles.itemText}>
+                    {item?.service}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }) : null}
         </View>
-        <View
-          style={{
-            marginHorizontal: moderateScale(16),
-            marginBottom: moderateScale(10),
-            marginTop: moderateScale(30),
-          }}
-        >
-          <Text
+      
+        {Boolean(trendingTopics) && trendingTopics?.length ?  (
+          <View
             style={{
-              fontFamily: THEMES.fontFamily.semiBold,
-              fontSize: THEMES.fonts.font14,
-              color: THEMES.colors.black,
-              marginBottom: moderateScale(13),
+              marginHorizontal: moderateScale(16),
+              marginBottom: moderateScale(10),
+              marginTop: moderateScale(30),
             }}
           >
-            Find Out What’s Trending
-          </Text>
-          <FlatList
-            showsHorizontalScrollIndicator={false}
-            data={Data}
-            horizontal={true}
-            showsVerticalScrollIndicator={false}
-            bounces={false}
-            renderItem={renderTrendingItem}
-            keyExtractor={(item) => item.id}
-          />
-        </View>
+            <Text
+              style={{
+                fontFamily: THEMES.fontFamily.semiBold,
+                fontSize: THEMES.fonts.font14,
+                color: THEMES.colors.black,
+                marginBottom: moderateScale(13),
+              }}
+            >
+              Find Out What’s Trending
+            </Text>
+            <FlatList
+              showsHorizontalScrollIndicator={false}
+              data={trendingTopics}
+              horizontal={true}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              renderItem={renderTrendingItem}
+              keyExtractor={(item) => item.id}
+            />
+          </View>
+        ): null}
       </ScrollView>
     </SafeAreaView>
   );

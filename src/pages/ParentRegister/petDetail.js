@@ -65,7 +65,6 @@ const PetDetail = (props) => {
   const initData = () => {
     if (validArray(petDetails)) {
       const firstPet = petDetails[0];
-      console.log("🚀 ~ initData ~ firstPet:", firstPet);
       if (firstPet?.about) {
         setPetDescription(firstPet?.about);
       }

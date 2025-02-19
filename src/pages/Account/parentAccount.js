@@ -173,7 +173,6 @@ const ParentAccount = (props) => {
           }
           // showBack
           title={Strings.myAccount}
-          showSearch
           bgColor="transparent"
         />
         <StatusBar
@@ -278,7 +277,7 @@ const ParentAccount = (props) => {
                     <Star />,
                     "Reviews",
                     "addBottom",
-                    "clientReview"
+                    "parentReviews"
                   )}
                 </View>
               </View>

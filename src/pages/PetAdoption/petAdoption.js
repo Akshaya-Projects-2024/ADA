@@ -213,6 +213,7 @@ const PetAdoption = (props) => {
     );
   };
   return (
+
     <View style={styles.container}>
       <SafeAreaView style={{ flex: 1 }}>
         <StatusBar backgroundColor={THEMES.colors.bgColor} />
@@ -440,6 +441,7 @@ const PetAdoption = (props) => {
         }}
       />
     </View>
+
   );
 };
 

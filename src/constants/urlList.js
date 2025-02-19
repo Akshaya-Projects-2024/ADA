@@ -40,4 +40,10 @@ export const urlList = {
   contactPage: "feedback/getcontactusdetails",
   writeUs: "feedback/addwritetous",
   feedback: "feedback/addFeedback",
+  globalReviews:'global/reviews',
+  addReview:"parent/addreview",
+  replyReview:'provider/updatereview',
+  reviewGiven:'parent/reviewgiven',
+  appointmentById:'appointment/getbyid',
+  deleteAccount:'register/deleteaccount'
 };

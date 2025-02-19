@@ -25,6 +25,7 @@ import IntroScreens from "../pages/Authentication/IntroScreens";
 import messaging from "@react-native-firebase/messaging";
 import PushNotification from "react-native-push-notification";
 import { showNotification } from "../utils/pushNotificationUtils";
+import ParentReviews from "../pages/ClientReviews/parentReviews";
 
 const Stack = createStackNavigator();
 
@@ -192,6 +193,12 @@ const Routes = (props) => {
         <Stack.Screen
           name="feedback"
           component={Feedback}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="parentReviews"
+          component={ParentReviews}
           options={navOptionHandler}
         />
       </Stack.Navigator>

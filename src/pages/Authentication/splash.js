@@ -70,6 +70,7 @@ const Splash = (props) => {
         const response = await getProfile(obj);
         if (response?.status === 200) {
           dispatch(dispatchUserData(response?.data?.data));
+          console.log("response?.data?.data",response?.data?.data)
         }
         resolve(response?.data?.data ? response?.data?.data : false);
       } catch (error) {

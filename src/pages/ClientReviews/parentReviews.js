@@ -20,23 +20,29 @@ import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
+    addReview,
   getAllReviews,
   replyReviewApi,
+  reviewGiven,
 } from "../../redux-store/actions/reviews";
 import { findDifferenceByDays, showToast } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
 import { useSelector } from "react-redux";
-import { contextValue } from "../../components/Loader";
 
-const ClientReview = () => {
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [globalReviews, setGlobalReviews] = useState();
-  const { providerProfile, profileData } = useSelector(
+const ParentReviews = () => {
+  const [reviewList, setReviewList] = useState([]);
+  const [review, setReview] = useState([]);
+  const { providerProfile, profileData,logindetails } = useSelector(
     ({ commonReducer }) => commonReducer
   );
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const [modalData, setModalData] = useState();
   const [comment, setComment] = useState();
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    initData();
+  }, []);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -50,9 +56,40 @@ const ClientReview = () => {
         ""
       ),
     [profileData?.providerBusiness?.services]
+    
   );
 
+  const initData = async () => {
+    let obj = {
+      createdby: await decryptService("userId"),
+    };
+    let res = await reviewGiven(obj);
+    if (res?.data?.length) {
+      setReviewList(res?.data);
+    }
+  };
+
+
+
+  const replyReviewBtn = async () => {
+    const userId = await decryptService("userId");
+    let obj = {
+      provider: "9769487604",
+      "rating": "2",
+      reply: comment,
+    };
+    console.log(obj)
+    let res = await addReview(obj);
+    if (res?.data?.status_code !== 200) {
+      setModalVisible(false);
+      showToast("success", res?.data?.message);
+    } else {
+      setModalVisible(false);
+    }
+  };
+
   const renderItem = (item) => {
+    console.log("ite", item)
     return (
       <>
         <View style={styles.flatlistView}>
@@ -157,215 +194,134 @@ const ClientReview = () => {
     );
   };
 
-  const listHeader = () => {
-    const data = globalReviews?.providerRatingCount;
-    return (
-      <>
-        <View style={styles.headerView}>
-          <View style={styles.headerRow}>
-            <View style={styles.w25}>
-              <Text style={styles.reviewCount}>
-                {globalReviews?.totalratingcount}
-              </Text>
-              <Text style={styles.reviewsText}>
-                {globalReviews?.reviews?.length == 0
-                  ? "0"
-                  : globalReviews?.reviews?.length}{" "}
-                Reviews
-              </Text>
-            </View>
-            <View style={styles.line} />
-            <View style={styles.w70}>
-              <ReviewComponent
-                reviewData={[
-                  { stars: 5, count: data?.five ? data?.five : 0 },
-                  { stars: 4, count: data?.four ? data?.four : 0 },
-                  { stars: 3, count: data?.three ? data?.three : 0 },
-                  { stars: 2, count: data?.two ? data?.two : 0 },
-                  { stars: 1, count: data?.one ? data?.one : 0 },
-                ]}
-                totalReviews={5}
-              />
-            </View>
-          </View>
-        </View>
-        <View style={styles.dropdownMainView}>
-          <View style={styles.dropDownRow}>
-            <View style={styles.w35}>
-              <Dropdown
-                dropdownData={[
-                  { label: "All Rating", value: "1" },
-                  { label: "1 Star", value: "2" },
-                  { label: "2 Star", value: "3" },
-                  { label: "3 Star", value: "4" },
-                  { label: "4 Star", value: "5" },
-                  { label: "5 Star", value: "6" },
-                ]}
-              />
-            </View>
-            <View style={styles.w40}>
-              <Dropdown
-                width={120}
-                dropdownData={[
-                  { label: "Most Recent", value: "1" },
-                  { label: "Most Relevant", value: "2" },
-                  { label: "Filter by Service", value: "3" },
-                ]}
-              />
-            </View>
-          </View>
-        </View>
-      </>
-    );
-  };
-
-  useEffect(() => {
-    initData();
-  }, []);
-
-  useEffect(() => {
-    if (!isModalVisible) {
-      initData();
-    }
-  }, [isModalVisible]);
-
-  initData = async () => {
-    try {
-      contextValue.setLoader(true);
-      const userId = await decryptService("userId");
-      let obj = {
-        userId: userId,
-        vendor: userId,
-        sortBy: "newest",
-        pageNum: 1,
-        pageSize: 20,
-      };
-      let res = await getAllReviews(obj);
-      if (Boolean(res)) {
-        contextValue.setLoader(false);
-        setGlobalReviews(res);
-      }else{
-          contextValue.setLoader(false);
-      }
-    } catch (error) {
-      contextValue.setLoader(false);
-    }
-  };
-
-  const replyReviewBtn = async () => {
-    const userId = await decryptService("userId");
-    let obj = {
-      provider: userId,
-      id: modalData.item.id,
-      reply: comment,
-    };
-    let res = await replyReviewApi(obj);
-    if (res?.data?.status_code !== 200) {
-      setModalVisible(false);
-      showToast("success", res?.data?.message);
-    } else {
-      setModalVisible(false);
-    }
-  };
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
+      <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
         <StatusBar backgroundColor={THEMES.colors.bgColor} />
         <Header
-          title={Strings.clientReviews}
+          title={"Reviews"}
           showBack
           bgColor="transparent"
           fontColor={THEMES.colors.black}
         />
-        <View style={styles.mainView}>
-          <FlatList
-            data={globalReviews?.reviews}
-            showsVerticalScrollIndicator={false}
-            bounces={false}
-            ListHeaderComponent={listHeader}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-          />
-        </View>
-        <Modal
-          animationType="none"
-          onBackButtonPress={toggleModal}
-          isVisible={isModalVisible}
-          style={styles.modal}
+        <View
+          style={{
+            flex: 1,
+            paddingTop: moderateScale(20),
+            paddingHorizontal: moderateScale(20),
+          }}
         >
-          <ScrollView
-            contentContainerStyle={{ justifyContent: "flex-end", flexGrow: 1 }}
-          >
-            <View style={styles.modalContent}>
-              <View style={styles.modalView}>
-                <View style={styles.modalRow}>
-                  <View style={styles.row}>
-                    <View style={styles.imgView}>
-                      <Image
-                        style={styles.img}
-                        source={{ uri: modalData?.item?.parentprofile }}
-                      />
-                    </View>
-                    <View style={{ marginLeft: moderateScale(8) }}>
-                      <View style={styles.nameRow}>
-                        <Text style={styles.nameText}>
-                          {modalData?.item?.parentname}
-                        </Text>
-                        <View>
-                          <StarRating
-                            starStyle={{
-                              paddingHorizontal: moderateScale(1.5),
-                            }}
-                            disabled={true} // Disable interaction
-                            maxStars={5}
-                            rating={modalData?.item?.rating} // Set the rating value
-                            fullStarColor={THEMES.colors.orange} // Customize star color
-                            starSize={16} // Customize star size
-                          />
-                        </View>
-                      </View>
+          {reviewList?.length == 0 && (
+            <InputField
+              label={"Review"}
+              placeholderText={"Please give your review"}
+              multiline={true}
+              value={review}
+              onChange={setReview}
+            />
+          )}
 
-                      <Text style={styles.profileTypeText}>
-                        {modalData?.item?.patname}
-                      </Text>
+          <View style={styles.mainView}>
+            <FlatList
+              data={reviewList}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+            />
+          </View>
+
+          <Modal
+            animationType="none"
+            onBackButtonPress={toggleModal}
+            isVisible={isModalVisible}
+            style={styles.modal}
+          >
+            <ScrollView
+              contentContainerStyle={{
+                justifyContent: "flex-end",
+                flexGrow: 1,
+              }}
+            >
+              <View style={styles.modalContent}>
+                <View style={styles.modalView}>
+                  <View style={styles.modalRow}>
+                    <View style={styles.row}>
+                      <View style={styles.imgView}>
+                        <Image
+                          style={styles.img}
+                          source={{ uri: modalData?.item?.parentprofile }}
+                        />
+                      </View>
+                      <View style={{ marginLeft: moderateScale(8) }}>
+                        <View style={styles.nameRow}>
+                          <Text style={styles.nameText}>
+                            {modalData?.item?.parentname}
+                          </Text>
+                          <View>
+                            <StarRating
+                              starStyle={{
+                                paddingHorizontal: moderateScale(1.5),
+                              }}
+                              disabled={true} // Disable interaction
+                              maxStars={5}
+                              rating={modalData?.item?.rating} // Set the rating value
+                              fullStarColor={THEMES.colors.orange} // Customize star color
+                              starSize={16} // Customize star size
+                            />
+                          </View>
+                        </View>
+
+                        <Text style={styles.profileTypeText}>
+                          {modalData?.item?.patname}
+                        </Text>
+                      </View>
                     </View>
                   </View>
+                  <View>
+                    <Text style={styles.commentText}>
+                      {modalData?.item?.remark}
+                    </Text>
+                  </View>
+                  <View style={styles.commentDaysView}>
+                    <Text style={styles.commentDayText}>
+                      {`${findDifferenceByDays(modalData?.item?.createdon)}` >
+                      50
+                        ? "Few days ago"
+                        : `${findDifferenceByDays(
+                            modalData?.item?.createdon
+                          )}d`}{" "}
+                      {}
+                    </Text>
+                  </View>
                 </View>
-                <View>
-                  <Text style={styles.commentText}>
-                    {modalData?.item?.remark}
-                  </Text>
+                <View style={styles.commentView}>
+                  <InputField
+                    label={Strings.comments}
+                    placeholderText={Strings.enterYourCommentHere}
+                    multiline={true}
+                    value={comment}
+                    onChange={setComment}
+                  />
                 </View>
-                <View style={styles.commentDaysView}>
-                  <Text style={styles.commentDayText}>
-                    {`${findDifferenceByDays(modalData?.item?.createdon)}` > 50
-                      ? "Few days ago"
-                      : `${findDifferenceByDays(
-                          modalData?.item?.createdon
-                        )}d`}{" "}
-                    {}
-                  </Text>
+                <View style={styles.btnView}>
+                  <Button
+                    title={Strings.reply}
+                    onPress={() => replyReviewBtn()}
+                  />
                 </View>
               </View>
-              <View style={styles.commentView}>
-                <InputField
-                  label={Strings.comments}
-                  placeholderText={Strings.enterYourCommentHere}
-                  multiline={true}
-                  value={comment}
-                  onChange={setComment}
-                />
-              </View>
-              <View style={styles.btnView}>
-                <Button
-                  title={Strings.reply}
-                  onPress={() => replyReviewBtn()}
-                />
-              </View>
-            </View>
-          </ScrollView>
-        </Modal>
+            </ScrollView>
+          </Modal>
+        </View>
+        <View
+          style={{
+            marginHorizontal: moderateScale(16),
+            marginBottom: moderateScale(10),
+          }}
+        >
+          <Button title={"Submit"} onPress={() => replyReviewBtn()} />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -378,8 +334,6 @@ const styles = StyleSheet.create({
   },
   mainView: {
     flex: 1,
-    paddingTop: moderateScale(30),
-    paddingHorizontal: moderateScale(20),
   },
   modal: {
     justifyContent: "flex-end",
@@ -668,4 +622,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ClientReview;
+export default ParentReviews;

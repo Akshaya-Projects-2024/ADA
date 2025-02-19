@@ -30,6 +30,7 @@ import { decryptService } from "../../utils/storageFunc";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useSelector } from "react-redux";
 import { contextValue } from "../../components/Loader";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const SESSION_TYPE = { oneTime: "one_time", recursive: "recursive" };
 
@@ -255,319 +256,322 @@ const SelectAppointment = ({ navigation, route }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header
-        title={"Select Appointment"}
-        showBack
-        fontColor="#EC559C"
-        bgColor="transparent"
-      />
-      <ScrollView
-        style={styles.flex}
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-      >
-        <View
-          style={{
-            paddingTop: moderateScale(15),
-            paddingHorizontal: moderateScale(16),
-          }}
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header
+          title={"Select Appointment"}
+          showBack
+          fontColor="#EC559C"
+          bgColor="transparent"
+        />
+        <ScrollView
+          style={styles.flex}
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.headerText}>Category</Text>
-          <FlatList
-            data={selectedProvider?.profile?.ProviderSession?.availableat ?? []}
-            renderItem={renderCategory}
-            keyExtractor={(item) => item}
-            horizontal={false}
-            contentContainerStyle={styles.categoryList}
-          />
-        </View>
-        <Pressable
-          onPress={handleSwitch}
-          style={{
-            marginHorizontal: moderateScale(14),
-            paddingTop: moderateScale(20),
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Text style={styles.headerTextV2}>{Strings.oneSession}</Text>
-          {sessionSelection === SESSION_TYPE.oneTime ? (
-            <SwitchOn />
-          ) : (
-            <SwitchOff />
-          )}
-          <Text style={styles.headerTextV2}>{Strings.dailySession}</Text>
-        </Pressable>
-        {sessionSelection === SESSION_TYPE.recursive ? (
-          <View style={styles.pickerContainer}>
-            <Pressable
-              style={styles.flex}
-              onPress={() => {
-                setStartDateVisible(true);
-              }}
-            >
-              <InputField
-                label={Strings.startDate}
-                placeholderText={"--"}
-                value={
-                  startDate ? moment(startDate)?.format("YYYY-MM-DD") : null
-                }
-                type="small"
-                inputStyle={styles.startDateInput}
-                editable={false}
-              />
-            </Pressable>
-            <Pressable
-              style={styles.flex}
-              onPress={() => {
-                setEndDateVisible(true);
-              }}
-            >
-              <InputField
-                label={Strings.endDate}
-                placeholderText={"--"}
-                value={endDate ? moment(endDate)?.format("YYYY-MM-DD") : null}
-                type="small"
-                inputStyle={styles.endDateInput}
-                editable={false}
-              />
-            </Pressable>
-          </View>
-        ) : null}
-        {validArray(weekDates) ? (
           <View
+            style={{
+              paddingTop: moderateScale(15),
+              paddingHorizontal: moderateScale(16),
+            }}
+          >
+            <Text style={styles.headerText}>Category</Text>
+            <FlatList
+              data={
+                selectedProvider?.profile?.ProviderSession?.availableat ?? []
+              }
+              renderItem={renderCategory}
+              keyExtractor={(item) => item}
+              horizontal={false}
+              contentContainerStyle={styles.categoryList}
+            />
+          </View>
+          <Pressable
+            onPress={handleSwitch}
             style={{
               marginHorizontal: moderateScale(14),
               paddingTop: moderateScale(20),
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
             }}
           >
-            <Text style={styles.headerText}>Date</Text>
-            <ScrollView
-              horizontal
-              bounces={false}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.scrollContainer}
-            >
-              {weekDates.map((date, index) => {
-                const isToday = date.isSame(moment(), "day");
-                const isSelected = date.isSame(selectedDate, "day");
-                return (
-                  <TouchableOpacity
-                    onPress={() => handleDatePress(date)}
-                    key={index}
-                    style={[
-                      styles.dateContainer,
-                      isSelected ? styles.selectedDate : null, // Highlight selected date
-                      isToday && !isSelected ? styles.activeDate : null, // Highlight current date if it's not selected
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.dayText,
-                        isSelected ? styles.selectedDayText : null, // Highlight selected day text
-                        isToday && !isSelected ? styles.activeDayText : null, // Highlight today's text
-                      ]}
-                    >
-                      {date.format("ddd")}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.dateText,
-                        isSelected ? styles.selectedDateText : null, // Highlight selected date text
-                        isToday && !isSelected ? styles.activeDateText : null, // Highlight today's text
-                      ]}
-                    >
-                      {date.format("D")}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          </View>
-        ) : null}
-        <>
-          {validArray(memorizedSlots?.morning) ? (
-            <View
-              style={{
-                paddingTop: moderateScale(20),
-                paddingHorizontal: moderateScale(16),
-              }}
-            >
-              <Text
-                style={{
-                  color: THEMES.colors.black,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                  fontSize: THEMES.fonts.font14,
-                  paddingBottom: moderateScale(5),
-                  paddingHorizontal: moderateScale(5),
+            <Text style={styles.headerTextV2}>{Strings.oneSession}</Text>
+            {sessionSelection === SESSION_TYPE.oneTime ? (
+              <SwitchOn />
+            ) : (
+              <SwitchOff />
+            )}
+            <Text style={styles.headerTextV2}>{Strings.dailySession}</Text>
+          </Pressable>
+          {sessionSelection === SESSION_TYPE.recursive ? (
+            <View style={styles.pickerContainer}>
+              <Pressable
+                style={styles.flex}
+                onPress={() => {
+                  setStartDateVisible(true);
                 }}
               >
-                Morning
-              </Text>
-              <View style={styles.timeSlotRow}>
-                {memorizedSlots?.morning?.map((slot, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={[
-                      styles.timeSlot,
-                      !slot?.isavailable && styles.disabledSlot,
-                      slot?.isbooked && styles.bookedSlot,
-                      selectedSlot?.start_time === slot?.start_time &&
-                        !slot?.isbooked &&
-                        styles.selectedSlotStyle,
-                    ]}
-                    onPress={() => selectTimeSlot(slot)}
-                    disabled={slot?.isbooked} // Disable if the slot is marked as disabled
-                  >
-                    <Text
-                      style={[
-                        slot?.isbooked && styles.disabledText,
-                        {
-                          color:
-                            selectedSlot?.start_time === slot?.start_time
-                              ? "#fff"
-                              : slot?.isavailable || slot?.isbooked
-                              ? "#000"
-                              : "#fff",
-                          fontSize: THEMES.fonts.font12,
-                          fontFamily: THEMES.fontFamily.medium,
-                        },
-                      ]}
-                    >
-                      {slot?.start_time}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+                <InputField
+                  label={Strings.startDate}
+                  placeholderText={"--"}
+                  value={
+                    startDate ? moment(startDate)?.format("YYYY-MM-DD") : null
+                  }
+                  type="small"
+                  inputStyle={styles.startDateInput}
+                  editable={false}
+                />
+              </Pressable>
+              <Pressable
+                style={styles.flex}
+                onPress={() => {
+                  setEndDateVisible(true);
+                }}
+              >
+                <InputField
+                  label={Strings.endDate}
+                  placeholderText={"--"}
+                  value={endDate ? moment(endDate)?.format("YYYY-MM-DD") : null}
+                  type="small"
+                  inputStyle={styles.endDateInput}
+                  editable={false}
+                />
+              </Pressable>
             </View>
           ) : null}
+          {validArray(weekDates) ? (
+            <View
+              style={{
+                marginHorizontal: moderateScale(14),
+                paddingTop: moderateScale(20),
+              }}
+            >
+              <Text style={styles.headerText}>Date</Text>
+              <ScrollView
+                horizontal
+                bounces={false}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContainer}
+              >
+                {weekDates.map((date, index) => {
+                  const isToday = date.isSame(moment(), "day");
+                  const isSelected = date.isSame(selectedDate, "day");
+                  return (
+                    <TouchableOpacity
+                      onPress={() => handleDatePress(date)}
+                      key={index}
+                      style={[
+                        styles.dateContainer,
+                        isSelected ? styles.selectedDate : null, // Highlight selected date
+                        isToday && !isSelected ? styles.activeDate : null, // Highlight current date if it's not selected
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.dayText,
+                          isSelected ? styles.selectedDayText : null, // Highlight selected day text
+                          isToday && !isSelected ? styles.activeDayText : null, // Highlight today's text
+                        ]}
+                      >
+                        {date.format("ddd")}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.dateText,
+                          isSelected ? styles.selectedDateText : null, // Highlight selected date text
+                          isToday && !isSelected ? styles.activeDateText : null, // Highlight today's text
+                        ]}
+                      >
+                        {date.format("D")}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          ) : null}
+          <>
+            {validArray(memorizedSlots?.morning) ? (
+              <View
+                style={{
+                  paddingTop: moderateScale(20),
+                  paddingHorizontal: moderateScale(16),
+                }}
+              >
+                <Text
+                  style={{
+                    color: THEMES.colors.black,
+                    fontFamily: THEMES.fontFamily.semiBold,
+                    fontSize: THEMES.fonts.font14,
+                    paddingBottom: moderateScale(5),
+                    paddingHorizontal: moderateScale(5),
+                  }}
+                >
+                  Morning
+                </Text>
+                <View style={styles.timeSlotRow}>
+                  {memorizedSlots?.morning?.map((slot, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={[
+                        styles.timeSlot,
+                        !slot?.isavailable && styles.disabledSlot,
+                        slot?.isbooked && styles.bookedSlot,
+                        selectedSlot?.start_time === slot?.start_time &&
+                          !slot?.isbooked &&
+                          styles.selectedSlotStyle,
+                      ]}
+                      onPress={() => selectTimeSlot(slot)}
+                      disabled={slot?.isbooked} // Disable if the slot is marked as disabled
+                    >
+                      <Text
+                        style={[
+                          slot?.isbooked && styles.disabledText,
+                          {
+                            color:
+                              selectedSlot?.start_time === slot?.start_time
+                                ? "#fff"
+                                : slot?.isavailable || slot?.isbooked
+                                ? "#000"
+                                : "#fff",
+                            fontSize: THEMES.fonts.font12,
+                            fontFamily: THEMES.fontFamily.medium,
+                          },
+                        ]}
+                      >
+                        {slot?.start_time}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            ) : null}
 
-          {validArray(memorizedSlots?.afternoon) ? (
-            <View
-              style={{
-                paddingTop: moderateScale(20),
-                paddingHorizontal: moderateScale(16),
-              }}
-            >
-              <Text
+            {validArray(memorizedSlots?.afternoon) ? (
+              <View
                 style={{
-                  color: THEMES.colors.black,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                  fontSize: THEMES.fonts.font14,
-                  paddingBottom: moderateScale(5),
-                  paddingHorizontal: moderateScale(5),
+                  paddingTop: moderateScale(20),
+                  paddingHorizontal: moderateScale(16),
                 }}
               >
-                Afternoon
-              </Text>
+                <Text
+                  style={{
+                    color: THEMES.colors.black,
+                    fontFamily: THEMES.fontFamily.semiBold,
+                    fontSize: THEMES.fonts.font14,
+                    paddingBottom: moderateScale(5),
+                    paddingHorizontal: moderateScale(5),
+                  }}
+                >
+                  Afternoon
+                </Text>
 
-              <View style={styles.timeSlotRow}>
-                {memorizedSlots?.afternoon?.map((slot, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={[
-                      styles.timeSlot,
-                      !slot?.isavailable && styles.disabledSlot,
-                      slot?.isbooked && styles.bookedSlot,
-                      selectedSlot?.start_time === slot?.start_time &&
-                        !slot?.isbooked &&
-                        styles.selectedSlotStyle,
-                    ]}
-                    onPress={() => selectTimeSlot(slot)}
-                    disabled={slot?.isbooked} // Disable if the slot is marked as disabled
-                  >
-                    <Text
+                <View style={styles.timeSlotRow}>
+                  {memorizedSlots?.afternoon?.map((slot, index) => (
+                    <TouchableOpacity
+                      key={index}
                       style={[
-                        slot?.isbooked && styles.disabledText,
-                        {
-                          color:
-                            selectedSlot?.start_time === slot?.start_time
-                              ? "#fff"
-                              : slot?.isavailable || slot?.isbooked
-                              ? "#000"
-                              : "#fff",
-                          fontSize: THEMES.fonts.font12,
-                          fontFamily: THEMES.fontFamily.medium,
-                        },
+                        styles.timeSlot,
+                        !slot?.isavailable && styles.disabledSlot,
+                        slot?.isbooked && styles.bookedSlot,
+                        selectedSlot?.start_time === slot?.start_time &&
+                          !slot?.isbooked &&
+                          styles.selectedSlotStyle,
                       ]}
+                      onPress={() => selectTimeSlot(slot)}
+                      disabled={slot?.isbooked} // Disable if the slot is marked as disabled
                     >
-                      {slot?.start_time}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                      <Text
+                        style={[
+                          slot?.isbooked && styles.disabledText,
+                          {
+                            color:
+                              selectedSlot?.start_time === slot?.start_time
+                                ? "#fff"
+                                : slot?.isavailable || slot?.isbooked
+                                ? "#000"
+                                : "#fff",
+                            fontSize: THEMES.fonts.font12,
+                            fontFamily: THEMES.fontFamily.medium,
+                          },
+                        ]}
+                      >
+                        {slot?.start_time}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
-            </View>
-          ) : null}
-          {validArray(memorizedSlots?.evening) ? (
-            <View
-              style={{
-                paddingTop: moderateScale(20),
-                paddingHorizontal: moderateScale(16),
-              }}
-            >
-              <Text
+            ) : null}
+            {validArray(memorizedSlots?.evening) ? (
+              <View
                 style={{
-                  color: THEMES.colors.black,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                  fontSize: THEMES.fonts.font14,
-                  paddingBottom: moderateScale(5),
-                  paddingHorizontal: moderateScale(5),
+                  paddingTop: moderateScale(20),
+                  paddingHorizontal: moderateScale(16),
                 }}
               >
-                Evening
-              </Text>
-              <View style={styles.timeSlotRow}>
-                {memorizedSlots.evening.map((slot, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={[
-                      styles.timeSlot,
-                      !slot?.isavailable && styles.disabledSlot,
-                      slot?.isbooked && styles.bookedSlot,
-                      selectedSlot?.start_time === slot?.start_time &&
-                        !slot?.isbooked &&
-                        styles.selectedSlotStyle,
-                    ]}
-                    onPress={() => selectTimeSlot(slot)}
-                    disabled={slot?.isbooked} // Disable if the slot is marked as disabled
-                  >
-                    <Text
+                <Text
+                  style={{
+                    color: THEMES.colors.black,
+                    fontFamily: THEMES.fontFamily.semiBold,
+                    fontSize: THEMES.fonts.font14,
+                    paddingBottom: moderateScale(5),
+                    paddingHorizontal: moderateScale(5),
+                  }}
+                >
+                  Evening
+                </Text>
+                <View style={styles.timeSlotRow}>
+                  {memorizedSlots.evening.map((slot, index) => (
+                    <TouchableOpacity
+                      key={index}
                       style={[
-                        slot?.isbooked && styles.disabledText,
-                        {
-                          color:
-                            selectedSlot?.start_time === slot?.start_time
-                              ? "#fff"
-                              : slot?.isavailable || slot?.isbooked
-                              ? "#000"
-                              : "#fff",
-                          fontSize: THEMES.fonts.font12,
-                          fontFamily: THEMES.fontFamily.medium,
-                        },
+                        styles.timeSlot,
+                        !slot?.isavailable && styles.disabledSlot,
+                        slot?.isbooked && styles.bookedSlot,
+                        selectedSlot?.start_time === slot?.start_time &&
+                          !slot?.isbooked &&
+                          styles.selectedSlotStyle,
                       ]}
+                      onPress={() => selectTimeSlot(slot)}
+                      disabled={slot?.isbooked} // Disable if the slot is marked as disabled
                     >
-                      {slot?.start_time}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                      <Text
+                        style={[
+                          slot?.isbooked && styles.disabledText,
+                          {
+                            color:
+                              selectedSlot?.start_time === slot?.start_time
+                                ? "#fff"
+                                : slot?.isavailable || slot?.isbooked
+                                ? "#000"
+                                : "#fff",
+                            fontSize: THEMES.fonts.font12,
+                            fontFamily: THEMES.fontFamily.medium,
+                          },
+                        ]}
+                      >
+                        {slot?.start_time}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
-            </View>
-          ) : null}
-        </>
+            ) : null}
+          </>
+         
+        </ScrollView>
         <View
-          style={{
-            flexDirection: "row",
-            marginTop: moderateScale(50),
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginHorizontal: moderateScale(20),
-          }}
-        >
-          <TouchableOpacity
+            style={{
+              marginHorizontal: moderateScale(20),
+              bottom: 0,
+              marginBottom:moderateScale(20)
+            }}
+          >
+            {/* <TouchableOpacity
             onPress={null}
             style={{
               borderWidth: 1,
@@ -581,82 +585,84 @@ const SelectAppointment = ({ navigation, route }) => {
             }}
           >
             <Chat />
-          </TouchableOpacity>
-          <View style={{ width: "80%" }}>
+          </TouchableOpacity> */}
+
             <Button title="Confirm" onPress={handleSubmit} />
           </View>
-        </View>
-      </ScrollView>
-      <Modal
-        isVisible={modalVisible}
-        backdropOpacity={0.5}
-        onBackdropPress={() => setModalVisible(false)}
-        style={{ margin: 0, flex: 1, justifyContent: "flex-end" }}
-      >
-        <View
-          style={{
-            elevation: 5,
-            borderTopWidth: 1,
-            borderTopColor: "transparent",
-            width: "100%",
-            margin: 0,
-            borderTopRightRadius: 50,
-            shadowColor: "#000",
-            justifyContent: "flex-end",
-            padding: moderateScale(20),
-            backgroundColor: THEMES.colors.bgColor,
-          }}
+        <Modal
+          isVisible={modalVisible}
+          backdropOpacity={0.5}
+          onBackdropPress={() => setModalVisible(false)}
+          style={{ margin: 0, flex: 1, justifyContent: "flex-end" }}
         >
           <View
             style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
+              elevation: 5,
+              borderTopWidth: 1,
+              borderTopColor: "transparent",
+              width: "100%",
+              margin: 0,
+              borderTopRightRadius: 50,
+              shadowColor: "#000",
+              justifyContent: "flex-end",
+              padding: moderateScale(20),
+              backgroundColor: THEMES.colors.bgColor,
             }}
           >
-            <Text
+            <View
               style={{
-                color: THEMES.colors.black,
-                fontFamily: THEMES.fontFamily.semiBold,
-                fontSize: THEMES.fonts.font14,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              Promo code
-            </Text>
-            <Text
-              style={{
-                color: THEMES.colors.black,
-                fontFamily: THEMES.fontFamily.regular,
-                fontSize: THEMES.fonts.font14,
-              }}
-            >
-              ₹ 1000/Per session
-            </Text>
+              <Text
+                style={{
+                  color: THEMES.colors.black,
+                  fontFamily: THEMES.fontFamily.semiBold,
+                  fontSize: THEMES.fonts.font14,
+                }}
+              >
+                Promo code
+              </Text>
+              <Text
+                style={{
+                  color: THEMES.colors.black,
+                  fontFamily: THEMES.fontFamily.regular,
+                  fontSize: THEMES.fonts.font14,
+                }}
+              >
+                ₹ 1000/Per session
+              </Text>
+            </View>
+            <View style={{ paddingVertical: moderateScale(30) }}>
+              <InputField
+                label={"Promo code"}
+                placeholderText={"Enter your code"}
+              />
+            </View>
+            <Button
+              title="Apply"
+              onPress={() => setModalVisible(false)}
+            ></Button>
           </View>
-          <View style={{ paddingVertical: moderateScale(30) }}>
-            <InputField
-              label={"Promo code"}
-              placeholderText={"Enter your code"}
-            />
-          </View>
-          <Button title="Apply" onPress={() => setModalVisible(false)}></Button>
-        </View>
-      </Modal>
-      <DateTimePickerModal
-        isVisible={startDateVisible}
-        mode="date"
-        onConfirm={handleStartDateConfirm}
-        onCancel={hideStartDatePicker}
-        minimumDate={new Date()}
-      />
-      <DateTimePickerModal
-        isVisible={endDateVisible}
-        mode="date"
-        onConfirm={handleEndDateConfirm}
-        onCancel={hideEndDatePicker}
-        minimumDate={startDate || new Date()}
-      />
-    </View>
+        </Modal>
+        <DateTimePickerModal
+          isVisible={startDateVisible}
+          mode="date"
+          onConfirm={handleStartDateConfirm}
+          onCancel={hideStartDatePicker}
+          minimumDate={new Date()}
+        />
+        <DateTimePickerModal
+          isVisible={endDateVisible}
+          mode="date"
+          onConfirm={handleEndDateConfirm}
+          onCancel={hideEndDatePicker}
+          minimumDate={startDate || new Date()}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ImageBackground,
+  Linking,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import { moderateScale } from "react-native-size-matters";
@@ -15,126 +16,187 @@ import Msg from "../../assets/svg/msgSquareText.svg";
 import Call from "../../assets/svg/phoneCall.svg";
 import RightArrow from "../../assets/svg/arrowRight.svg";
 import More from "../../assets/svg/more.svg";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { decryptService } from "../../utils/storageFunc";
+import { getAppointmentById } from "../../redux-store/actions/auth";
+import { contextValue } from "../../components/Loader";
 
-const Data = ["Vaccinations", "Document 1", "Document 2", "Document 3"];
 
-const AppointmentDetail = (props) => {
+const AppointmentDetail = (props) => { 
+  const selectedData = props?.route?.params?.selectedItem;
+  const [appointmentData, setAppointmentData] = useState();
+  const [document, setDocument] = useState();
+
+  useEffect(() => {
+    initData();
+  }, []);
+
+  const initData = async () => {
+    try {
+      contextValue?.setLoader(true);
+      let obj = {
+        userid: await decryptService("userId"),
+        id: selectedData?.appointment_id,
+      };
+      let res = await getAppointmentById(obj);
+      if (res?.data?.status_code == 200) {
+        if (res?.data?.data?.length) {
+          contextValue?.setLoader(false);
+          setAppointmentData(res?.data?.data?.[0]);
+          if (res?.data?.data?.[0]?.petdetails?.documents?.length) {
+            const certificateDocs =
+              res?.data?.data?.[0]?.petdetails?.documents?.filter(
+                (doc) => doc.documenttype === "certificate"
+              );
+            setDocument(certificateDocs);
+          }
+        }
+      }
+    } catch (error) {
+      contextValue?.setLoader(false);
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={require("../../assets/images/dogBackground.png")}
-        resizeMode="cover"
-        style={styles.imgBackground}
-      >
-        <TouchableOpacity
-          style={styles.goBackBtn}
-          hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-          onPress={() => props.navigation.goBack()}
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <ImageBackground
+          source={{ uri: appointmentData?.petdetails?.documents?.[0]?.url }}
+          resizeMode="cover"
+          style={styles.imgBackground}
         >
-          <Back stroke="#000"/>
-        </TouchableOpacity>
-        <View style={styles.contentView}>
-          <ScrollView
-            style={{ flex: 1 }}
-            bounces={false}
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
+          <TouchableOpacity
+            style={styles.goBackBtn}
+            hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
+            onPress={() => props.navigation.goBack()}
           >
-            <View style={styles.mainContent}>
-              <View style={styles.flexRow}>
-                <Text numberOfLines={1} style={styles.petName}>
-                  Rockey
-                </Text>
-                <Text numberOfLines={1} style={styles.breedType}>
-                  German Shepard
-                </Text>
-              </View>
-              <View style={styles.content}>
-                <View style={styles.boxView}>
-                  <Text style={styles.dogText}>Dog</Text>
-                  <Text style={styles.type}>Type</Text>
+            <Back stroke="#000" />
+          </TouchableOpacity>
+          <View style={styles.contentView}>
+            <ScrollView
+              style={{ flex: 1 }}
+              bounces={false}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.mainContent}>
+                <View style={styles.flexRow}>
+                  <Text numberOfLines={1} style={styles.petName}>
+                    {appointmentData?.petdetails?.name}
+                  </Text>
+                  <Text numberOfLines={1} style={styles.breedType}>
+                    {appointmentData?.petdetails?.breed}
+                  </Text>
                 </View>
-                <View style={styles.ageContent}>
-                  <Text style={styles.ageText}>1 Y 8 M</Text>
-                  <Text style={styles.age}>Age</Text>
-                </View>
-                <View style={styles.genderContent}>
-                  <Text style={styles.genderText}>Male</Text>
-                  <Text style={styles.gender}>Gender</Text>
-                </View>
-                <View style={styles.weightContent}>
-                  <Text style={styles.weightText}>50kg</Text>
-                  <Text style={styles.weight}>Weight</Text>
-                </View>
-              </View>
-
-              <View>
-                <Text style={styles.aboutPetText}>About Pet:</Text>
-                <Text style={styles.petDescription}>
-                  Hi ,I am Rocky. I likes to chew cucumber, Mutter and cuddles
-                  from my dad. I am mischievous but very friendly dog. 
-                </Text>
-                <View style={styles.medicalDocView}>
-                  <Text style={styles.medicalText}>Medical documents</Text>
-                  <RightArrow stroke="#000" />
-                </View>
-
-                <View style={styles.documentView}>
-                  <ScrollView
-                    horizontal={true}
-                    style={{ flex: 1 }}
-                    bounces={false}
-                    showsHorizontalScrollIndicator={false}
-                    showsVerticalScrollIndicator={false}
-                  >
-                    {Data.map((item, index) => {
-                      return (
-                        <View
-                          style={[
-                            styles.documents,
-                            { marginLeft: index === 0 ? 0 : moderateScale(10) },
-                          ]}
-                        >
-                          <Text style={styles.docText}>{item}</Text>
-                        </View>
-                      );
-                    })}
-                  </ScrollView>
-                </View>
-                <View style={styles.moreView}>
-                  <More />
-                </View>
-
-                <View style={styles.cardView}>
-                  <View style={styles.imgView}>
-                    <Image
-                      source={require("../../assets/images/dogImg.png")}
-                      style={styles.img}
-                    />
-                  </View>
-                  <View style={styles.parentDetailsView}>
-                    <Text style={styles.parentText}>Pet parent details</Text>
-                    <Text numberOfLines={2} style={styles.location}>
-                      Mr. Mickey Hawkins - Mumbai
+                <View style={styles.content}>
+                  <View style={styles.boxView}>
+                    <Text style={styles.dogText}>
+                      {" "}
+                      {appointmentData?.petdetails?.type}
                     </Text>
-                    <View style={styles.rowDetail}>
-                      <Text style={styles.numberText}>987654321</Text>
-                      <View style={styles.ml20}>
-                        <Msg />
-                      </View>
+                    <Text style={styles.type}>Type</Text>
+                  </View>
+                  <View style={styles.ageContent}>
+                    <Text style={styles.ageText}>
+                      {appointmentData?.petdetails?.age}
+                    </Text>
+                    <Text style={styles.age}>Age</Text>
+                  </View>
+                  <View style={styles.genderContent}>
+                    <Text style={styles.genderText}>
+                      {appointmentData?.petdetails?.gender}
+                    </Text>
+                    <Text style={styles.gender}>Gender</Text>
+                  </View>
+                  <View style={styles.weightContent}>
+                    <Text style={styles.weightText}>
+                      {appointmentData?.petdetails?.weight} kg
+                    </Text>
+                    <Text style={styles.weight}>Weight</Text>
+                  </View>
+                </View>
 
-                      <View style={styles.ml20}>
-                        <Call />
+                <View>
+                  <Text style={styles.aboutPetText}>About Pet:</Text>
+                  <Text style={styles.petDescription}>
+                    {appointmentData?.petdetails?.about}
+                  </Text>
+                  <View style={styles.medicalDocView}>
+                    <Text style={styles.medicalText}>Medical documents</Text>
+                    <RightArrow stroke="#000" />
+                  </View>
+
+                  <View style={styles.documentView}>
+                    <ScrollView
+                      horizontal={true}
+                      style={{ flex: 1 }}
+                      bounces={false}
+                      showsHorizontalScrollIndicator={false}
+                      showsVerticalScrollIndicator={false}
+                    >
+                      {document?.length &&
+                        document?.map((item, index) => {
+                          return (
+                            <TouchableOpacity
+                              onPress={() => Linking.openURL(item.url)}
+                              style={[
+                                styles.documents,
+                                {
+                                  marginLeft:
+                                    index === 0 ? 0 : moderateScale(10),
+                                },
+                              ]}
+                            >
+                              <Text style={styles.docText}>
+                                {item?.documenttype} {index + 1}
+                              </Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                    </ScrollView>
+                  </View>
+                  <View style={styles.moreView}>
+                    <More />
+                  </View>
+                 
+                  <View style={styles.cardView}>
+                    <View style={styles.imgView}>
+                      <Image
+                        source={{uri:appointmentData?.petdetails?.documents?.[0]?.url}}
+                        style={styles.img}
+                      />
+                    </View>
+                    <View style={styles.parentDetailsView}>
+                      <Text style={styles.parentText}>Pet parent details</Text>
+                      <Text numberOfLines={2} style={styles.location}>
+                        {appointmentData?.parentdetails?.name}
+                      </Text>
+                      <View style={styles.rowDetail}>
+                        <Text style={styles.numberText}>
+                          {" "}
+                          {appointmentData?.parentdetails?.mobile}
+                        </Text>
+
+                        <TouchableOpacity
+                          style={styles.ml20}
+                          onPress={() =>
+                            Linking.openURL(
+                              `tel:${appointmentData?.parentdetails?.mobile}`
+                            )
+                          }
+                        >
+                          <Call />
+                        </TouchableOpacity>
                       </View>
                     </View>
                   </View>
                 </View>
               </View>
-            </View>
-          </ScrollView>
-        </View>
-      </ImageBackground>
-    </View>
+            </ScrollView>
+          </View>
+        </ImageBackground>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -247,6 +309,7 @@ const styles = StyleSheet.create({
     color: THEMES.colors.black,
     textAlign: "center",
     paddingHorizontal: moderateScale(21),
+    textTransform: "capitalize",
   },
   gender: {
     fontFamily: THEMES.fontFamily.semiBold,
@@ -317,6 +380,7 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.semiBold,
     color: THEMES.colors.black,
     fontSize: THEMES.fonts.font12,
+    textTransform: "capitalize",
   },
   moreView: {
     paddingTop: moderateScale(14),
@@ -367,6 +431,7 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.bold,
     fontSize: THEMES.fonts.font14,
     paddingTop: moderateScale(3),
+    textTransform:'capitalize'
   },
   rowDetail: {
     flexDirection: "row",
@@ -379,7 +444,7 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font12,
   },
   ml20: {
-    marginLeft: moderateScale(20),
+    marginLeft: moderateScale(10),
   },
   goBackBtn: {
     paddingTop: moderateScale(18),
