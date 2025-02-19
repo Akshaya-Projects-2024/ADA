@@ -281,7 +281,7 @@ const MarkHoliday = () => {
             day_of_week: element?.value,
             start_time: moment(element?.start, "hh:mm A").format("HH:mm"),
             end_time: moment(element?.end, "hh:mm A").format("HH:mm"),
-            is_available: "false",
+            is_available: false,
           };
           weeklyHolidayData.push(op);
         } else {
