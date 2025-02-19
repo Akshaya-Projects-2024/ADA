@@ -35,7 +35,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileDummy from "../../assets/svg/user.svg";
 import Toggle from "../../components/Toggle";
 import { LoginModules } from "../../constants/enums";
-import { getContactDetails } from "../../redux-store/actions/commonApis";
 import HolidayMenuIcon from "../../assets/svg/HolidayMenuIcon";
 
 const MenuItem = ({
@@ -338,13 +337,14 @@ const MyAccount = (props) => {
                     "",
                     "commonScreen"
                   )}
-                  {renderItem(
-                    THEMES.colors.peach,
-                    <Logout />,
-                    Strings.logout,
-                    "addBottom",
-                    "commonScreen"
-                  )}
+                  <MenuItem
+                    bgColor={THEMES.colors.peach}
+                    icon={<Logout />}
+                    title={Strings.logout}
+                    showPending={false}
+                    onPress={() => {}}
+                    addBottom={"addBottom"}
+                  />
                 </View>
               </View>
             </View>

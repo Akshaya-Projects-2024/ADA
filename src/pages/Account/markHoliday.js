@@ -105,26 +105,49 @@ const MarkHoliday = () => {
       const params = { provider_id: userId };
       const res = await getHolidayData(params);
       const res2 = await getWeeklyHolidayData(params);
+      const currentDay = new Date().getDay();
+      const removedData = daysz.slice(currentDay - 1);
+      let newDates = [...removedData, ...daysz.slice(0, currentDay - 1)];
+      const newSetDates = [];
+      newDates = newDates.map((it) => {
+        return {
+          label: it.key,
+          start: "",
+          end: "",
+          selected: false,
+          value: it.value,
+        };
+      });
       if (res?.status === 200) {
         console.log("🚀 ~ initData ~ res:", res?.data?.data);
       }
-      if (res2?.status === 200) {
-        console.log("🚀 ~ initData ~ res2:", res2?.data?.data);
-      }
-      const currentDay = new Date().getDay();
-      const removedData = daysz.slice(currentDay - 1);
-      const newDates = [...removedData, ...daysz.slice(0, currentDay - 1)];
-      setTimes(
-        newDates.map((it) => {
-          return {
-            label: it.key,
-            start: "",
-            end: "",
-            selected: false,
-            value: it.value,
+      if (res2?.status === 200 && validArray(res2?.data?.data?.weeklyholiday)) {
+        for (
+          let index = 0;
+          index < res2?.data?.data?.weeklyholiday.length;
+          index++
+        ) {
+          const element = res2?.data?.data?.weeklyholiday[index];
+          const foundIndex = newDates.findIndex(
+            (it) =>
+              it?.value?.toLowerCase() === element?.day_of_week?.toLowerCase()
+          );
+          newDates[foundIndex] = {
+            ...newDates[foundIndex],
+            start: moment(element?.start_time, "HH:mm").format("hh:mm A"),
+            end: moment(element?.end_time, "HH:mm").format("hh:mm A"),
+            selected: true,
           };
-        })
-      );
+          newSetDates.push({
+            ...newDates[foundIndex],
+            start: moment(element?.start_time, "HH:mm").format("hh:mm A"),
+            end: moment(element?.end_time, "HH:mm").format("hh:mm A"),
+            selected: true,
+          });
+        }
+      }
+      setTimes(newDates);
+      setHolidayDays(newSetDates);
       contextValue?.setLoader(false);
     } catch (error) {
       contextValue?.setLoader(false);
@@ -656,11 +679,7 @@ const MarkHoliday = () => {
           flag={confirmModal}
           title={Strings.cancelAppointmentsTitle}
           description={Strings.cancelAppointmentsDescription}
-          leftButtonText="Close"
           rightButtonText="Cancel"
-          leftButtonPressed={() => {
-            setConfirmModal(false);
-          }}
           rightButtonPressed={onSubmit}
           onClose={() => {
             setConfirmModal(false);
