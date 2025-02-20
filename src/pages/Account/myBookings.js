@@ -225,8 +225,18 @@ const MyBookings = ({ navigation, route }) => {
 
   const EmptyContentView = () => {
     return (
-      <View style={{ flex:0.85, justifyContent: "center", alignItems: "center" }} >
-        <Text style={{color:'#000', fontSize: moderateScale(16), fontWeight: 500}}>No scheduled apointments.</Text>
+      <View
+        style={{ flex: 0.85, justifyContent: "center", alignItems: "center" }}
+      >
+        <Text
+          style={{
+            color: "#000",
+            fontSize: moderateScale(16),
+            fontWeight: 500,
+          }}
+        >
+          No scheduled apointments.
+        </Text>
       </View>
     );
   };

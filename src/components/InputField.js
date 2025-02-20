@@ -15,6 +15,7 @@ const InputField = (props) => {
     maxLength = 250,
     inputStyle = {},
     editable = true,
+    fontScaling = true,
   } = props;
   return (
     <View style={[styles.mainView, inputStyle]}>
@@ -42,6 +43,7 @@ const InputField = (props) => {
             onChangeText={onChange}
             keyboardType={keyboardType ? keyboardType : "default"}
             editable={editable}
+            allowFontScaling={fontScaling}
           />
         </View>
         {rightIcon && <View>{rightIcon}</View>}

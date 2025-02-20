@@ -105,7 +105,6 @@ const Routes = (props) => {
           component={AuthStack}
           options={navOptionHandler}
         />
-
         <Stack.Screen
           name="app"
           component={AppStack}

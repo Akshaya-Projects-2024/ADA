@@ -44,6 +44,7 @@ import { resetNavigation } from "../../navigations/rootNavigationRef";
 import { showToast } from "../../utils/utils";
 import { contextValue } from "../../components/Loader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import HolidayMenuIcon from "../../assets/svg/HolidayMenuIcon";
 
 const MenuItem = ({
   bgColor,
@@ -138,6 +139,7 @@ const MyAccount = (props) => {
       };
       let res = await deleteAccountApi(obj);
       if (res?.data?.status_code == 200) {
+        handleLogout()
         resetNavigation("app");
       } else {
         showToast("Error", "Something went wrong!! Please try again later.");
@@ -340,7 +342,7 @@ const MyAccount = (props) => {
                   )}
                   {renderItem(
                     THEMES.colors.sandyBeach,
-                    <BottomOpenCheck stroke={THEMES.colors.california} />,
+                    <HolidayMenuIcon />,
                     Strings.markHoliday,
                     "",
                     "markHoliday"

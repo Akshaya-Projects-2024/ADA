@@ -43,14 +43,11 @@ const Dialog = ({
       justifyContent: "space-between",
     },
     crossIcon: {
-      position: "absolute",
-      right: ms(12),
-      top: ms(12),
+      paddingHorizontal: ms(12),
+      paddingTop: ms(12),
       justifyContent: "space-between",
       flexDirection: "row",
-      flex: 1,
       width: "100%",
-      paddingStart: ms(6),
     },
     titleText: {
       fontSize: THEMES.fonts.font24,
@@ -63,7 +60,7 @@ const Dialog = ({
       fontFamily: THEMES.fontFamily.regular,
     },
     container: {
-      paddingTop: ms(40),
+      paddingTop: ms(7.5),
       paddingHorizontal: ms(12),
       paddingBottom: ms(12),
     },
@@ -91,10 +88,8 @@ const Dialog = ({
         <View style={styles.container}>
           <Text style={styles.descriptionText}>{description}</Text>
         </View>
-        {leftButtonText &&
-        typeof leftButtonPressed === "function" &&
-        rightButtonText &&
-        typeof rightButtonPressed === "function" ? (
+        {(leftButtonText && typeof leftButtonPressed === "function") ||
+        (rightButtonText && typeof rightButtonPressed === "function") ? (
           <View style={styles.buttonContainer}>
             {leftButtonText && typeof leftButtonPressed === "function" ? (
               <Button
