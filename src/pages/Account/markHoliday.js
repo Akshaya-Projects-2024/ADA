@@ -129,7 +129,6 @@ const MarkHoliday = () => {
         setStartDate(res?.data?.data?.start_date);
         setEndTime(res?.data?.data?.end_time);
         setStartTime(res?.data?.data?.start_time);
-        console.log("🚀 ~ initData ~ res:", res?.data?.data);
       }
       if (res2?.status === 200 && validArray(res2?.data?.data?.weeklyholiday)) {
         for (
