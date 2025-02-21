@@ -118,7 +118,17 @@ const MarkHoliday = () => {
           value: it.value,
         };
       });
-      if (res?.status === 200) {
+      if (
+        res?.status === 200 &&
+        res?.data?.data?.end_date &&
+        res?.data?.data?.end_time &&
+        res?.data?.data?.start_date &&
+        res?.data?.data?.start_time
+      ) {
+        setEndDate(res?.data?.data?.end_date);
+        setStartDate(res?.data?.data?.start_date);
+        setEndTime(res?.data?.data?.end_time);
+        setStartTime(res?.data?.data?.start_time);
         console.log("🚀 ~ initData ~ res:", res?.data?.data);
       }
       if (res2?.status === 200 && validArray(res2?.data?.data?.weeklyholiday)) {
