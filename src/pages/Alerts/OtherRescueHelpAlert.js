@@ -35,12 +35,9 @@ import { deleteDocument, uploadDocument } from "../../redux-store/actions/auth";
 import { DOCUMENT_TYPES } from "../Account/uploadImagesDocs";
 import { showToast } from "../../utils/utils";
 import { AddLostPetAlert } from "../../redux-store/actions/alerts";
-import { err } from "react-native-svg";
 import { goBack } from "../../navigations/rootNavigationRef";
 
-const MedicalHelp = (props) => {
-
-  const [selectedGender, setSelectedGender] = useState(null);
+const OtherRescueHelpAlert = (props) => {
   const [petImage, setPetImage] = useState([]);
   const [petImagesVisible, setPetImageVisible] = useState(false);
   const [isDateVisible, setDateVisibility] = useState(false);
@@ -144,11 +141,7 @@ const MedicalHelp = (props) => {
 
   const onSubmit = async () => {
     try {
-      if (!petName) {
-        showToast("error", "Please enter pet name");
-      } else if (!selectedGender) {
-        showToast("error", "Please select gender");
-      } else if (!petImage) {
+      if (!petImage) {
         showToast("error", "Please add images of the pet");
       } else if (!location) {
         showToast("error", "Please enter location");
@@ -167,9 +160,9 @@ const MedicalHelp = (props) => {
 
       let obj = {
         userid: await decryptService("userId"),
-        isownpet: 1,
-        name: petName,
-        gender: selectedGender,
+        isownpet: 0,
+        name: "",
+        gender: "",
         lastseen: dateString.toISOString(),
         lastseenlocation: location,
         audience: "Public",
@@ -177,7 +170,7 @@ const MedicalHelp = (props) => {
         contactnum: contactNo,
         message: message,
         documents: petId.map((item) => item.id).join(","),
-        requesttype: "medical" ,
+        requesttype: "rescue",
         coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
       };
       let res = await AddLostPetAlert(obj);
@@ -246,8 +239,7 @@ const MedicalHelp = (props) => {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
         <StatusBar backgroundColor={THEMES.colors.white} />
-        {console.log("Route",Route)}
-        <Header title={"Medical Help"} fontColor="#000" showBack />
+        <Header title="Rescue Help" fontColor="#000" showBack />
 
         <ScrollView style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
           <View
@@ -257,75 +249,6 @@ const MedicalHelp = (props) => {
               marginBottom: moderateScale(24),
             }}
           >
-            <View
-              style={{
-                paddingTop: moderateScale(24),
-                paddingHorizontal: moderateScale(20),
-              }}
-            >
-              <InputField
-                label={"Pet Name*"}
-                placeholderText={"Enter Pet name"}
-                value={petName}
-                onChange={setPetName}
-              />
-            </View>
-            <View style={styles.toggleContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.toggleButton,
-                  {
-                    backgroundColor:
-                      selectedGender === "Male"
-                        ? THEMES.colors.cyan
-                        : THEMES.colors.white,
-                  },
-                ]}
-                onPress={() => setSelectedGender("Male")}
-              >
-                <Text
-                  style={[
-                    styles.toggleText,
-                    {
-                      color:
-                        selectedGender === "Male"
-                          ? THEMES.colors.white
-                          : THEMES.colors.cyan,
-                    },
-                  ]}
-                >
-                  Male
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.toggleButton,
-                  {
-                    backgroundColor:
-                      selectedGender === "Female"
-                        ? THEMES.colors.cyan
-                        : THEMES.colors.white,
-                  },
-                ]}
-                onPress={() => setSelectedGender("Female")}
-              >
-                <Text
-                  style={[
-                    styles.toggleText,
-                    {
-                      color:
-                        selectedGender === "Female"
-                          ? THEMES.colors.white
-                          : THEMES.colors.cyan,
-                    },
-                  ]}
-                >
-                  Female
-                </Text>
-              </TouchableOpacity>
-            </View>
-
             <View
               style={{
                 paddingHorizontal: moderateScale(20),
@@ -710,4 +633,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MedicalHelp;
+export default OtherRescueHelpAlert;

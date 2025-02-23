@@ -35,11 +35,9 @@ import { deleteDocument, uploadDocument } from "../../redux-store/actions/auth";
 import { DOCUMENT_TYPES } from "../Account/uploadImagesDocs";
 import { showToast } from "../../utils/utils";
 import { AddLostPetAlert } from "../../redux-store/actions/alerts";
-import { err } from "react-native-svg";
 import { goBack } from "../../navigations/rootNavigationRef";
 
-const MedicalHelp = (props) => {
-
+const OtherLostPetAlert = (props) => {
   const [selectedGender, setSelectedGender] = useState(null);
   const [petImage, setPetImage] = useState([]);
   const [petImagesVisible, setPetImageVisible] = useState(false);
@@ -109,6 +107,7 @@ const MedicalHelp = (props) => {
   const shareImageBase64 = async (image, platforms = []) => {
     try {
       for (const platform of platforms) {
+        console.log("platform", platform);
         if (platform == "FACEBOOK") {
           const shareData = {
             title: "Share on Facebook",
@@ -144,18 +143,16 @@ const MedicalHelp = (props) => {
 
   const onSubmit = async () => {
     try {
-      if (!petName) {
-        showToast("error", "Please enter pet name");
-      } else if (!selectedGender) {
-        showToast("error", "Please select gender");
-      } else if (!petImage) {
+      if (!petImage) {
         showToast("error", "Please add images of the pet");
-      } else if (!location) {
-        showToast("error", "Please enter location");
       } else if (!date) {
         showToast("error", "Please select date");
+      } else if (!location) {
+        showToast("error", "Please enter location");
       } else if (!feature) {
-        showToast("error", "Please enter help description");
+        showToast("error", "Please enter feature");
+      } else if (!message) {
+        showToast("error", "Please enter message");
       } else if (!contactNo) {
         showToast("error", "Please enter contact No");
       } else if (!agree) {
@@ -167,17 +164,17 @@ const MedicalHelp = (props) => {
 
       let obj = {
         userid: await decryptService("userId"),
-        isownpet: 1,
-        name: petName,
-        gender: selectedGender,
+        isownpet: 0,
+        name: "",
+        gender: "",
         lastseen: dateString.toISOString(),
         lastseenlocation: location,
         audience: "Public",
         features: feature,
-        contactnum: contactNo,
         message: message,
+        contactnum: contactNo,
         documents: petId.map((item) => item.id).join(","),
-        requesttype: "medical" ,
+        requesttype: "lostpet",
         coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
       };
       let res = await AddLostPetAlert(obj);
@@ -185,7 +182,7 @@ const MedicalHelp = (props) => {
         if (selectedPlatforms) {
           await shareImageBase64(res?.image, selectedPlatforms);
         }
-        showToast("success", "Medical Pet Alert has successfully created");
+        showToast("success", "Lost Pet Alert has successfully create");
         goBack();
       }
     } catch (error) {
@@ -246,8 +243,7 @@ const MedicalHelp = (props) => {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
         <StatusBar backgroundColor={THEMES.colors.white} />
-        {console.log("Route",Route)}
-        <Header title={"Medical Help"} fontColor="#000" showBack />
+        <Header title="Lost pet alert" fontColor="#000" showBack />
 
         <ScrollView style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
           <View
@@ -257,75 +253,6 @@ const MedicalHelp = (props) => {
               marginBottom: moderateScale(24),
             }}
           >
-            <View
-              style={{
-                paddingTop: moderateScale(24),
-                paddingHorizontal: moderateScale(20),
-              }}
-            >
-              <InputField
-                label={"Pet Name*"}
-                placeholderText={"Enter Pet name"}
-                value={petName}
-                onChange={setPetName}
-              />
-            </View>
-            <View style={styles.toggleContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.toggleButton,
-                  {
-                    backgroundColor:
-                      selectedGender === "Male"
-                        ? THEMES.colors.cyan
-                        : THEMES.colors.white,
-                  },
-                ]}
-                onPress={() => setSelectedGender("Male")}
-              >
-                <Text
-                  style={[
-                    styles.toggleText,
-                    {
-                      color:
-                        selectedGender === "Male"
-                          ? THEMES.colors.white
-                          : THEMES.colors.cyan,
-                    },
-                  ]}
-                >
-                  Male
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.toggleButton,
-                  {
-                    backgroundColor:
-                      selectedGender === "Female"
-                        ? THEMES.colors.cyan
-                        : THEMES.colors.white,
-                  },
-                ]}
-                onPress={() => setSelectedGender("Female")}
-              >
-                <Text
-                  style={[
-                    styles.toggleText,
-                    {
-                      color:
-                        selectedGender === "Female"
-                          ? THEMES.colors.white
-                          : THEMES.colors.cyan,
-                    },
-                  ]}
-                >
-                  Female
-                </Text>
-              </TouchableOpacity>
-            </View>
-
             <View
               style={{
                 paddingHorizontal: moderateScale(20),
@@ -377,20 +304,6 @@ const MedicalHelp = (props) => {
                 paddingTop: moderateScale(24),
               }}
             >
-              <InputField
-                label={"Location"}
-                placeholderText={"Enter location name"}
-                value={location}
-                onChange={setLocation}
-              />
-            </View>
-
-            <View
-              style={{
-                paddingHorizontal: moderateScale(20),
-                paddingTop: moderateScale(24),
-              }}
-            >
               <TouchableOpacity
                 onPress={() => setDateVisibility(true)}
                 style={[
@@ -414,7 +327,7 @@ const MedicalHelp = (props) => {
                           },
                         ]}
                       >
-                        Help needed date
+                        Last seen date
                       </Text>
                       <Text style={styles.dateValue}>{date}</Text>
                     </>
@@ -429,7 +342,7 @@ const MedicalHelp = (props) => {
                           },
                         ]}
                       >
-                        Help needed date
+                        Last seen date
                       </Text>
                       <Text style={styles.datePlaceholderText}>
                         {Strings.ddMMYYYY}
@@ -439,19 +352,20 @@ const MedicalHelp = (props) => {
                 </View>
                 <Calendars />
               </TouchableOpacity>
-              <View
-                style={{
-                  paddingTop: moderateScale(24),
-                }}
-              >
-                <InputField
-                  label={"Help Description*"}
-                  placeholderText={"Enter the Distinguishing features"}
-                  multiline={true}
-                  value={feature}
-                  onChange={setFeature}
-                />
-              </View>
+            </View>
+
+            <View
+              style={{
+                paddingHorizontal: moderateScale(20),
+                paddingTop: moderateScale(24),
+              }}
+            >
+              <InputField
+                label={"Last seen location"}
+                placeholderText={"Enter location name"}
+                value={location}
+                onChange={setLocation}
+              />
             </View>
 
             <View
@@ -467,6 +381,13 @@ const MedicalHelp = (props) => {
                 value={selectedCategory}
                 onChange={setSelectedCategory}
               />
+              {/* <ModalDropdown
+                placeholder="Select whom to send"
+                data={categoryData}
+                title={"Select"}
+                setSelectedValue={setSelectedCategory}
+                selectedValue={selectedCategory}
+              /> */}
             </View>
 
             <View
@@ -537,6 +458,32 @@ const MedicalHelp = (props) => {
                 />
               </View>
 
+              <View
+                style={{
+                  paddingTop: moderateScale(24),
+                }}
+              >
+                <InputField
+                  label={"Distinguishing features*"}
+                  placeholderText={"Enter the Distinguishing features"}
+                  multiline={true}
+                  value={feature}
+                  onChange={setFeature}
+                />
+              </View>
+              <View
+                style={{
+                  paddingTop: moderateScale(24),
+                }}
+              >
+                <InputField
+                  label={"Your Message*"}
+                  placeholderText={"Write your message"}
+                  multiline={true}
+                  value={message}
+                  onChange={setMessage}
+                />
+              </View>
               <View
                 style={{
                   paddingTop: moderateScale(24),
@@ -710,4 +657,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MedicalHelp;
+export default OtherLostPetAlert;

@@ -49,5 +49,8 @@ export const urlList = {
   replyReview:'provider/updatereview',
   reviewGiven:'parent/reviewgiven',
   appointmentById:'appointment/getbyid',
-  deleteAccount:'register/deleteaccount'
+  deleteAccount:'register/deleteaccount',
+  lostPetAlert:'parent/addpetalert',
+  shareAdoptionTemplate:'parent/shareadoptiontemplate',
+  getAllEvents:'provider/getallevents'
 };

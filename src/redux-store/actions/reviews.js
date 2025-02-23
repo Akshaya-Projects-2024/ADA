@@ -9,7 +9,6 @@ export const getAllReviews = async (params) => {
         res?.data?.message || res?.data?.error || "Something went wrong!"
       );
     }
-    console.log("res",res)
     if (res?.data?.data) {
       return res?.data?.data;
     }

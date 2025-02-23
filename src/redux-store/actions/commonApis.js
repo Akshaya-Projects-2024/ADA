@@ -93,3 +93,6 @@ export const feedbackApi = async (obj) => {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
+
+
+

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -15,14 +15,44 @@ import Back from "../../assets/svg/back.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileDummy from "../../assets/svg/user.svg";
 import Call from "../../assets/svg/phoneCall.svg";
+import ShareImg from "../../assets/svg/share.svg";
+import Share from "react-native-share";
+import { shareAdoption } from "../../redux-store/actions/auth";
+import { decryptService } from "../../utils/storageFunc";
 
 const AdoptionDetail = (props) => {
   const selectedAdotpionData = props.route.params.selectedData;
+  const [image, setImage] = useState();
+
+  useEffect(() => {
+    initData();
+  }, []);
+
+  const initData = async () => {
+    let obj = {
+      id: selectedAdotpionData?.id,
+      createdby: await decryptService("userId"),
+    };
+    let response = await shareAdoption(obj);
+    if (response?.status === 200) {
+      setImage(response?.data?.data);
+    }
+  };
+
+ const shareImageBase64 = async () => {
+    const shareData = {
+      title: "Share",
+      message: "Check out this image!",
+      url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
+    };
+    await Share.open(shareData);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <ImageBackground
-          source={{ uri: selectedAdotpionData?.document?.url }}
+          source={{ uri: selectedAdotpionData?.document?.[0]?.url }}
           resizeMode="cover"
           style={styles.imgBackground}
         >
@@ -103,7 +133,7 @@ const AdoptionDetail = (props) => {
 
                   <View style={styles.cardView}>
                     <View style={styles.imgView}>
-                      {!selectedAdotpionData?.parentphoto ? (
+                      {selectedAdotpionData?.parentphoto ? (
                         <Image
                           source={{ uri: selectedAdotpionData?.parentphoto }}
                           style={styles.img}
@@ -132,11 +162,16 @@ const AdoptionDetail = (props) => {
                         {selectedAdotpionData?.parentlocation}
                       </Text>
                       <View style={styles.rowDetail}>
-                      <Text style={styles.mobileNoText}>
-                        {selectedAdotpionData?.contactnumber}
-                      </Text>
-                      <TouchableOpacity
-                        style={{marginHorizontal:moderateScale(10)}}
+                        <Text style={styles.mobileNoText}>
+                          {selectedAdotpionData?.contactnumber}
+                        </Text>
+                        <TouchableOpacity
+                          style={{
+                            marginHorizontal: moderateScale(10),
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
                           onPress={() =>
                             Linking.openURL(
                               `tel:${selectedAdotpionData?.contactnumber}`
@@ -144,8 +179,14 @@ const AdoptionDetail = (props) => {
                           }
                         >
                           <Call />
+                          <TouchableOpacity
+                            onPress={()=>shareImageBase64()}
+                            style={{ marginHorizontal: moderateScale(20) }}
+                          >
+                            <ShareImg />
+                          </TouchableOpacity>
                         </TouchableOpacity>
-                        </View>
+                      </View>
                     </View>
                   </View>
                 </View>

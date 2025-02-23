@@ -31,6 +31,7 @@ const Service = ({ navigation, route }) => {
   const selectedService = route?.params?.selectedService;
   const [searchText, setSearchText] = useState("");
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]); // Data after filtering
 
   useEffect(() => {
     initData();
@@ -49,6 +50,7 @@ const Service = ({ navigation, route }) => {
         const output = response?.data?.data;
         if (validArray(output)) {
           setData(output);
+          setFilteredData(output);
         }
       }
       contextValue?.setLoader(false);
@@ -56,6 +58,19 @@ const Service = ({ navigation, route }) => {
       console.log("🚀 ~ initData ~ error:", error);
       contextValue?.setLoader(false);
       showToast("error", error?.message);
+    }
+  };
+
+  const handleSearch = (text) => {
+    setSearchText(text);
+    if (text.trim() === "") {
+      setFilteredData(data);
+    } else {
+      const filtered = data.filter((item) => {
+        const businessName = item?.profile?.providerBusiness?.name || "";
+        return businessName.toLowerCase().includes(text.toLowerCase());
+      });
+      setFilteredData(filtered);
     }
   };
 
@@ -199,57 +214,55 @@ const Service = ({ navigation, route }) => {
     );
   };
 
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
-    <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
-      <StatusBar backgroundColor={THEMES.colors.white} />
-      <Header
-        title={selectedService?.service}
-        fontColor="#EC559C"
-        showBack
-        bgColor="transparent"
-        right={<Filter onPress={() => navigation.navigate("emergencyAlert")} />}
-      />
-      <View
-        style={{
-          width: "90%",
-          alignSelf: "center",
-          paddingTop: moderateScale(10),
-          marginBottom: moderateScale(20),
-        }}
-      >
+      <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
+        <StatusBar backgroundColor={THEMES.colors.white} />
+        <Header
+          title={selectedService?.service}
+          fontColor="#EC559C"
+          showBack
+          bgColor="transparent"
+        />
         <View
           style={{
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor: "#F2F2F2",
-            borderRadius: 25, // Rounded input
-            borderWidth: 1, // To add a border like in the image
-            borderColor: "#D9D9D9", // Border color to match the design
-            paddingHorizontal: 10, // Spacing around the text and icons
-            height: 45,
+            width: "90%",
+            alignSelf: "center",
+            paddingTop: moderateScale(10),
+            marginBottom: moderateScale(20),
           }}
         >
-          <Search />
-          <TextInput
-            value={searchText}
-            onChangeText={setSearchText}
-            placeholder="Search"
+          <View
             style={{
-              flex: 1, // Allow input to take full width except for icons
-              fontSize: THEMES.fonts.font14, // Adjust font size to match the design
-              color: "#000",
-              paddingHorizontal: moderateScale(10),
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "#F2F2F2",
+              borderRadius: 25, // Rounded input
+              borderWidth: 1, // To add a border like in the image
+              borderColor: "#D9D9D9", // Border color to match the design
+              paddingHorizontal: 10, // Spacing around the text and icons
+              height: 45,
             }}
-          />
-          {searchText.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchText("")}>
-              <Cross style={{ width: 20, height: 20 }} />
-            </TouchableOpacity>
-          )}
-        </View>
-        {/* <TouchableOpacity
+          >
+            <Search />
+            <TextInput
+              value={searchText}
+              onChangeText={handleSearch}
+              placeholder="Search"
+              style={{
+                flex: 1, // Allow input to take full width except for icons
+                fontSize: THEMES.fonts.font14, // Adjust font size to match the design
+                color: "#000",
+                paddingHorizontal: moderateScale(10),
+              }}
+            />
+            {searchText.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchText("")}>
+                <Cross style={{ width: 20, height: 20 }} />
+              </TouchableOpacity>
+            )}
+          </View>
+          {/* <TouchableOpacity
           style={{
             padding: moderateScale(8),
             borderRadius: 25,
@@ -275,17 +288,17 @@ const Service = ({ navigation, route }) => {
             <Cross style={{ width: 20, height: 20 }} />
           </View>
         </TouchableOpacity> */}
-      </View>
+        </View>
 
-      <FlatList
-        data={data}
-        showsVerticalScrollIndicator={false}
-        bounces={false}
-        renderItem={renderItem}
-        ListEmptyComponent={EmptyView}
-        contentContainerStyle={{ flexGrow: 1 }}
-      />
-    </View>
+        <FlatList
+          data={filteredData}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+          renderItem={renderItem}
+          ListEmptyComponent={EmptyView}
+          contentContainerStyle={{ flexGrow: 1 }}
+        />
+      </View>
     </SafeAreaView>
   );
 };

@@ -648,3 +648,21 @@ export const setWeeklyHolidayData = async (params) => {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
+
+export const shareAdoption = async (params) => {
+  try {
+    const res = await Api.POST(urlList.shareAdoptionTemplate, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("setWeeklyHolidayData Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};

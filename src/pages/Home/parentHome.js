@@ -44,14 +44,8 @@ import { contextValue } from "../../components/Loader";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getMyTopics } from "../../redux-store/actions/topics";
 import { SvgUri } from "react-native-svg";
+import { getAllEventsApi } from "../../redux-store/actions/events";
 const { width: screenWidth } = Dimensions.get("window");
-
-const services = [
-  { id: 1, title: "Trainer", icon: <Trainer /> },
-  { id: 2, title: "Behaviourist", icon: <Behaviourist /> },
-  { id: 3, title: "Pet Walker", icon: <Walker /> },
-  { id: 4, title: "Groomer", icon: <Groomer /> },
-];
 
 const { width } = Dimensions.get("window");
 
@@ -64,16 +58,27 @@ const ParentHome = (props) => {
   const profile = useSelector((state) => state?.commonReducer);
   const [serviceListData, setServiceData] = useState([]);
   const [trendingTopics, setTrendingTopics] = useState([]);
-
+  const [eventData, setEventData] = useState([]);
 
   useEffect(() => {
     if (isFocused) {
       getTrendingTopics();
       getServiceList();
       initData();
+      getEvents();
       dispatch(setLoggedInMoodule(LoginModules.parent));
     }
   }, [isFocused, dispatch]);
+
+  const getEvents = async () => {
+    let obj = {
+      userId: await decryptService("userId"),
+    };
+    let res = await getAllEventsApi(obj);
+    if (res?.data?.data?.length) {
+      setEventData(res?.data?.data);
+    }
+  };
 
   const getServiceList = async () => {
     contextValue?.setLoader(true);
@@ -116,7 +121,7 @@ const ParentHome = (props) => {
   const initData = async () => {
     try {
       contextValue?.setLoader(true);
-      
+
       const userId = await decryptService("userId");
       const params = {
         userid: userId,
@@ -205,6 +210,49 @@ const ParentHome = (props) => {
     );
   };
 
+  const renderBannerItem = ({ item, index }) => {
+    console.log("item", item);
+    return (
+      <TouchableOpacity
+        onPress={() => props.navigation.navigate("upComingEvents")}
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          paddingVertical: moderateScale(15),
+          borderRadius: 12,
+          borderBottomLeftRadius: 0,
+          backgroundColor: "#fff",
+          alignContent: "center",
+          borderColor: THEMES.colors.lightGrey,
+          borderWidth: 1,
+          marginTop: moderateScale(28),
+        }}
+      >
+        {item?.image ? (
+          <Image
+            style={{
+              borderRadius: 11,
+              width: "90%",
+              borderColor: THEMES.colors.lightGrey,
+              borderWidth: 1,
+            }}
+            source={{ item: item?.image }}
+          />
+        ) : (
+          <Image
+            style={{
+              borderRadius: 11,
+              width: "90%",
+              borderColor: THEMES.colors.lightGrey,
+              borderWidth: 1,
+            }}
+            source={require("../../assets/images/banner.png")}
+          />
+        )}
+      </TouchableOpacity>
+    );
+  };
+
   const renderItem = ({ item, index }) => {
     return (
       <View key={`${item?.id}_${index}`}>
@@ -224,15 +272,27 @@ const ParentHome = (props) => {
               marginTop: moderateScale(28),
             }}
           >
-            <Image
-              style={{
-                borderRadius: 11,
-                width: "90%",
-                borderColor: THEMES.colors.lightGrey,
-                borderWidth: 1,
-              }}
-              source={require("../../assets/images/banner.png")}
-            />
+            {item.image ? (
+              <Image
+                style={{
+                  borderRadius: 11,
+                  width: "90%",
+                  borderColor: THEMES.colors.lightGrey,
+                  borderWidth: 1,
+                }}
+                source={{ uri: item.image }}
+              />
+            ) : (
+              <Image
+                style={{
+                  borderRadius: 11,
+                  width: "90%",
+                  borderColor: THEMES.colors.lightGrey,
+                  borderWidth: 1,
+                }}
+                source={require("../../assets/images/banner.png")}
+              />
+            )}
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
@@ -512,13 +572,24 @@ const ParentHome = (props) => {
             />
           </View>
         </View>
-        <Carousel
-          data={appointmentData}
-          renderItem={renderItem}
-          sliderWidth={screenWidth}
-          itemWidth={screenWidth * 0.9}
-          onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
-        />
+        {appointmentData?.length ? (
+          <Carousel
+            data={appointmentData}
+            renderItem={renderItem}
+            sliderWidth={screenWidth}
+            itemWidth={screenWidth * 0.9}
+            onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
+          />
+        ) : (
+          <Carousel
+            data={eventData}
+            renderItem={renderBannerItem}
+            sliderWidth={screenWidth}
+            itemWidth={screenWidth * 0.9}
+            onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
+          />
+        )}
+
         {paginationDots()}
         <View>
           <View
@@ -592,29 +663,30 @@ const ParentHome = (props) => {
             justifyContent: "center",
           }}
         >
-          {Boolean(serviceListData) && serviceListData?.length ?
-            serviceListData?.map((item, index) => {
-              return (
-                <TouchableOpacity
-                  style={styles.itemContainer}
-                  onPress={() =>
-                    props.navigation.navigate("service", {
-                      selectedService: item,
-                    })
-                  }
-                >
-                  <View style={styles.iconContainer}>
-                    <SvgUri width={35} height={35} uri={item?.logo} />
-                  </View>
-                  <Text numberOfLines={1} style={styles.itemText}>
-                    {item?.service}
-                  </Text>
-                </TouchableOpacity>
-              );
-            }) : null}
+          {Boolean(serviceListData) && serviceListData?.length
+            ? serviceListData?.map((item, index) => {
+                return (
+                  <TouchableOpacity
+                    style={styles.itemContainer}
+                    onPress={() =>
+                      props.navigation.navigate("service", {
+                        selectedService: item,
+                      })
+                    }
+                  >
+                    <View style={styles.iconContainer}>
+                      <SvgUri width={35} height={35} uri={item?.logo} />
+                    </View>
+                    <Text numberOfLines={1} style={styles.itemText}>
+                      {item?.service}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })
+            : null}
         </View>
-      
-        {Boolean(trendingTopics) && trendingTopics?.length ?  (
+
+        {Boolean(trendingTopics) && trendingTopics?.length ? (
           <View
             style={{
               marginHorizontal: moderateScale(16),
@@ -642,7 +714,7 @@ const ParentHome = (props) => {
               keyExtractor={(item) => item.id}
             />
           </View>
-        ): null}
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );

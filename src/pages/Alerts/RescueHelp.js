@@ -38,8 +38,7 @@ import { AddLostPetAlert } from "../../redux-store/actions/alerts";
 import { err } from "react-native-svg";
 import { goBack } from "../../navigations/rootNavigationRef";
 
-const MedicalHelp = (props) => {
-
+const RescueHelp = (props) => {
   const [selectedGender, setSelectedGender] = useState(null);
   const [petImage, setPetImage] = useState([]);
   const [petImagesVisible, setPetImageVisible] = useState(false);
@@ -177,7 +176,7 @@ const MedicalHelp = (props) => {
         contactnum: contactNo,
         message: message,
         documents: petId.map((item) => item.id).join(","),
-        requesttype: "medical" ,
+        requesttype: "rescue",
         coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
       };
       let res = await AddLostPetAlert(obj);
@@ -246,8 +245,7 @@ const MedicalHelp = (props) => {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
         <StatusBar backgroundColor={THEMES.colors.white} />
-        {console.log("Route",Route)}
-        <Header title={"Medical Help"} fontColor="#000" showBack />
+        <Header title={"Rescue Help"} fontColor="#000" showBack />
 
         <ScrollView style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
           <View
@@ -710,4 +708,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MedicalHelp;
+export default RescueHelp;

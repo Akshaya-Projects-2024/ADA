@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "321435785630",
+    "project_id": "llyod-358917",
+    "storage_bucket": "llyod-358917.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:321435785630:android:139e3d0cb2202d36285e8f",
+        "android_client_info": {
+          "package_name": "com.lloyd"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "321435785630-q325h5qck10ul9d320gupem7r189p94s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0gQvoDA3Dj9-YvV3UdufgVmRugvPirLY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "321435785630-q325h5qck10ul9d320gupem7r189p94s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

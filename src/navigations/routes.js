@@ -26,6 +26,16 @@ import messaging from "@react-native-firebase/messaging";
 import PushNotification from "react-native-push-notification";
 import { showNotification } from "../utils/pushNotificationUtils";
 import ParentReviews from "../pages/ClientReviews/parentReviews";
+import CommonScreen from "../pages/Account/commonScreen";
+import LostDogAlert from "../pages/Notification/rescueAlert";
+import LostPetAlert from "../pages/Alerts/LostPetAlert";
+import Location from "../pages/Alerts/Location";
+import EmergencyAlert from "../pages/Alerts/EmergencyAlert";
+import OtherLostPetAlert from "../pages/Alerts/OtherLostPetAlert";
+import MedicalHelp from "../pages/Alerts/MedicalHelp";
+import OtherMedicalAlert from "../pages/Alerts/otherMedicalAlert";
+import RescueHelp from "../pages/Alerts/RescueHelp";
+import OtherRescueHelpAlert from "../pages/Alerts/OtherRescueHelpAlert";
 
 const Stack = createStackNavigator();
 
@@ -200,6 +210,57 @@ const Routes = (props) => {
           component={ParentReviews}
           options={navOptionHandler}
         />
+        <Stack.Screen
+          name="commonScreen"
+          component={CommonScreen}
+          options={navOptionHandler}
+        />
+        <Stack.Screen
+          name="lostPetAlert"
+          component={LostPetAlert}
+          options={navOptionHandler}
+        />
+        <Stack.Screen
+          name="location"
+          component={Location}
+          options={navOptionHandler}
+        />
+        <Stack.Screen
+          name="emergencyAlert"
+          component={EmergencyAlert}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="otherLostPetAlert"
+          component={OtherLostPetAlert}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="medicalHelp"
+          component={MedicalHelp}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="otherMedicalAlert"
+          component={OtherMedicalAlert}
+          options={navOptionHandler}
+        />
+         <Stack.Screen
+          name="rescueHelp"
+          component={RescueHelp}
+          options={navOptionHandler}
+        />
+
+<Stack.Screen
+          name="otherRescueHelpAlert"
+          component={OtherRescueHelpAlert}
+          options={navOptionHandler}
+        />
+
+
       </Stack.Navigator>
     </NavigationContainer>
   );

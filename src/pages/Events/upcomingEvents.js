@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -17,6 +17,9 @@ import Description from "../../assets/svg/codesandbox.svg";
 import Location from "../../assets/svg/location.svg";
 import Calendar from "../../assets/svg/calendar_event.svg";
 import Call from "../../assets/svg/call.svg";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { getAllEventsApi } from "../../redux-store/actions/events";
+import { decryptService } from "../../utils/storageFunc";
 
 const DATA = [
   {
@@ -36,7 +39,47 @@ const DATA = [
 ];
 
 const UpcomingEvents = () => {
-  const renderItem = () => {
+  const [eventData, setEventData] = useState([]);
+
+  useEffect(()=>{
+    getEvents()
+  },[])
+
+  const getEvents = async () => {
+    let obj = {
+      userId: await decryptService("userId"),
+    };
+    let res = await getAllEventsApi(obj);
+    if (res?.data?.data?.length) {
+      setEventData(res?.data?.data);
+    }
+  };
+
+  const formatDateTime = (startdate, starttime) => {
+    // Split the date string (format: "YYYY-MM-DD")
+    const [year, month, day] = startdate.split("-");
+    
+    // Split the time string (format: "HH:mm:ss")
+    const [hoursStr, minutesStr] = starttime.split(":");
+    let hours = parseInt(hoursStr, 10);
+    const minutes = minutesStr; // Already in correct format
+    
+    // Determine AM or PM and convert to 12-hour format
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    if (hours === 0) hours = 12; // Convert "0" hour to "12" for midnight/noon
+    
+    // Array of month names
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    
+    // Build and return the formatted string
+    return `${day} ${monthNames[parseInt(month, 10) - 1]} ${year}, ${hours}.${minutes} ${ampm}`;
+  }
+
+  const renderItem = ({item, index}) => {
     return (
       <View
         style={{
@@ -71,13 +114,14 @@ const UpcomingEvents = () => {
           }}
         ></View>
         <Text
+        numberOfLines={2}
           style={{
             fontFamily: THEMES.fontFamily.bold,
             fontSize: THEMES.fonts.font12,
             color: THEMES.colors.black,
           }}
         >
-          Event name
+          Event name : {item.name}
         </Text>
         <View
           style={{
@@ -98,7 +142,7 @@ const UpcomingEvents = () => {
                 color: THEMES.colors.black,
               }}
             >
-              1 July, 05:30 PM
+             {formatDateTime(item.startdate, item.starttime)}
             </Text>
           </View>
         </View>
@@ -123,8 +167,7 @@ const UpcomingEvents = () => {
                 lineHeight: moderateScale(20),
               }}
             >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+             {item.description}
             </Text>
           </View>
         </View>
@@ -151,7 +194,7 @@ const UpcomingEvents = () => {
                   color: THEMES.colors.cyan,
                 }}
               >
-                Gadkari hall, Thane
+                {item.audience}
               </Text>
             </View>
             <View style={{ width: "30%", alignItems: "flex-end" }}>
@@ -181,6 +224,7 @@ const UpcomingEvents = () => {
   };
 
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
@@ -198,13 +242,14 @@ const UpcomingEvents = () => {
       >
         <FlatList
           showsVerticalScrollIndicator={false}
-          data={DATA}
+          data={eventData}
           bounces={false}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
         />
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 

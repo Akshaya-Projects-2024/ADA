@@ -20,7 +20,7 @@ import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-    addReview,
+  addReview,
   getAllReviews,
   replyReviewApi,
   reviewGiven,
@@ -29,10 +29,12 @@ import { findDifferenceByDays, showToast } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
 import { useSelector } from "react-redux";
 
-const ParentReviews = () => {
+const ParentReviews = (props) => {
+  const id =
+    props?.route?.params?.selectedService?.profile?.providerBusiness?.userid;
   const [reviewList, setReviewList] = useState([]);
   const [review, setReview] = useState([]);
-  const { providerProfile, profileData,logindetails } = useSelector(
+  const { providerProfile, profileData, logindetails } = useSelector(
     ({ commonReducer }) => commonReducer
   );
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
@@ -56,29 +58,30 @@ const ParentReviews = () => {
         ""
       ),
     [profileData?.providerBusiness?.services]
-    
   );
 
   const initData = async () => {
     let obj = {
-      createdby: await decryptService("userId"),
+      userId: "7977276381",
+      vendor: "7977276381",
+      sortBy: "newest",
+      pageNum: 1,
+      pageSize: 20,
     };
-    let res = await reviewGiven(obj);
-    if (res?.data?.length) {
-      setReviewList(res?.data);
+    let res = await getAllReviews(obj);
+    console.log(res);
+    if (res?.reviews?.length) {
+      setReviewList(res?.reviews);
     }
   };
-
-
 
   const replyReviewBtn = async () => {
     const userId = await decryptService("userId");
     let obj = {
       provider: "9769487604",
-      "rating": "2",
+      rating: "2",
       reply: comment,
     };
-    console.log(obj)
     let res = await addReview(obj);
     if (res?.data?.status_code !== 200) {
       setModalVisible(false);
@@ -89,7 +92,6 @@ const ParentReviews = () => {
   };
 
   const renderItem = (item) => {
-    console.log("ite", item)
     return (
       <>
         <View style={styles.flatlistView}>
@@ -211,7 +213,7 @@ const ParentReviews = () => {
             paddingHorizontal: moderateScale(20),
           }}
         >
-          {reviewList?.length == 0 && (
+          {/* {reviewList?.length == 0 && (
             <InputField
               label={"Review"}
               placeholderText={"Please give your review"}
@@ -221,6 +223,15 @@ const ParentReviews = () => {
             />
           )}
 
+          <View style={styles.mainView}>
+            <FlatList
+              data={reviewList}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+            />
+          </View> */}
           <View style={styles.mainView}>
             <FlatList
               data={reviewList}

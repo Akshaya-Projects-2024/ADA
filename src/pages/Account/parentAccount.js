@@ -7,6 +7,7 @@ import {
   StatusBar,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import LinearGradient from "react-native-linear-gradient";
@@ -36,6 +37,11 @@ import ProfileDummy from "../../assets/svg/user.svg";
 import Toggle from "../../components/Toggle";
 import { LoginModules } from "../../constants/enums";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { contextValue } from "../../components/Loader";
+import { deleteAccountApi } from "../../redux-store/actions/auth";
+import { resetNavigation } from "../../navigations/rootNavigationRef";
+import { showToast } from "../../utils/utils";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const MenuItem = ({
   bgColor,
@@ -71,6 +77,69 @@ const MenuItem = ({
   );
 };
 
+
+const deleteAccountMethod = () => {
+  Alert.alert(
+    "Delete Account",
+    "Are you sure you want to delete your Account ??",
+    [
+      {
+        text: "Cancel",
+        onPress: () => {},
+        style: "cancel",
+      },
+      { text: "Ok", onPress: () => handleDeleteAccount() },
+    ],
+    { cancelable: false }
+  );
+};
+
+const logoutMethod = () => {
+  Alert.alert(
+    "Logout",
+    "Are you sure you want to logout ??",
+    [
+      {
+        text: "Cancel",
+        onPress: () => {},
+        style: "cancel",
+      },
+      { text: "Ok", onPress: () => handleLogout() },
+    ],
+    { cancelable: false }
+  );
+};
+
+const handleDeleteAccount = async () => {
+  try {
+    contextValue.setLoader(true);
+    let obj = {
+      userId: await decryptService("userId"),
+      userType: "parent",
+    };
+    let res = await deleteAccountApi(obj);
+    if (res?.data?.status_code == 200) {
+      handleLogout()
+      resetNavigation("app");
+    } else {
+      showToast("Error", "Something went wrong!! Please try again later.");
+    }
+    contextValue.setLoader(false);
+  } catch (error) {
+    showToast("Error", "Something went wrong!! Please try again later.");
+    contextValue.setLoader(false);
+  }
+};
+
+const handleLogout = async () => {
+  const asyncStorageKeys = await AsyncStorage.getAllKeys();
+  let filteredAsyncStorage = asyncStorageKeys;
+  if (filteredAsyncStorage?.length > 0) {
+    await AsyncStorage.multiRemove(filteredAsyncStorage);
+  }
+  resetNavigation("app");
+};
+
 const ParentAccount = (props) => {
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const profile = useSelector((state) => state?.commonReducer);
@@ -86,9 +155,15 @@ const ParentAccount = (props) => {
     const Icon = icon;
     return (
       <TouchableOpacity
-        onPress={() =>
-          props.navigation.navigate(route, { route: "parentAccount" })
-        }
+        onPress={() => {
+          if (route == "deleteAccount") {
+            deleteAccountMethod();
+          } else if (route == "logout") {
+            logoutMethod();
+          } else {
+            props.navigation.navigate(route, { route: "parentAccount" });
+          }
+        }}
         style={[
           styles.flexRow,
 
@@ -276,8 +351,15 @@ const ParentAccount = (props) => {
                     THEMES.colors.hawkesBlue,
                     <Star />,
                     "Reviews",
-                    "addBottom",
+                    "",
                     "parentReviews"
+                  )}
+                  {renderItem(
+                    THEMES.colors.peach,
+                    <Logout />,
+                    "Emergency Alert",
+                    "addBottom",
+                    "emergencyAlert"
                   )}
                 </View>
               </View>
@@ -352,14 +434,14 @@ const ParentAccount = (props) => {
                     <Delete />,
                     Strings.deleteAccount,
                     "",
-                    "commonScreen"
+                    "deleteAccount"
                   )}
                   {renderItem(
                     THEMES.colors.peach,
                     <Logout />,
                     Strings.logout,
                     "addBottom",
-                    "commonScreen"
+                    "logout"
                   )}
                 </View>
               </View>

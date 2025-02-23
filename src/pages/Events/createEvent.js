@@ -69,7 +69,7 @@ const CreateEvent = () => {
     const formattedTime = moment(date).format("HH:mm:ss");
     setEndTime(formattedTime);
     hideEndDatePicker();
-  }; 
+  };
 
   const handlePosterImages = (image) => {
     var temp = [...posterImg];
@@ -114,6 +114,14 @@ const CreateEvent = () => {
       showToast("error", "Please enter Event name");
     } else if (!description) {
       showToast("error", "Please enter description");
+    } else if (!sDate) {
+      showToast("error", "Please enter start date");
+    } else if (!startTime) {
+      showToast("error", "Please enter start time");
+    } else if (!eDate) {
+      showToast("error", "Please enter end date");
+    } else if (!endTime) {
+      showToast("error", "Please enter end time");
     } else if (!contactNo) {
       showToast("error", "Please enter contact no");
     } else {
@@ -132,7 +140,6 @@ const CreateEvent = () => {
           audience: audience,
           userId: userId,
         };
-
         let res = await createEvent(obj);
         if (res?.data?.status_code == 200) {
           setSuccess(true);
@@ -146,294 +153,297 @@ const CreateEvent = () => {
   };
 
   return (
-    <SafeAreaView style={{flex:1}}>
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header
-        title={"Create Event"}
-        fontColor="#EC559C"
-        showBack
-        bgColor="transparent"
-      />
-      <ScrollView
-        style={{ flex: 1 }}
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.mainView}>
-          <InputField
-            label={"Name of Event/ Offer*"}
-            placeholderText={"Enter Name of Event/ Offer"}
-            value={eventName}
-            onChange={setEventName}
-          />
-          <>
-            <View style={styles.secondaryFlex}>
-              <Text style={styles.titleText}>Event poster/images</Text>
-              <TouchableOpacity onPress={() => setPosterVisible(true)}>
-                <Text style={styles.addText}>{Strings.add}</Text>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={[
-                styles.flatlistView,
-                {
-                  alignItems: posterImg?.length == 0 ? "center" : "flex-start",
-                },
-              ]}
-            >
-              <FlatList
-                horizontal={true}
-                contentContainerStyle={{
-                  justifyContent: posterImg?.length ? "flex-start" : "center",
-                  alignItems: "center",
-                  padding: posterImg?.length
-                    ? moderateScale(0)
-                    : moderateScale(16),
-                  borderColor: THEMES.colors.darkGrey,
-                  borderRadius: 10,
-                }}
-                showsHorizontalScrollIndicator={false}
-                data={posterImg}
-                renderItem={renderItem}
-                ListHeaderComponent={() =>
-                  posterImg?.length == 0 ? (
-                    <Text style={styles.imgPlaceholder}>
-                      {Strings.pleaseAddImg}
-                    </Text>
-                  ) : null
-                }
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header
+          title={"Create Event"}
+          fontColor="#EC559C"
+          showBack
+          bgColor="transparent"
+        />
+        <ScrollView
+          style={{ flex: 1 }}
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.mainView}>
+            <InputField
+              label={"Name of Event/ Offer*"}
+              placeholderText={"Enter Name of Event/ Offer"}
+              value={eventName}
+              onChange={setEventName}
+            />
+            <>
+              <View style={styles.secondaryFlex}>
+                <Text style={styles.titleText}>Event poster/images</Text>
+                <TouchableOpacity onPress={() => setPosterVisible(true)}>
+                  <Text style={styles.addText}>{Strings.add}</Text>
+                </TouchableOpacity>
+              </View>
+              <View
+                style={[
+                  styles.flatlistView,
+                  {
+                    alignItems:
+                      posterImg?.length == 0 ? "center" : "flex-start",
+                  },
+                ]}
+              >
+                <FlatList
+                  horizontal={true}
+                  contentContainerStyle={{
+                    justifyContent: posterImg?.length ? "flex-start" : "center",
+                    alignItems: "center",
+                    padding: posterImg?.length
+                      ? moderateScale(0)
+                      : moderateScale(16),
+                    borderColor: THEMES.colors.darkGrey,
+                    borderRadius: 10,
+                  }}
+                  showsHorizontalScrollIndicator={false}
+                  data={posterImg}
+                  renderItem={renderItem}
+                  ListHeaderComponent={() =>
+                    posterImg?.length == 0 ? (
+                      <Text style={styles.imgPlaceholder}>
+                        {Strings.pleaseAddImg}
+                      </Text>
+                    ) : null
+                  }
+                />
+              </View>
+            </>
+
+            <View style={styles.pt16}>
+              <InputField
+                label={"Description*"}
+                placeholderText={"Enter the offer description"}
+                multiline
+                value={description}
+                onChange={setDescription}
               />
             </View>
-          </>
-
-          <View style={styles.pt16}>
-            <InputField
-              label={"Description*"}
-              placeholderText={"Enter the offer description"}
-              multiline
-              value={description}
-              onChange={setDescription}
-            />
-          </View>
-          <View style={styles.pt16}>
-            <InputField
-              label={"Location"}
-              placeholderText={"Enter location name"}
-              value={location}
-              onChange={setLocation}
-            />
-          </View>
-          <View style={styles.dateView}>
-            <Text style={styles.startDate}>Start</Text>
-            <TouchableOpacity
-              style={styles.dates}
-              onPress={() => setCalendarModal(true)}
-            >
-              <View style={{ paddingRight: moderateScale(9) }}>
-                <Text style={styles.selectDateText}>Select Date</Text>
-                <Text style={styles.dateText}>
-                  {sDate ? sDate : "DD/MM/YYYY"}
-                </Text>
-              </View>
-              <Calendar />
-            </TouchableOpacity>
-
-            <View style={styles.timeView}>
+            <View style={styles.pt16}>
+              <InputField
+                label={"Location"}
+                placeholderText={"Enter location name"}
+                value={location}
+                onChange={setLocation}
+              />
+            </View>
+            <View style={styles.dateView}>
+              <Text style={styles.startDate}>Start*</Text>
               <TouchableOpacity
-                onPress={() => setStartTimeModalVisible(true)}
-                style={{ paddingRight: moderateScale(9) }}
+                style={styles.dates}
+                onPress={() => setCalendarModal(true)}
               >
-                <Text style={styles.timeText}>Time</Text>
-                {startTime ? (
-                  <Text style={styles.timeValue}>{startTime}</Text>
-                ) : (
-                  <Text style={styles.timeValue}>{Strings.hhmm}</Text>
-                )}
+                <View style={{ paddingRight: moderateScale(9) }}>
+                  <Text style={styles.selectDateText}>Select Date</Text>
+                  <Text style={styles.dateText}>
+                    {sDate ? sDate : "DD/MM/YYYY"}
+                  </Text>
+                </View>
+                <Calendar />
               </TouchableOpacity>
-              <Time />
+
+              <View style={styles.timeView}>
+                <TouchableOpacity
+                  onPress={() => setStartTimeModalVisible(true)}
+                  style={{ paddingRight: moderateScale(9) }}
+                >
+                  <Text style={styles.timeText}>Time</Text>
+                  {startTime ? (
+                    <Text style={styles.timeValue}>{startTime}</Text>
+                  ) : (
+                    <Text style={styles.timeValue}>{Strings.hhmm}</Text>
+                  )}
+                </TouchableOpacity>
+                <Time />
+              </View>
+            </View>
+
+            <View style={styles.endContent}>
+              <Text style={styles.endText}>End*</Text>
+              <TouchableOpacity
+                onPress={() => setCalendarModal(true)}
+                style={styles.endValue}
+              >
+                <View style={{ paddingRight: moderateScale(9) }}>
+                  <Text style={styles.datePlaceholder}>Select Date</Text>
+                  <Text style={styles.value}>
+                    {eDate ? eDate : "DD/MM/YYYY"}
+                  </Text>
+                </View>
+                <Calendar />
+              </TouchableOpacity>
+
+              <View style={styles.endValue}>
+                <TouchableOpacity
+                  onPress={() => setEndTimeModalVisible(true)}
+                  style={{
+                    paddingRight: moderateScale(9),
+                    backgroundColor: "#fff",
+                  }}
+                >
+                  <Text style={styles.datePlaceholder}>Time</Text>
+                  {endTime ? (
+                    <Text style={styles.timeValue}>{endTime}</Text>
+                  ) : (
+                    <Text style={styles.timeValue}>{Strings.hhmm}</Text>
+                  )}
+                </TouchableOpacity>
+                <Time />
+              </View>
+            </View>
+
+            <View style={styles.pt16}>
+              <InputField
+                label={"Contact Information*"}
+                placeholderText={"Enter Contact Number"}
+                value={contactNo}
+                onChange={setContactNo}
+                maxLength={10}
+                keyboardType="phone-pad"
+              />
+            </View>
+            <View style={styles.pt16}>
+              <InputField
+                label={"Registration Link"}
+                placeholderText={"Paste registration link"}
+                rightIcon={<ClipboardPaste stroke={THEMES.colors.silver} />}
+                value={registrationlink}
+                onChange={setRegistrationlink}
+              />
+            </View>
+            <View style={styles.pt16}>
+              <InputField
+                label={"Whom to send"}
+                placeholderText={"Enter"}
+                // rightIcon={<ArrowDown stroke={THEMES.colors.darkGrey} />}
+                value={audience}
+                onChange={setAudience}
+              />
             </View>
           </View>
-
-          <View style={styles.endContent}>
-            <Text style={styles.endText}>End</Text>
-            <TouchableOpacity
-              onPress={() => setCalendarModal(true)}
-              style={styles.endValue}
-            >
-              <View style={{ paddingRight: moderateScale(9) }}>
-                <Text style={styles.datePlaceholder}>Select Date</Text>
-                <Text style={styles.value}>{eDate ? eDate : "DD/MM/YYYY"}</Text>
-              </View>
-              <Calendar />
-            </TouchableOpacity>
-
-            <View style={styles.endValue}>
-              <TouchableOpacity
-                onPress={() => setEndTimeModalVisible(true)}
-                style={{
-                  paddingRight: moderateScale(9),
-                  backgroundColor: "#fff",
-                }}
-              >
-                <Text style={styles.datePlaceholder}>Time</Text>
-                {endTime ? (
-                  <Text style={styles.timeValue}>{endTime}</Text>
-                ) : (
-                  <Text style={styles.timeValue}>{Strings.hhmm}</Text>
-                )}
-              </TouchableOpacity>
-              <Time />
-            </View>
-          </View>
-
-          <View style={styles.pt16}>
-            <InputField
-              label={"Contact Information*"}
-              placeholderText={"Enter Contact Number"}
-              value={contactNo}
-              onChange={setContactNo}
-              maxLength={10}
-              keyboardType="phone-pad"
-            />
-          </View>
-          <View style={styles.pt16}>
-            <InputField
-              label={"Registration Link"}
-              placeholderText={"Paste registration link"}
-              rightIcon={<ClipboardPaste stroke={THEMES.colors.silver} />}
-              value={registrationlink}
-              onChange={setRegistrationlink}
-            />
-          </View>
-          <View style={styles.pt16}>
-            <InputField
-              label={"Whom to send"}
-              placeholderText={"Enter"}
-              // rightIcon={<ArrowDown stroke={THEMES.colors.darkGrey} />}
-              value={audience}
-              onChange={setAudience}
-            />
-          </View>
-        </View>
-        <View
-          style={{
-            marginHorizontal: moderateScale(16),
-            marginBottom: moderateScale(10),
-          }}
-        >
-          <Button title="Submit" onPress={() => onSubmit()}></Button>
-          <Modal
-            onBackdropPress={() => setSuccess(false)}
-            isVisible={success}
-            backdropOpacity={0.5}
+          <View
             style={{
-              margin: 0,
-              borderRadius: 16,
-              flex: 1,
+              marginHorizontal: moderateScale(16),
+              marginBottom: moderateScale(10),
             }}
           >
-            <View
+            <Button title="Submit" onPress={() => onSubmit()}></Button>
+            <Modal
+              onBackdropPress={() => setSuccess(false)}
+              isVisible={success}
+              backdropOpacity={0.5}
               style={{
-                backgroundColor: THEMES.colors.bgColor,
-                paddingVertical: moderateScale(24),
-                paddingHorizontal: moderateScale(24),
+                margin: 0,
                 borderRadius: 16,
-                marginHorizontal: moderateScale(29),
+                flex: 1,
               }}
             >
               <View
                 style={{
-                  justifyContent: "space-between",
-                  flexDirection: "row",
+                  backgroundColor: THEMES.colors.bgColor,
+                  paddingVertical: moderateScale(24),
+                  paddingHorizontal: moderateScale(24),
+                  borderRadius: 16,
+                  marginHorizontal: moderateScale(29),
                 }}
               >
+                <View
+                  style={{
+                    justifyContent: "space-between",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Text
+                    numberOfLines={2}
+                    style={{
+                      color: THEMES.colors.black,
+                      fontFamily: THEMES.fontFamily.bold,
+                      fontSize: THEMES.fonts.font20,
+                      width: "70%",
+                      lineHeight: moderateScale(24),
+                    }}
+                  >
+                    ✨ Event Created Successfully!✨
+                  </Text>
+                  <TouchableOpacity
+                    hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
+                    onPress={() => setSuccess(false)}
+                  >
+                    <BlackCross />
+                  </TouchableOpacity>
+                </View>
                 <Text
-                  numberOfLines={2}
                   style={{
                     color: THEMES.colors.black,
-                    fontFamily: THEMES.fontFamily.bold,
-                    fontSize: THEMES.fonts.font20,
-                    width: "70%",
-                    lineHeight: moderateScale(24),
+                    fontFamily: THEMES.fontFamily.regular,
+                    fontSize: THEMES.fonts.font14,
+                    paddingTop: moderateScale(16),
+                    lineHeight: moderateScale(20),
                   }}
                 >
-                  ✨ Event Created Successfully!✨
+                  Congratulations! Your event has been created. Get ready to
+                  meet some furry friends!
                 </Text>
-                <TouchableOpacity
-                  hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-                  onPress={() => setSuccess(false)}
-                >
-                  <BlackCross />
-                </TouchableOpacity>
-              </View>
-              <Text
-                style={{
-                  color: THEMES.colors.black,
-                  fontFamily: THEMES.fontFamily.regular,
-                  fontSize: THEMES.fonts.font14,
-                  paddingTop: moderateScale(16),
-                  lineHeight: moderateScale(20),
-                }}
-              >
-                Congratulations! Your event has been created. Get ready to meet
-                some furry friends!
-              </Text>
-              <View
-                style={{
-                  alignItems: "center",
-                  paddingTop: moderateScale(31),
-                }}
-              >
-                <Button
-                  title="Go back to Homescreen"
-                  onPress={() => {
-                    setSuccess(false);
-                    setTimeout(() => {
-                      goBack();
-                    }, 500);
+                <View
+                  style={{
+                    alignItems: "center",
+                    paddingTop: moderateScale(31),
                   }}
-                />
+                >
+                  <Button
+                    title="Go back to Homescreen"
+                    onPress={() => {
+                      setSuccess(false);
+                      setTimeout(() => {
+                        goBack();
+                      }, 500);
+                    }}
+                  />
+                </View>
               </View>
-            </View>
+            </Modal>
+          </View>
+        </ScrollView>
+        <DateTimePicker
+          isVisible={isStartTimeModalVisible}
+          mode="time"
+          onConfirm={handleStartConfirm}
+          onCancel={hideStartDatePicker}
+        />
+        <DateTimePicker
+          isVisible={isEndTimeModalVisible}
+          mode="time"
+          onConfirm={handleEndConfirm}
+          onCancel={hideEndDatePicker}
+        />
+        {calendarModal && (
+          <Modal
+            isVisible={calendarModal}
+            backdropOpacity={0.5}
+            onBackdropPress={() => setCalendarModal(false)}
+            style={{ margin: 0, flex: 1 }}
+          >
+            <CalendarScreen
+              onBack={() => setCalendarModal(false)}
+              setEDate={setEDate}
+              sDate={sDate}
+              eDate={eDate}
+              setSDate={setSDate}
+            />
           </Modal>
-        </View>
-      </ScrollView>
-      <DateTimePicker
-        isVisible={isStartTimeModalVisible}
-        mode="time"
-        onConfirm={handleStartConfirm}
-        onCancel={hideStartDatePicker}
-      />
-      <DateTimePicker
-        isVisible={isEndTimeModalVisible}
-        mode="time"
-        onConfirm={handleEndConfirm}
-        onCancel={hideEndDatePicker}
-      />
-      {calendarModal && (
-        <Modal
-          isVisible={calendarModal}
-          backdropOpacity={0.5}
-          onBackdropPress={() => setCalendarModal(false)}
-          style={{ margin: 0, flex: 1 }}
-        >
-          <CalendarScreen
-            onBack={() => setCalendarModal(false)}
-            setEDate={setEDate}
-            sDate={sDate}
-            eDate={eDate}
-            setSDate={setSDate}
-          />
-        </Modal>
-      )}
-      <UploadImageModal
-        isVisible={posterVisible}
-        onClose={() => setPosterVisible(false)}
-        handleSelectedImage={(image) => handlePosterImages(image)}
-      />
-    </View>
+        )}
+        <UploadImageModal
+          isVisible={posterVisible}
+          onClose={() => setPosterVisible(false)}
+          handleSelectedImage={(image) => handlePosterImages(image)}
+        />
+      </View>
     </SafeAreaView>
   );
 };

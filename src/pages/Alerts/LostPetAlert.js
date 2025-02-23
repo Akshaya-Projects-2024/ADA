@@ -27,24 +27,36 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import moment from "moment";
 import ModalDropdown from "../../components/ModalDropdown";
 import CheckBox from "react-native-check-box";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { decryptService } from "../../utils/storageFunc";
+import Share from "react-native-share";
+import { getCurrentLocation } from "../../utils/geolocationUtils";
+import { deleteDocument, uploadDocument } from "../../redux-store/actions/auth";
+import { DOCUMENT_TYPES } from "../Account/uploadImagesDocs";
+import { showToast } from "../../utils/utils";
+import { AddLostPetAlert } from "../../redux-store/actions/alerts";
+import { err } from "react-native-svg";
+import { goBack } from "../../navigations/rootNavigationRef";
 
-const categoryData = [
-  { id: "1", label: "Training" },
-  { id: "2", label: "ABC" },
-  { id: "3", label: "XYZ" },
-  { id: "4", label: "MNO" },
-];
-
-const LostPetAlert = () => {
+const LostPetAlert = (props) => {
   const [selectedGender, setSelectedGender] = useState(null);
   const [petImage, setPetImage] = useState([]);
   const [petImagesVisible, setPetImageVisible] = useState(false);
   const [isDateVisible, setDateVisibility] = useState(false);
   const [date, selectedDate] = useState();
-  const [selectedCategory, setSelectedCategory] = useState();
+  const [selectedCategory, setSelectedCategory] = useState("Public");
   const [facebook, setFacebook] = useState();
   const [instagram, setInstagram] = useState();
   const [whatsup, setWhatsup] = useState();
+  const [petName, setPetName] = useState();
+  const [location, setLocation] = useState();
+  const [feature, setFeature] = useState();
+  const [message, setMessage] = useState();
+  const [contactNo, setContactNo] = useState();
+  const [agree, setAgree] = useState();
+  const [petId, setPetId] = useState([]);
+  const [selectedPlatforms, setSelectedPlatforms] = useState([]);
+
   const hideDatePickerCancel = () => {
     setDateVisibility(false);
   };
@@ -55,10 +67,34 @@ const LostPetAlert = () => {
     hideDatePickerCancel();
   };
 
-  const handlePetImg = (image) => {
-    var temp = [...petImage];
-    temp.push(image);
-    setPetImage(temp);
+  const handlePetImg = async (image) => {
+    const extension = image?.fileName?.split(".").pop();
+    const userId = await decryptService("userId");
+    let payload = {
+      userid: userId,
+      documenttype: "photo",
+      extention: extension,
+      document: image?.fileData,
+    };
+    apiCall(payload, DOCUMENT_TYPES.document, image);
+  };
+
+  const apiCall = async (postData, type, item) => {
+    try {
+      const res = await uploadDocument(postData);
+      if (res?.status == 200) {
+        const data = [...petImage];
+        data.push({ ...item, id: res?.data?.data?.reqId });
+        setPetImage(data);
+
+        const dataId = [...petId];
+        dataId.push({ id: res?.data?.data?.reqId });
+        setPetId(dataId);
+        showToast("success", "Successfully uploaded the image");
+      }
+    } catch (error) {
+      showToast("error", error.message);
+    }
   };
 
   const getBase64Obj = (url) => {
@@ -66,6 +102,96 @@ const LostPetAlert = () => {
       return {
         uri: url.includes("https") ? url : `data:image/jpg;base64,${url}`,
       };
+    }
+  };
+
+  const shareImageBase64 = async (image, platforms = []) => {
+    try {
+      for (const platform of platforms) {
+        console.log("platform", platform);
+        if (platform == "FACEBOOK") {
+          const shareData = {
+            title: "Share on Facebook",
+            message: "Check out this image!",
+            url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
+          };
+          await Share.open(shareData);
+        }
+
+        if (platform == "INSTAGRAM") {
+          const shareData = {
+            title: "Share on instagram",
+            message: "Check out this image!",
+            url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
+          };
+          await Share.open(shareData);
+        }
+
+        if (platform == "WHATSUP") {
+          const shareData = {
+            title: "Share on instagram",
+            message: "Check out this image!",
+            url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
+            social: Share.Social.WHATSAPP,
+          };
+          await Share.open(shareData);
+        }
+      }
+    } catch (error) {
+      console.log("Error sharing image:", error);
+    }
+  };
+
+  const onSubmit = async () => {
+    try {
+      if (!petName) {
+        showToast("error", "Please enter pet name");
+      } else if (!selectedGender) {
+        showToast("error", "Please select gender");
+      } else if (!petImage) {
+        showToast("error", "Please add images of the pet");
+      } else if (!date) {
+        showToast("error", "Please select date");
+      } else if (!location) {
+        showToast("error", "Please enter location");
+      } else if (!feature) {
+        showToast("error", "Please enter feature");
+      } else if (!message) {
+        showToast("error", "Please enter message");
+      } else if (!contactNo) {
+        showToast("error", "Please enter contact No");
+      } else if (!agree) {
+        showToast("error", "Please select the terms and condition");
+      }
+      const currentPosition = await getCurrentLocation();
+      const [day, month, year] = date?.split("/"); // Split into parts
+      const dateString = new Date(`${year}-${month}-${day}T00:00:00Z`); // Rearrange & create Date object
+
+      let obj = {
+        userid: await decryptService("userId"),
+        isownpet: 1,
+        name: petName,
+        gender: selectedGender,
+        lastseen: dateString.toISOString(),
+        lastseenlocation: location,
+        audience: "Public",
+        features: feature,
+        contactnum: contactNo,
+        message: message,
+        documents: petId.map((item) => item.id).join(","),
+        requesttype: "lostpet",
+        coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
+      };
+      let res = await AddLostPetAlert(obj);
+      if (Boolean(res?.image)) {
+        if (selectedPlatforms) {
+          await shareImageBase64(res?.image, selectedPlatforms);
+        }
+        showToast("success", "Lost Pet Alert has successfully created");
+        goBack();
+      }
+    } catch (error) {
+      console.log("err", error);
     }
   };
 
@@ -80,10 +206,7 @@ const LostPetAlert = () => {
         />
         <TouchableOpacity
           onPress={() => {
-            const removeItemById = petImage.filter(
-              (item) => item?.fileData !== photo
-            );
-            setPetImage(removeItemById);
+            onCancel(DOCUMENT_TYPES.image, item?.item);
           }}
           style={styles.crossView}
         >
@@ -93,422 +216,410 @@ const LostPetAlert = () => {
     );
   };
 
+  const onCancel = async (type, doc) => {
+    try {
+      const userId = await decryptService("userId");
+      const postData = {
+        userid: userId,
+        id: doc?.id,
+      };
+      const res = await deleteDocument(postData);
+      if (res?.status == 200) {
+        const removeItemById = petImage.filter((it) => it?.id !== doc?.id);
+        const removeId = petImage.filter((it) => it?.id !== doc?.id);
+        setPetId(removeId);
+        setPetImage(removeItemById);
+        showToast("success", "Successfully deleted the image");
+      }
+    } catch (error) {
+      showToast("error", error.message);
+    }
+  };
+
+  const handleSelection = (platform, isChecked) => {
+    if (isChecked) {
+      setSelectedPlatforms((prev) => [...prev, platform]); // Add to array
+    } else {
+      setSelectedPlatforms((prev) => prev.filter((p) => p !== platform)); // Remove from array
+    }
+  };
+
   return (
-    <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
-      <StatusBar backgroundColor={THEMES.colors.white} />
-      <Header title="Lost pet alert" fontColor="#000" showBack />
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
+        <StatusBar backgroundColor={THEMES.colors.white} />
+        <Header title="Lost pet alert" fontColor="#000" showBack />
 
-      <ScrollView style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: THEMES.colors.bgColor,
-            marginBottom: moderateScale(24),
-          }}
-        >
+        <ScrollView style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
           <View
             style={{
-              paddingTop: moderateScale(24),
-              paddingHorizontal: moderateScale(20),
+              flex: 1,
+              backgroundColor: THEMES.colors.bgColor,
+              marginBottom: moderateScale(24),
             }}
           >
-            <InputField
-              label={"Pet Name*"}
-              placeholderText={"Enter Pet name"}
-            />
-          </View>
-          <View style={styles.toggleContainer}>
-            <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                {
-                  backgroundColor:
-                    selectedGender === "Male"
-                      ? THEMES.colors.cyan
-                      : THEMES.colors.white,
-                },
-              ]}
-              onPress={() => setSelectedGender("Male")}
+            <View
+              style={{
+                paddingTop: moderateScale(24),
+                paddingHorizontal: moderateScale(20),
+              }}
             >
-              <Text
+              <InputField
+                label={"Pet Name*"}
+                placeholderText={"Enter Pet name"}
+                value={petName}
+                onChange={setPetName}
+              />
+            </View>
+            <View style={styles.toggleContainer}>
+              <TouchableOpacity
                 style={[
-                  styles.toggleText,
+                  styles.toggleButton,
                   {
-                    color:
+                    backgroundColor:
                       selectedGender === "Male"
-                        ? THEMES.colors.white
-                        : THEMES.colors.cyan,
+                        ? THEMES.colors.cyan
+                        : THEMES.colors.white,
                   },
                 ]}
+                onPress={() => setSelectedGender("Male")}
               >
-                Male
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={[
+                    styles.toggleText,
+                    {
+                      color:
+                        selectedGender === "Male"
+                          ? THEMES.colors.white
+                          : THEMES.colors.cyan,
+                    },
+                  ]}
+                >
+                  Male
+                </Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[
-                styles.toggleButton,
-                {
-                  backgroundColor:
-                    selectedGender === "Female"
-                      ? THEMES.colors.cyan
-                      : THEMES.colors.white,
-                },
-              ]}
-              onPress={() => setSelectedGender("Female")}
-            >
-              <Text
+              <TouchableOpacity
                 style={[
-                  styles.toggleText,
+                  styles.toggleButton,
                   {
-                    color:
+                    backgroundColor:
                       selectedGender === "Female"
-                        ? THEMES.colors.white
-                        : THEMES.colors.cyan,
+                        ? THEMES.colors.cyan
+                        : THEMES.colors.white,
                   },
                 ]}
+                onPress={() => setSelectedGender("Female")}
               >
-                Female
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View
-            style={{
-              paddingHorizontal: moderateScale(20),
-              paddingTop: moderateScale(24),
-            }}
-          >
-            <View style={styles.secondaryFlex}>
-              <Text style={styles.titleText}>Photo of the pet</Text>
-              <TouchableOpacity onPress={() => setPetImageVisible(true)}>
-                <Text style={styles.addText}>{Strings.add}</Text>
+                <Text
+                  style={[
+                    styles.toggleText,
+                    {
+                      color:
+                        selectedGender === "Female"
+                          ? THEMES.colors.white
+                          : THEMES.colors.cyan,
+                    },
+                  ]}
+                >
+                  Female
+                </Text>
               </TouchableOpacity>
             </View>
+
             <View
-              style={[
-                styles.flatlistView,
-                {
-                  alignItems: petImage?.length == 0 ? "center" : "flex-start",
-                },
-              ]}
+              style={{
+                paddingHorizontal: moderateScale(20),
+                paddingTop: moderateScale(24),
+              }}
             >
-              <FlatList
-                horizontal={true}
-                contentContainerStyle={{
-                  justifyContent: petImage?.length ? "flex-start" : "center",
-                  alignItems: "center",
-                  padding: petImage?.length
-                    ? moderateScale(0)
-                    : moderateScale(16),
-                  borderColor: THEMES.colors.darkGrey,
-                  borderRadius: 10,
-                }}
-                showsHorizontalScrollIndicator={false}
-                data={petImage}
-                renderItem={renderItem}
-                ListHeaderComponent={() =>
-                  petImage?.length == 0 ? (
-                    <Text style={styles.imgPlaceholder}>
-                      {Strings.pleaseAddImg}
-                    </Text>
-                  ) : null
-                }
+              <View style={styles.secondaryFlex}>
+                <Text style={styles.titleText}>Photo of the pet</Text>
+                <TouchableOpacity onPress={() => setPetImageVisible(true)}>
+                  <Text style={styles.addText}>{Strings.add}</Text>
+                </TouchableOpacity>
+              </View>
+              <View
+                style={[
+                  styles.flatlistView,
+                  {
+                    alignItems: petImage?.length == 0 ? "center" : "flex-start",
+                  },
+                ]}
+              >
+                <FlatList
+                  horizontal={true}
+                  contentContainerStyle={{
+                    justifyContent: petImage?.length ? "flex-start" : "center",
+                    alignItems: "center",
+                    padding: petImage?.length
+                      ? moderateScale(0)
+                      : moderateScale(16),
+                    borderColor: THEMES.colors.darkGrey,
+                    borderRadius: 10,
+                  }}
+                  showsHorizontalScrollIndicator={false}
+                  data={petImage}
+                  renderItem={renderItem}
+                  ListHeaderComponent={() =>
+                    petImage?.length == 0 ? (
+                      <Text style={styles.imgPlaceholder}>
+                        {Strings.pleaseAddImg}
+                      </Text>
+                    ) : null
+                  }
+                />
+              </View>
+            </View>
+
+            <View
+              style={{
+                paddingHorizontal: moderateScale(20),
+                paddingTop: moderateScale(24),
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => setDateVisibility(true)}
+                style={[
+                  styles.dateContainer,
+                  {
+                    paddingHorizontal: moderateScale(15),
+                    flexDirection: "row",
+                    alignItems: "center",
+                  },
+                ]}
+              >
+                <View style={{ paddingRight: moderateScale(10) }}>
+                  {date ? (
+                    <>
+                      <Text
+                        style={[
+                          styles.datePlaceholderText,
+                          {
+                            paddingBottom: moderateScale(1),
+                            fontSize: THEMES.fonts.font10,
+                          },
+                        ]}
+                      >
+                        Last seen date
+                      </Text>
+                      <Text style={styles.dateValue}>{date}</Text>
+                    </>
+                  ) : (
+                    <>
+                      <Text
+                        style={[
+                          styles.datePlaceholderText,
+                          {
+                            paddingBottom: moderateScale(2),
+                            fontSize: THEMES.fonts.font10,
+                          },
+                        ]}
+                      >
+                        Last seen date
+                      </Text>
+                      <Text style={styles.datePlaceholderText}>
+                        {Strings.ddMMYYYY}
+                      </Text>
+                    </>
+                  )}
+                </View>
+                <Calendars />
+              </TouchableOpacity>
+            </View>
+
+            <View
+              style={{
+                paddingHorizontal: moderateScale(20),
+                paddingTop: moderateScale(24),
+              }}
+            >
+              <InputField
+                label={"Last seen location"}
+                placeholderText={"Enter location name"}
+                value={location}
+                onChange={setLocation}
               />
             </View>
-          </View>
 
-          <View
-            style={{
-              paddingHorizontal: moderateScale(20),
-              paddingTop: moderateScale(24),
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => setDateVisibility(true)}
-              style={[
-                styles.dateContainer,
-                {
-                  paddingHorizontal: moderateScale(15),
+            <View
+              style={{
+                paddingTop: moderateScale(24),
+                paddingHorizontal: moderateScale(20),
+              }}
+            >
+              <InputField
+                editable={false}
+                label={"Select whom to send"}
+                placeholderText={"Select"}
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+              />
+              {/* <ModalDropdown
+                placeholder="Select whom to send"
+                data={categoryData}
+                title={"Select"}
+                setSelectedValue={setSelectedCategory}
+                selectedValue={selectedCategory}
+              /> */}
+            </View>
+
+            <View
+              style={{
+                paddingTop: moderateScale(24),
+                paddingHorizontal: moderateScale(20),
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: THEMES.fontFamily.semiBold,
+                  color: THEMES.colors.darkGrey,
+                  fontSize: THEMES.fonts.font12,
+                }}
+              >
+                Do you want to share this alert on Facebook with details to
+                reach out common people
+              </Text>
+
+              <View style={styles.contentValueView}>
+                <CheckBox
+                  checkedImage={<Checked />}
+                  unCheckedImage={<UnChecked />}
+                  onClick={() => {
+                    setFacebook(!facebook);
+                    handleSelection("FACEBOOK", !facebook);
+                  }}
+                  isChecked={facebook}
+                  style={{ flex: 1 }}
+                  rightTextStyle={{
+                    color: THEMES.colors.black,
+                    fontSize: THEMES.fonts.font12,
+                    fontFamily: THEMES.fontFamily.medium,
+                  }}
+                  rightText={"Facebook"}
+                />
+                <CheckBox
+                  checkedImage={<Checked />}
+                  unCheckedImage={<UnChecked />}
+                  onClick={() => {
+                    setInstagram(!instagram);
+                    handleSelection("INSTAGRAM", !instagram);
+                  }}
+                  isChecked={instagram}
+                  style={{ flex: 1 }}
+                  rightText={"Instagram"}
+                  rightTextStyle={{
+                    color: THEMES.colors.black,
+                    fontSize: THEMES.fonts.font12,
+                    fontFamily: THEMES.fontFamily.medium,
+                  }}
+                />
+                <CheckBox
+                  checkedImage={<Checked />}
+                  unCheckedImage={<UnChecked />}
+                  onClick={() => {
+                    setWhatsup(!instagram);
+                    handleSelection("WHATSUP", !whatsup);
+                  }}
+                  isChecked={whatsup}
+                  style={{ flex: 1 }}
+                  rightText={"Whatsup"}
+                  rightTextStyle={{
+                    color: THEMES.colors.black,
+                    fontSize: THEMES.fonts.font12,
+                    fontFamily: THEMES.fontFamily.medium,
+                  }}
+                />
+              </View>
+
+              <View
+                style={{
+                  paddingTop: moderateScale(24),
+                }}
+              >
+                <InputField
+                  label={"Distinguishing features*"}
+                  placeholderText={"Enter the Distinguishing features"}
+                  multiline={true}
+                  value={feature}
+                  onChange={setFeature}
+                />
+              </View>
+              <View
+                style={{
+                  paddingTop: moderateScale(24),
+                }}
+              >
+                <InputField
+                  label={"Your Message*"}
+                  placeholderText={"Write your message"}
+                  multiline={true}
+                  value={message}
+                  onChange={setMessage}
+                />
+              </View>
+              <View
+                style={{
+                  paddingTop: moderateScale(24),
+                }}
+              >
+                <InputField
+                  label={"Additional contact number*"}
+                  placeholderText={"Enter number"}
+                  value={contactNo}
+                  keyboardType="phone-pad"
+                  onChange={setContactNo}
+                  maxLength={10}
+                />
+              </View>
+
+              <View
+                style={{
+                  paddingTop: moderateScale(24),
                   flexDirection: "row",
                   alignItems: "center",
-                },
-              ]}
-            >
-              <View style={{ paddingRight: moderateScale(10) }}>
-                {date ? (
-                  <>
-                    <Text
-                      style={[
-                        styles.datePlaceholderText,
-                        {
-                          paddingBottom: moderateScale(1),
-                          fontSize: THEMES.fonts.font10,
-                        },
-                      ]}
-                    >
-                      Last seen date
-                    </Text>
-                    <Text style={styles.dateValue}>{date}</Text>
-                  </>
-                ) : (
-                  <>
-                    <Text
-                      style={[
-                        styles.datePlaceholderText,
-                        {
-                          paddingBottom: moderateScale(2),
-                          fontSize: THEMES.fonts.font10,
-                        },
-                      ]}
-                    >
-                      Last seen date
-                    </Text>
-                    <Text style={styles.datePlaceholderText}>
-                      {Strings.ddMMYYYY}
-                    </Text>
-                  </>
-                )}
+                  justifyContent: "center",
+                }}
+              >
+                <CheckBox
+                  checkedImage={<Checked />}
+                  unCheckedImage={<UnChecked />}
+                  onClick={() => setAgree(!agree)}
+                  isChecked={agree}
+                  style={{ flex: 1 }}
+                  rightText={"Agree terms and conditions"}
+                  rightTextStyle={{
+                    color: THEMES.colors.black,
+                    fontSize: THEMES.fonts.font12,
+                    fontFamily: THEMES.fontFamily.medium,
+                  }}
+                />
               </View>
-              <Calendars />
-            </TouchableOpacity>
-          </View>
 
-          <View
-            style={{
-              paddingHorizontal: moderateScale(20),
-              paddingTop: moderateScale(24),
-            }}
-          >
-            <InputField
-              label={"Last seen location"}
-              placeholderText={"Enter location"}
-            />
-          </View>
-
-          <View
-            style={{
-              paddingTop: moderateScale(24),
-            }}
-          >
-            <ModalDropdown
-              placeholder="Select whom to send"
-              data={categoryData}
-              title={"Select"}
-              setSelectedValue={setSelectedCategory}
-              selectedValue={selectedCategory}
-            />
-          </View>
-
-          <View
-            style={{
-              paddingTop: moderateScale(24),
-              paddingHorizontal: moderateScale(20),
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: THEMES.fontFamily.semiBold,
-                color: THEMES.colors.darkGrey,
-                fontSize: THEMES.fonts.font12,
-              }}
-            >
-              Do you want to share this alert on Facebook with details to reach
-              out common people
-            </Text>
-
-            <View style={styles.contentValueView}>
-              <CheckBox
-                checkedImage={<Checked />}
-                unCheckedImage={<UnChecked />}
-                onClick={() => setFacebook(!facebook)}
-                isChecked={facebook}
-                style={{ flex: 1 }}
-                rightTextStyle={{
-                  color: THEMES.colors.black,
-                  fontSize: THEMES.fonts.font12,
-                  fontFamily: THEMES.fontFamily.medium,
+              <View
+                style={{
+                  paddingTop: moderateScale(30),
                 }}
-                rightText={"Facebook"}
-              />
-              <CheckBox
-                checkedImage={<Checked />}
-                unCheckedImage={<UnChecked />}
-                onClick={() => setInstagram(!instagram)}
-                isChecked={instagram}
-                style={{ flex: 1 }}
-                rightText={"Instagram"}
-                rightTextStyle={{
-                  color: THEMES.colors.black,
-                  fontSize: THEMES.fonts.font12,
-                  fontFamily: THEMES.fontFamily.medium,
-                }}
-              />
-              <CheckBox
-                checkedImage={<Checked />}
-                unCheckedImage={<UnChecked />}
-                onClick={() => setWhatsup(!whatsup)}
-                isChecked={whatsup}
-                style={{ flex: 1 }}
-                rightText={"Whatsup"}
-                rightTextStyle={{
-                  color: THEMES.colors.black,
-                  fontSize: THEMES.fonts.font12,
-                  fontFamily: THEMES.fontFamily.medium,
-                }}
-              />
-            </View>
-
-            <View
-              style={{
-                paddingTop: moderateScale(24),
-              }}
-            >
-              <InputField
-                label={"Distinguishing features*"}
-                placeholderText={"Enter the Distinguishing features"}
-                multiline={true}
-              />
-            </View>
-            <View
-              style={{
-                paddingTop: moderateScale(24),
-              }}
-            >
-              <InputField
-                label={"Your message*"}
-                placeholderText={"Enter message"}
-                multiline={true}
-              />
+              >
+                <Button title="Submit" onPress={() => onSubmit()}></Button>
+              </View>
             </View>
           </View>
-          <View
-            style={{
-              paddingTop: moderateScale(24),
-              paddingHorizontal: moderateScale(20),
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: THEMES.fontFamily.semiBold,
-                color: THEMES.colors.darkGrey,
-                fontSize: THEMES.fonts.font12,
-              }}
-            >
-              Do you want to share this alert on Facebook with details to reach
-              out common people
-            </Text>
+        </ScrollView>
 
-            <View style={styles.contentValueView}>
-              <CheckBox
-                checkedImage={<Checked />}
-                unCheckedImage={<UnChecked />}
-                onClick={() => setFacebook(!facebook)}
-                isChecked={facebook}
-                style={{ flex: 1 }}
-                rightTextStyle={{
-                  color: THEMES.colors.black,
-                  fontSize: THEMES.fonts.font12,
-                  fontFamily: THEMES.fontFamily.medium,
-                }}
-                rightText={"Facebook"}
-              />
-              <CheckBox
-                checkedImage={<Checked />}
-                unCheckedImage={<UnChecked />}
-                onClick={() => setInstagram(!instagram)}
-                isChecked={instagram}
-                style={{ flex: 1 }}
-                rightText={"Instagram"}
-                rightTextStyle={{
-                  color: THEMES.colors.black,
-                  fontSize: THEMES.fonts.font12,
-                  fontFamily: THEMES.fontFamily.medium,
-                }}
-              />
-              <CheckBox
-                checkedImage={<Checked />}
-                unCheckedImage={<UnChecked />}
-                onClick={() => setWhatsup(!whatsup)}
-                isChecked={whatsup}
-                style={{ flex: 1 }}
-                rightText={"Whatsup"}
-                rightTextStyle={{
-                  color: THEMES.colors.black,
-                  fontSize: THEMES.fonts.font12,
-                  fontFamily: THEMES.fontFamily.medium,
-                }}
-              />
-            </View>
-
-            <View
-              style={{
-                paddingTop: moderateScale(24),
-              }}
-            >
-              <InputField
-                label={"Distinguishing features*"}
-                placeholderText={"Enter the Distinguishing features"}
-                multiline={true}
-              />
-            </View>
-            <View
-              style={{
-                paddingTop: moderateScale(24),
-              }}
-            >
-              <InputField
-                label={"Additional contact number*"}
-                placeholderText={"Enter number"}
-              />
-            </View>
-
-            <View
-              style={{
-                paddingTop: moderateScale(24),
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <CheckBox
-                checkedImage={<Checked />}
-                unCheckedImage={<UnChecked />}
-                onClick={() => setWhatsup(!whatsup)}
-                isChecked={whatsup}
-                style={{ flex: 1 }}
-                rightText={"Agree terms and conditions"}
-                rightTextStyle={{
-                  color: THEMES.colors.black,
-                  fontSize: THEMES.fonts.font12,
-                  fontFamily: THEMES.fontFamily.medium,
-                }}
-              />
-            </View>
-
-            <View
-              style={{
-                paddingTop: moderateScale(30),
-              }}
-            >
-              <Button title="Submit"></Button>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-
-      <UploadImageModal
-        isVisible={petImagesVisible}
-        onClose={() => setPetImageVisible(false)}
-        handleSelectedImage={(image) => handlePetImg(image)}
-      />
-      <DateTimePicker
-        isVisible={isDateVisible}
-        mode="date"
-        onConfirm={handleDateConfirm}
-        onCancel={hideDatePickerCancel}
-      />
-    </View>
+        <UploadImageModal
+          isVisible={petImagesVisible}
+          onClose={() => setPetImageVisible(false)}
+          handleSelectedImage={(image) => handlePetImg(image)}
+        />
+        <DateTimePicker
+          isVisible={isDateVisible}
+          mode="date"
+          onConfirm={handleDateConfirm}
+          onCancel={hideDatePickerCancel}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 

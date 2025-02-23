@@ -163,12 +163,12 @@ const PetAdoption = (props) => {
             borderColor: "transparent",
           }}
         >
-          {Boolean(item?.document?.url) ? (
+          {Boolean(item?.document?.[0]?.url) ? (
             <Image
               resizeMode="contain"
               style={{ width: 48, height: 48, borderRadius: 48 / 2 }}
               source={{
-                uri: item?.document?.url,
+                uri: item?.document?.[0]?.url,
               }}
             />
           ) : (
