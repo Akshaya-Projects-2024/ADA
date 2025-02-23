@@ -24,6 +24,8 @@ const AdoptionDetail = (props) => {
   const selectedAdotpionData = props.route.params.selectedData;
   const [image, setImage] = useState();
 
+  console.log("selectedAdotpionData", selectedAdotpionData);
+
   useEffect(() => {
     initData();
   }, []);
@@ -39,7 +41,7 @@ const AdoptionDetail = (props) => {
     }
   };
 
- const shareImageBase64 = async () => {
+  const shareImageBase64 = async () => {
     const shareData = {
       title: "Share",
       message: "Check out this image!",
@@ -73,30 +75,132 @@ const AdoptionDetail = (props) => {
                   </Text>
                 </View>
                 <View style={styles.dogDetailView}>
-                  <View style={styles.dogView}>
+                  <View
+                    style={{
+                      position: "relative",
+                      width: moderateScale(75),
+                      height: moderateScale(75),
+                    }}
+                  >
+                    <Image
+                      source={require("../../assets/images/dogType.png")}
+                      style={{ width: "100%", height: "100%" }}
+                      resizeMode="cover"
+                    />
+                    <View
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text style={styles.dogText}>
+                        {" "}
+                        {selectedAdotpionData?.category}
+                      </Text>
+                      <Text style={styles.type}>Type</Text>
+                    </View>
+                  </View>
+                  {/* <View style={[styles.dogView,{position:'absolute',textAlign:'center', margin:0, }]}>
                     <Text style={styles.dogText}>
                       {" "}
                       {selectedAdotpionData?.category}
                     </Text>
                     <Text style={styles.type}>Type</Text>
+                  </View> */}
+
+                  <View
+                    style={{
+                      position: "relative",
+                      width: moderateScale(75),
+                      height: moderateScale(75),
+                    }}
+                  >
+                    <Image
+                      source={require("../../assets/images/ageType.png")}
+                      style={{ width: "100%", height: "100%" }}
+                      resizeMode="cover"
+                    />
+                    <View
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text style={styles.ageText}>
+                        {selectedAdotpionData?.age}
+                      </Text>
+                      <Text style={styles.age}>Age</Text>
+                    </View>
                   </View>
-                  <View style={styles.ageView}>
-                    <Text style={styles.ageText}>
-                      {selectedAdotpionData?.age}
-                    </Text>
-                    <Text style={styles.age}>Age</Text>
+
+                  <View
+                    style={{
+                      position: "relative",
+                      width: moderateScale(75),
+                      height: moderateScale(75),
+                    }}
+                  >
+                    <Image
+                      source={require("../../assets/images/genderType.png")}
+                      style={{ width: "100%", height: "100%" }}
+                      resizeMode="cover"
+                    />
+                    <View
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text style={styles.genderText}>
+                        {selectedAdotpionData?.gender}
+                      </Text>
+                      <Text style={styles.gender}>Gender</Text>
+                    </View>
                   </View>
-                  <View style={styles.genderView}>
-                    <Text style={styles.genderText}>
-                      {selectedAdotpionData?.gender}
-                    </Text>
-                    <Text style={styles.gender}>Gender</Text>
-                  </View>
-                  <View style={styles.weightView}>
-                    <Text style={styles.weightText}>
-                      {selectedAdotpionData?.weight}
-                    </Text>
-                    <Text style={styles.weight}>Weight</Text>
+
+                  <View
+                    style={{
+                      position: "relative",
+                      width: moderateScale(75),
+                      height: moderateScale(75),
+                    }}
+                  >
+                    <Image
+                      source={require("../../assets/images/weightType.png")}
+                      style={{ width: "100%", height: "100%" }}
+                      resizeMode="cover"
+                    />
+                    <View
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text style={styles.weightText}>
+                        {selectedAdotpionData?.weight}
+                      </Text>
+                      <Text style={styles.weight}>Weight</Text>
+                    </View>
                   </View>
                 </View>
 
@@ -128,6 +232,25 @@ const AdoptionDetail = (props) => {
                       ]}
                     >
                       {selectedAdotpionData?.reason}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={
+                      selectedAdotpionData?.medicalcondition
+                        ? styles.locationMain
+                        : styles.padding0
+                    }
+                  >
+                    <Text style={styles.lastSeenText}>Medical condition </Text>
+                    <Text
+                      numberOfLines={2}
+                      style={[
+                        styles.location,
+                        { paddingTop: moderateScale(5) },
+                      ]}
+                    >
+                      {selectedAdotpionData?.medicalcondition}
                     </Text>
                   </View>
 
@@ -180,7 +303,7 @@ const AdoptionDetail = (props) => {
                         >
                           <Call />
                           <TouchableOpacity
-                            onPress={()=>shareImageBase64()}
+                            onPress={() => shareImageBase64()}
                             style={{ marginHorizontal: moderateScale(20) }}
                           >
                             <ShareImg />
@@ -259,7 +382,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 12,
     borderColor: "transparent",
-    backgroundColor: "#fee6e4",
     paddingVertical: moderateScale(16),
   },
   dogText: {

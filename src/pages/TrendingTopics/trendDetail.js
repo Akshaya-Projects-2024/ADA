@@ -56,14 +56,14 @@ const TrendDetail = (props) => {
         />
       </View>
       <View style={styles.headerView}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
           onPress={() => props.navigation.goBack()}
         >
           <Back stroke="#000" />
         </TouchableOpacity>
 
-        <Share />
+        <Share /> */}
       </View>
       <ScrollView
         style={{ flex: 1 }}

@@ -5,6 +5,7 @@ import PetAdoption from "../pages/PetAdoption/petAdoption";
 import MyAccount from "../pages/Account/myAccount";
 import BottomTabBarItem from "./BottomTabBarItem";
 import Chat from "../pages/Chat/chat";
+import EmergencyAlert from "../pages/Alerts/EmergencyAlert";
 
 const Tab = createBottomTabNavigator();
 
@@ -31,7 +32,7 @@ export default function BottomTabNavigation() {
         component={PetAdoption}
         options={navOptionHandler}
       />
-      <Tab.Screen name="chat" component={Chat} options={navOptionHandler} />
+      <Tab.Screen name="emergencyAlert" component={EmergencyAlert} options={navOptionHandler} />
       <Tab.Screen
         name="myAccount"
         component={MyAccount}

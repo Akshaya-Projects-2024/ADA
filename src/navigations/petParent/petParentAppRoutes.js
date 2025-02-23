@@ -7,6 +7,7 @@ import TrendingTopics from "../../pages/TrendingTopics/trendingTopics";
 import PetAdoption from "../../pages/PetAdoption/petAdoption";
 import Chat from "../../pages/Chat/chat";
 import ParentAccount from "../../pages/Account/parentAccount";
+import EmergencyAlert from "../../pages/Alerts/EmergencyAlert";
 
 const navOptionHandler = () => ({
   headerShown: false,
@@ -35,12 +36,14 @@ const PetParentAppStack = () => (
       component={PetAdoption}
       options={navOptionHandler}
     />
-    <Tab.Screen name="chat" component={Chat} options={navOptionHandler} />
+    <Tab.Screen name="emergencyAlert" component={EmergencyAlert} options={navOptionHandler} />
     <Tab.Screen
       name="parentAccount"
       component={ParentAccount}
       options={navOptionHandler}
     />
+
+    
   </Tab.Navigator>
 );
 

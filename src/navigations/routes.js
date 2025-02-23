@@ -225,12 +225,7 @@ const Routes = (props) => {
           component={Location}
           options={navOptionHandler}
         />
-        <Stack.Screen
-          name="emergencyAlert"
-          component={EmergencyAlert}
-          options={navOptionHandler}
-        />
-
+      
         <Stack.Screen
           name="otherLostPetAlert"
           component={OtherLostPetAlert}
@@ -248,19 +243,23 @@ const Routes = (props) => {
           component={OtherMedicalAlert}
           options={navOptionHandler}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="rescueHelp"
           component={RescueHelp}
           options={navOptionHandler}
         />
 
-<Stack.Screen
+        <Stack.Screen
           name="otherRescueHelpAlert"
           component={OtherRescueHelpAlert}
           options={navOptionHandler}
         />
 
-
+        <Stack.Screen
+          name="emergencyAlert"
+          component={EmergencyAlert}
+          options={navOptionHandler}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

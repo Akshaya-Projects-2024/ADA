@@ -75,7 +75,7 @@ const ContactPage = (props) => {
           }}
         >
           We’d love to hear from you! Whether you have a suggestion on our
-          improvement, a compl ain to discuss or an issue to solve, reach out to
+          improvement, a complain to discuss or an issue to solve, reach out to
           us!
         </Text>
         <View

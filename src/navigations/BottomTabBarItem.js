@@ -89,8 +89,8 @@ const BottomTabBarItem = ({ navigation, state }) => {
       />
       <Tab
         index={3}
-        route="chat"
-        label="Chat"
+        route="emergencyAlert"
+        label="Alert"
         icon={"chat"}
         darkColor={"#0e96ea"}
         lightColor={"#edf5ff"}
