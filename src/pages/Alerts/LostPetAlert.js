@@ -37,6 +37,7 @@ import { showToast } from "../../utils/utils";
 import { AddLostPetAlert } from "../../redux-store/actions/alerts";
 import { err } from "react-native-svg";
 import { goBack } from "../../navigations/rootNavigationRef";
+import { contextValue } from "../../components/Loader";
 
 const LostPetAlert = (props) => {
   const [selectedGender, setSelectedGender] = useState(null);
@@ -68,6 +69,7 @@ const LostPetAlert = (props) => {
   };
 
   const handlePetImg = async (image) => {
+    contextValue?.setLoader(true);
     const extension = image?.fileName?.split(".").pop();
     const userId = await decryptService("userId");
     let payload = {
@@ -90,9 +92,11 @@ const LostPetAlert = (props) => {
         const dataId = [...petId];
         dataId.push({ id: res?.data?.data?.reqId });
         setPetId(dataId);
+        contextValue?.setLoader(false);
         showToast("success", "Successfully uploaded the image");
       }
     } catch (error) {
+      contextValue?.setLoader(false);
       showToast("error", error.message);
     }
   };
@@ -108,11 +112,10 @@ const LostPetAlert = (props) => {
   const shareImageBase64 = async (image, platforms = []) => {
     try {
       for (const platform of platforms) {
-        console.log("platform", platform);
         if (platform == "FACEBOOK") {
           const shareData = {
-            title: "Share on Facebook",
-            message: "Check out this image!",
+            title: "Attention Required !!",
+            message: message,
             url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
           };
           await Share.open(shareData);
@@ -120,8 +123,8 @@ const LostPetAlert = (props) => {
 
         if (platform == "INSTAGRAM") {
           const shareData = {
-            title: "Share on instagram",
-            message: "Check out this image!",
+            title: "Attention Required !!",
+            message: message,
             url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
           };
           await Share.open(shareData);
@@ -129,8 +132,8 @@ const LostPetAlert = (props) => {
 
         if (platform == "WHATSUP") {
           const shareData = {
-            title: "Share on instagram",
-            message: "Check out this image!",
+            title: "Attention Required !!",
+            message: message,
             url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
             social: Share.Social.WHATSAPP,
           };
@@ -162,35 +165,36 @@ const LostPetAlert = (props) => {
         showToast("error", "Please enter contact No");
       } else if (!agree) {
         showToast("error", "Please select the terms and condition");
-      }
-      const currentPosition = await getCurrentLocation();
-      const [day, month, year] = date?.split("/"); // Split into parts
-      const dateString = new Date(`${year}-${month}-${day}T00:00:00Z`); // Rearrange & create Date object
+      } else {
+        contextValue?.setLoader(true);
+        const currentPosition = await getCurrentLocation();
 
-      let obj = {
-        userid: await decryptService("userId"),
-        isownpet: 1,
-        name: petName,
-        gender: selectedGender,
-        lastseen: dateString.toISOString(),
-        lastseenlocation: location,
-        audience: "Public",
-        features: feature,
-        contactnum: contactNo,
-        message: message,
-        documents: petId.map((item) => item.id).join(","),
-        requesttype: "lostpet",
-        coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
-      };
-      let res = await AddLostPetAlert(obj);
-      if (Boolean(res?.image)) {
-        if (selectedPlatforms) {
-          await shareImageBase64(res?.image, selectedPlatforms);
+        let obj = {
+          userid: await decryptService("userId"),
+          isownpet: 1,
+          name: petName,
+          gender: selectedGender,
+          lastseen: date,
+          lastseenlocation: location,
+          audience: "Public",
+          features: feature,
+          contactnum: contactNo,
+          message: message,
+          documents: petId.map((item) => item.id).join(","),
+          requesttype: "lostpet",
+          coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
+        };
+        let res = await AddLostPetAlert(obj);
+        if (Boolean(res?.image)) {
+          if (selectedPlatforms) {
+            await shareImageBase64(res?.image, selectedPlatforms);
+          }
+          showToast("success", "Lost Pet Alert has successfully created");
+          goBack();
         }
-        showToast("success", "Lost Pet Alert has successfully created");
-        goBack();
       }
     } catch (error) {
+      contextValue?.setLoader(false);
       console.log("err", error);
     }
   };

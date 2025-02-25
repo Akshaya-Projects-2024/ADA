@@ -36,6 +36,7 @@ import { DOCUMENT_TYPES } from "../Account/uploadImagesDocs";
 import { showToast } from "../../utils/utils";
 import { AddLostPetAlert } from "../../redux-store/actions/alerts";
 import { goBack } from "../../navigations/rootNavigationRef";
+import { contextValue } from "../../components/Loader";
 
 const OtherRescueHelpAlert = (props) => {
   const [petImage, setPetImage] = useState([]);
@@ -49,7 +50,6 @@ const OtherRescueHelpAlert = (props) => {
   const [petName, setPetName] = useState();
   const [location, setLocation] = useState();
   const [feature, setFeature] = useState();
-  const [message, setMessage] = useState();
   const [contactNo, setContactNo] = useState();
   const [agree, setAgree] = useState();
   const [petId, setPetId] = useState([]);
@@ -66,6 +66,7 @@ const OtherRescueHelpAlert = (props) => {
   };
 
   const handlePetImg = async (image) => {
+    contextValue?.setLoader(true);
     const extension = image?.fileName?.split(".").pop();
     const userId = await decryptService("userId");
     let payload = {
@@ -88,9 +89,11 @@ const OtherRescueHelpAlert = (props) => {
         const dataId = [...petId];
         dataId.push({ id: res?.data?.data?.reqId });
         setPetId(dataId);
+        contextValue?.setLoader(false);
         showToast("success", "Successfully uploaded the image");
       }
     } catch (error) {
+      contextValue?.setLoader(false);
       showToast("error", error.message);
     }
   };
@@ -105,11 +108,12 @@ const OtherRescueHelpAlert = (props) => {
 
   const shareImageBase64 = async (image, platforms = []) => {
     try {
+      contextValue?.setLoader(false);
       for (const platform of platforms) {
         if (platform == "FACEBOOK") {
           const shareData = {
-            title: "Share on Facebook",
-            message: "Check out this image!",
+            title: "Attention Required !!",
+            message: feature,
             url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
           };
           await Share.open(shareData);
@@ -117,8 +121,8 @@ const OtherRescueHelpAlert = (props) => {
 
         if (platform == "INSTAGRAM") {
           const shareData = {
-            title: "Share on instagram",
-            message: "Check out this image!",
+            title: "Attention Required !!",
+            message: feature,
             url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
           };
           await Share.open(shareData);
@@ -126,8 +130,8 @@ const OtherRescueHelpAlert = (props) => {
 
         if (platform == "WHATSUP") {
           const shareData = {
-            title: "Share on instagram",
-            message: "Check out this image!",
+            title: "Attention Required !!",
+            message: feature,
             url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
             social: Share.Social.WHATSAPP,
           };
@@ -135,6 +139,7 @@ const OtherRescueHelpAlert = (props) => {
         }
       }
     } catch (error) {
+      contextValue?.setLoader(false);
       console.log("Error sharing image:", error);
     }
   };
@@ -153,35 +158,34 @@ const OtherRescueHelpAlert = (props) => {
         showToast("error", "Please enter contact No");
       } else if (!agree) {
         showToast("error", "Please select the terms and condition");
-      }
-      const currentPosition = await getCurrentLocation();
-      const [day, month, year] = date?.split("/"); // Split into parts
-      const dateString = new Date(`${year}-${month}-${day}T00:00:00Z`); // Rearrange & create Date object
-
-      let obj = {
-        userid: await decryptService("userId"),
-        isownpet: 0,
-        name: "",
-        gender: "",
-        lastseen: dateString.toISOString(),
-        lastseenlocation: location,
-        audience: "Public",
-        features: feature,
-        contactnum: contactNo,
-        message: message,
-        documents: petId.map((item) => item.id).join(","),
-        requesttype: "rescue",
-        coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
-      };
-      let res = await AddLostPetAlert(obj);
-      if (Boolean(res?.image)) {
-        if (selectedPlatforms) {
-          await shareImageBase64(res?.image, selectedPlatforms);
+      } else {
+        contextValue?.setLoader(true);
+        const currentPosition = await getCurrentLocation();
+        let obj = {
+          userid: await decryptService("userId"),
+          isownpet: 0,
+          name: "",
+          gender: "",
+          lastseen: date,
+          lastseenlocation: location,
+          audience: "Public",
+          features: feature,
+          contactnum: contactNo,
+          documents: petId?.map((item) => item?.id).join(","),
+          requesttype: "rescue",
+          coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
+        };
+        let res = await AddLostPetAlert(obj);
+        if (Boolean(res?.image)) {
+          if (selectedPlatforms) {
+            await shareImageBase64(res?.image, selectedPlatforms);
+          }
+          showToast("success", "Rescue Pet Alert has successfully created");
+          goBack();
         }
-        showToast("success", "Medical Pet Alert has successfully created");
-        goBack();
       }
     } catch (error) {
+      contextValue?.setLoader(false);
       console.log("err", error);
     }
   };
