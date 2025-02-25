@@ -12,8 +12,6 @@ import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
 import Header from "../../components/Header";
 import { moderateScale, s } from "react-native-size-matters";
-import ReviewComponent from "../../components/ReviewComponent";
-import Dropdown from "../../components/DropDown";
 import StarRating from "react-native-star-rating";
 import Modal from "react-native-modal";
 import InputField from "../../components/InputField";
@@ -28,21 +26,25 @@ import {
 import { findDifferenceByDays, showToast } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
 import { useSelector } from "react-redux";
+import { contextValue } from "../../components/Loader";
 
 const ParentReviews = (props) => {
-  const id =
+  const vendorId =
     props?.route?.params?.selectedService?.profile?.providerBusiness?.userid;
   const [reviewList, setReviewList] = useState([]);
   const [review, setReview] = useState([]);
   const { providerProfile, profileData, logindetails } = useSelector(
     ({ commonReducer }) => commonReducer
   );
+  const profile = useSelector((state) => state?.commonReducer);
+
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const [modalData, setModalData] = useState();
   const [comment, setComment] = useState();
   const [isModalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
+    contextValue?.setLoader(true);
     initData();
   }, []);
 
@@ -50,39 +52,45 @@ const ParentReviews = (props) => {
     setModalVisible(!isModalVisible);
   };
 
-  const profileServices = useMemo(
-    () =>
-      profileData?.providerBusiness?.services?.reduce(
-        (accumulator, currentValue) =>
-          accumulator + `${currentValue?.service} `,
-        ""
-      ),
-    [profileData?.providerBusiness?.services]
-  );
+  useEffect(() => {
+    if (!isModalVisible) {
+      initData();
+    }
+  }, [isModalVisible]);
 
   const initData = async () => {
-    let obj = {
-      userId: "7977276381",
-      vendor: "7977276381",
-      sortBy: "newest",
-      pageNum: 1,
-      pageSize: 20,
-    };
-    let res = await getAllReviews(obj);
-    console.log(res);
-    if (res?.reviews?.length) {
-      setReviewList(res?.reviews);
+    try {
+      let obj = {
+        userId: await decryptService("userId"), //login in id
+        vendor: vendorId ? vendorId : await decryptService("userId"), // pass id
+        sortBy: "newest",
+        pageNum: 1,
+        pageSize: 50,
+      };
+      let res = await getAllReviews(obj);
+      if (res?.reviews?.length) {
+        setReviewList(res?.reviews);
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {
+      contextValue?.setLoader(false);
     }
   };
 
+  const renderListEmpty = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>No Reviews found.</Text>
+    </View>
+  );
+
   const replyReviewBtn = async () => {
-    const userId = await decryptService("userId");
     let obj = {
-      provider: "9769487604",
-      rating: "2",
+      provider: await decryptService("userId"),
+      id: modalData?.item?.id,
       reply: comment,
     };
-    let res = await addReview(obj);
+
+    let res = await replyReviewApi(obj);
     if (res?.data?.status_code !== 200) {
       setModalVisible(false);
       showToast("success", res?.data?.message);
@@ -135,7 +143,7 @@ const ParentReviews = (props) => {
               {}
             </Text>
 
-            {!item?.item?.reply && (
+            {/* {!item?.item?.reply && (
               <Text
                 onPress={() => {
                   setModalData(item);
@@ -146,7 +154,7 @@ const ParentReviews = (props) => {
               >
                 {Strings.reply}{" "}
               </Text>
-            )}
+            )} */}
           </View>
           {item?.item?.reply && (
             <View style={{ paddingTop: moderateScale(12) }}>
@@ -156,7 +164,7 @@ const ParentReviews = (props) => {
                     <Image
                       style={{ width: 52, height: 52, borderRadius: 52 / 2 }}
                       source={{
-                        uri: profileData?.providerDocument?.[0]?.url,
+                        uri: profile?.logindetails?.parentphoto,
                       }}
                     />
                   </View>
@@ -164,13 +172,12 @@ const ParentReviews = (props) => {
                     <Text style={styles.replyName}>
                       {guestUser
                         ? Strings.guest
-                        : profileData?.providerBusiness?.name}
+                        : profile?.parentProfie?.parentContact?.name}
                     </Text>
-                    {profileServices && (
-                      <Text numberOfLines={2} style={styles.replyProfile}>
-                        {profileServices}
-                      </Text>
-                    )}
+
+                    <Text numberOfLines={2} style={styles.replyProfile}>
+                      {profile?.parentProfie?.parentContact?.about}
+                    </Text>
                   </View>
                 </View>
                 <View style={styles.replyComment}>
@@ -213,32 +220,17 @@ const ParentReviews = (props) => {
             paddingHorizontal: moderateScale(20),
           }}
         >
-          {/* {reviewList?.length == 0 && (
-            <InputField
-              label={"Review"}
-              placeholderText={"Please give your review"}
-              multiline={true}
-              value={review}
-              onChange={setReview}
-            />
-          )}
-
           <View style={styles.mainView}>
             <FlatList
               data={reviewList}
               showsVerticalScrollIndicator={false}
               bounces={false}
               renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-            />
-          </View> */}
-          <View style={styles.mainView}>
-            <FlatList
-              data={reviewList}
-              showsVerticalScrollIndicator={false}
-              bounces={false}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item.id.toString()}
+              ListEmptyComponent={renderListEmpty}
+              contentContainerStyle={
+                reviewList?.length === 0 ? styles.flatListContainer : null
+              }
             />
           </View>
 
@@ -324,14 +316,6 @@ const ParentReviews = (props) => {
               </View>
             </ScrollView>
           </Modal>
-        </View>
-        <View
-          style={{
-            marginHorizontal: moderateScale(16),
-            marginBottom: moderateScale(10),
-          }}
-        >
-          <Button title={"Submit"} onPress={() => replyReviewBtn()} />
         </View>
       </View>
     </SafeAreaView>
@@ -611,7 +595,7 @@ const styles = StyleSheet.create({
     color: "#323232",
     fontFamily: THEMES.fontFamily.regular,
     paddingTop: moderateScale(5),
-    width: "80%",
+    width: "90%",
   },
   replyComment: {
     flexDirection: "row",
@@ -630,6 +614,26 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: THEMES.colors.cyan,
     fontFamily: THEMES.fontFamily.semiBold,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: moderateScale(16),
+    color: "#000",
+  },
+  item: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+  },
+  flatListContainer: {
+    flexGrow: 1, // Occupies available space
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

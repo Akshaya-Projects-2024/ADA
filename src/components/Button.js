@@ -11,9 +11,11 @@ const Button = (props) => {
     bgColor,
     textColor,
     isFlex = false,
+    disabled,
   } = props;
   return (
     <TouchableOpacity
+      disabled={disabled}
       onPress={onPress}
       style={[
         styles.btnStyle,
@@ -22,6 +24,8 @@ const Button = (props) => {
             ? bgColor
             : onlyBorder
             ? THEMES.colors.white
+            : disabled
+            ? "gray"
             : THEMES.colors.cyan,
           borderColor: onlyBorder ? THEMES.colors.cyan : null,
           borderWidth: onlyBorder ? 1.5 : 0,

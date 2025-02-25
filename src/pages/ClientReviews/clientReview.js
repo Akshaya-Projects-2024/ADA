@@ -238,7 +238,7 @@ const ClientReview = () => {
         vendor: userId,
         sortBy: "newest",
         pageNum: 1,
-        pageSize: 20,
+        pageSize: 50,
       };
       let res = await getAllReviews(obj);
       if (Boolean(res)) {
@@ -256,9 +256,10 @@ const ClientReview = () => {
     const userId = await decryptService("userId");
     let obj = {
       provider: userId,
-      id: modalData.item.id,
+      id: modalData?.item?.id,
       reply: comment,
     };
+
     let res = await replyReviewApi(obj);
     if (res?.data?.status_code !== 200) {
       setModalVisible(false);

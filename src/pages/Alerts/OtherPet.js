@@ -195,6 +195,7 @@ const OtherPet = () => {
             }}
           >
             <ModalDropdown
+              editable={false}
               placeholder="Select whom to send"
               data={categoryData}
               title={"Select"}

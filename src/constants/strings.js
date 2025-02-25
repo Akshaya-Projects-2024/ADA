@@ -131,11 +131,11 @@ const Strings = {
   paymentErrorForAdoption:
     "Hey, To get details of Pet please get subcription plan",
   appointmentError:
-    "Complete your Registration and Subscribe to the app to create new appoitements.",
+    "Complete your Registration and Subscribe to the app to create new appointments.",
   approvaltError:
     "Your profile is under verification. Please wait for approval",
   approvaltErrorForDashboard:
-    "Complete your Registration and Subscribe to the app to create new appoitements.",
+    "Complete your Registration and Subscribe to the app to create new appointments.",
   attention: "Attention!",
   clear: "Clear",
   services: "Services",

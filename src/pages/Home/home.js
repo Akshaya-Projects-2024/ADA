@@ -118,7 +118,6 @@ const Home = (props) => {
   const [paymentModal, setPaymentModal] = useState(false);
 
   const paymentCompleted = useMemo(() => {
-    console.log(profile?.providerProfile?.subscription?.status, profile?.logindetails?.isprovider)
     if (
       profile?.providerProfile?.subscription?.status === "active" &&
       profile?.logindetails?.isprovider === ApprovalStatus.approved

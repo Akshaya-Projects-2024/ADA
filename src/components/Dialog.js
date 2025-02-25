@@ -50,12 +50,12 @@ const Dialog = ({
       width: "100%",
     },
     titleText: {
-      fontSize: THEMES.fonts.font24,
+      fontSize: THEMES.fonts.font20,
       color: THEMES.colors.black,
       fontFamily: THEMES.fontFamily.bold,
     },
     descriptionText: {
-      fontSize: THEMES.fonts.font18,
+      fontSize: THEMES.fonts.font16,
       color: THEMES.colors.black,
       fontFamily: THEMES.fontFamily.regular,
     },

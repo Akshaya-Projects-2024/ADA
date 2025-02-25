@@ -32,6 +32,9 @@ import { createEvent } from "../../redux-store/actions/events";
 import { showToast } from "../../utils/utils";
 import { goBack } from "../../navigations/rootNavigationRef";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { uploadDocument } from "../../redux-store/actions/auth";
+import { contextValue } from "../../components/Loader";
+import Dialog from "../../components/Dialog";
 
 const CreateEvent = () => {
   const [isStartTimeModalVisible, setStartTimeModalVisible] = useState(false);
@@ -48,8 +51,9 @@ const CreateEvent = () => {
   const [description, setDescription] = useState();
   const [contactNo, setContactNo] = useState();
   const [registrationlink, setRegistrationlink] = useState("");
-  const [audience, setAudience] = useState("");
+  const [audience, setAudience] = useState("Public");
   const [location, setLocation] = useState("");
+  const [modal, setModal] = useState(false);
 
   const hideStartDatePicker = () => {
     setStartTimeModalVisible(false);
@@ -71,10 +75,30 @@ const CreateEvent = () => {
     hideEndDatePicker();
   };
 
-  const handlePosterImages = (image) => {
-    var temp = [...posterImg];
-    temp.push(image);
-    setPosterImg(temp);
+  const handlePosterImages = async (image) => {
+    const extension = image?.uri?.split(".").pop();
+    const userId = await decryptService("userId");
+    let payload = {
+      userid: userId,
+      documenttype: "photo",
+      extention: extension,
+      document: image?.fileData,
+    };
+    apiCall(payload, "photo", image);
+  };
+
+  const apiCall = async (postData, type, item) => {
+    try {
+      const res = await uploadDocument(postData);
+      if (res?.status === 200) {
+        const data = [...posterImg];
+        data.push({ ...item, id: res?.data?.data?.reqId });
+        setPosterImg(data);
+        showToast("success", "Successfully uploaded the image");
+      }
+    } catch (error) {
+      showToast("error", error.message);
+    }
   };
 
   const getBase64Obj = (url) => {
@@ -126,6 +150,7 @@ const CreateEvent = () => {
       showToast("error", "Please enter contact no");
     } else {
       try {
+        contextValue?.setLoader(true);
         const userId = await decryptService("userId");
         let obj = {
           id: 0,
@@ -139,14 +164,18 @@ const CreateEvent = () => {
           registrationlink: registrationlink,
           audience: audience,
           userId: userId,
+          documents: posterImg.map((item) => item.id).join(","), //TODO
         };
         let res = await createEvent(obj);
         if (res?.data?.status_code == 200) {
-          setSuccess(true);
+          contextValue?.setLoader(false);
+          setModal(true);
         } else {
+          contextValue?.setLoader(false);
           setSuccess(false);
         }
       } catch (error) {
+        contextValue?.setLoader(false);
         console.log("error", error);
       }
     }
@@ -319,6 +348,7 @@ const CreateEvent = () => {
             </View>
             <View style={styles.pt16}>
               <InputField
+                editable={false}
                 label={"Whom to send"}
                 placeholderText={"Enter"}
                 // rightIcon={<ArrowDown stroke={THEMES.colors.darkGrey} />}
@@ -334,80 +364,6 @@ const CreateEvent = () => {
             }}
           >
             <Button title="Submit" onPress={() => onSubmit()}></Button>
-            <Modal
-              onBackdropPress={() => setSuccess(false)}
-              isVisible={success}
-              backdropOpacity={0.5}
-              style={{
-                margin: 0,
-                borderRadius: 16,
-                flex: 1,
-              }}
-            >
-              <View
-                style={{
-                  backgroundColor: THEMES.colors.bgColor,
-                  paddingVertical: moderateScale(24),
-                  paddingHorizontal: moderateScale(24),
-                  borderRadius: 16,
-                  marginHorizontal: moderateScale(29),
-                }}
-              >
-                <View
-                  style={{
-                    justifyContent: "space-between",
-                    flexDirection: "row",
-                  }}
-                >
-                  <Text
-                    numberOfLines={2}
-                    style={{
-                      color: THEMES.colors.black,
-                      fontFamily: THEMES.fontFamily.bold,
-                      fontSize: THEMES.fonts.font20,
-                      width: "70%",
-                      lineHeight: moderateScale(24),
-                    }}
-                  >
-                    ✨ Event Created Successfully!✨
-                  </Text>
-                  <TouchableOpacity
-                    hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-                    onPress={() => setSuccess(false)}
-                  >
-                    <BlackCross />
-                  </TouchableOpacity>
-                </View>
-                <Text
-                  style={{
-                    color: THEMES.colors.black,
-                    fontFamily: THEMES.fontFamily.regular,
-                    fontSize: THEMES.fonts.font14,
-                    paddingTop: moderateScale(16),
-                    lineHeight: moderateScale(20),
-                  }}
-                >
-                  Congratulations! Your event has been created. Get ready to
-                  meet some furry friends!
-                </Text>
-                <View
-                  style={{
-                    alignItems: "center",
-                    paddingTop: moderateScale(31),
-                  }}
-                >
-                  <Button
-                    title="Go back to Homescreen"
-                    onPress={() => {
-                      setSuccess(false);
-                      setTimeout(() => {
-                        goBack();
-                      }, 500);
-                    }}
-                  />
-                </View>
-              </View>
-            </Modal>
           </View>
         </ScrollView>
         <DateTimePicker
@@ -444,6 +400,22 @@ const CreateEvent = () => {
           handleSelectedImage={(image) => handlePosterImages(image)}
         />
       </View>
+      <Dialog
+        flag={modal}
+        title={"✨ Event Created Successfully!✨"}
+        description={
+          "Congratulations! Your event has been created. Get ready to meet some furry friends!"
+        }
+        rightButtonText="Go back to Homescreen"
+        rightButtonPressed={() => {
+          setModal(false);
+          goBack();
+        }}
+        onClose={() => {
+          setModal(false);
+          goBack();
+        }}
+      />
     </SafeAreaView>
   );
 };

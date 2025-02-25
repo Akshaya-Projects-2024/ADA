@@ -662,7 +662,48 @@ export const shareAdoption = async (params) => {
     }
     throw new Error("Something went wrong!");
   } catch (error) {
-    console.log("setWeeklyHolidayData Error! ", error);
+    console.log("shareAdoption Error! ", error);
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
+
+
+export const shareProfileApi = async (params) => {
+  try {
+    const res = await Api.POST(urlList.shareProfile, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+
+    if (res?.data?.data) {
+      return res?.data?.data;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("shareProfileApi Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+
+export const bookmarkApi = async (params) => {
+  try {
+    const res = await Api.POST(urlList.addBookmark, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+
+    if (res?.data) {
+      return res?.data;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("shareProfileApi Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+

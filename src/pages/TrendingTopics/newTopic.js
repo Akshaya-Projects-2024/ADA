@@ -25,6 +25,7 @@ import { goBack } from "../../navigations/rootNavigationRef";
 import { RichEditor, RichToolbar } from "react-native-pell-rich-editor";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
+import Dialog from "../../components/Dialog";
 
 const NewTopic = () => {
   const [visible, setVisible] = useState(false);
@@ -35,6 +36,7 @@ const NewTopic = () => {
   const { providerProfile, profileData } = useSelector(
     ({ commonReducer }) => commonReducer
   );
+  const [modal, setModal] = useState(false);
 
   const richText = useRef();
   const [htmlContent, setHtmlContent] = useState("");
@@ -97,8 +99,7 @@ const NewTopic = () => {
         let res = await createTopic(obj);
         if (res?.status == 200) {
           contextValue?.setLoader(false);
-          showToast("success", "Topic created successfully!!!");
-          goBack();
+          setModal(true)
         } else {
           contextValue?.setLoader(false);
           showToast("error", "Something went wrong!!!");
@@ -111,58 +112,92 @@ const NewTopic = () => {
   };
 
   return (
-    <SafeAreaView style={{flex:1}}>
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header
-        showBack
-        title={Strings.newTopic}
-        bgColor="transparent"
-        fontColor={THEMES.colors.black}
-      />
-      <View style={styles.mainView}>
-        <ScrollView
-          style={{ flex: 1 }}
-          bounces={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-        >
-          <InputField
-            label={"Title*"}
-            placeholderText={"Enter title"}
-            value={title}
-            onChange={setTitle}
-          />
-          <>
-            <View style={styles.logoBoxView}>
-              {photo ? (
-                <>
-                  <Text
-                    style={[styles.emptyText, { margin: moderateScale(10) }]}
-                  >
-                    {Strings.uploadCoverImg}
-                  </Text>
-                  <View style={styles.row}>
-                    <View style={styles.logoImgView}>
-                      <Image
-                        style={styles.logoImg}
-                        resizeMode="contain"
-                        source={getBase64Obj(
-                          photo?.filepath ?? photo?.fileData
-                        )}
-                      />
-                      <TouchableOpacity
-                        onPress={() => {
-                          setPhoto();
-                        }}
-                        style={styles.crossView}
-                      >
-                        <CrossCircle
-                          stroke={THEMES.colors.black}
-                          style={styles.crossImg}
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header
+          showBack
+          title={Strings.newTopic}
+          bgColor="transparent"
+          fontColor={THEMES.colors.black}
+        />
+        <View style={styles.mainView}>
+          <ScrollView
+            style={{ flex: 1 }}
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+          >
+            <InputField
+              label={"Title*"}
+              placeholderText={"Enter title"}
+              value={title}
+              onChange={setTitle}
+            />
+            <>
+              <View style={styles.logoBoxView}>
+                {photo ? (
+                  <>
+                    <Text
+                      style={[styles.emptyText, { margin: moderateScale(10) }]}
+                    >
+                      {Strings.uploadCoverImg}
+                    </Text>
+                    <View style={styles.row}>
+                      <View style={styles.logoImgView}>
+                        <Image
+                          style={styles.logoImg}
+                          resizeMode="contain"
+                          source={getBase64Obj(
+                            photo?.filepath ?? photo?.fileData
+                          )}
                         />
-                      </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => {
+                            setPhoto();
+                          }}
+                          style={styles.crossView}
+                        >
+                          <CrossCircle
+                            stroke={THEMES.colors.black}
+                            style={styles.crossImg}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                      {!photo && (
+                        <Text
+                          onPress={() => setVisible(true)}
+                          style={{
+                            fontFamily: THEMES.fontFamily.semiBold,
+                            fontSize: THEMES.fonts.font14,
+                            color: THEMES.colors.cyan,
+                          }}
+                        >
+                          Browse
+                        </Text>
+                      )}
                     </View>
+                  </>
+                ) : (
+                  <View style={styles.emptyView}>
+                    <View>
+                      <Text style={styles.emptyText}>
+                        {Strings.uploadCoverImg}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.emptyText,
+                          {
+                            paddingTop: moderateScale(5),
+                            fontSize: THEMES.fonts.font12,
+                            color: THEMES.colors.silver,
+                          },
+                        ]}
+                      >
+                        {Strings.selectImg}
+                      </Text>
+                    </View>
+
                     {!photo && (
                       <Text
                         onPress={() => setVisible(true)}
@@ -176,83 +211,65 @@ const NewTopic = () => {
                       </Text>
                     )}
                   </View>
-                </>
-              ) : (
-                <View style={styles.emptyView}>
-                  <View>
-                    <Text style={styles.emptyText}>
-                      {Strings.uploadCoverImg}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.emptyText,
-                        {
-                          paddingTop: moderateScale(5),
-                          fontSize: THEMES.fonts.font12,
-                          color: THEMES.colors.silver,
-                        },
-                      ]}
-                    >
-                      {Strings.selectImg}
-                    </Text>
-                  </View>
-
-                  {!photo && (
-                    <Text
-                      onPress={() => setVisible(true)}
-                      style={{
-                        fontFamily: THEMES.fontFamily.semiBold,
-                        fontSize: THEMES.fonts.font14,
-                        color: THEMES.colors.cyan,
-                      }}
-                    >
-                      Browse
-                    </Text>
-                  )}
-                </View>
-              )}
-            </View>
-          </>
-          <View style={{ paddingTop: moderateScale(16) }}>
-            <RichEditor
-              ref={richText}
-              style={styles.editor}
-              placeholder="Write your Blog here"
-              initialContentHTML={blog}
-              onChange={setBlog}
-            />
-            <RichToolbar
-              style={styles.toolbar}
-              editor={richText}
-              actions={[
-                "bold",
-                "italic",
-                "underline",
-                "orderedList",
-                "unorderedList",
-              ]}
-            />
-            {/* <InputField
+                )}
+              </View>
+            </>
+            <View style={{ paddingTop: moderateScale(16) }}>
+              <RichEditor
+                ref={richText}
+                style={styles.editor}
+                placeholder="Write your Blog here"
+                initialContentHTML={blog}
+                onChange={setBlog}
+              />
+              <RichToolbar
+                style={styles.toolbar}
+                editor={richText}
+                actions={[
+                  "bold",
+                  "italic",
+                  "underline",
+                  "orderedList",
+                  "unorderedList",
+                ]}
+              />
+              {/* <InputField
               label={"Your blog*"}
               placeholderText={Strings.writeBlog}
               multiline
               value={blog}
               onChange={setBlog}
             /> */}
-          </View>
-        </ScrollView>
-        <UploadImageModal
-          isVisible={visible}
-          onClose={() => setVisible(false)}
-          handleSelectedImage={(image) => setPhoto(image)}
-        />
-      </View>
-      {!isKeyboardVisible && (
-        <View style={styles.submitButton}>
-          <Button title={Strings.submit} onPress={() => onSubmit()} />
+            </View>
+          </ScrollView>
+          <UploadImageModal
+            isVisible={visible}
+            onClose={() => setVisible(false)}
+            handleSelectedImage={(image) => setPhoto(image)}
+          />
         </View>
-      )}
-    </View>
+        {!isKeyboardVisible && (
+          <View style={styles.submitButton}>
+            <Button title={Strings.submit} onPress={() => onSubmit()} />
+          </View>
+        )}
+      </View>
+      <Dialog
+        flag={modal}
+        title={"🌟 Thank You for Sharing!"}
+        description={
+          "Your valuable topic will greatly benefit all the pet lovers in our community. We appreciate your contribution!"
+        }
+        rightButtonText="Go back to Homescreen"
+        rightButtonPressed={() => {
+          setModal(false);
+          goBack();
+        }}
+        onClose={() => {
+          setModal(false);
+          goBack();
+        }}
+      />
     </SafeAreaView>
   );
 };

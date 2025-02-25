@@ -19,6 +19,8 @@ import { SvgUri } from "react-native-svg";
 import { contextValue } from "../../components/Loader";
 import EmptyView from "../../components/EmptyView";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+
 const { width } = Dimensions.get("window");
 
 const ServiceList = (props) => {
@@ -50,6 +52,7 @@ const ServiceList = (props) => {
   };
 
   const renderService = ({ item }) => {
+    console.log("it", item)
     return (
       <TouchableOpacity
         style={styles.itemContainer}

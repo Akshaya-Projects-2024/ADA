@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -20,19 +20,91 @@ import Bookmark from "../../assets/svg/bookmark.svg";
 import RightArrow from "../../assets/svg/arrowRight.svg";
 import Button from "../../components/Button";
 import { getBase64Obj } from "../../utils/documentUtils";
-import { validArray } from "../../utils/utils";
+import { showToast, validArray } from "../../utils/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const Data = ["Vaccinations", "Document 1", "Document 2", "Document 3"];
+import ProviderFallback from "../../assets/svg/ProviderFallback";
+import {
+  bookmarkApi,
+  getProviderSlots,
+  shareProfileApi,
+} from "../../redux-store/actions/auth";
+import { decryptService } from "../../utils/storageFunc";
+import ShareApp from "react-native-share";
+import { contextValue } from "../../components/Loader";
+import moment from "moment";
+import Dialog from "../../components/Dialog";
 
 const ServiceDetail = ({ navigation, route }) => {
   const selectedProvider = route?.params?.selectedProvider;
   const selectedService = route?.params?.selectedService;
-  console.log(selectedProvider,selectedService )
   const filteredData = selectedProvider?.profile?.providerDocument?.filter(
     (item) => item.documenttype !== "companylogo"
   );
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
+  const [bookmark, setBookmark] = useState(
+    selectedProvider?.bookmarked == 1 ? true : false
+  );
+  const [bookAppointmentDisabled, setBookAppointmentBtnDisbaled] = useState();
+  const [modal, setModal] = useState(false);
 
+  useEffect(() => {
+    getDates();
+  }, []);
+
+  const share = async () => {
+    try {
+      let obj = {
+        userid: await decryptService("userId"),
+        vendor: selectedProvider?.profile?.providerBusiness?.userid,
+      };
+      let res = await shareProfileApi(obj);
+      if (res) {
+        const shareData = {
+          title: "Share",
+          message: "Share this profile",
+          url: `data:image/jpeg;base64,${res}`, // Base64 encoded image
+        };
+        await ShareApp.open(shareData);
+      }
+    } catch (error) {}
+  };
+
+  const getDates = useCallback(async () => {
+    const start = moment();
+    const end = moment(start).add(14, "days");
+    const params = {
+      userid: await decryptService("userId"),
+      providerid: selectedProvider?.profile?.providerBusiness?.userid,
+      startdate: moment(start)?.format("YYYY-MM-DD"),
+      enddate: moment(end)?.format("YYYY-MM-DD"),
+    };
+    const res = await getProviderSlots(params);
+    if (Object.keys(res?.data?.data).length === 0) {
+      setBookAppointmentBtnDisbaled(true);
+    }
+  }, []);
+
+  const addBookmarkMethod = async () => {
+    try {
+      contextValue?.setLoader(true);
+      let obj = {
+        userid: await decryptService("userId"),
+        servicecode: selectedService?.code,
+        provider: selectedProvider?.profile?.providerBusiness?.userid,
+        isactive: 1,
+      };
+      let res = await bookmarkApi(obj);
+      if (res) {
+        setBookmark(true);
+      } else {
+        setBookmark(false);
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {
+      contextValue?.setLoader(false);
+    }
+  };
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
@@ -54,10 +126,19 @@ const ServiceDetail = ({ navigation, route }) => {
             <Back stroke={"#000"} />
           </TouchableOpacity>
           <View style={{ flexDirection: "row" }}>
-            <Bookmark />
-            <View style={{ marginLeft: moderateScale(20) }}>
+            <TouchableOpacity onPress={() => addBookmarkMethod()}>
+              <Bookmark
+                fill={bookmark ? "#FFAE42" : "white"}
+                stroke={bookmark ? "#FFAE42" : "black"}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => share()}
+              style={{ marginLeft: moderateScale(20) }}
+            >
               <Share />
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
         <ScrollView
@@ -76,20 +157,35 @@ const ServiceDetail = ({ navigation, route }) => {
           >
             <View
               style={{
-                backgroundColor: "#D9D9D9",
+                backgroundColor: "#fff",
                 height: 105,
                 width: 97,
                 borderRadius: 12,
+                elevation: 5,
               }}
             >
-              <Image
-                style={{
-                  height: 105,
-                  width: 97,
-                  borderRadius: 12,
-                }}
-                source={getBase64Obj(selectedProvider?.photo)}
-              />
+              {selectedProvider?.photo ? (
+                <Image
+                  style={{
+                    height: 105,
+                    width: 97,
+                    borderRadius: 12,
+                  }}
+                  source={getBase64Obj(selectedProvider?.photo)}
+                />
+              ) : (
+                <View
+                  style={{
+                    height: 105,
+                    width: 97,
+                    borderRadius: 12,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <ProviderFallback width={80} height={100} />
+                </View>
+              )}
             </View>
             <View style={{ paddingLeft: moderateScale(19), width: "80%" }}>
               <Text
@@ -241,7 +337,9 @@ const ServiceDetail = ({ navigation, route }) => {
                       fontSize: THEMES.fonts.font12,
                     }}
                   >
-                    0%
+                    {(selectedProvider?.profile?.providerRating?.rating / 5) *
+                      100}
+                    %
                   </Text>
                 </View>
               </View>
@@ -298,7 +396,7 @@ const ServiceDetail = ({ navigation, route }) => {
                   </Text>
                   <Text
                     onPress={() =>
-                     navigation.navigate("parentReviews", {
+                      navigation.navigate("parentReviews", {
                         selectedService: selectedProvider,
                       })
                     }
@@ -323,7 +421,7 @@ const ServiceDetail = ({ navigation, route }) => {
                     selectedProvider?.profile?.providerRating?.highestReview
                   )
                     ? selectedProvider?.profile?.providerRating
-                        ?.highestReview[0]?.remark
+                        ?.highestReview?.[0]?.remark
                     : ""}
                 </Text>
               </View>
@@ -382,32 +480,37 @@ const ServiceDetail = ({ navigation, route }) => {
                   showsHorizontalScrollIndicator={false}
                   showsVerticalScrollIndicator={false}
                 >
-                  {filteredData?.length &&
-                    filteredData?.map((item, index) => {
-                      return (
-                        <TouchableOpacity
-                          onPress={() => Linking.openURL(item.url)}
-                          style={[
-                            styles.documents,
-                            { marginLeft: index === 0 ? 0 : moderateScale(10) },
-                          ]}
-                        >
-                          <Text style={styles.docText}>{`Document ${
-                            index + 1
-                          }`}</Text>
-                        </TouchableOpacity>
-                      );
-                    })}
+                  {filteredData?.map((item, index) => {
+                    return (
+                      <TouchableOpacity
+                        onPress={() => Linking.openURL(item.url)}
+                        style={[
+                          styles.documents,
+                          { marginLeft: index === 0 ? 0 : moderateScale(10) },
+                        ]}
+                      >
+                        <Text style={styles.docText}>{`Document ${
+                          index + 1
+                        }`}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </ScrollView>
               </View>
+              {console.log(
+                "selectedProvider",
+                selectedProvider?.profile?.sessionDetails[0]
+              )}
               <View style={{ paddingTop: moderateScale(40) }}>
                 <Button
                   title="Book Appointment"
                   onPress={() =>
-                    navigation.navigate("selectAppointment", {
-                      selectedProvider: selectedProvider,
-                      selectedService: selectedService,
-                    })
+                    bookAppointmentDisabled
+                      ? setModal(true)
+                      : navigation.navigate("selectAppointment", {
+                          selectedProvider: selectedProvider,
+                          selectedService: selectedService,
+                        })
                   }
                 />
               </View>
@@ -415,6 +518,18 @@ const ServiceDetail = ({ navigation, route }) => {
           </View>
         </ScrollView>
       </View>
+      <Dialog
+        flag={modal}
+        title={"No slots Available"}
+        description={
+          "All slots are currently booked. Please check again later or try selecting a different time."
+        }
+        rightButtonText="Okay"
+        rightButtonPressed={() => setModal(false)}
+        onClose={() => {
+          setModal(false);
+        }}
+      />
     </SafeAreaView>
   );
 };

@@ -22,11 +22,12 @@ import { showToast } from "../../utils/utils";
 import { useSelector } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
+import Dialog from "../../components/Dialog";
 
 const MediaLink = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const route = props?.route?.params?.route;
-
+  const [modal, setModal] = useState(false);
   const [link, setLink] = useState();
   const [instaLink, setInstaLink] = useState();
   const [fbLink, setFbLink] = useState();
@@ -84,7 +85,7 @@ const MediaLink = (props) => {
         };
         const res = await saveMediaLinks(postData);
         if (res?.status == 200) {
-          showToast("success", "You have been registered successfully!!!");
+          setModal(true);
         } else {
           showToast("error", res?.data?.message);
         }
@@ -228,6 +229,18 @@ const MediaLink = (props) => {
           )}
         </View>
       </View>
+      <Dialog
+        flag={"Registration Complete! 🎉"}
+        title={"No slots Available"}
+        description={
+          "Thank you for registering on “App Name”. Your profile will be validated and activated within 48 hours. Happy exploring!"
+        }
+        rightButtonText="Close"
+        rightButtonPressed={() => setModal(false)}
+        onClose={() => {
+          setModal(false);
+        }}
+      />
     </SafeAreaView>
   );
 };

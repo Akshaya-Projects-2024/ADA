@@ -351,16 +351,16 @@ const ParentAccount = (props) => {
                     THEMES.colors.hawkesBlue,
                     <Star />,
                     "Reviews",
-                    "",
+                    "addBottom",
                     "parentReviews"
                   )}
-                  {renderItem(
+                  {/* {renderItem(
                     THEMES.colors.peach,
                     <Logout />,
                     "Emergency Alert",
                     "addBottom",
                     "emergencyAlert"
-                  )}
+                  )} */}
                 </View>
               </View>
               {/* 

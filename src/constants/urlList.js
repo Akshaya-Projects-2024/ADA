@@ -52,5 +52,7 @@ export const urlList = {
   deleteAccount:'register/deleteaccount',
   lostPetAlert:'parent/addpetalert',
   shareAdoptionTemplate:'parent/shareadoptiontemplate',
-  getAllEvents:'provider/getallevents'
+  getAllEvents:'provider/getallevents',
+  shareProfile:'provider/shareprofile',
+  addBookmark:'parent/bookmark'
 };

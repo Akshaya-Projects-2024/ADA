@@ -26,16 +26,19 @@ import { contextValue } from "../../components/Loader";
 import EmptyView from "../../components/EmptyView";
 import ProviderFallback from "../../assets/svg/ProviderFallback";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Bookmark from "../../assets/svg/bookmark.svg";
+import { useIsFocused } from "@react-navigation/native";
 
 const Service = ({ navigation, route }) => {
   const selectedService = route?.params?.selectedService;
   const [searchText, setSearchText] = useState("");
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // Data after filtering
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     initData();
-  }, []);
+  }, [isFocused]);
 
   const initData = async () => {
     contextValue?.setLoader(true);
@@ -111,6 +114,25 @@ const Service = ({ navigation, route }) => {
           }}
         >
           <View
+            style={{
+              position: "absolute",
+              top: moderateScale(5),
+              right: moderateScale(10),
+              zIndex: 10,
+            }}
+          >
+            {item.bookmarked ? (
+              <View>
+                {item.bookmarked && (
+                  <Bookmark
+                    fill={item?.bookmarked == 1 ? "#FFAE42" : "white"}
+                    stroke={item?.bookmarked == 1 ? "#FFAE42" : "black"}
+                  />
+                )}
+              </View>
+            ) : null}
+          </View>
+          <View
             style={{ flexDirection: "row", alignItems: "center", width: "70%" }}
           >
             {item?.photo ? (
@@ -163,7 +185,8 @@ const Service = ({ navigation, route }) => {
                   fontFamily: THEMES.fontFamily.medium,
                   fontSize: THEMES.fonts.font10,
                   paddingTop: moderateScale(3),
-                  maxWidth: moderateScale(275),
+                  maxWidth: moderateScale(260),
+                  width:'90%',
                 }}
               >
                 {`${selectedService?.service} | ${item?.profile?.providerBusiness?.experience} Years exp`}
