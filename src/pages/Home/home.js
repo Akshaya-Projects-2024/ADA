@@ -575,7 +575,7 @@ const Home = (props) => {
                   </Text>
                   <Right />
                 </View>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
                   onPress={() =>
                     handlePremiumActionPressed(() => {
@@ -593,7 +593,7 @@ const Home = (props) => {
                   }}
                 >
                   <Plus stroke={THEMES.colors.white} />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
               <View style={{ paddingTop: moderateScale(23) }}>
                 <View

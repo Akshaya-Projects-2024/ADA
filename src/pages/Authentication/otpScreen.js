@@ -330,7 +330,7 @@ const OtpScreen = (props) => {
             >
               {`An ${
                 isMobileNumber ? "OTP" : "email"
-              } with a verification code has been sent to`}
+              } has been sent to`}
 
               <Text
                 style={{
@@ -355,7 +355,7 @@ const OtpScreen = (props) => {
                 paddingTop: moderateScale(15),
               }}
             >
-              Enter the code here:
+              Enter the OTP here:
             </Text>
 
             <View style={styles.otpContainer}>
@@ -383,7 +383,7 @@ const OtpScreen = (props) => {
                 paddingTop: moderateScale(15),
               }}
             >
-              Didn’t get a verification code?
+              Didn’t get a verification OTP?
             </Text>
           </View>
         </ScrollView>

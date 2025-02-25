@@ -260,9 +260,8 @@ const TrendingTopics = (props) => {
           fontColor={"#fda208"}
           noBack
         />
-
         <View style={{ flex: 1 }}>
-          {topicList?.length ? (
+          {topicList?.length || trendingTopics?.length ? (
             <ScrollView
               style={{ flex: 1 }}
               bounces={false}

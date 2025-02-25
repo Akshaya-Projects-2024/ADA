@@ -233,7 +233,7 @@ const MediaLink = (props) => {
         flag={"Registration Complete! 🎉"}
         title={"No slots Available"}
         description={
-          "Thank you for registering on “App Name”. Your profile will be validated and activated within 48 hours. Happy exploring!"
+          "Thank you for registering on ADA. Your profile will be validated and activated within 48 hours. Happy exploring!"
         }
         rightButtonText="Close"
         rightButtonPressed={() => setModal(false)}

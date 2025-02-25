@@ -139,7 +139,7 @@ const MyAccount = (props) => {
       };
       let res = await deleteAccountApi(obj);
       if (res?.data?.status_code == 200) {
-        handleLogout()
+        handleLogout();
         resetNavigation("app");
       } else {
         showToast("Error", "Something went wrong!! Please try again later.");
@@ -295,7 +295,7 @@ const MyAccount = (props) => {
                 <BadgeCheck />
               </View>
               <View style={styles.nameView}>
-                <Text style={styles.nameText}>
+                <Text style={[styles.nameText]}>
                   {guestUser
                     ? Strings.guest
                     : profile?.providerProfile?.providerBusiness?.name}
@@ -498,6 +498,8 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font16,
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.bold,
+    width: "80%",
+    textAlign: "center",
   },
   nameView: {
     alignItems: "center",

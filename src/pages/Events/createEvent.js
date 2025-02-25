@@ -32,7 +32,7 @@ import { createEvent } from "../../redux-store/actions/events";
 import { showToast } from "../../utils/utils";
 import { goBack } from "../../navigations/rootNavigationRef";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { uploadDocument } from "../../redux-store/actions/auth";
+import { deleteDocument, uploadDocument } from "../../redux-store/actions/auth";
 import { contextValue } from "../../components/Loader";
 import Dialog from "../../components/Dialog";
 
@@ -76,6 +76,7 @@ const CreateEvent = () => {
   };
 
   const handlePosterImages = async (image) => {
+    contextValue?.setLoader(true);
     const extension = image?.uri?.split(".").pop();
     const userId = await decryptService("userId");
     let payload = {
@@ -94,6 +95,7 @@ const CreateEvent = () => {
         const data = [...posterImg];
         data.push({ ...item, id: res?.data?.data?.reqId });
         setPosterImg(data);
+        contextValue?.setLoader(false);
         showToast("success", "Successfully uploaded the image");
       }
     } catch (error) {
@@ -109,6 +111,28 @@ const CreateEvent = () => {
     }
   };
 
+
+  const onCancel = async (doc) => {
+    try {
+      contextValue?.setLoader(true)
+      const userId = await decryptService("userId");
+      const postData = {
+        userid: userId,
+        id: doc?.id,
+      };
+      const res = await deleteDocument(postData);
+      if (res?.status === 200) {
+        const removeItemById = posterImg?.filter((it) => it?.id !== doc?.id);
+        setPosterImg(removeItemById);
+        contextValue?.setLoader(false)
+        showToast("success", "Successfully deleted the image");
+      }
+    } catch (error) {
+      contextValue?.setLoader(false)
+      showToast("error", error.message);
+    }
+  };
+
   const renderItem = (item, index) => {
     const photo = item?.item.fileData;
     return (
@@ -120,10 +144,7 @@ const CreateEvent = () => {
         />
         <TouchableOpacity
           onPress={() => {
-            const removeItemById = businessImg.filter(
-              (item) => item?.fileData !== photo
-            );
-            setPosterImg(removeItemById);
+            onCancel(item?.item);
           }}
           style={styles.crossView}
         >
@@ -136,6 +157,8 @@ const CreateEvent = () => {
   const onSubmit = async () => {
     if (!eventName) {
       showToast("error", "Please enter Event name");
+    } else if (!posterImg?.length) {
+      showToast("error", "Please enter poster images");
     } else if (!description) {
       showToast("error", "Please enter description");
     } else if (!sDate) {
@@ -166,6 +189,7 @@ const CreateEvent = () => {
           userId: userId,
           documents: posterImg.map((item) => item.id).join(","), //TODO
         };
+        console.log("obj", obj)
         let res = await createEvent(obj);
         if (res?.data?.status_code == 200) {
           contextValue?.setLoader(false);

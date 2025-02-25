@@ -244,8 +244,8 @@ const ClientReview = () => {
       if (Boolean(res)) {
         contextValue.setLoader(false);
         setGlobalReviews(res);
-      }else{
-          contextValue.setLoader(false);
+      } else {
+        contextValue.setLoader(false);
       }
     } catch (error) {
       contextValue.setLoader(false);
@@ -269,6 +269,22 @@ const ClientReview = () => {
     }
   };
 
+  const EmptyContentView = () => {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text
+          style={{
+            color: "#000",
+            fontSize: moderateScale(16),
+            fontWeight: 500,
+          }}
+        >
+          No Reviews found
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -279,16 +295,19 @@ const ClientReview = () => {
           bgColor="transparent"
           fontColor={THEMES.colors.black}
         />
-        <View style={styles.mainView}>
-          <FlatList
-            data={globalReviews?.reviews}
-            showsVerticalScrollIndicator={false}
-            bounces={false}
-            ListHeaderComponent={listHeader}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-          />
-        </View>
+        {globalReviews?.reviews?.length ? (
+          <View style={styles.mainView}>
+            <FlatList
+              data={globalReviews?.reviews}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              ListHeaderComponent={listHeader}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+            />
+          </View>
+        ) : EmptyContentView()}
+
         <Modal
           animationType="none"
           onBackButtonPress={toggleModal}
