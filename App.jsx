@@ -25,6 +25,7 @@ import {
   createNotificationChannel,
   getNotificationToken,
 } from "./src/utils/pushNotificationUtils";
+import { UserProvider } from "./src/api/UserContext";
 
 const store = configureStore();
 
@@ -103,12 +104,14 @@ function App() {
     <SafeAreaProvider>
       <SafeAreaView style={{ flex: 1 }}>
         <Provider store={store}>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <Loader>
-              <Routes />
-            </Loader>
-            <Toast />
-          </GestureHandlerRootView>
+          <UserProvider>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <Loader>
+                <Routes />
+                 </Loader>
+              <Toast />
+            </GestureHandlerRootView>
+          </UserProvider>
         </Provider>
       </SafeAreaView>
     </SafeAreaProvider>

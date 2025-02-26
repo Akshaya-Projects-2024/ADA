@@ -27,27 +27,8 @@ import {
 } from "../../utils/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
+import { useUser } from "../../api/UserContext";
 
-const businessName = [
-  { id: "1", label: "ADV Solutions" },
-  { id: "2", label: "Mighty Furries" },
-  { id: "3", label: "Premium Pets" },
-  { id: "4", label: "THE CITY PET SHOP & CLINIC" },
-  { id: "5", label: "PET STORE - A Complete Pet Shop" },
-];
-
-const serviceProviderData = [
-  { id: "1", label: "Pet Training" },
-  { id: "2", label: "Grooming" },
-  { id: "3", label: "Pet Boarding" },
-];
-
-const categoryData = [
-  { id: "1", label: "Training" },
-  { id: "2", label: "ABC" },
-  { id: "3", label: "XYZ" },
-  { id: "4", label: "MNO" },
-];
 
 const experienceData = [
   { id: "1", label: "1 Years" },
@@ -73,6 +54,7 @@ const BusinessDetail = (props) => {
   const { providerProfile } = useSelector((state) => state?.commonReducer);
   const { providerBusiness } = providerProfile;
   const [serviceProviderRole, setServiceProviderRole] = useState();
+  const { userData, apiInitCall } = useUser();
 
   useEffect(() => {
     if (serviceProviderRoleData.length) {
@@ -155,6 +137,7 @@ const BusinessDetail = (props) => {
               route ? { route: route } : {}
             );
           }
+          apiInitCall()
         } else {
           showToast("error", res?.data?.message);
         }

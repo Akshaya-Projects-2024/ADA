@@ -68,9 +68,9 @@ export const validateServiceProfile = (
     };
   }
   if (
-    includeOptional &&
+    (includeOptional &&
     (!validArray(userData?.providerProfile?.providerDocument) ||
-      !validateDocuments(userData?.providerProfile?.providerDocument))
+      !validateDocuments(userData?.providerProfile?.providerDocument))) || !validArray(userData?.providerProfile?.ProviderSession?.availableat)
   ) {
     return {
       flag: false,

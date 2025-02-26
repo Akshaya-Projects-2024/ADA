@@ -27,6 +27,7 @@ import { useSelector } from "react-redux";
 import { showToast } from "../../utils/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
+import { useUser } from "../../api/UserContext";
 
 export const DOCUMENT_TYPES = {
   image: "businessImg",
@@ -45,6 +46,7 @@ const UploadImagesDocs = (props) => {
   const [documentVisible, setDocumentVisible] = useState(false);
   const { providerProfile } = useSelector((state) => state?.commonReducer);
   const { providerDocument } = providerProfile;
+  const { userData, apiInitCall } = useUser();
 
   useEffect(() => {
     initData();
@@ -428,6 +430,7 @@ const UploadImagesDocs = (props) => {
                   route ? { route: route } : {}
                 );
               }
+              apiInitCall()
             }}
           />
         </View>

@@ -20,6 +20,7 @@ import { useSelector } from "react-redux";
 import { showToast } from "../../utils/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
+import { useUser } from "../../api/UserContext";
 
 const ContactDetails = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -31,6 +32,7 @@ const ContactDetails = (props) => {
   const [address, setAddress] = useState();
   const [postalCode, setPostalCode] = useState();
   const [location, setLocation] = useState();
+  const { userData, apiInitCall } = useUser();
 
   useEffect(() => {
     initData();
@@ -107,6 +109,7 @@ const ContactDetails = (props) => {
         } else {
           showToast("error", res?.data?.message);
         }
+        apiInitCall()
       } catch (error) {
         showToast("error", "Something went wrong!!!");
       }

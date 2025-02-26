@@ -211,10 +211,14 @@ const TimeTracker = ({
       [shift]: { ...day[shift], [type]: value },
     };
     if (selectedForAll) {
+      temp.map((item, index) => {
+        item[shift][type] = null;
+      });
+
       const filteredItems = temp.filter(
         (it) => !it[shift][type] && it?.selected
       );
-      for (let index = 0; index < filteredItems.length; index++) {
+      for (let index = 0; index < filteredItems?.length; index++) {
         const element = filteredItems[index];
         const indx = temp.findIndex((ite) => ite?.label === element?.label);
         element[shift] = { ...element[shift], [type]: value };

@@ -31,6 +31,7 @@ import { savePetDetails } from "../../redux-store/actions/auth";
 import { useSelector } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
+import { useUser } from "../../api/UserContext";
 
 const petType = [
   { id: "1", label: "Cat" },
@@ -57,6 +58,7 @@ const PetDetail = (props) => {
   const [registerModal, setRegisterModal] = useState(false);
   const { parentProfie } = useSelector((state) => state?.commonReducer);
   const { petDetails } = parentProfie;
+  const { userData, apiInitCall } = useUser();
 
   useEffect(() => {
     initData();

@@ -20,6 +20,8 @@ import { showToast } from "../../utils/utils";
 import { saveSessionDetails } from "../../redux-store/actions/auth";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
+import { useUser } from "../../api/UserContext";
+
 
 const WorkingHours = (props) => {
   const route = props?.route?.params?.route;
@@ -37,6 +39,7 @@ const WorkingHours = (props) => {
       };
     })
   );
+  const { userData, apiInitCall } = useUser();
   const { providerProfile } = useSelector((state) => state?.commonReducer);
   const { sessionDetails } = providerProfile;
 
@@ -182,6 +185,7 @@ const WorkingHours = (props) => {
         } else {
           showToast("error", response?.data?.message);
         }
+        apiInitCall()
       }
     } catch (error) {
       console.log("🚀 ~ onSubmit ~ error:", error);

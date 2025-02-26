@@ -23,6 +23,8 @@ import { useSelector } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
 import Dialog from "../../components/Dialog";
+import { useUser } from "../../api/UserContext";
+import { contextValue } from "../../components/Loader";
 
 const MediaLink = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -34,6 +36,7 @@ const MediaLink = (props) => {
   const [weblink, setWebLink] = useState();
   const { providerProfile } = useSelector((state) => state?.commonReducer);
   const { MediaLinks } = providerProfile;
+  const { userData, apiInitCall } = useUser();
 
   useEffect(() => {
     initData();
@@ -74,6 +77,7 @@ const MediaLink = (props) => {
   const onSubmit = async () => {
     if (link && instaLink && fbLink && weblink) {
       try {
+        contextValue?.setLoader(true)
         const userId = await decryptService("userId");
         const postData = {
           userid: userId,
@@ -89,10 +93,12 @@ const MediaLink = (props) => {
         } else {
           showToast("error", res?.data?.message);
         }
+        contextValue?.setLoader(false)
       } catch (error) {
         console.log("error", error);
         showToast("error", "Something went wrong!!!");
       }
+      apiInitCall()
     }
     handleNavigation();
   };

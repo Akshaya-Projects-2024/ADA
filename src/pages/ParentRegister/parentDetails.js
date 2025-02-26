@@ -31,6 +31,7 @@ import { getCurrentLocation } from "../../utils/geolocationUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
 import { dispatchUserData } from "../../redux-store/actions/registerAction";
+import { useUser } from "../../api/UserContext";
 
 const ParentDetails = (props) => {
   const route = props?.route?.params?.route;
@@ -55,6 +56,7 @@ const ParentDetails = (props) => {
     providerProfile?.providerContact?.email || undefined
   );
   const [pinCode, setPincode] = useState();
+  const { userData, apiInitCall } = useUser();
 
   useEffect(() => {
     initData();
@@ -143,8 +145,7 @@ const ParentDetails = (props) => {
         const response = await getProfile(obj);
         if (response?.status === 200) {
           dispatch(dispatchUserData(response?.data?.data));
-        }
-        console.log("res", response?.data?.data);
+        };
         resolve(response?.data?.data ? response?.data?.data : false);
       } catch (error) {
         console.log("err111", error);
@@ -189,6 +190,7 @@ const ParentDetails = (props) => {
           ...(parentContact?.id ? { id: parentContact?.id } : {}),
         };
         const res = await saveParentDetails(postData);
+        console.log("res",res?.data?.status_code)
         fetchProfileData();
         if (res?.data?.status_code == 200) {
           if (route === "parentAccount") {
@@ -198,10 +200,12 @@ const ParentDetails = (props) => {
               "petDetail",
               route ? { route: route } : {}
             );
+            showToast("success", res?.data?.message)
           }
         } else {
           showToast("error", res?.data?.message);
         }
+        apiInitCall()
       } catch (error) {
         showToast("error", "Something went wrong!!!");
       }

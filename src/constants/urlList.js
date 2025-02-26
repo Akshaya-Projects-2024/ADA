@@ -54,5 +54,6 @@ export const urlList = {
   shareAdoptionTemplate:'parent/shareadoptiontemplate',
   getAllEvents:'provider/getallevents',
   shareProfile:'provider/shareprofile',
-  addBookmark:'parent/bookmark'
+  addBookmark:'parent/bookmark',
+  providerAppointmentAdd:'/appointment/add'
 };

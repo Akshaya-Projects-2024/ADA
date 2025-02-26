@@ -211,7 +211,8 @@ const MyAccount = (props) => {
       });
     } else {
       props.navigation.navigate(validParentProfile?.navigateTo, {
-        route: "parentAccount",
+        route: "myAccount",
+
       });
     }
   };

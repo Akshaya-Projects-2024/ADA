@@ -26,6 +26,7 @@ import { showToast, validArray } from "../../utils/utils";
 import { useSelector } from "react-redux";
 import ModalDropdown from "../../components/ModalDropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useUser } from "../../api/UserContext";
 const SESSION_AVAILABILITY = {
   home: "Home Visit",
   center: "At Center Service",
@@ -52,6 +53,7 @@ const SessionDetail = (props) => {
   const [selectedServiceProvider, setServiceProviderValue] = useState();
   const [selectedServiceMonthProvider, setServiceProviderMonthValue] =
     useState();
+    const { userData, apiInitCall } = useUser();
 
   useEffect(() => {
     initData();
@@ -243,6 +245,7 @@ const SessionDetail = (props) => {
             sessionRes?.data?.message || sessionChargesRes?.data?.message
           );
         }
+        apiInitCall()
       }
     } catch (error) {
       showToast("error", "Something went wrong!!!");

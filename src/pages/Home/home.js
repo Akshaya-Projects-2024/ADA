@@ -53,6 +53,7 @@ import {
 import { contextValue } from "../../components/Loader";
 import Dialog from "../../components/Dialog";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useUser } from "../../api/UserContext";
 
 const afterTimeSlots = [
   { time: "09:00", disabled: false, enabled: true },
@@ -65,15 +66,6 @@ const afterTimeSlots = [
   { time: "02:00", disabled: false, enabled: true },
   { time: "03:30", disabled: true, enabled: false },
   { time: "04:00", disabled: false, enabled: true },
-];
-
-const categories = [
-  "Trainer",
-  "Pet Nutritionist",
-  "Animal Therapist",
-  "Pet Walker",
-  "Animal Communicator",
-  "Groomer",
 ];
 
 const Home = (props) => {
@@ -116,6 +108,9 @@ const Home = (props) => {
   const profile = useSelector((state) => state?.commonReducer);
   const [appointmentConfirm, setAppointmentConfirm] = useState(false);
   const [paymentModal, setPaymentModal] = useState(false);
+  const [clientName, setClientName] = useState(false);
+  const [mobileNumber, setMobileNumber] = useState(false);
+  const { userData, apiInitCall } = useUser();
 
   const paymentCompleted = useMemo(() => {
     if (
@@ -134,7 +129,13 @@ const Home = (props) => {
     profile?.logindetails?.isprovider,
     profile?.providerProfile?.subscription?.status,
   ]);
+  const [selectedServices, setSelectedServices] = useState([]);
 
+  const toggleService = (id) => {
+    setSelectedServices((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
   useEffect(() => {
     if (isFocused) {
       initData();
@@ -147,6 +148,7 @@ const Home = (props) => {
       setOtpInput("");
       setSelectedItem();
     }
+    apiInitCall();
   }, [isFocused, dispatch, initData]);
 
   const renderCategory = ({ item }) => {
@@ -157,7 +159,7 @@ const Home = (props) => {
         onPress={() => setSelectedCategory(item)}
       >
         <Text style={[styles.categoryText, isSelected && styles.selectedText]}>
-          {item}
+          {item?.service}
         </Text>
       </TouchableOpacity>
     );
@@ -575,7 +577,7 @@ const Home = (props) => {
                   </Text>
                   <Right />
                 </View>
-                {/* <TouchableOpacity
+                <TouchableOpacity
                   hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
                   onPress={() =>
                     handlePremiumActionPressed(() => {
@@ -593,7 +595,7 @@ const Home = (props) => {
                   }}
                 >
                   <Plus stroke={THEMES.colors.white} />
-                </TouchableOpacity> */}
+                </TouchableOpacity>
               </View>
               <View style={{ paddingTop: moderateScale(23) }}>
                 <View
@@ -773,7 +775,11 @@ const Home = (props) => {
             </Text>
           </View>
           <View>
-            <TouchableOpacity activeOpacity={1}   onPress={()=>props.navigation.navigate('clientReview')} style={styles.headerView}>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => props.navigation.navigate("clientReview")}
+              style={styles.headerView}
+            >
               <View style={styles.headerRow}>
                 <View style={styles.w25}>
                   <Text style={styles.reviewCount}>
@@ -962,6 +968,7 @@ const Home = (props) => {
       </Modal>
 
       <Modal
+        onBackButtonPress={() => setAppointmentVisible(false)}
         onBackdropPress={() => setAppointmentVisible(false)}
         isVisible={appointmentVisible}
         backdropOpacity={0.5}
@@ -1001,15 +1008,19 @@ const Home = (props) => {
               <InputField
                 label={"Client name *"}
                 placeholderText={"Enter client name"}
+                value={clientName}
+                onChange={setClientName}
               />
             </View>
             <View style={{ paddingTop: moderateScale(15) }}>
               <InputField
                 label={"Mobile number *"}
                 placeholderText={"Enter mobile number"}
+                value={mobileNumber}
+                onChange={setMobileNumber}
               />
             </View>
-            <View style={{ paddingTop: moderateScale(15) }}>
+            <View style={{ paddingTop: moderateScale(15), width: "90%" }}>
               <Text
                 style={{
                   color: THEMES.colors.black,
@@ -1020,12 +1031,13 @@ const Home = (props) => {
               >
                 Category
               </Text>
+
               <FlatList
-                data={categories}
+                data={userData?.providerProfile?.providerBusiness?.services}
+                keyExtractor={(item) => item.id.toString()}
                 renderItem={renderCategory}
-                keyExtractor={(item, index) => `${item}_${index}`}
-                horizontal={false}
-                contentContainerStyle={styles.categoryList}
+                horizontal
+                showsHorizontalScrollIndicator={false}
               />
             </View>
 
