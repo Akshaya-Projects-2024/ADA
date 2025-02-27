@@ -75,17 +75,15 @@ const SelectAppointment = ({ navigation, route }) => {
           requestedby: "parent", //HARDCODE
         };
         const res = await createAppointment(params);
+        contextValue?.setLoader(false);
         if (res?.status === 200) {
           showToast("success", res?.data?.data || String.appointmentConfirm);
-          setTimeout(() => {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "petParentAppStack" }],
-            });
-          }, 250);
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "petParentAppStack" }],
+          });
         }
       }
-      contextValue?.setLoader(false);
     } catch (error) {
       contextValue?.setLoader(false);
       showToast("error", error?.message);
