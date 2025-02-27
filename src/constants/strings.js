@@ -165,6 +165,7 @@ const Strings = {
   cancelAppointmentsTitle: "✨ Do You Want to Cancel Appointments? ✨",
   cancelAppointmentsDescription:
     "All appointments scheduled on the selected holiday will be automatically canceled.",
+  appointmentConfirm: "Appointment has been accepted",
 };
 
 export default Strings;

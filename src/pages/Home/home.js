@@ -23,12 +23,8 @@ import Carousel from "react-native-snap-carousel";
 import Modal from "react-native-modal";
 import InputField from "../../components/InputField";
 import ReviewComponent from "../../components/ReviewComponent";
-import SwitchOn from "../../assets/svg/switchOn.svg";
-import SwitchOff from "../../assets/svg/switchOff.svg";
-import DateTimePicker from "react-native-modal-datetime-picker";
 import moment from "moment";
 import Strings from "../../constants/strings";
-import Calendars from "../../assets/svg/calendar.svg";
 import { showToast, validArray } from "../../utils/utils";
 import Toggle from "../../components/Toggle";
 import { useIsFocused } from "@react-navigation/native";
@@ -47,6 +43,7 @@ import { decryptService } from "../../utils/storageFunc";
 import {
   completeAppointment,
   confirmAppointment,
+  createAppointment,
   getUpcomingAppointments,
   providerDashboardSlotsData,
 } from "../../redux-store/actions/auth";
@@ -54,49 +51,19 @@ import { contextValue } from "../../components/Loader";
 import Dialog from "../../components/Dialog";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUser } from "../../api/UserContext";
-
-const afterTimeSlots = [
-  { time: "09:00", disabled: false, enabled: true },
-  { time: "09:30", disabled: true, enabled: false },
-  { time: "10:00", disabled: false, enabled: true },
-  { time: "10:30", disabled: true, enabled: false },
-  { time: "11:00", disabled: false, enabled: true },
-  { time: "12:00", disabled: false, enabled: true },
-  { time: "01:30", disabled: true, enabled: false },
-  { time: "02:00", disabled: false, enabled: true },
-  { time: "03:30", disabled: true, enabled: false },
-  { time: "04:00", disabled: false, enabled: true },
-];
+import SessionsForAppointment from "../../components/SessionsForAppointment";
+import { SESSION_TYPE } from "../Services/selectAppointment";
 
 const Home = (props) => {
   const { top } = useSafeAreaInsets();
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
-  const [selectedValue, setSelectedValue] = useState();
-  const { colors, fontFamily, fonts } = THEMES;
   const [activeIndex, setActiveIndex] = useState(0);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedAttendedId, setSelectedAttendedId] = useState();
-  const [menuPosition, setMenuPosition] = useState({
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-  });
-  const [selectedItemId, setSelectedItemId] = useState(null);
   const [isVisible, setVisible] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState("Daily");
   const [attendedModal, setAttendedModal] = useState(false);
   const [otpInput, setOtpInput] = useState();
   const [appointmentVisible, setAppointmentVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [oneSession, setOneSession] = useState(true);
-  const [isDateVisible, setDateVisibility] = useState(false);
-  const [isDateEndVisible, setDateEndVisibility] = useState(false);
-  const [startDate, selectedStartDate] = useState();
-  const [endDate, selectedEndDate] = useState();
-  const [selectedSlot, setSelectedSlot] = useState(null);
-  const [selectedAfternonnSlot, setSelectedAfternoonSlot] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const { width: screenWidth } = Dimensions.get("window");
   const [appointmentData, setAppointmentData] = useState([]);
@@ -108,9 +75,75 @@ const Home = (props) => {
   const profile = useSelector((state) => state?.commonReducer);
   const [appointmentConfirm, setAppointmentConfirm] = useState(false);
   const [paymentModal, setPaymentModal] = useState(false);
-  const [clientName, setClientName] = useState(false);
-  const [mobileNumber, setMobileNumber] = useState(false);
+  const [clientName, setClientName] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
   const { userData, apiInitCall } = useUser();
+
+  const handleSubmit = async (
+    selectedDate,
+    startDate,
+    endDate,
+    selectedSlot,
+    sessionSelection
+  ) => {
+    try {
+      contextValue?.setLoader(true);
+      if (!selectedCategory?.code) {
+        throw new Error("Invalid Service! Please select valid service");
+      } else if (!selectedDate) {
+        throw new Error("Please Select valid date");
+      } else if (!startDate) {
+        throw new Error("Please Select valid start date");
+      } else if (!endDate) {
+        throw new Error("Please Select valid end date");
+      } else if (!selectedSlot?.start_time) {
+        throw new Error("Please Select valid time slot");
+      } else if (!selectedSlot?.end_time) {
+        throw new Error("Please Select valid time slot");
+      } else if (!clientName) {
+        throw new Error("Please provide client name");
+      } else if (!mobileNumber) {
+        throw new Error("Please provide client mobile number");
+      } else {
+        const userId = await decryptService("userId");
+        const params = {
+          parent_id: "",
+          provider_id: userId,
+          service_code: Number(selectedCategory?.code),
+          start_date:
+            sessionSelection === SESSION_TYPE.oneTime
+              ? moment(selectedDate).format("YYYY-MM-DD")
+              : moment(startDate).format("YYYY-MM-DD"),
+          end_date:
+            sessionSelection === SESSION_TYPE.oneTime
+              ? moment(selectedDate).format("YYYY-MM-DD")
+              : moment(endDate).format("YYYY-MM-DD"),
+          start_time: selectedSlot?.start_time,
+          end_time: selectedSlot?.end_time,
+          status: "scheduled", //HARDCODE
+          notes: "First appointment of the day", //HARDCODE
+          petid: 0,
+          requestedby: "provider", //HARDCODE
+          clientname: clientName,
+          contactnum: mobileNumber,
+        };
+        const res = await createAppointment(params);
+        if (res?.status === 200) {
+          showToast("success", res?.data?.data || String.appointmentConfirm);
+        }
+      }
+      // initData(); TODO
+      contextValue?.setLoader(false);
+    } catch (error) {
+      contextValue?.setLoader(false);
+      showToast("error", error?.message);
+    } finally {
+      setSelectedCategory(null);
+      setClientName("");
+      setMobileNumber("");
+      setAppointmentVisible(false);
+    }
+  };
 
   const paymentCompleted = useMemo(() => {
     if (
@@ -129,13 +162,7 @@ const Home = (props) => {
     profile?.logindetails?.isprovider,
     profile?.providerProfile?.subscription?.status,
   ]);
-  const [selectedServices, setSelectedServices] = useState([]);
 
-  const toggleService = (id) => {
-    setSelectedServices((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
   useEffect(() => {
     if (isFocused) {
       initData();
@@ -149,7 +176,7 @@ const Home = (props) => {
       setSelectedItem();
     }
     apiInitCall();
-  }, [isFocused, dispatch, initData]);
+  }, [isFocused, dispatch, initData, apiInitCall]);
 
   const renderCategory = ({ item }) => {
     const isSelected = selectedCategory === item;
@@ -304,38 +331,6 @@ const Home = (props) => {
     );
   };
 
-  const selectTimeSlot = (time) => {
-    if (!time.disabled) {
-      setSelectedSlot(time.time);
-    }
-  };
-
-  const selectAfternoonTimeSlot = (time) => {
-    if (!time.disabled) {
-      setSelectedAfternoonSlot(time.time);
-    }
-  };
-
-  const hideDatePickerCancel = () => {
-    setDateVisibility(false);
-  };
-
-  const handleDateConfirm = (date) => {
-    const formattedDate = moment(date).format("DD/MM/YYYY");
-    selectedStartDate(formattedDate);
-    hideDatePickerCancel();
-  };
-
-  const hideDateEndPickerCancel = () => {
-    setDateEndVisibility(false);
-  };
-
-  const handleDateEndConfirm = (date) => {
-    const formattedDate = moment(date).format("DD/MM/YYYY");
-    selectedEndDate(formattedDate);
-    hideDateEndPickerCancel();
-  };
-
   const switchProfile = () => {
     const validParentProfile = validateParentProfile(profile);
     if (validParentProfile?.flag) {
@@ -427,21 +422,6 @@ const Home = (props) => {
   const onAppointmentClose = () => {
     setAppointmentConfirm(false);
     setSelectedItem();
-  };
-
-  const handleOnConfirm = (appointment) => {
-    Alert.alert(
-      "",
-      "Are you sure you want to confirm this appointment?",
-      [
-        {
-          text: "No",
-          style: "cancel",
-        },
-        { text: "Yes", onPress: () => confirm(appointment) },
-      ],
-      { cancelable: false }
-    );
   };
 
   const onCancel = () => {
@@ -983,330 +963,64 @@ const Home = (props) => {
           paddingTop: moderateScale(10),
         }}
       >
-        <ScrollView
-          style={{ flex: 1 }}
-          bounces={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
+        <View
+          style={{
+            paddingTop: moderateScale(20),
+            flex: 1,
+          }}
         >
-          <View
+          <Text
             style={{
-              paddingTop: moderateScale(20),
-              flex: 1,
+              color: THEMES.colors.black,
+              fontFamily: THEMES.fontFamily.semiBold,
+              fontSize: THEMES.fonts.font14,
             }}
           >
+            Add Appointment
+          </Text>
+          <View style={{ paddingTop: moderateScale(15) }}>
+            <InputField
+              label={"Client name *"}
+              placeholderText={"Enter client name"}
+              value={clientName}
+              onChange={setClientName}
+            />
+          </View>
+          <View style={{ paddingTop: moderateScale(15) }}>
+            <InputField
+              maxLength={10}
+              keyboardType="phone-pad"
+              label={"Mobile number *"}
+              placeholderText={"Enter mobile number"}
+              value={mobileNumber}
+              onChange={setMobileNumber}
+            />
+          </View>
+          <View style={{ paddingTop: moderateScale(15), width: "90%" }}>
             <Text
               style={{
                 color: THEMES.colors.black,
                 fontFamily: THEMES.fontFamily.semiBold,
                 fontSize: THEMES.fonts.font14,
+                paddingBottom: moderateScale(10),
               }}
             >
-              Add Appointment
+              Category
             </Text>
-            <View style={{ paddingTop: moderateScale(15) }}>
-              <InputField
-                label={"Client name *"}
-                placeholderText={"Enter client name"}
-                value={clientName}
-                onChange={setClientName}
-              />
-            </View>
-            <View style={{ paddingTop: moderateScale(15) }}>
-              <InputField
-                label={"Mobile number *"}
-                placeholderText={"Enter mobile number"}
-                value={mobileNumber}
-                onChange={setMobileNumber}
-              />
-            </View>
-            <View style={{ paddingTop: moderateScale(15), width: "90%" }}>
-              <Text
-                style={{
-                  color: THEMES.colors.black,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                  fontSize: THEMES.fonts.font14,
-                  paddingBottom: moderateScale(10),
-                }}
-              >
-                Category
-              </Text>
-
-              <FlatList
-                data={userData?.providerProfile?.providerBusiness?.services}
-                keyExtractor={(item) => item.id.toString()}
-                renderItem={renderCategory}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-              />
-            </View>
-
-            <View style={styles.container}>
-              <Text
-                style={[
-                  !oneSession
-                    ? styles.unselectedRadioText
-                    : styles.selectedRadioText,
-                  {
-                    width: "40%",
-                  },
-                ]}
-              >
-                Single session
-              </Text>
-              <View style={{ width: "20%", alignItems: "center" }}>
-                {!oneSession ? (
-                  <TouchableOpacity onPress={() => setOneSession(!oneSession)}>
-                    <SwitchOff />
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity onPress={() => setOneSession(!oneSession)}>
-                    <SwitchOn />
-                  </TouchableOpacity>
-                )}
-              </View>
-              <Text
-                style={[
-                  !oneSession
-                    ? styles.selectedRadioText
-                    : styles.unselectedRadioText,
-                  {
-                    width: "40%",
-                    textAlign: "right",
-                  },
-                ]}
-              >
-                Daily Session
-              </Text>
-            </View>
-
-            <View
-              style={{
-                paddingTop: moderateScale(15),
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => setDateVisibility(true)}
-                style={[
-                  styles.dateContainer,
-                  {
-                    paddingHorizontal: moderateScale(15),
-                    flexDirection: "row",
-                    alignItems: "center",
-                  },
-                ]}
-              >
-                <View style={{ paddingRight: moderateScale(10) }}>
-                  {startDate ? (
-                    <>
-                      <Text
-                        style={[
-                          styles.datePlaceholderText,
-                          {
-                            paddingBottom: moderateScale(1),
-                            fontSize: THEMES.fonts.font10,
-                          },
-                        ]}
-                      >
-                        Start Date
-                      </Text>
-                      <Text style={styles.dateValue}>{startDate}</Text>
-                    </>
-                  ) : (
-                    <>
-                      <Text
-                        style={[
-                          styles.datePlaceholderText,
-                          {
-                            paddingBottom: moderateScale(2),
-                            fontSize: THEMES.fonts.font10,
-                          },
-                        ]}
-                      >
-                        Start Date
-                      </Text>
-                      <Text style={styles.datePlaceholderText}>
-                        {Strings.ddMMYYYY}
-                      </Text>
-                    </>
-                  )}
-                </View>
-                <Calendars />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => setDateEndVisibility(true)}
-                style={[
-                  styles.dateContainer,
-                  {
-                    paddingHorizontal: moderateScale(15),
-                    flexDirection: "row",
-                    alignItems: "center",
-                  },
-                ]}
-              >
-                <View style={{ paddingRight: moderateScale(10) }}>
-                  {endDate ? (
-                    <>
-                      <Text
-                        style={[
-                          styles.datePlaceholderText,
-                          {
-                            paddingBottom: moderateScale(2),
-                            fontSize: THEMES.fonts.font10,
-                          },
-                        ]}
-                      >
-                        End Date
-                      </Text>
-                      <Text style={styles.dateValue}>{endDate}</Text>
-                    </>
-                  ) : (
-                    <>
-                      <Text
-                        style={[
-                          styles.datePlaceholderText,
-                          {
-                            paddingBottom: moderateScale(2),
-                            fontSize: THEMES.fonts.font10,
-                          },
-                        ]}
-                      >
-                        End Date
-                      </Text>
-                      <Text style={styles.datePlaceholderText}>
-                        {Strings.ddMMYYYY}
-                      </Text>
-                    </>
-                  )}
-                </View>
-                <Calendars />
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                paddingTop: moderateScale(15),
-              }}
-            >
-              <Text
-                style={{
-                  color: THEMES.colors.black,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                  fontSize: THEMES.fonts.font14,
-                  paddingBottom: moderateScale(5),
-                  paddingHorizontal: moderateScale(5),
-                }}
-              >
-                Morning
-              </Text>
-
-              <View style={styles.timeSlotRow}>
-                {afterTimeSlots.map((slot, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={[
-                      styles.timeSlot,
-                      slot.disabled && styles.disabledSlot,
-                      selectedSlot === slot.time &&
-                        !slot.disabled &&
-                        styles.selectedSlotStyle,
-                    ]}
-                    onPress={() => selectTimeSlot(slot)}
-                    disabled={slot.disabled} // Disable if the slot is marked as disabled
-                  >
-                    <Text
-                      style={[
-                        slot.disabled && styles.disabledText,
-                        {
-                          color: slot.disabled
-                            ? "#000"
-                            : slot.enabled
-                            ? "#000"
-                            : "#fff",
-                          fontSize: THEMES.fonts.font12,
-                          fontFamily: THEMES.fontFamily.medium,
-                        },
-                      ]}
-                    >
-                      {slot.time}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            <View
-              style={{
-                paddingTop: moderateScale(15),
-              }}
-            >
-              <Text
-                style={{
-                  color: THEMES.colors.black,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                  fontSize: THEMES.fonts.font14,
-                  paddingBottom: moderateScale(5),
-                  paddingHorizontal: moderateScale(5),
-                }}
-              >
-                Afternoon
-              </Text>
-
-              <View style={styles.timeSlotRow}>
-                {afterTimeSlots.map((slot, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={[
-                      styles.timeSlot,
-                      slot.disabled && styles.disabledSlot,
-                      selectedSlot === slot.time &&
-                        !slot.disabled &&
-                        styles.selectedSlotStyle,
-                    ]}
-                    onPress={() => selectTimeSlot(slot)}
-                    disabled={slot.disabled} // Disable if the slot is marked as disabled
-                  >
-                    <Text
-                      style={[
-                        slot.disabled && styles.disabledText,
-                        {
-                          color: slot.disabled
-                            ? "#000"
-                            : slot.enabled
-                            ? "#000"
-                            : "#fff",
-                          fontSize: THEMES.fonts.font12,
-                          fontFamily: THEMES.fontFamily.medium,
-                        },
-                      ]}
-                    >
-                      {slot.time}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            <View style={{ paddingVertical: moderateScale(30) }}>
-              <Button title={"Add"} />
-            </View>
+            <FlatList
+              data={userData?.providerProfile?.providerBusiness?.services}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={renderCategory}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            />
           </View>
-          <DateTimePicker
-            isVisible={isDateVisible}
-            mode="date"
-            onConfirm={handleDateConfirm}
-            onCancel={hideDatePickerCancel}
+          <SessionsForAppointment
+            selectedProviderId={userData?.logindetails?.userid}
+            handleSubmit={handleSubmit}
+            buttonTitle="Add"
           />
-          <DateTimePicker
-            isVisible={isDateEndVisible}
-            mode="date"
-            onConfirm={handleDateEndConfirm}
-            onCancel={hideDateEndPickerCancel}
-          />
-        </ScrollView>
+        </View>
       </Modal>
       <Dialog
         flag={appointmentConfirm}

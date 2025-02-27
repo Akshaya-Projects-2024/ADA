@@ -57,7 +57,7 @@ export const WriteToUsApi = async (obj) => {
     }
     if (res) {
       if (res?.data?.status_code == 200) {
-        let data = res?.data
+        let data = res?.data;
         return data;
       } else {
         return [];
@@ -69,7 +69,6 @@ export const WriteToUsApi = async (obj) => {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
-
 
 export const feedbackApi = async (obj) => {
   try {
@@ -81,7 +80,7 @@ export const feedbackApi = async (obj) => {
     }
     if (res) {
       if (res?.data?.status_code == 200) {
-        let data = res?.data
+        let data = res?.data;
         return data;
       } else {
         return [];
@@ -93,29 +92,3 @@ export const feedbackApi = async (obj) => {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
-
-export const AddProviderAppointment = async (obj) => {
-  try {
-    const res = await Api.POST(urlList.providerAppointmentAdd, obj);
-    if (!res || res?.data?.error || res?.data?.errorCode) {
-      throw new Error(
-        res?.data?.message || res?.data?.error || "Something went wrong!"
-      );
-    }
-    if (res) {
-      if (res?.data?.status_code == 200) {
-        let data = res?.data
-        return data;
-      } else {
-        return [];
-      }
-    }
-    throw new Error("Something went wrong!");
-  } catch (error) {
-    console.log("checkLogin Error! ", error);
-    throw new Error(error?.message || error || "Opps! Something went wrong!");
-  }
-};
-
-
-
