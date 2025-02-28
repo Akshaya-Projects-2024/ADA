@@ -45,6 +45,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { getMyTopics } from "../../redux-store/actions/topics";
 import { SvgUri } from "react-native-svg";
 import { getAllEventsApi } from "../../redux-store/actions/events";
+import { vh, vw } from "../../utils/dimensions";
 const { width: screenWidth } = Dimensions.get("window");
 
 const { width } = Dimensions.get("window");
@@ -76,6 +77,7 @@ const ParentHome = (props) => {
     };
     let res = await getAllEventsApi(obj);
     if (res?.data?.data?.length) {
+      console.log(res?.data?.data);
       setEventData(res?.data?.data);
     }
   };
@@ -211,45 +213,40 @@ const ParentHome = (props) => {
   };
 
   const renderBannerItem = ({ item, index }) => {
-    console.log("item", item);
     return (
-      <TouchableOpacity
-        onPress={() => props.navigation.navigate("upComingEvents")}
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          paddingVertical: moderateScale(15),
-          borderRadius: 12,
-          borderBottomLeftRadius: 0,
-          backgroundColor: "#fff",
-          alignContent: "center",
-          borderColor: THEMES.colors.lightGrey,
-          borderWidth: 1,
-          marginTop: moderateScale(28),
-        }}
-      >
-        {item?.image ? (
-          <Image
+      <>
+        {item?.documentlist?.url ? (
+          <TouchableOpacity
+            onPress={() => props.navigation.navigate("upComingEvents")}
             style={{
-              borderRadius: 11,
-              width: "90%",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingVertical: moderateScale(10),
+              borderRadius: 12,
+              borderBottomLeftRadius: 0,
+              backgroundColor: "#fff",
+              alignContent: "center",
               borderColor: THEMES.colors.lightGrey,
               borderWidth: 1,
+              marginTop: moderateScale(28),
             }}
-            source={{ item: item?.image }}
-          />
-        ) : (
-          <Image
-            style={{
-              borderRadius: 11,
-              width: "90%",
-              borderColor: THEMES.colors.lightGrey,
-              borderWidth: 1,
-            }}
-            source={require("../../assets/images/banner.png")}
-          />
-        )}
-      </TouchableOpacity>
+          >
+            {item?.documentlist?.url ? (
+              <Image
+                resizeMode="cover"
+                style={{
+                  borderRadius: 11,
+                  width: vw(320),
+                  height: vh(150),
+                  borderColor: THEMES.colors.lightGrey,
+                  borderWidth: 1,
+                }}
+                source={{ uri: item?.documentlist?.url }}
+              />
+            ) : null}
+          </TouchableOpacity>
+        ) : null}
+      </>
     );
   };
 

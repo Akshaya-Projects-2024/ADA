@@ -15,6 +15,7 @@ import moment from "moment";
 import Cross from "../assets/svg/redCross.svg";
 import Check from "../assets/svg/check.svg";
 import { AppointmentStatus } from "../constants/enums";
+import ProfileDummy from "../assets/svg/user.svg";
 
 const AppointmentCard = ({
   item,
@@ -56,12 +57,15 @@ const AppointmentCard = ({
     }
     return THEMES.colors.black;
   }, [item?.status]);
-
   return (
     <Pressable
       onPress={() => {
         setSelectedItem(item);
-        navigation.navigate("appointmentDetail", { selectedItem: item });
+        {
+          item.requestedby !== "provider"
+            ? navigation.navigate("appointmentDetail", { selectedItem: item })
+            : null;
+        }
       }}
       style={[styles.flatlistView, { backgroundColor: itemBackgroundColor }]}
     >
@@ -74,30 +78,58 @@ const AppointmentCard = ({
         <View style={styles.flatListRow}>
           <View style={styles.flatListImgView}>
             <View style={styles.imageContainer}>
-              <Image
-                style={styles.petImage}
-                source={
-                  petImage?.url
-                    ? getBase64Obj(petImage?.url)
-                    : require("../assets/images/profileImg.png")
-                }
-              />
+              {petImage?.url ? (
+                <Image
+                  style={styles.petImage}
+                  source={getBase64Obj(petImage?.url)}
+                />
+              ) : (
+                <View
+                  style={{
+                    borderWidth: 1,
+                    alignItems: "center",
+                    borderColor: "gray",
+                    backgroundColor: "#fff",
+                    justifyContent: "center",
+                    width: 48,
+                    height: 48,
+                    borderRadius: 48 / 2,
+                  }}
+                >
+                  <ProfileDummy width={30} />
+                </View>
+              )}
             </View>
             <View style={styles.profileContainer}>
-              <Image
-                style={styles.profileImage}
-                source={
-                  item?.providerPhoto
-                    ? getBase64Obj(item?.providerPhoto)
-                    : require("../assets/images/profileImg.png")
-                }
-              />
+              {item?.providerPhoto ? (
+                <Image
+                  style={styles.profileImage}
+                  source={getBase64Obj(item?.providerPhoto)}
+                />
+              ) : (
+                <View
+                  style={{
+                    borderWidth: 1,
+                    alignItems: "center",
+                    borderColor: "gray",
+                    backgroundColor: "#fff",
+                    justifyContent: "center",
+                    width: 48,
+                    height: 48,
+                    borderRadius: 48 / 2,
+                  }}
+                >
+                  <ProfileDummy width={30} />
+                </View>
+              )}
             </View>
           </View>
           <View style={styles.nameText}>
-            <Text
-              style={[styles.name,{textTransform:'capitalize'}]}
-            >{`${item?.parentdetails?.name} & ${item?.petdetails?.name}`}</Text>
+            <Text style={[styles.name, { textTransform: "capitalize" }]}>
+              {item?.requestedby !== "provider"
+                ? `${item?.parentdetails?.name} & ${item?.petdetails?.name}`
+                : `${item?.clientname}`}
+            </Text>
             <View style={styles.flatListNameRow}>
               <View style={styles.serviceText}>
                 <Text
@@ -157,64 +189,73 @@ const AppointmentCard = ({
             ) : null}
           </View>
         </View>
-        {routeFrom && routeFrom === "parentAccount" ? null : item?.status ===
-          AppointmentStatus.pending ? (
-          <View style={styles.row}>
-            <Pressable
-              onPress={() => {
-                setSelectedItem(item);
-                setVisible(true);
-              }}
-            >
-              <Cross width={24} height={24} />
-            </Pressable>
-            <Pressable
-              style={{ marginLeft: moderateScale(12) }}
-              onPress={() => {
-                setSelectedItem(item);
-                setAppointmentConfirm(true);
-              }}
-            >
-              <Check width={24} height={24} />
-            </Pressable>
-          </View>
-        ) : null}
-        {item?.status === AppointmentStatus.cancelled ? (
-          <Text style={[styles.statusText, { color: itemtextColor }]}>
-            Cancelled
-          </Text>
-        ) : null}
-        {routeFrom && routeFrom === "parentAccount" ? null : item?.status ===
-          AppointmentStatus.scheduled ? (
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedItem(item);
-              setAttendedModal(true);
-            }}
-            style={styles.confirmButton}
-          >
-            <Text style={(styles.statusText, { color: itemtextColor })}>
-              Confirm
-            </Text>
-          </TouchableOpacity>
-        ) : null}
-        {item?.status === AppointmentStatus.rescheduled ? (
-          <Text
-            style={
-              (styles.statusText,
-              {
-                color: itemtextColor,
-              })
-            }
-          >
-            Rescheduled
-          </Text>
-        ) : null}
-        {item?.status === AppointmentStatus.completed ? (
-          <Text style={(styles.statusText, { color: itemtextColor })}>
-            Attended
-          </Text>
-        ) : null}
+
+        <>
+          {item?.requestedby !== "provider" ? (
+            <>
+              {routeFrom &&
+              routeFrom === "parentAccount" ? null : item?.status ===
+                AppointmentStatus.pending ? (
+                <View style={styles.row}>
+                  <Pressable
+                    onPress={() => {
+                      setSelectedItem(item);
+                      setVisible(true);
+                    }}
+                  >
+                    <Cross width={24} height={24} />
+                  </Pressable>
+                  <Pressable
+                    style={{ marginLeft: moderateScale(12) }}
+                    onPress={() => {
+                      setSelectedItem(item);
+                      setAppointmentConfirm(true);
+                    }}
+                  >
+                    <Check width={24} height={24} />
+                  </Pressable>
+                </View>
+              ) : null}
+              {item?.status === AppointmentStatus.cancelled ? (
+                <Text style={[styles.statusText, { color: itemtextColor }]}>
+                  Cancelled
+                </Text>
+              ) : null}
+              {routeFrom &&
+              routeFrom === "parentAccount" ? null : item?.status ===
+                AppointmentStatus.scheduled ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSelectedItem(item);
+                    setAttendedModal(true);
+                  }}
+                  style={styles.confirmButton}
+                >
+                  <Text style={(styles.statusText, { color: itemtextColor })}>
+                    Confirm
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
+              {item?.status === AppointmentStatus.rescheduled ? (
+                <Text
+                  style={
+                    (styles.statusText,
+                    {
+                      color: itemtextColor,
+                    })
+                  }
+                >
+                  Rescheduled
+                </Text>
+              ) : null}
+              {item?.status === AppointmentStatus.completed ? (
+                <Text style={(styles.statusText, { color: itemtextColor })}>
+                  Attended
+                </Text>
+              ) : null}
+            </>
+          ) : null}
+        </>
       </View>
     </Pressable>
   );
@@ -249,7 +290,7 @@ const styles = StyleSheet.create({
     paddingVertical: moderateScale(1),
   },
   nameText: {
-    marginHorizontal: moderateScale(8),
+    marginHorizontal: moderateScale(13),
     paddingVertical: moderateScale(5),
     flex: 1,
   },
@@ -306,6 +347,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: moderateScale(12),
+    paddingVertical: moderateScale(8),
   },
   flatListImgView: {
     width: 55,

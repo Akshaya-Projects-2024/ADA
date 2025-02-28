@@ -207,7 +207,7 @@ const validateDocuments = (docs) => {
   const doc = docs?.some((it) => it?.documenttype === DOCUMENT_TYPES.document);
   const image = docs?.some((it) => it?.documenttype === DOCUMENT_TYPES.image);
   const logo = docs?.some((it) => it?.documenttype === DOCUMENT_TYPES.logo);
-  console.log(doc && image && logo, doc, image, logo);
+
   return doc && image && logo;
 };
 

@@ -22,7 +22,6 @@ export const UserProvider = ({ children }) => {
       if (response?.status === 200) {
         dispatch(dispatchUserData(response?.data?.data));
         setUserData(response?.data?.data);
-        console.log("User Data:", response?.data?.data);
       }
       return response?.data?.data || false;
     } catch (error) {

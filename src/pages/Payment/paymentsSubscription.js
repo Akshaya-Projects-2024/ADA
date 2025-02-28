@@ -196,7 +196,6 @@ const PaymentsSubscription = (props) => {
         order_id: subscriptionDetails?.id, //Replace this with an order_id created using Orders API.
         theme: { color: "#53a20e" },
       };
-      console.log("options",options)
       const paymentResponse = await RazorpayCheckout.open({
         ...options,
       });

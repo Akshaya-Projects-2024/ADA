@@ -24,8 +24,6 @@ const AdoptionDetail = (props) => {
   const selectedAdotpionData = props.route.params.selectedData;
   const [image, setImage] = useState();
 
-  console.log("selectedAdotpionData", selectedAdotpionData);
-
   useEffect(() => {
     initData();
   }, []);

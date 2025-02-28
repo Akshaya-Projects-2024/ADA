@@ -374,6 +374,11 @@ const MyBookings = ({ navigation, route }) => {
           </View>
         </Modal>
         <Modal
+          onBackButtonPress={() => {
+            setAttendedModal(false);
+            setSelectedItem();
+            setOtpInput("");
+          }}
           onBackdropPress={() => {
             setAttendedModal(false);
             setSelectedItem();

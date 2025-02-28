@@ -136,23 +136,7 @@ const ParentDetails = (props) => {
     }
   };
 
-  const fetchProfileData = useCallback(() => {
-    return new Promise(async (resolve) => {
-      try {
-        const obj = {
-          userid: await decryptService("userId"),
-        };
-        const response = await getProfile(obj);
-        if (response?.status === 200) {
-          dispatch(dispatchUserData(response?.data?.data));
-        };
-        resolve(response?.data?.data ? response?.data?.data : false);
-      } catch (error) {
-        console.log("err111", error);
-        resolve(false);
-      }
-    });
-  });
+
 
   const onSubmit = async () => {
     if (!parentImg) {
@@ -190,8 +174,6 @@ const ParentDetails = (props) => {
           ...(parentContact?.id ? { id: parentContact?.id } : {}),
         };
         const res = await saveParentDetails(postData);
-        console.log("res",res?.data?.status_code)
-        fetchProfileData();
         if (res?.data?.status_code == 200) {
           if (route === "parentAccount") {
             props.navigation.dispatch(StackActions.pop(1));
@@ -200,12 +182,12 @@ const ParentDetails = (props) => {
               "petDetail",
               route ? { route: route } : {}
             );
-            showToast("success", res?.data?.message)
+            showToast("success", res?.data?.message);
           }
         } else {
           showToast("error", res?.data?.message);
         }
-        apiInitCall()
+        apiInitCall();
       } catch (error) {
         showToast("error", "Something went wrong!!!");
       }

@@ -21,6 +21,8 @@ import {
   validateServiceProfile,
 } from "../../utils/userUtils";
 import { LoginModules } from "../../constants/enums";
+import DeviceInfo from "react-native-device-info";
+
 
 const Splash = (props) => {
   const timeoutRef = useRef();
@@ -56,6 +58,7 @@ const Splash = (props) => {
 
   useEffect(() => {
     if (isFocused) {
+
       dispatch(getServiceProviderRole());
       checkIfUserExits();
     }
@@ -70,7 +73,6 @@ const Splash = (props) => {
         const response = await getProfile(obj);
         if (response?.status === 200) {
           dispatch(dispatchUserData(response?.data?.data));
-          console.log("response?.data?.data",response?.data?.data)
         }
         resolve(response?.data?.data ? response?.data?.data : false);
       } catch (error) {

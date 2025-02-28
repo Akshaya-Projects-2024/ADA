@@ -132,7 +132,7 @@ const Home = (props) => {
           showToast("success", res?.data?.data || String.appointmentConfirm);
         }
       }
-      // initData(); TODO
+      initData(); //TODO
       contextValue?.setLoader(false);
     } catch (error) {
       contextValue?.setLoader(false);
@@ -1007,7 +1007,7 @@ const Home = (props) => {
             >
               Category
             </Text>
-            <FlatList
+            <FlatList 
               data={userData?.providerProfile?.providerBusiness?.services}
               keyExtractor={(item) => item.id.toString()}
               renderItem={renderCategory}

@@ -27,7 +27,6 @@ export const replyReviewApi = async (params) => {
           res?.data?.message || res?.data?.error || "Something went wrong!"
         );
       }
-      console.log("res?.data?",res?.data)
       if (res?.data?.data) {
         return res?.data;
       }

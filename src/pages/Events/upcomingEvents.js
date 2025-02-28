@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Dimensions,
   FlatList,
+  Linking,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
@@ -20,23 +21,9 @@ import Call from "../../assets/svg/call.svg";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { getAllEventsApi } from "../../redux-store/actions/events";
 import { decryptService } from "../../utils/storageFunc";
+import { vh, vw } from "../../utils/dimensions";
 
-const DATA = [
-  {
-    id: 1,
-    date: "1 July, 05:30 PM",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  ",
-    location: "Gadkari hall, Thane",
-  },
-  {
-    id: 1,
-    date: "1 July, 05:30 PM",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.  ",
-    location: "Gadkari hall, Thane",
-  },
-];
+
 
 const UpcomingEvents = () => {
   const [eventData, setEventData] = useState([]);
@@ -99,13 +86,15 @@ const UpcomingEvents = () => {
         }}
       >
         <Image
-          style={{
-            borderRadius: 11,
-            borderColor: THEMES.colors.lightGrey,
-            borderWidth: 1,
-            alignSelf: "center",
-          }}
-          source={require("../../assets/images/banner.png")}
+           resizeMode="cover"
+           style={{
+             borderRadius: 11,
+             width: vw(320),
+             height: vh(150),
+             borderColor: THEMES.colors.lightGrey,
+             borderWidth: 1,
+           }}
+          source={{uri: item?.documentlist?.url}}
         />
         <View
           style={{
@@ -197,8 +186,14 @@ const UpcomingEvents = () => {
                 {item.audience}
               </Text>
             </View>
+            {console.log("ite",item)}
             <View style={{ width: "30%", alignItems: "flex-end" }}>
-              <View
+              <TouchableOpacity
+                 onPress={() =>
+                  Linking.openURL(
+                    `tel:${item?.contact}`
+                  )
+                }
                 style={{
                   width: 40,
                   height: 40,
@@ -215,7 +210,7 @@ const UpcomingEvents = () => {
                 }}
               >
                 <Call />
-              </View>
+              </TouchableOpacity>
             </View>
           </View>
         </View>

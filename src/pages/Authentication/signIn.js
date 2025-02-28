@@ -6,10 +6,11 @@ import {
   ImageBackground,
   Keyboard,
   StatusBar,
+  Platform,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
-import { getUniqueId } from "react-native-device-info";
+import { getUniqueId, getSystemVersion } from "react-native-device-info";
 import { moderateScale } from "react-native-size-matters";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
@@ -35,6 +36,8 @@ const SignIn = (props) => {
         const postData = {
           UserId: inputValue,
           Deviceid: deviceId,
+          devicetype: Platform.OS == "android" ? "android" : "IOS",
+          osversion: getSystemVersion(),
         };
         const res = await checkLogin(postData);
         if (res?.data?.status_code == 200) {
