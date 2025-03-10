@@ -10,7 +10,7 @@ import {
   Image,
   FlatList,
 } from "react-native";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, s } from "react-native-size-matters";
 
 import Strings from "../../constants/strings";
 import Header from "../../components/Header";
@@ -27,7 +27,11 @@ import { THEMES } from "../../assets/theme/themes";
 import { decryptService } from "../../utils/storageFunc";
 import { BREEDS } from "../../constants/mockData";
 import { showToast, validArray } from "../../utils/utils";
-import { savePetDetails, uploadDocument } from "../../redux-store/actions/auth";
+import {
+  deletePetDocumentApi,
+  savePetDetails,
+  uploadDocument,
+} from "../../redux-store/actions/auth";
 import { useSelector } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
@@ -37,11 +41,6 @@ import { getAdoptionCategory } from "../../redux-store/actions/commonApis";
 import { useDebounce } from "../../hooks/useDebounce";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { contextValue } from "../../components/Loader";
-
-const petType = [
-  { id: "1", label: "Cat" },
-  { id: "2", label: "Dog" },
-];
 
 const GENDER = { male: "Male", female: "Female" };
 
@@ -60,25 +59,113 @@ const PetDetail = (props) => {
   const [petTypeData, setPetTypeData] = useState();
   const [petData, setPetData] = useState();
   const [petPhotoVisible, setPetPhotoVisible] = useState();
-
+  const { userData, apiInitCall } = useUser();
   const [breedList, setBreedList] = useState([]);
   const [selectPetBreed, setSelectedPetBreed] = useState(); // breed
 
   const [medicalVisible, setMedicalVisible] = useState(false);
   const [petAllImages, setPetAllImages] = useState([]);
   const [petCertificates, setPetCertificates] = useState([]);
-
+  const [petProfilePhoto, setPetProfilePhoto] = useState();
   const [registerModal, setRegisterModal] = useState(false);
   const { parentProfie } = useSelector((state) => state?.commonReducer);
   const { petDetails } = parentProfie;
+  console.log(petDetails[0]?.id)
+
+  const [submitDocumentData, setSubmitDocumentData] = useState([]);
+
+  const isURL = (str) => /^(https?:\/\/|file:\/\/)/.test(str);
+
+  const isBase64 = (str) =>
+    /^data:(image|application)\/[a-zA-Z]+;base64,/.test(str);
+
+  // Example Usage
+  const checkType = (input) => {
+    if (isURL(input)) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   useEffect(() => {
     initData();
   }, []);
 
+  const getPetData = (result, data) => {
+    if (validArray(petDetails)) {
+      const firstPet = petDetails[0];
+      if (firstPet?.about) {
+        setPetDescription(firstPet?.about);
+      }
+      if (firstPet?.age) {
+        setPetAge(firstPet?.age?.toString());
+      }
+
+      if (firstPet?.type) {
+        const selectedType = result?.filter((it) => it.label == firstPet?.type);
+        if (selectedType) {
+          setSelectedPetType(selectedType);
+        }
+      }
+
+      if (firstPet?.breed) {
+        const selectedType = result?.filter((it) => it.label == firstPet?.type);
+        const selectedData = data?.find(
+          (item) => item.category == selectedType?.[0]?.label
+        );
+
+        const result1 = selectedData?.breeds?.map((item, index) => ({
+          id: index,
+          label: item,
+        }));
+
+        setBreedList(result1 ? result1 : []);
+
+        const selectedTypeBreed = result1?.filter(
+          (it) => it.label == firstPet?.breed
+        );
+
+        if (selectedTypeBreed) {
+          setSelectedPetBreed(selectedTypeBreed);
+        }
+      }
+
+      if (firstPet?.gender) {
+        setSelectedGender(firstPet?.gender);
+      }
+      if (firstPet?.name) {
+        setPetName(firstPet?.name);
+      }
+
+      if (firstPet?.weight) {
+        setPetWeight(firstPet?.weight);
+      }
+ 
+      if (firstPet?.documents) {
+        const profilePhoto = firstPet?.documents?.filter(
+          (item) => item.documenttype === "profilePhoto"
+        );
+
+        const petImages = firstPet?.documents?.filter(
+          (item) => item.documenttype === "photo"
+        );
+        const certificates = firstPet?.documents?.filter(
+          (item) => item.documenttype === "certificate"
+        );
+
+        setPetProfilePhoto(profilePhoto);
+        setPetImage(profilePhoto?.[0]?.url);
+        setPetAllImages(petImages);
+        setPetCertificates(certificates);
+        setSubmitDocumentData([...petImages, ...certificates]);
+      }
+    }
+  };
+
   const initData = async () => {
     try {
-      contextValue?.setLoader(true)
+      contextValue?.setLoader(true);
       let obj = {
         category: "",
       };
@@ -91,17 +178,17 @@ const PetDetail = (props) => {
       if (result?.length) {
         setPetTypeData(result);
       }
-      contextValue?.setLoader(false) 
+      getPetData(result, data);
+      contextValue?.setLoader(false);
     } catch (error) {
-      contextValue?.setLoader(false) 
+      contextValue?.setLoader(false);
     }
-  
   };
 
   const handleSelectedCategory = (value) => {
     setSelectedPetType(value);
     setSelectedPetBreed([]);
-    const selectedData = petData.find(
+    const selectedData = petData?.find(
       (item) => item.category == value?.[0]?.label
     );
     const result = selectedData?.breeds?.map((item, index) => ({
@@ -114,26 +201,26 @@ const PetDetail = (props) => {
   const handlePetImg = async (image) => {
     const extension = image?.uri?.split(".").pop();
     const userId = await decryptService("userId");
-
-    let payload = {
+    let payload = [{
       userid: userId,
-      documenttype: "photo",
+      documenttype: "profilePhoto",
       extention: extension,
       document: image?.fileData,
-    };
+    }];
     setPetImage(image?.fileData);
-    apiCall(payload);
+    setPetProfilePhoto(payload);
   };
 
-  const apiCall = async (postData) => {
+  const deleteDocumentMethod = async (documentId) => {
     try {
-      const res = await uploadDocument(postData);
-      if (res?.status == 200) {
-        showToast("success", "Successfully uploaded the image");
-      }
-    } catch (error) {
-      showToast("error", error.message);
-    }
+      const userId = await decryptService("userId");
+      let obj = {
+        petid: petDetails?.[0]?.id,
+        id: documentId,
+        userid: userId,
+      };
+      let res = await deletePetDocumentApi(obj);
+    } catch (error) {}
   };
 
   const handlePetDocuments = async (image) => {
@@ -142,39 +229,17 @@ const PetDetail = (props) => {
       documenttype: "photo",
       extention: extension,
       document: image?.fileData,
+      url: image?.uri,
     };
-    setPetAllImages((prevImages) => [...prevImages, payload]);
-  };
+    let obj = {
+      documenttype: "photo",
+      extention: extension,
+      document: image?.fileData,
+      url: "",
+    };
 
-  const onCancel = async (type, doc) => {
-    try {
-      const userId = await decryptService("userId");
-      const postData = {
-        userid: userId,
-        id: doc?.id,
-      };
-      const res = await deleteDocument(postData);
-      if (res?.status == 200) {
-        if (type === DOCUMENT_TYPES.logo) {
-          setPhoto(null);
-        }
-        if (type === DOCUMENT_TYPES.document) {
-          const removeItemById = documentImg.filter(
-            (it) => it?.fileName !== doc?.fileName
-          );
-          setDocumentImg(removeItemById);
-        }
-        if (type === DOCUMENT_TYPES.image) {
-          const removeItemById = businessImg.filter(
-            (it) => it?.fileData !== doc?.fileData
-          );
-          setBusinessImg(removeItemById);
-        }
-        showToast("success", "Successfully deleted the image");
-      }
-    } catch (error) {
-      showToast("error", error.message);
-    }
+    setSubmitDocumentData((prevImages) => [...prevImages, obj]);
+    setPetAllImages((prevImages) => [...prevImages, payload]);
   };
 
   const handleCertificates = async (image) => {
@@ -183,12 +248,43 @@ const PetDetail = (props) => {
       documenttype: "certificate",
       extention: extension,
       document: image?.fileData,
+      url: image?.uri,
     };
+    let obj = {
+      documenttype: "certificate",
+      extention: extension,
+      document: image?.fileData,
+      url: "",
+    };
+    setSubmitDocumentData((prevImages) => [...prevImages, obj]);
     setPetCertificates((pre) => [...pre, payload]);
   };
 
+  const onCancelPetImages = async (selectedImage) => {
+    try {
+      deleteDocumentMethod(selectedImage?.item?.id);
+      setPetAllImages(
+        petAllImages?.filter((img) => img.url !== selectedImage?.item?.url)
+      );
+      setSubmitDocumentData([...petAllImages, ...petCertificates]);
+    } catch (error) {
+      showToast("error", error.message);
+    }
+  };
+
+  const onCancelDocument = async (selectedImage) => {
+    try {
+      deleteDocumentMethod(selectedImage?.item?.id);
+      setPetCertificates(
+        petCertificates?.filter((img) => img.url !== selectedImage?.item?.url)
+      );
+      setSubmitDocumentData([...petAllImages, ...petCertificates]);
+    } catch (error) {
+      showToast("error", error.message);
+    }
+  };
   const onSubmit = async () => {
-    console.log("img");
+    const firstPet = petDetails[0];
     if (!petImage) {
       showToast("error", "Please select pet image");
     } else if (!petName) {
@@ -203,19 +299,21 @@ const PetDetail = (props) => {
       showToast("error", "Please select pet gender");
     } else {
       try {
-        contextValue?.setLoader(true)
+        contextValue?.setLoader(true);
         const userId = await decryptService("userId");
         const params = {
+          id: petDetails[0]?.id,
           userid: userId,
           name: petName,
           type: selectedPetType[0]?.label || null,
           age: Number(petAge),
           gender: selectedGender,
           about: petDescription ? petDescription : "",
-          documents: [...petAllImages, ...petCertificates],
+          documents: submitDocumentData.concat(petProfilePhoto),
           breed: selectPetBreed[0]?.label,
           weight: petWeight,
         };
+        console.log(params,"params")
         const res = await savePetDetails(params);
         if (res?.data?.status_code == 200) {
           if (route === "parentAccount") {
@@ -226,10 +324,12 @@ const PetDetail = (props) => {
         } else {
           showToast("error", res?.data?.message);
         }
-        contextValue?.setLoader(false)
+        apiInitCall();
+        contextValue?.setLoader(false);
       } catch (error) {
-        contextValue?.setLoader(false)
-        showToast("error", "Something went wrong!!!");
+        console.log("er", error)
+        contextValue?.setLoader(false);
+        showToast("error", error);
       }
     }
   };
@@ -243,31 +343,54 @@ const PetDetail = (props) => {
 
   const renderItem = (item, index) => {
     const photo = item?.item.document;
-    console.log("index", index);
     return (
-      <View style={styles.imgContent}>
-        <Image
-          style={styles.img}
-          resizeMode="contain"
-          source={getBase64Obj(photo)}
-        />
-        <TouchableOpacity style={styles.crossView}>
+      <View style={[styles.imgContent]}>
+        {photo ? (
+          <Image
+            style={styles.img}
+            resizeMode="contain"
+            source={getBase64Obj(photo)}
+          />
+        ) : (
+          <Image
+            style={styles.img}
+            resizeMode="contain"
+            source={{ uri: item?.item?.url }}
+          />
+        )}
+
+        <TouchableOpacity
+          style={styles.crossView}
+          onPress={() => onCancelPetImages(item)}
+        >
           <CrossCircle stroke={THEMES.colors.black} style={styles.crossImg} />
         </TouchableOpacity>
       </View>
     );
   };
 
-  const renderMedicalItem = (item) => {
-    const photo = item?.item.fileData;
+  const renderDocumentItem = (item, index) => {
+    const photo = item?.item.document;
     return (
       <View style={styles.imgContent}>
-        <Image
-          style={styles.img}
-          resizeMode="contain"
-          source={getBase64Obj(photo)}
-        />
-        <TouchableOpacity>
+        {photo ? (
+          <Image
+            style={styles.img}
+            resizeMode="contain"
+            source={getBase64Obj(photo)}
+          />
+        ) : (
+          <Image
+            style={styles.img}
+            resizeMode="contain"
+            source={{ uri: item?.item?.url }}
+          />
+        )}
+
+        <TouchableOpacity
+          style={styles.crossView}
+          onPress={() => onCancelDocument(item)}
+        >
           <CrossCircle stroke={THEMES.colors.black} style={styles.crossImg} />
         </TouchableOpacity>
       </View>
@@ -313,19 +436,34 @@ const PetDetail = (props) => {
                   justifyContent: "center",
                 }}
               >
-                {petImage?.length ? (
-                  <Image
-                    style={{
-                      width: 100,
-                      height: 100,
-                      borderRadius: 50,
-                      backgroundColor: "#ddd",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                    resizeMode="contain"
-                    source={getBase64Obj(petImage)}
-                  />
+                {Boolean(petImage?.length)  ? (
+                  checkType(petImage) ? (
+                    <Image
+                      style={{
+                        width: 100,
+                        height: 100,
+                        borderRadius: 50,
+                        backgroundColor: "#ddd",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      resizeMode="contain"
+                      source={{ uri: petImage }}
+                    />
+                  ) : (
+                    (<Image
+                      style={{
+                        width: 100,
+                        height: 100,
+                        borderRadius: 50,
+                        backgroundColor: "#ddd",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      resizeMode="contain"
+                      source={getBase64Obj(petImage)}
+                    />)
+                  )
                 ) : (
                   <ProfileDummy />
                 )}
@@ -508,9 +646,7 @@ const PetDetail = (props) => {
                       ? "flex-start"
                       : "center",
                     alignItems: "center",
-                    padding: petImage?.length
-                      ? moderateScale(0)
-                      : moderateScale(16),
+                    padding: moderateScale(16),
                     borderColor: THEMES.colors.darkGrey,
                     borderRadius: 10,
                   }}
@@ -556,15 +692,13 @@ const PetDetail = (props) => {
                       ? "flex-start"
                       : "center",
                     alignItems: "center",
-                    padding: petImage?.length
-                      ? moderateScale(0)
-                      : moderateScale(16),
+                    padding: moderateScale(16),
                     borderColor: THEMES.colors.darkGrey,
                     borderRadius: 10,
                   }}
                   showsHorizontalScrollIndicator={false}
                   data={petCertificates}
-                  renderItem={renderItem}
+                  renderItem={renderDocumentItem}
                   ListHeaderComponent={() =>
                     petCertificates?.length == 0 ? (
                       <Text style={styles.imgPlaceholder}>
@@ -751,7 +885,6 @@ const styles = StyleSheet.create({
     marginRight: 5,
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: moderateScale(16),
   },
   img: {
     width: 60,

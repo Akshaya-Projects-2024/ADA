@@ -26,6 +26,7 @@ import { RichEditor, RichToolbar } from "react-native-pell-rich-editor";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
 import Dialog from "../../components/Dialog";
+import { vh } from "../../utils/dimensions";
 
 const NewTopic = () => {
   const [visible, setVisible] = useState(false);
@@ -96,10 +97,11 @@ const NewTopic = () => {
             profileData?.providerBusiness?.name ||
             profileData?.parentContact?.name,
         };
+
         let res = await createTopic(obj);
         if (res?.status == 200) {
           contextValue?.setLoader(false);
-          setModal(true)
+          setModal(true);
         } else {
           contextValue?.setLoader(false);
           showToast("error", "Something went wrong!!!");
@@ -119,7 +121,7 @@ const NewTopic = () => {
           showBack
           title={Strings.newTopic}
           bgColor="transparent"
-          fontColor={THEMES.colors.black}
+          fontColor={"#fda208"}
         />
         <View style={styles.mainView}>
           <ScrollView
@@ -224,6 +226,7 @@ const NewTopic = () => {
               />
               <RichToolbar
                 style={styles.toolbar}
+                initialHeight={30}
                 editor={richText}
                 actions={[
                   "bold",
@@ -364,6 +367,8 @@ const styles = StyleSheet.create({
   },
   toolbar: {
     backgroundColor: "#f1f1f1",
+    height: vh(40),
+    flex: 0,
   },
 });
 

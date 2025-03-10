@@ -244,7 +244,7 @@ const TrendingTopics = (props) => {
             fontWeight: 500,
           }}
         >
-          No trending topics data available.
+          Oops! No information available.
         </Text>
       </View>
     );
@@ -261,6 +261,64 @@ const TrendingTopics = (props) => {
           noBack
         />
         <View style={{ flex: 1 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              paddingHorizontal: moderateScale(20),
+              paddingTop: moderateScale(13),
+            }}
+          >
+            <View style={{ width: "87%" }}>
+              <TouchableOpacity
+                onPress={() =>
+                  props.navigation.navigate("auth", {
+                    screen: "search",
+                  })
+                }
+                style={{
+                  padding: moderateScale(8),
+                  borderRadius: 25,
+                  borderWidth: 1.5,
+                  backgroundColor: "#f5f5f5",
+                  borderColor: "#bebebd",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Search />
+                <Text
+                  style={{
+                    paddingLeft: moderateScale(8),
+                    fontSize: THEMES.fonts.font12,
+                    color: THEMES.colors.darkGrey,
+                  }}
+                >
+                  Search
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              onPress={() =>
+                props.navigation.navigate("auth", {
+                  screen: "newTopic",
+                })
+              }
+              style={{
+                backgroundColor: THEMES.colors.cyan,
+                padding: moderateScale(11),
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: moderateScale(8),
+                borderBottomLeftRadius: moderateScale(0),
+              }}
+            >
+              <Plus stroke={"#fff"} />
+            </TouchableOpacity>
+          </View>
+
           {topicList?.length || trendingTopics?.length ? (
             <ScrollView
               style={{ flex: 1 }}
@@ -274,61 +332,6 @@ const TrendingTopics = (props) => {
                   paddingHorizontal: moderateScale(20),
                 }}
               >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View style={{ width: "87%" }}>
-                    <TouchableOpacity
-                      onPress={() =>
-                        props.navigation.navigate("auth", {
-                          screen: "search",
-                        })
-                      }
-                      style={{
-                        padding: moderateScale(8),
-                        borderRadius: 25,
-                        borderWidth: 1.5,
-                        backgroundColor: "#f5f5f5",
-                        borderColor: "#bebebd",
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Search />
-                      <Text
-                        style={{
-                          paddingLeft: moderateScale(8),
-                          fontSize: THEMES.fonts.font12,
-                          color: THEMES.colors.darkGrey,
-                        }}
-                      >
-                        Search
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <TouchableOpacity
-                    onPress={() =>
-                      props.navigation.navigate("auth", {
-                        screen: "newTopic",
-                      })
-                    }
-                    style={{
-                      backgroundColor: THEMES.colors.cyan,
-                      padding: moderateScale(11),
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: moderateScale(8),
-                      borderBottomLeftRadius: moderateScale(0),
-                    }}
-                  >
-                    <Plus stroke={"#fff"} />
-                  </TouchableOpacity>
-                </View>
                 {topicList?.length > 5 && (
                   <View style={{ paddingTop: moderateScale(15) }}>
                     <Text

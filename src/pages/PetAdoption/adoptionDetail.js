@@ -19,33 +19,45 @@ import ShareImg from "../../assets/svg/share.svg";
 import Share from "react-native-share";
 import { shareAdoption } from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
+import { contextValue } from "../../components/Loader";
 
 const AdoptionDetail = (props) => {
   const selectedAdotpionData = props.route.params.selectedData;
   const [image, setImage] = useState();
 
+  console.log("selectedAdotpionData", selectedAdotpionData);
   useEffect(() => {
     initData();
   }, []);
 
   const initData = async () => {
-    let obj = {
-      id: selectedAdotpionData?.id,
-      createdby: await decryptService("userId"),
-    };
-    let response = await shareAdoption(obj);
-    if (response?.status === 200) {
-      setImage(response?.data?.data);
+    try {
+      contextValue?.setLoader(true);
+      let obj = {
+        id: selectedAdotpionData?.id,
+        createdby: await decryptService("userId"),
+      };
+      let response = await shareAdoption(obj);
+      if (response?.status === 200) {
+        setImage(response?.data?.data);
+        contextValue?.setLoader(false);
+      }
+     
+    } catch (error) {
+      contextValue?.setLoader(false);
     }
   };
 
   const shareImageBase64 = async () => {
-    const shareData = {
-      title: "Share",
-      message: "Check out this image!",
-      url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
-    };
-    await Share.open(shareData);
+    console.log(":image", image);
+    if (image) {
+      const shareData = {
+        title: "Share",
+        message: `"Hi my name is" ${selectedAdotpionData?.name}`,
+        url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
+      };
+      await Share.open(shareData);
+    }
   };
 
   return (

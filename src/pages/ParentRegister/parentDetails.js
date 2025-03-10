@@ -32,6 +32,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
 import { dispatchUserData } from "../../redux-store/actions/registerAction";
 import { useUser } from "../../api/UserContext";
+import { contextValue } from "../../components/Loader";
 
 const ParentDetails = (props) => {
   const route = props?.route?.params?.route;
@@ -139,6 +140,7 @@ const ParentDetails = (props) => {
 
 
   const onSubmit = async () => {
+    contextValue?.setLoader(true)
     if (!parentImg) {
       showToast("error", "Please upload parent profile picture");
     } else if (!parentName) {
@@ -177,6 +179,7 @@ const ParentDetails = (props) => {
         if (res?.data?.status_code == 200) {
           if (route === "parentAccount") {
             props.navigation.dispatch(StackActions.pop(1));
+
           } else {
             props.navigation.navigate(
               "petDetail",
@@ -188,8 +191,10 @@ const ParentDetails = (props) => {
           showToast("error", res?.data?.message);
         }
         apiInitCall();
+        contextValue?.setLoader(false);
       } catch (error) {
         showToast("error", "Something went wrong!!!");
+        contextValue?.setLoader(false);
       }
     }
   };

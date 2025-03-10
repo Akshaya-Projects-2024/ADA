@@ -223,7 +223,7 @@ const PetAdoption = (props) => {
             fontWeight: 500,
           }}
         >
-          No pet adoption data available.
+         Hey, No pet for adoption.Hope everyone got their home
         </Text>
       </View>
     );

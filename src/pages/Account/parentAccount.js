@@ -77,7 +77,6 @@ const MenuItem = ({
   );
 };
 
-
 const deleteAccountMethod = () => {
   Alert.alert(
     "Delete Account",
@@ -119,7 +118,7 @@ const handleDeleteAccount = async () => {
     };
     let res = await deleteAccountApi(obj);
     if (res?.data?.status_code == 200) {
-      handleLogout()
+      handleLogout();
       resetNavigation("app");
     } else {
       showToast("Error", "Something went wrong!! Please try again later.");
@@ -328,11 +327,6 @@ const ParentAccount = (props) => {
                     icon={<Activity />}
                     title={"Activity tracker"}
                     showPending={false}
-                    onPress={() =>
-                      props.navigation.navigate("petDetail", {
-                        route: "parentAccount",
-                      })
-                    }
                     addBottom={"addBottom"}
                   />
                 </View>

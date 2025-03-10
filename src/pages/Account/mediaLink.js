@@ -77,7 +77,7 @@ const MediaLink = (props) => {
   const onSubmit = async () => {
     if (link && instaLink && fbLink && weblink) {
       try {
-        contextValue?.setLoader(true)
+        contextValue?.setLoader(true);
         const userId = await decryptService("userId");
         const postData = {
           userid: userId,
@@ -93,12 +93,12 @@ const MediaLink = (props) => {
         } else {
           showToast("error", res?.data?.message);
         }
-        contextValue?.setLoader(false)
+        contextValue?.setLoader(false);
       } catch (error) {
         console.log("error", error);
         showToast("error", "Something went wrong!!!");
       }
-      apiInitCall()
+      apiInitCall();
     }
     handleNavigation();
   };

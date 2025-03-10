@@ -21,12 +21,30 @@ import { contextValue } from "../../components/Loader";
 import { dispathGuestUser } from "../../redux-store/actions/userActions";
 import { useDispatch } from "react-redux";
 
+const mobileNumberRegex =
+  /^(\+?\d{1,4}[\s-])?(\(?\d{3}\)?[\s-]?)?[\d\s-]{7,10}$/;
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 const SignIn = (props) => {
   const [inputValue, setInputValue] = useState(""); //a@yopmail.com //9769487604 //"jogayex376@bawsny.com" //cicocaj728@evusd.com
   const dispatch = useDispatch();
+
+  const checkIfMobileOrEmail = (inputValue) => {
+    if (mobileNumberRegex.test(inputValue)) {
+      return "mobile"; // Valid mobile number
+    } else if (emailRegex.test(inputValue)) {
+      return "email"; // Valid email address
+    } else {
+      return "invalid"; // Invalid input
+    }
+  };
+
   const onSubmit = async () => {
+    const result = checkIfMobileOrEmail(inputValue);
     if (!inputValue) {
-      showToast("error", "Please enter Mobile number or Email Id");
+      showToast("error", "Please enter mobile number or email Id");
+    } else if (result == "invalid") {
+      showToast("error", "Please enter valid mobile number or email Id");
     } else {
       try {
         contextValue?.setLoader(true);
@@ -36,7 +54,7 @@ const SignIn = (props) => {
         const postData = {
           UserId: inputValue,
           Deviceid: deviceId,
-          devicetype: Platform.OS == "android" ? "android" : "IOS",
+          devicetype: Platform.OS == "android" ? "android" : "ios",
           osversion: getSystemVersion(),
         };
         const res = await checkLogin(postData);
@@ -60,26 +78,26 @@ const SignIn = (props) => {
     }
   };
 
-  const onLaterPressed = () => {
-    dispatch(dispathGuestUser(true));
-    setTimeout(() => {
-      props.navigation.reset({
-        index: 0,
-        routes: [
-          {
-            name: "auth",
-            state: {
-              routes: [
-                {
-                  name: "home",
-                },
-              ],
-            },
-          },
-        ],
-      });
-    });
-  };
+  // const onLaterPressed = () => {
+  //   dispatch(dispathGuestUser(true));
+  //   setTimeout(() => {
+  //     props.navigation.reset({
+  //       index: 0,
+  //       routes: [
+  //         {
+  //           name: "auth",
+  //           state: {
+  //             routes: [
+  //               {
+  //                 name: "home",
+  //               },
+  //             ],
+  //           },
+  //         },
+  //       ],
+  //     });
+  //   });
+  // };
 
   return (
     <View style={styles.container}>
@@ -131,7 +149,7 @@ const styles = StyleSheet.create({
   },
   signInText: {
     fontFamily: THEMES.fontFamily.bold,
-    fontSize: THEMES.fonts.font24,
+    fontSize: THEMES.fonts.font22,
     color: THEMES.colors.outrageousOrange,
     textAlign: "center",
   },

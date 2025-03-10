@@ -710,3 +710,23 @@ export const bookmarkApi = async (params) => {
   }
 };
 
+export const deletePetDocumentApi = async (params) => {
+  try {
+    const res = await Api.POST(urlList.deletePetDocument, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+
+    if (res?.data) {
+      return res?.data;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("shareProfileApi Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+

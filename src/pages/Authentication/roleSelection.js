@@ -79,7 +79,6 @@ const RoleSelection = (props) => {
               fontFamily: THEMES.fontFamily.bold,
               fontSize: THEMES.fonts.font24,
               textAlign: "center",
-              paddingHorizontal: moderateScale(45),
             }}
           >
             🐾 Selection of Roles 🐾
@@ -265,7 +264,12 @@ const RoleSelection = (props) => {
                 >
                   Unlock a World of Tail-Wagging Fun!
                 </Text>
-                <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setSelected("")
+                    setModalVisible(false);
+                  }}
+                >
                   <Cross />
                 </TouchableOpacity>
               </View>
@@ -278,8 +282,8 @@ const RoleSelection = (props) => {
                     lineHeight: moderateScale(22),
                   }}
                 >
-                  Would you like to register for purr-sonalized recommendations
-                  and pawsome content?
+                  Would you like to register for purr-sonalized profile and
+                  pawsome content?
                 </Text>
               </View>
               <View

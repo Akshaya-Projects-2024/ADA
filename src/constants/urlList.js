@@ -55,4 +55,6 @@ export const urlList = {
   getAllEvents: "provider/getallevents",
   shareProfile: "provider/shareprofile",
   addBookmark: "parent/bookmark",
+  deletePetDocument: "register/pet/deletedocument"
+
 };

@@ -119,7 +119,7 @@ const Strings = {
   selectImg: "Select Image",
   mobileNoEmail: "Mobile number/Email ID",
   entermobileEmail: "Enter your Mobile Number / Email ID",
-  signIn: "Sign in",
+  signIn: "Sign in or Sign up",
   signWithOtp: "Sign in with OTP",
   skip: "Skip",
   petAdoption: "Pet Adoption",
@@ -149,7 +149,7 @@ const Strings = {
   welcome: "Welcome",
   experienced: "Experienced",
   allInOne: "Your All-In-One",
-  introText2: "Experienced & Hand-Picked Professionals",
+  introText2: "& Hand-Picked Professionals",
   introText3: "Pet Care Hub",
   introDes1:
     "We're dedicated to providing top-priority, personalized care for you and your beloved pet with the highest level of professionalism.",

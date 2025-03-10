@@ -13,7 +13,6 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
 import { moderateScale, ms } from "react-native-size-matters";
-import SearchIcon from "../../assets/svg/search.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
 import { search } from "../../redux-store/actions/auth";
@@ -21,6 +20,7 @@ import { decryptService } from "../../utils/storageFunc";
 import { useDebounce } from "../../hooks/useDebounce";
 import { findDifferenceByDays, showToast, validArray } from "../../utils/utils";
 import { getBase64Obj } from "../../utils/documentUtils";
+import SearchImg from "../../assets/svg/search.svg";
 
 const Chip = ({ item, onPress, selected }) => {
   return (
@@ -200,30 +200,32 @@ const Search = ({ navigation }) => {
           showBack
           title={"Search"}
           bgColor="transparent"
-          fontColor={THEMES.colors.black}
+          fontColor={"#fda208"}
         />
         <View style={{ paddingHorizontal: moderateScale(20) }}>
           <View
             style={{
               flexDirection: "row",
               paddingHorizontal: moderateScale(8),
-              borderColor: "#bebebd",
-              borderWidth: 1.5,
               borderRadius: 25,
+              borderWidth: 0.9,
+              backgroundColor: "#f5f5f5",
+              borderColor: "#bebebd",
               marginBottom: ms(5),
               backgroundColor: "#f5f5f5",
+              borderColor: "#bebebd",
               elevation: 1,
               alignItems: "center",
             }}
           >
             <View style={{ paddingRight: 10 }}>
-              <SearchIcon />
+            <SearchImg />
             </View>
 
             <TextInput
               style={styles.searchBar}
-              placeholder="Search..."
-              placeholderTextColor={"#000"}
+              placeholder="Search"
+              placeholderTextColor={THEMES.colors.darkGrey}
               value={searchText}
               onChangeText={handleSearchChange}
             />
@@ -292,7 +294,7 @@ const Search = ({ navigation }) => {
           />
         ) : Array.isArray(data) && data?.length <= 0 ? (
           <View style={styles.emptyView}>
-            <Text>No data found!</Text>
+            <Text>Oops! No information available!</Text>
           </View>
         ) : null}
       </SafeAreaView>
@@ -419,6 +421,7 @@ const styles = StyleSheet.create({
   emptyView: {
     justifyContent: "center",
     alignItems: "center",
+    flex:1
   },
 });
 

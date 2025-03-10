@@ -7,12 +7,15 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import { ms } from "react-native-size-matters";
+import { moderateScale, ms } from "react-native-size-matters";
 import Strings from "../../constants/strings";
 import { THEMES } from "../../assets/theme/themes";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Carousel from "react-native-snap-carousel";
 import { encryptService } from "../../utils/storageFunc";
+import { vh, vw } from "../../utils/dimensions";
+import PaginationDots from "react-native-pagination-dots";
+
 
 const Intro1 = ({ func }) => {
   const { width } = useWindowDimensions();
@@ -45,7 +48,7 @@ const Intro2 = ({ func }) => {
         <Text style={styles.label2Style}>{Images[1].label2}</Text>
       ) : null}
       <Text style={styles.descStyle}>{Images[1].desc}</Text>
-      <Image style={styles.image1} source={Images[1].url} />
+      <Image style={[styles.image1,{top:vh(350)}]} source={Images[1].url} />
     </View>
   );
 };
@@ -78,7 +81,7 @@ const Images = [
   },
   {
     url: require("../../assets/images/intro_2.png"),
-    bgColor: THEMES.colors.outrageousOrange,
+    bgColor: THEMES.colors.outrageousPink,
     label: Strings.experienced,
     label2: Strings.introText2,
     desc: Strings.introDes2,
@@ -86,7 +89,7 @@ const Images = [
   },
   {
     url: require("../../assets/images/intro_3.png"),
-    bgColor: THEMES.colors.outrageousPink,
+    bgColor: THEMES.colors.outrageousOrange,
     label: Strings.allInOne,
     label2: Strings.introText3,
     desc: Strings.introDes3,
@@ -130,6 +133,16 @@ const IntroScreens = (props) => {
         itemWidth={width}
         onSnapToItem={(index) => setCurrentIndex(index)} // Track active slide index
       />
+       <View style={styles.paginationContainer}>
+        <PaginationDots
+          length={Images?.length} // Total steps
+          activeIndex={currentIndex} // Current index
+          activeColor="white"
+          inactiveColor="#ddd"
+          size={8} // Adjust dot size
+        />
+      </View>
+
     </View>
   );
 };
@@ -145,17 +158,18 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font16,
     color: THEMES.colors.white,
     position: "absolute",
-    right: ms(20),
-    top: 0,
+    right: ms(30),
+    top: vh(25),
+   
   },
   container: { flexGrow: 1 },
   container2: { flex: 1 },
   labelStyle: {
     fontFamily: THEMES.fontFamily.meow,
-    fontSize: THEMES.fonts.font52,
+    fontSize: THEMES.fonts.font45,
     color: THEMES.colors.white,
     textAlign: "center",
-    marginBottom: ms(10),
+    marginHorizontal:moderateScale(10)
   },
   label2Style: {
     fontFamily: THEMES.fontFamily.bold,
@@ -172,7 +186,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginHorizontal: ms(45),
     lineHeight: ms(24),
+
   },
   image1: { position: "absolute", bottom: 0, right: 0 },
-  image3: { position: "absolute", bottom: 0, left: 0 },
+  image3: { position: "absolute", bottom: 0, left: 0, top: 350 },
+  paginationContainer: {
+    position: "absolute",
+    bottom: 70,
+    alignSelf: "flex-start",
+    flexDirection:'row',
+    marginHorizontal:vw(20)
+
+  },
+
 });
+
