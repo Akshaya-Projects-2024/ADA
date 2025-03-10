@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
   Dimensions,
   StatusBar,
 } from "react-native";
@@ -31,12 +30,9 @@ import { useIsFocused } from "@react-navigation/native";
 import {
   setLoggedInMoodule,
   validateParentProfile,
+  validateStatusAndProfileData,
 } from "../../utils/userUtils";
-import {
-  AppointmentStatus,
-  ApprovalStatus,
-  LoginModules,
-} from "../../constants/enums";
+import { AppointmentStatus, LoginModules } from "../../constants/enums";
 import { useDispatch, useSelector } from "react-redux";
 import AppointmentCard from "../../components/AppointmentCard";
 import { decryptService } from "../../utils/storageFunc";
@@ -145,24 +141,6 @@ const Home = (props) => {
     }
   };
 
-  const paymentCompleted = useMemo(() => {
-    if (
-      profile?.providerProfile?.subscription?.status === "active" &&
-      profile?.logindetails?.isprovider === ApprovalStatus.approved
-    ) {
-      return { flag: true };
-    } else if (
-      profile?.providerProfile?.subscription?.status === "active" &&
-      profile?.logindetails?.isprovider !== ApprovalStatus.approved
-    ) {
-      return { flag: false, message: Strings.approvaltError };
-    }
-    return { flag: false, message: Strings.paymentError };
-  }, [
-    profile?.logindetails?.isprovider,
-    profile?.providerProfile?.subscription?.status,
-  ]);
-
   useEffect(() => {
     if (isFocused) {
       initData();
@@ -177,6 +155,7 @@ const Home = (props) => {
     }
     apiInitCall();
   }, [isFocused, dispatch, initData, apiInitCall]);
+  console.log(validateStatusAndProfileData(profile));
 
   const renderCategory = ({ item }) => {
     const isSelected = selectedCategory === item;
@@ -346,7 +325,7 @@ const Home = (props) => {
   };
 
   const handlePremiumActionPressed = (premiumAction) => {
-    if (paymentCompleted?.flag) {
+    if (validateStatusAndProfileData(profile)?.flag) {
       premiumAction();
     } else {
       setPaymentModal(true);
@@ -1007,7 +986,7 @@ const Home = (props) => {
             >
               Category
             </Text>
-            <FlatList 
+            <FlatList
               data={userData?.providerProfile?.providerBusiness?.services}
               keyExtractor={(item) => item.id.toString()}
               renderItem={renderCategory}
@@ -1034,7 +1013,7 @@ const Home = (props) => {
       <Dialog
         flag={paymentModal}
         title={Strings.attention}
-        description={paymentCompleted?.message}
+        description={validateStatusAndProfileData(profile)?.message}
         leftButtonText="Cancel"
         rightButtonText="OK"
         leftButtonPressed={() => {

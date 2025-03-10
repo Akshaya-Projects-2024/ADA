@@ -1,4 +1,6 @@
 import { SHIFTS } from "../components/TimeTracker";
+import { ApprovalStatus } from "../constants/enums";
+import Strings from "../constants/strings";
 import { DOCUMENT_TYPES } from "../pages/Account/uploadImagesDocs";
 import { IMAGE_TYPE } from "../pages/ParentRegister/petDetail";
 import { dispatchLoggedInModule } from "../redux-store/actions/userActions";
@@ -69,8 +71,9 @@ export const validateServiceProfile = (
   }
   if (
     (includeOptional &&
-    (!validArray(userData?.providerProfile?.providerDocument) ||
-      !validateDocuments(userData?.providerProfile?.providerDocument))) || !validArray(userData?.providerProfile?.ProviderSession?.availableat)
+      (!validArray(userData?.providerProfile?.providerDocument) ||
+        !validateDocuments(userData?.providerProfile?.providerDocument))) ||
+    !validArray(userData?.providerProfile?.ProviderSession?.availableat)
   ) {
     return {
       flag: false,
@@ -126,6 +129,29 @@ export const validateServiceProfile = (
     };
   }
   return { flag: true, partiallyCompleted: true };
+};
+
+export const validateStatusAndProfileData = (userData) => {
+  const op = validateServiceProfile(userData); //TODO for partial profile checking
+  // const op = validateCompleteServiceProfile(userData); //TODO for complete profile checking
+  console.log("🚀 ~ validateStatusAndProfileData ~ op:", op);
+  if (
+    userData?.providerProfile?.subscription?.status === "active" &&
+    userData?.logindetails?.isprovider === ApprovalStatus.approved &&
+    op.flag
+  ) {
+    return { flag: true };
+  }
+  if (
+    userData?.providerProfile?.subscription?.status === "active" &&
+    userData?.logindetails?.isprovider !== ApprovalStatus.approved
+  ) {
+    return { flag: false, message: Strings.approvaltError };
+  }
+  if (!op.flag) {
+    return { flag: false, message: Strings.profileError };
+  }
+  return { flag: false, message: Strings.paymentError };
 };
 
 export const validateCompleteServiceProfile = (userData) => {

@@ -134,6 +134,7 @@ const Strings = {
     "Complete your Registration and Subscribe to the app to create new appointments.",
   approvaltError:
     "Your profile is under verification. Please wait for approval",
+  profileError: "Your profile is incomplete. Please complete your registration",
   approvaltErrorForDashboard:
     "Complete your Registration and Subscribe to the app to create new appointments.",
   attention: "Attention!",
