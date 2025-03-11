@@ -25,7 +25,6 @@ const AdoptionDetail = (props) => {
   const selectedAdotpionData = props.route.params.selectedData;
   const [image, setImage] = useState();
 
-  console.log("selectedAdotpionData", selectedAdotpionData);
   useEffect(() => {
     initData();
   }, []);
@@ -316,7 +315,7 @@ const AdoptionDetail = (props) => {
                             onPress={() => shareImageBase64()}
                             style={{ marginHorizontal: moderateScale(20) }}
                           >
-                            <ShareImg />
+                            <ShareImg/>
                           </TouchableOpacity>
                         </TouchableOpacity>
                       </View>

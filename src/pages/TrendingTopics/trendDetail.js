@@ -11,13 +11,18 @@ import {
 import { THEMES } from "../../assets/theme/themes";
 import { moderateScale, s } from "react-native-size-matters";
 import Back from "../../assets/svg/back.svg";
-import Share from "../../assets/svg/share.svg";
+import ShareImg from "../../assets/svg/share.svg";
 import RenderHTML from "react-native-render-html";
 import { useWindowDimensions } from "react-native";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import ProfileDummy from "../../assets/svg/user.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { shareTopicApi } from "../../redux-store/actions/topics";
+import { contextValue } from "../../components/Loader";
+import { decryptService } from "../../utils/storageFunc";
+import { showToast } from "../../utils/utils";
+import Share from "react-native-share";
 
 const TrendDetail = (props) => {
   const { width } = useWindowDimensions();
@@ -26,6 +31,7 @@ const TrendDetail = (props) => {
   const { providerProfile, profileData } = useSelector(
     ({ commonReducer }) => commonReducer
   );
+  const [shareImg, setShareImg] = useState();
 
   useEffect(() => {
     if (Boolean(profileData)) {
@@ -34,6 +40,41 @@ const TrendDetail = (props) => {
       }
     }
   }, [profileData]);
+
+  useEffect(() => {
+    initData();
+  }, []);
+
+  const initData = async () => {
+    try {
+      contextValue?.setLoader(true);
+      let obj = {
+        id: data?.id,
+        userId: await decryptService("userId"),
+      };
+      let response = await shareTopicApi(obj);
+      if (response?.status_code === 200) {
+        setShareImg(response?.data);
+      } else {
+        showToast("error", "No Image available");
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {
+      contextValue?.setLoader(false);
+    }
+  };
+
+  const shareImageBase64 = async () => {
+    if (shareImg) {
+      const shareData = {
+        title: "Share",
+        message: `${data?.subject}`,
+        url: `data:application/pdf;base64,${shareImg}`, // Base64 encoded image
+      };
+      await Share.open(shareData);
+    }
+  };
+
 
   const calculateReadTime = (content) => {
     const words = content?.trim()?.split(/\s+/).length; // Count words
@@ -48,67 +89,80 @@ const TrendDetail = (props) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
-    <View style={styles.container}>
-      <View style={styles.imgStyle}>
-        <Image
-          style={styles.imgStyle}
-          source={{ uri: data?.cover || data?.Cover }}
-        />
-      </View>
-      <View style={styles.headerView}>
-        {/* <TouchableOpacity
-          hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-          onPress={() => props.navigation.goBack()}
-        >
-          <Back stroke="#000" />
-        </TouchableOpacity>
-
-        <Share /> */}
-      </View>
-      <ScrollView
-        style={{ flex: 1 }}
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.contentView}>
-          <Text style={styles.timeText}>
-            {calculateReadTime(data?.blog || data?.Blog)}
-          </Text>
-          <View style={{ paddingTop: moderateScale(4) }}>
-            <Text style={styles.titleText}>{data?.subject}</Text>
-          </View>
-          <View style={styles.profileView}>
-            <View style={styles.profile}>
-              {Boolean(profileImg) ? (
-                <Image
-                  resizeMode="contain"
-                  style={styles.profile}
-                  source={{
-                    uri: profileImg,
-                  }}
-                />
-              ) : (
-                <View style={[styles.profile,{borderWidth:1, alignItems:'center', justifyContent:'center'}]}>
-                  <ProfileDummy width={25}/>
-                </View>
-              )}
-            </View>
-            <Text style={styles.profileName}>
-              {data?.author || data?.Author} ,{" "}
-              {formatDate(data?.createdon || data?.Createdon)}
-            </Text>
-          </View>
-          <View style={{ paddingTop: moderateScale(10) }}>
-            <RenderHTML
-              contentWidth={width}
-              source={{ html: data?.blog || data?.Blog }}
-              baseStyle={styles.descriptionText}
-            />
-          </View>
+      <View style={styles.container}>
+        <View style={styles.imgStyle}>
+          <Image
+            style={styles.imgStyle}
+            source={{ uri: data?.cover || data?.Cover }}
+          />
         </View>
-      </ScrollView>
-    </View>
+        <View style={styles.headerView}>
+          <TouchableOpacity
+            hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
+            onPress={() => props.navigation.goBack()}
+          >
+            <Back />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={()=>shareImageBase64()}
+            hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
+          >
+            <ShareImg />
+          </TouchableOpacity>
+        </View>
+        <ScrollView
+          style={{ flex: 1 }}
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.contentView}>
+            <Text style={styles.timeText}>
+              {calculateReadTime(data?.blog || data?.Blog)}
+            </Text>
+            <View style={{ paddingTop: moderateScale(4) }}>
+              <Text style={styles.titleText}>{data?.subject}</Text>
+            </View>
+            <View style={styles.profileView}>
+              <View style={styles.profile}>
+                {Boolean(profileImg) ? (
+                  <Image
+                    resizeMode="contain"
+                    style={styles.profile}
+                    source={{
+                      uri: profileImg,
+                    }}
+                  />
+                ) : (
+                  <View
+                    style={[
+                      styles.profile,
+                      {
+                        borderWidth: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      },
+                    ]}
+                  >
+                    <ProfileDummy width={25} />
+                  </View>
+                )}
+              </View>
+              <Text style={styles.profileName}>
+                {data?.author || data?.Author} ,{" "}
+                {formatDate(data?.createdon || data?.Createdon)}
+              </Text>
+            </View>
+            <View style={{ paddingTop: moderateScale(10) }}>
+              <RenderHTML
+                contentWidth={width}
+                source={{ html: data?.blog || data?.Blog }}
+                baseStyle={styles.descriptionText}
+              />
+            </View>
+          </View>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };

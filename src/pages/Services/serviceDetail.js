@@ -137,7 +137,7 @@ const ServiceDetail = ({ navigation, route }) => {
               onPress={() => share()}
               style={{ marginLeft: moderateScale(20) }}
             >
-              <Share />
+              <Share/>
             </TouchableOpacity>
           </View>
         </View>

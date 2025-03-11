@@ -45,43 +45,13 @@ import { showToast } from "../../utils/utils";
 import { contextValue } from "../../components/Loader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import HolidayMenuIcon from "../../assets/svg/HolidayMenuIcon";
-
-const MenuItem = ({
-  bgColor,
-  icon,
-  title,
-  addBottom,
-  showPending = false,
-  onPress,
-}) => {
-  const Icon = icon;
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={[
-        styles.flexRow,
-        {
-          paddingBottom: addBottom && moderateScale(16),
-        },
-      ]}
-    >
-      <View style={styles.rowCenter}>
-        <View style={[styles.iconStyle, { backgroundColor: bgColor }]}>
-          {Icon}
-        </View>
-        <Text style={styles.titleText}>{title}</Text>
-      </View>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        {showPending && <Text style={styles.pendingText}>Pending</Text>}
-        <RightArrow stroke={THEMES.colors.boulder} />
-      </View>
-    </TouchableOpacity>
-  );
-};
+import Dialog from "../../components/Dialog";
 
 const MyAccount = (props) => {
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const profile = useSelector((state) => state?.commonReducer);
+  const [deleteAccountModal, setDeleteAccountModal] = useState(false);
+  const [loogutModal, setLogoutModal] = useState(false);
 
   const profileServices = useMemo(
     () =>
@@ -98,40 +68,45 @@ const MyAccount = (props) => {
     return validProviderProfile;
   }, [profile]);
 
-  const deleteAccountMethod = () => {
-    Alert.alert(
-      "Delete Account",
-      "Are you sure you want to delete your Account ??",
-      [
-        {
-          text: "Cancel",
-          onPress: () => {},
-          style: "cancel",
-        },
-        { text: "Ok", onPress: () => handleDeleteAccount() },
-      ],
-      { cancelable: false }
-    );
-  };
 
-  const logoutMethod = () => {
-    Alert.alert(
-      "Logout",
-      "Are you sure you want to logout ??",
-      [
-        {
-          text: "Cancel",
-          onPress: () => {},
-          style: "cancel",
-        },
-        { text: "Ok", onPress: () => handleLogout() },
-      ],
-      { cancelable: false }
+
+  const MenuItem = ({
+    bgColor,
+    icon,
+    title,
+    addBottom,
+    showPending = false,
+    onPress,
+  }) => {
+    const Icon = icon;
+
+    return (
+      <TouchableOpacity
+        onPress={onPress}
+        style={[
+          styles.flexRow,
+          {
+            paddingBottom: addBottom && moderateScale(16),
+          },
+        ]}
+      >
+        <View style={styles.rowCenter}>
+          <View style={[styles.iconStyle, { backgroundColor: bgColor }]}>
+            {Icon}
+          </View>
+          <Text style={styles.titleText}>{title}</Text>
+        </View>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          {showPending && <Text style={styles.pendingText}>Pending</Text>}
+          <RightArrow stroke={THEMES.colors.boulder} />
+        </View>
+      </TouchableOpacity>
     );
   };
 
   const handleDeleteAccount = async () => {
     try {
+      setDeleteAccountModal(false);
       contextValue.setLoader(true);
       let obj = {
         userId: await decryptService("userId"),
@@ -139,8 +114,10 @@ const MyAccount = (props) => {
       };
       let res = await deleteAccountApi(obj);
       if (res?.data?.status_code == 200) {
-        handleLogout();
-        resetNavigation("app");
+        setTimeout(() => {
+          handleLogout();
+          resetNavigation("app");
+        }, 300);
       } else {
         showToast("Error", "Something went wrong!! Please try again later.");
       }
@@ -157,6 +134,7 @@ const MyAccount = (props) => {
     if (filteredAsyncStorage?.length > 0) {
       await AsyncStorage.multiRemove(filteredAsyncStorage);
     }
+    setLogoutModal(false)
     resetNavigation("app");
   };
 
@@ -174,9 +152,9 @@ const MyAccount = (props) => {
       <TouchableOpacity
         onPress={() => {
           if (route == "deleteAccount") {
-            deleteAccountMethod();
+            setDeleteAccountModal(true);
           } else if (route == "logout") {
-            logoutMethod();
+            setLogoutModal(true)
           } else {
             props.navigation.navigate(route, { route: "myprofile" });
           }
@@ -212,7 +190,6 @@ const MyAccount = (props) => {
     } else {
       props.navigation.navigate(validParentProfile?.navigateTo, {
         route: "myAccount",
-
       });
     }
   };
@@ -430,6 +407,27 @@ const MyAccount = (props) => {
             </View>
           </View>
         </ScrollView>
+        <Dialog
+          title={"Delete Account"}
+          flag={deleteAccountModal}
+          description={Strings.deleteAcccount}
+          leftButtonText="No"
+          rightButtonText="Yes"
+          leftButtonPressed={() => setDeleteAccountModal(false)}
+          rightButtonPressed={handleDeleteAccount}
+          onClose={() => setDeleteAccountModal(false)}
+        />
+
+<Dialog
+          title={"Logout Account"}
+          flag={loogutModal}
+          description={Strings.logoutAccount}
+          leftButtonText="No"
+          rightButtonText="Yes"
+          leftButtonPressed={() => setLogoutModal(false)}
+          rightButtonPressed={handleLogout}
+          onClose={() => setLogoutModal(false)}
+        />
       </SafeAreaView>
     </LinearGradient>
   );

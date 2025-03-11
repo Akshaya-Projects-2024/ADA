@@ -15,7 +15,7 @@ const Strings = {
   businessDetails: "Business details",
   businessDescription: "Name, Role, Services, Experience",
   contactDescription: "Phone number, Email ID, Address",
-  uploadImages: "Uploaded images & documents",
+  uploadImages: "Upload images & documents",
   uploadImagesDescription: "Place images, Certificates, Logo etc.",
   sessionDetails: "Session details",
   sessionDescriptions: "Time, charges, Home visit, Holiday",
@@ -166,6 +166,8 @@ const Strings = {
   cancelAppointmentsDescription:
     "All appointments scheduled on the selected holiday will be automatically canceled.",
   appointmentConfirm: "Appointment has been accepted",
+  deleteAcccount:"Are you sure you want to delete this account?",
+  logoutAccount:"Are you sure you want to logout?"
 };
 
 export default Strings;
