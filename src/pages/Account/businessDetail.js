@@ -28,7 +28,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
 import { useUser } from "../../api/UserContext";
-
+import { isValidName } from "../../utils/validation";
 
 const experienceData = [
   { id: "1", label: "1 Years" },
@@ -39,6 +39,9 @@ const experienceData = [
   { id: "6", label: "6 Years" },
   { id: "7", label: "7 Years" },
   { id: "8", label: "8 Years" },
+  { id: "9", label: "9 Years" },
+  { id: "10", label: "10 Years" },
+  { id: "More than 10yrs", label: "More than 10yrs" },
 ];
 
 const BusinessDetail = (props) => {
@@ -54,6 +57,7 @@ const BusinessDetail = (props) => {
   const { providerProfile } = useSelector((state) => state?.commonReducer);
   const { providerBusiness } = providerProfile;
   const [serviceProviderRole, setServiceProviderRole] = useState();
+  const [serviceProviderForOther, setServiceProviderForOther] = useState("");
   const { userData, apiInitCall } = useUser();
 
   useEffect(() => {
@@ -85,6 +89,7 @@ const BusinessDetail = (props) => {
   }, []);
 
   const initData = () => {
+    console.log("providerBusiness",providerBusiness)
     if (providerBusiness?.name) {
       setBusinessValue(providerBusiness?.name);
     }
@@ -99,13 +104,20 @@ const BusinessDetail = (props) => {
     if (providerBusiness?.description) {
       setDescription(providerBusiness?.description);
     }
+    if (providerBusiness?.others) {
+      setServiceProviderForOther(providerBusiness?.others);
+    }
   };
 
   const onSubmit = async () => {
     if (!businessValue) {
       showToast("error", "Please enter Business name or person name");
+    } else if (!isValidName(businessValue)) {
+      showToast("error", "Please enter valid business name");
     } else if (!selectedServiceProvider) {
       showToast("error", "Please select service provider role");
+    } else if (selectedServiceProvider?.some(item => item.label == "Other" && !isValidName(serviceProviderForOther))) {
+      showToast("error", "Please enter valid service provider role");
     } else if (!selectedExperience) {
       showToast("error", "Please enter your experience");
     } else if (!description) {
@@ -125,8 +137,10 @@ const BusinessDetail = (props) => {
           name: businessValue,
           services: formattedServices,
           userid: userId,
+          others:selectedServiceProvider?.some(item => item.label == "Other") ? serviceProviderForOther : "",
           ...(providerBusiness?.id ? { id: providerBusiness?.id } : {}),
         };
+        console.log("formattedServices",formattedServices)
         const res = await saveBusinessDetails(postData);
         if (res?.data?.status_code == 200) {
           if (route === "myprofile") {
@@ -137,7 +151,7 @@ const BusinessDetail = (props) => {
               route ? { route: route } : {}
             );
           }
-          apiInitCall()
+          apiInitCall();
         } else {
           showToast("error", res?.data?.message);
         }
@@ -195,8 +209,40 @@ const BusinessDetail = (props) => {
                 setSelectedValue={setServiceProviderValue}
                 selectedValue={selectedServiceProvider}
                 multiSelect={true}
+                showScroll={true}
               />
             </View>
+
+            {selectedServiceProvider?.some(item => item.label == "Other") && (
+              <View
+                style={{
+                  paddingTop: moderateScale(16),
+                  marginHorizontal: moderateScale(20),
+                }}
+              >
+                <InputField
+                  label={"Other"}
+                  placeholderText={"Enter your role here"}
+                  value={serviceProviderForOther}
+                  onChange={setServiceProviderForOther}
+                />
+              </View>
+            )}
+
+            {/* <View
+              style={{
+                paddingTop: moderateScale(16),
+                marginHorizontal: moderateScale(20),
+              }}
+            >
+              <InputField
+                label={"About Info /Description*"}
+                placeholderText={"Write the about info/description"}
+                multiline
+                value={description}
+                onChange={setDescription}
+              />
+            </View> */}
 
             <View style={{ paddingTop: moderateScale(16) }}>
               <ModalDropdown

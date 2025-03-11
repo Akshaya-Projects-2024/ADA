@@ -220,7 +220,9 @@ const PetAdoption = (props) => {
           style={{
             color: "#000",
             fontSize: moderateScale(16),
+            marginHorizontal:moderateScale(10),
             fontWeight: 500,
+            textAlign:'center'
           }}
         >
          Hey, No pet for adoption.Hope everyone got their home

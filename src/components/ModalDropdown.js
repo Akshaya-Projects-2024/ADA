@@ -23,6 +23,7 @@ const ModalDropdown = (props) => {
     placeholder,
     multiSelect = false,
     noPadding,
+    showScroll = false
   } = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedId, setSelectedId] = useState(false);
@@ -143,7 +144,7 @@ const ModalDropdown = (props) => {
               ListEmptyComponent={renderEmptyView}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
-              showsVerticalScrollIndicator={false}
+              showsVerticalScrollIndicator={showScroll}
               showsHorizontalScrollIndicator={false}
             />
             {multiSelect && (
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    maxHeight: 450,
+    maxHeight: 500,
   },
   modalTitle: {
     fontSize: THEMES.fonts.font16,

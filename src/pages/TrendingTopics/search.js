@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
 import { moderateScale, ms } from "react-native-size-matters";
@@ -21,69 +20,10 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { findDifferenceByDays, showToast, validArray } from "../../utils/utils";
 import { getBase64Obj } from "../../utils/documentUtils";
 import SearchImg from "../../assets/svg/search.svg";
-
-const Chip = ({ item, onPress, selected }) => {
-  return (
-    <TouchableOpacity
-      style={{
-        backgroundColor: "#ffffff",
-        borderColor: "#000000",
-        borderWidth: 0.5,
-        paddingHorizontal: moderateScale(8),
-        paddingVertical: moderateScale(8),
-        borderRadius: 20,
-        margin: 4,
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-      onPress={() => onPress(item)}
-    >
-      <Text style={styles.chipText}>{item.label}</Text>
-    </TouchableOpacity>
-  );
-};
-const TrendingChip = ({ item, onPress, selected }) => {
-  return (
-    <TouchableOpacity
-      style={[
-        styles.trendingChip,
-        selected ? styles.trendingChipSelected : null,
-      ]}
-      onPress={() => onPress(item)}
-    >
-      <Icon
-        name={"trending-up"}
-        size={16}
-        color={selected ? "#ffffff" : "#000000"}
-      />
-      <Text style={selected ? styles.selectedchipText : styles.chipText}>
-        {item.label}
-      </Text>
-    </TouchableOpacity>
-  );
-};
-
-const SearchedChip = ({ item, onPress, selected }) => {
-  return (
-    <TouchableOpacity style={styles.chip}>
-      <Icon
-        name={"search"}
-        size={20}
-        color={selected ? "#ffffff" : "#000000"}
-      />
-      <Text
-        style={{
-          fontSize: THEMES.fonts.font12,
-          paddingHorizontal: moderateScale(5),
-          paddingVertical: moderateScale(4),
-        }}
-      >
-        {item.label}
-      </Text>
-    </TouchableOpacity>
-  );
-};
+import {
+  addTopicKeywordApi,
+  getKeywordApi,
+} from "../../redux-store/actions/topics";
 
 const TopicsCard = ({ item, onPress }) => {
   return (
@@ -100,7 +40,9 @@ const TopicsCard = ({ item, onPress }) => {
         source={getBase64Obj(item?.cover)}
       />
       <View style={styles.contentContainer}>
-        <Text numberOfLines={2} style={styles.titleStyle}>{item?.subject}</Text>
+        <Text numberOfLines={2} style={styles.titleStyle}>
+          {item?.subject}
+        </Text>
         <View style={styles.authorContainer}>
           <Text style={styles.authorStyle}>{item?.author}</Text>
           <Text style={styles.dateStyle}>
@@ -120,16 +62,47 @@ const Search = ({ navigation }) => {
   const [data, setData] = useState();
 
   const [searchText, setSearchText] = useState("");
+  const [keywordValue, setKeywordValue] = useState([]);
   const [selectedChips, setSelectedChips] = useState([]);
   const [recentSearches, setRecentSearches] = useState([]);
   const searchQuery = useDebounce(searchText);
 
   useEffect(() => {
     contextValue?.setLoader(true);
+    initData(); // Load data on component mount
+    getKeyword();
   }, []);
 
+  const Chip = ({ item, onPress, selected }) => {
+    return (
+      <TouchableOpacity
+        style={{
+          backgroundColor: "#ffffff",
+          borderColor: "#000000",
+          borderWidth: 0.5,
+          paddingHorizontal: moderateScale(20),
+          paddingVertical: moderateScale(5),
+          borderRadius: 20,
+          margin: 4,
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        onPress={() => onPress(item)}
+      >
+        <Text style={styles.chipText}>{item.keyword}</Text>
+      </TouchableOpacity>
+    );
+  };
+
   useEffect(() => {
-    initData();
+    if (searchQuery.length >= 3) {
+      initData();
+      getKeyword();
+    } else if (searchQuery.length === 0) {
+      initData(); // Restore initial data when search is cleared
+      getKeyword();
+    }
   }, [searchQuery]);
 
   const initData = async () => {
@@ -144,6 +117,16 @@ const Search = ({ navigation }) => {
       const response = res?.data?.data;
       if (validArray(response)) {
         setData(response);
+        if (searchQuery && response) {
+          let obj = {
+            userId: await decryptService("userId"),
+            keyword: searchQuery,
+          };
+          const res = await addTopicKeywordApi(obj);
+          if (res?.data?.status_code == 200) {
+            getKeyword();
+          }
+        }
       } else {
         setData([]);
       }
@@ -155,42 +138,32 @@ const Search = ({ navigation }) => {
     }
   };
 
+  const getKeyword = async () => {
+    try {
+      contextValue?.setLoader(true);
+      const params = {
+        userId: await decryptService("userId"),
+      };
+      const res = await getKeywordApi(params);
+      if (res?.data?.length) {
+        setKeywordValue(res?.data);
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {}
+  };
+
   // Handle search input change
   const handleSearchChange = (text) => {
     setSearchText(text);
   };
 
   const handleChipPress = (item) => {
-    setSelectedChips((prevSelected) => {
-      if (prevSelected.includes(item.id)) {
-        return prevSelected.filter((id) => id !== item.id);
-      } else {
-        // Add the selected item to recent searches if it's not already present
-        setRecentSearches((prev) => {
-          if (!prev.find((recentItem) => recentItem.id === item.id)) {
-            return [...prev, item];
-          }
-          return prev;
-        });
-        return [...prevSelected, item.id];
-      }
-    });
-    setSearchText("");
-  };
-
-  // Clear recent searches
-  const clearRecentSearches = () => {
-    setRecentSearches([]);
+    setSearchText(item?.keyword);
   };
 
   const handleCardPressed = (item) => {
     navigation.navigate("trendDetail", { selectedData: item });
   };
-  // Filter trending topics and recent searches
-  // const trendingTopics = data.filter((item) => item.trending);
-  // const filteredData = data.filter((item) =>
-  //   item.label.toLowerCase().includes(searchText.toLowerCase())
-  // );
 
   return (
     <View style={styles.container}>
@@ -219,7 +192,7 @@ const Search = ({ navigation }) => {
             }}
           >
             <View style={{ paddingRight: 10 }}>
-            <SearchImg />
+              <SearchImg />
             </View>
 
             <TextInput
@@ -230,6 +203,23 @@ const Search = ({ navigation }) => {
               onChangeText={handleSearchChange}
             />
           </View>
+          {keywordValue?.length !== 0 && (
+            <>
+              <Text style={styles.selectTimeText}>Recent Searches</Text>
+              <FlatList
+                data={keywordValue}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <Chip
+                    item={item}
+                    onPress={handleChipPress}
+                    selected={selectedChips.includes(item.id)}
+                  />
+                )}
+                contentContainerStyle={styles.chipContainer}
+              />
+            </>
+          )}
 
           {/* TODO Show search results only when searchText is not empty */}
           {/* {searchText !== "" && (
@@ -284,7 +274,8 @@ const Search = ({ navigation }) => {
           />*/}
         </View>
         {validArray(data) ? (
-          <FlatList
+          <>
+           <FlatList
             data={data}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -292,6 +283,8 @@ const Search = ({ navigation }) => {
             )}
             contentContainerStyle={styles.topicsContainer}
           />
+          </>
+          
         ) : Array.isArray(data) && data?.length <= 0 ? (
           <View style={styles.emptyView}>
             <Text>Oops! No information available!</Text>
@@ -312,7 +305,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: THEMES.fonts.font12,
     color: THEMES.colors.black,
-    fontFamily:"Inter-SemiBold"
+    fontFamily: "Inter-SemiBold",
   },
   chipContainer: {
     flexDirection: "row",
@@ -375,6 +368,8 @@ const styles = StyleSheet.create({
     color: THEMES.colors.black,
     fontSize: THEMES.fonts.font14,
     fontFamily: THEMES.fontFamily.semiBold,
+    paddingTop: moderateScale(20),
+    paddingBottom: moderateScale(5),
   },
   sameTimeForDayText: {
     fontFamily: THEMES.fontFamily.medium,
@@ -385,6 +380,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     marginHorizontal: ms(20),
     paddingBottom: ms(5),
+    paddingTop: ms(10),
   },
   topicsCard: {
     backgroundColor: THEMES.colors.white,
@@ -421,7 +417,7 @@ const styles = StyleSheet.create({
   emptyView: {
     justifyContent: "center",
     alignItems: "center",
-    flex:1
+    flex: 1,
   },
 });
 
