@@ -143,12 +143,12 @@ const ParentDetails = (props) => {
   };
 
   const onSubmit = async () => {
-    contextValue?.setLoader(true);
+    
     if (!parentImg) {
       showToast("error", "Please upload parent profile picture");
     } else if (!parentName) {
       showToast("error", "Please enter your parent name");
-    } else if (!isValidName(businessValue)) {
+    } else if (!isValidName(parentName)) {
       showToast("error", "Please enter valid parent name");
     } else if (!description) {
       showToast("error", "Please enter description");
@@ -168,6 +168,7 @@ const ParentDetails = (props) => {
       showToast("error", "Please enter valid postal code");
     } else {
       try {
+        contextValue?.setLoader(true);
         const userId = await decryptService("userId");
         const currentPosition = await getCurrentLocation();
         const postData = {

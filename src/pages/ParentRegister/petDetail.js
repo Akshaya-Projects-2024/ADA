@@ -41,7 +41,7 @@ import { getAdoptionCategory } from "../../redux-store/actions/commonApis";
 import { useDebounce } from "../../hooks/useDebounce";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { contextValue } from "../../components/Loader";
-import { isValidNumber } from "../../utils/validation";
+import { isValidName, isValidNumber } from "../../utils/validation";
 
 const GENDER = { male: "Male", female: "Female" };
 

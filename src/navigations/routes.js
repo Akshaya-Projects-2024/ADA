@@ -36,6 +36,7 @@ import MedicalHelp from "../pages/Alerts/MedicalHelp";
 import OtherMedicalAlert from "../pages/Alerts/otherMedicalAlert";
 import RescueHelp from "../pages/Alerts/RescueHelp";
 import OtherRescueHelpAlert from "../pages/Alerts/OtherRescueHelpAlert";
+import Notification from "../pages/Notification/notification";
 
 const Stack = createStackNavigator();
 
@@ -225,7 +226,7 @@ const Routes = (props) => {
           component={Location}
           options={navOptionHandler}
         />
-      
+
         <Stack.Screen
           name="otherLostPetAlert"
           component={OtherLostPetAlert}
@@ -258,6 +259,12 @@ const Routes = (props) => {
         <Stack.Screen
           name="emergencyAlert"
           component={EmergencyAlert}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="notification"
+          component={Notification}
           options={navOptionHandler}
         />
       </Stack.Navigator>

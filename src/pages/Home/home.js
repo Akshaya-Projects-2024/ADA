@@ -501,7 +501,7 @@ const Home = (props) => {
                 flexDirection: "row",
               }}
             >
-              <Bell />
+              <Bell onPress={() => props.navigation.navigate("notification")} />
               <Event
                 onPress={() =>
                   handlePremiumActionPressed(() =>
@@ -1007,7 +1007,7 @@ const Home = (props) => {
             >
               Category
             </Text>
-            <FlatList 
+            <FlatList
               data={userData?.providerProfile?.providerBusiness?.services}
               keyExtractor={(item) => item.id.toString()}
               renderItem={renderCategory}
