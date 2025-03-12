@@ -59,9 +59,8 @@ const MyProfile = (props) => {
               "",
               "businessDetail",
               Strings.businessDescription,
-              guestUser ||
-                (!profileStatus?.flag &&
-                  profileStatus?.modules?.includes("businessDetail"))
+              !profileStatus?.flag &&
+                profileStatus?.modules?.includes("businessDetail")
             )}
 
             {renderItem(
@@ -69,36 +68,32 @@ const MyProfile = (props) => {
               "",
               "contactDetails",
               Strings.contactDescription,
-              guestUser ||
-                (!profileStatus?.flag &&
-                  profileStatus?.modules?.includes("contactDetails"))
+              !profileStatus?.flag &&
+                profileStatus?.modules?.includes("contactDetails")
             )}
             {renderItem(
               Strings.uploadImages,
               "",
               "uploadImagesDocs",
               Strings.uploadImagesDescription,
-              guestUser ||
-                (!profileStatus?.flag &&
-                  profileStatus?.modules?.includes("uploadImagesDocs"))
+              !profileStatus?.flag &&
+                profileStatus?.modules?.includes("uploadImagesDocs")
             )}
             {renderItem(
               Strings.sessionDetails,
               "",
               "sessionDetail",
               Strings.sessionDescriptions,
-              guestUser ||
-                (!profileStatus?.flag &&
-                  profileStatus?.modules?.includes("sessionDetail"))
+              !profileStatus?.flag &&
+                profileStatus?.modules?.includes("sessionDetail")
             )}
             {renderItem(
               Strings.mediaLinks,
               "addBottom",
               "mediaLink",
               Strings.mediaDescription,
-              guestUser ||
-                (!profileStatus?.flag &&
-                  profileStatus?.modules?.includes("mediaLink"))
+              !profileStatus?.flag &&
+                profileStatus?.modules?.includes("mediaLink")
             )}
           </View>
         </View>
