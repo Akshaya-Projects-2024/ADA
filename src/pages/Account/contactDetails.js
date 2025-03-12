@@ -21,11 +21,17 @@ import { showToast } from "../../utils/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
 import { useUser } from "../../api/UserContext";
+import {
+  validateIndianPostalCode,
+  validateInput,
+} from "../../utils/validation";
 
 const ContactDetails = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const route = props?.route?.params?.route;
-  const { providerProfile } = useSelector((state) => state?.commonReducer);
+  const { providerProfile, logindetails } = useSelector(
+    (state) => state?.commonReducer
+  );
   const { providerContact } = providerProfile;
   const [mobileNo, setMobileNo] = useState();
   const [emailId, setEmailId] = useState();
@@ -55,17 +61,26 @@ const ContactDetails = (props) => {
     };
   }, []);
 
-  const initData = () => {
+  const initData = async () => {
+    let userId = await decryptService("userId");
+    let input = validateInput(userId);
+
+    if (input == "email") {
+      setEmailId(userId);
+    } else {
+      setMobileNo(userId);
+    }
+
     if (providerContact?.address) {
       setAddress(providerContact?.address);
     }
-    if (providerContact?.email) {
+    if (providerContact?.email && input !== "email") {
       setEmailId(providerContact?.email);
     }
     if (providerContact?.location) {
       setLocation(providerContact?.location);
     }
-    if (providerContact?.mobile) {
+    if (providerContact?.mobile && input !== "mobile") {
       setMobileNo(providerContact?.mobile);
     }
     if (providerContact?.pin) {
@@ -74,16 +89,26 @@ const ContactDetails = (props) => {
   };
 
   const onSubmit = async () => {
+    console.log(
+      "validateIndianPostalCode(postalCode)",
+      validateIndianPostalCode(postalCode)
+    );
     if (!mobileNo) {
       showToast("error", "Please enter mobile number");
+    } else if (validateInput(mobileNo) == "invalid") {
+      showToast("error", "Please enter valid mobile number");
     } else if (!emailId) {
       showToast("error", "Please enter email Id");
+    } else if (validateInput(emailId) == "invalid") {
+      showToast("error", "Please enter valid email Id");
     } else if (!address) {
       showToast("error", "Please enter address");
     } else if (!location) {
       showToast("error", "Please enter your location");
     } else if (!postalCode) {
       showToast("error", "Please enter your postal code");
+    } else if (!validateIndianPostalCode(postalCode)) {
+      showToast("error", "Please enter valid postal code");
     } else {
       try {
         const userId = await decryptService("userId");
@@ -109,7 +134,7 @@ const ContactDetails = (props) => {
         } else {
           showToast("error", res?.data?.message);
         }
-        apiInitCall()
+        apiInitCall();
       } catch (error) {
         showToast("error", "Something went wrong!!!");
       }

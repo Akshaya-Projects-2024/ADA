@@ -20,10 +20,8 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { findDifferenceByDays, showToast, validArray } from "../../utils/utils";
 import { getBase64Obj } from "../../utils/documentUtils";
 import SearchImg from "../../assets/svg/search.svg";
-import {
-  addTopicKeywordApi,
-  getKeywordApi,
-} from "../../redux-store/actions/topics";
+import TrendingTopicIc from "../../assets/svg/trendingTopics.svg";
+import { clearKeywordApi } from "../../redux-store/actions/topics";
 
 const TopicsCard = ({ item, onPress }) => {
   return (
@@ -56,52 +54,89 @@ const TopicsCard = ({ item, onPress }) => {
   );
 };
 
+const defaultSearchData = {
+  Keywords: [],
+  SearchResult: [],
+  TrendingTopics: [],
+};
+
 const Search = ({ navigation }) => {
   const { colors, fontFamily, fonts } = THEMES;
 
-  const [data, setData] = useState();
+  const [data, setData] = useState(defaultSearchData);
 
   const [searchText, setSearchText] = useState("");
-  const [keywordValue, setKeywordValue] = useState([]);
-  const [selectedChips, setSelectedChips] = useState([]);
-  const [recentSearches, setRecentSearches] = useState([]);
+  const [selectedChipsId, setSelectedChipsId] = useState([]);
   const searchQuery = useDebounce(searchText);
+  const [selectedChip, setSelectedChip] = useState();
 
   useEffect(() => {
     contextValue?.setLoader(true);
-    initData(); // Load data on component mount
-    getKeyword();
+    initData();
   }, []);
 
-  const Chip = ({ item, onPress, selected }) => {
+  const Chip = ({ item, onPress, selected, isTrending }) => {
+    console.log(
+      "selected",
+      item?.keyword == selectedChip,
+      item?.keyword,
+      selectedChip
+    );
     return (
       <TouchableOpacity
         style={{
-          backgroundColor: "#ffffff",
+          backgroundColor: isTrending
+            ? item?.keyword == selectedChip
+              ? "#00BBC8"
+              : "#EAFFF6"
+            : "#ffffff",
           borderColor: "#000000",
           borderWidth: 0.5,
-          paddingHorizontal: moderateScale(20),
+          paddingHorizontal: moderateScale(12),
           paddingVertical: moderateScale(5),
           borderRadius: 20,
           margin: 4,
           flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",
+          gap: 4,
         }}
-        onPress={() => onPress(item)}
+        onPress={() => {
+          onPress(item);
+        }}
       >
-        <Text style={styles.chipText}>{item.keyword}</Text>
+        {isTrending ? (
+          <TrendingTopicIc
+            width={ms(19)}
+            height={ms(19)}
+            stroke={item?.keyword == selectedChip ? "#fff" : "#000"}
+          />
+        ) : (
+          <SearchImg width={ms(15)} height={ms(15)} />
+        )}
+        <Text
+          style={[
+            styles.chipText,
+            {
+              color:
+                isTrending && item?.keyword == selectedChip
+                  ? colors.white
+                  : colors.black,
+            },
+          ]}
+        >
+          {item.keyword}
+        </Text>
       </TouchableOpacity>
     );
   };
 
   useEffect(() => {
+    contextValue?.setLoader(true);
     if (searchQuery.length >= 3) {
       initData();
-      getKeyword();
     } else if (searchQuery.length === 0) {
       initData(); // Restore initial data when search is cleared
-      getKeyword();
     }
   }, [searchQuery]);
 
@@ -114,42 +149,17 @@ const Search = ({ navigation }) => {
         keyword: searchQuery,
       };
       const res = await search(params);
-      const response = res?.data?.data;
-      if (validArray(response)) {
-        setData(response);
-        if (searchQuery && response) {
-          let obj = {
-            userId: await decryptService("userId"),
-            keyword: searchQuery,
-          };
-          const res = await addTopicKeywordApi(obj);
-          if (res?.data?.status_code == 200) {
-            getKeyword();
-          }
-        }
+      if (validArray(res?.data?.data?.SearchResult)) {
+        setData(res?.data?.data);
       } else {
-        setData([]);
+        setData(defaultSearchData);
       }
       contextValue?.setLoader(false);
     } catch (error) {
-      setData([]);
+      setData(defaultSearchData);
       contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
-  };
-
-  const getKeyword = async () => {
-    try {
-      contextValue?.setLoader(true);
-      const params = {
-        userId: await decryptService("userId"),
-      };
-      const res = await getKeywordApi(params);
-      if (res?.data?.length) {
-        setKeywordValue(res?.data);
-      }
-      contextValue?.setLoader(false);
-    } catch (error) {}
   };
 
   // Handle search input change
@@ -159,10 +169,33 @@ const Search = ({ navigation }) => {
 
   const handleChipPress = (item) => {
     setSearchText(item?.keyword);
+    setSelectedChipsId([item?.keyword]);
+    setSelectedChip(item?.keyword);
   };
 
   const handleCardPressed = (item) => {
     navigation.navigate("trendDetail", { selectedData: item });
+  };
+
+  const clearRecentSearches = async () => {
+    try {
+      contextValue?.setLoader(true);
+      const obj = {
+        userId: await decryptService("userId"),
+      };
+      let res = await clearKeywordApi(obj);
+      if (res?.status_code == 200) {
+        console.log("inner");
+        setSelectedChipsId([]);
+        setSearchText("");
+        setData((prevData) => ({
+          ...prevData,
+          Keywords: [],
+          SearchResult: [],
+        }));
+        contextValue?.setLoader(true);
+      }
+    } catch (error) {}
   };
 
   return (
@@ -203,17 +236,56 @@ const Search = ({ navigation }) => {
               onChangeText={handleSearchChange}
             />
           </View>
-          {keywordValue?.length !== 0 && (
+          {data?.Keywords?.length !== 0 && (
             <>
-              <Text style={styles.selectTimeText}>Recent Searches</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingTop: moderateScale(20),
+                  paddingBottom: moderateScale(5),
+                }}
+              >
+                <Text style={styles.selectTimeText}>Trending Topics</Text>
+              </View>
               <FlatList
-                data={keywordValue}
+                data={data?.Keywords}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                   <Chip
                     item={item}
                     onPress={handleChipPress}
-                    selected={selectedChips.includes(item.id)}
+                    selected={selectedChipsId.includes(item.id)}
+                    isTrending={true}
+                  />
+                )}
+                contentContainerStyle={styles.chipContainer}
+              />
+            </>
+          )}
+          {data?.Keywords?.length !== 0 && (
+            <>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  paddingTop: moderateScale(20),
+                  paddingBottom: moderateScale(5),
+                }}
+              >
+                <Text style={styles.selectTimeText}>Recent Searches</Text>
+                <TouchableOpacity onPress={clearRecentSearches}>
+                  <Text style={styles.clearText}>Clear</Text>
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={data?.Keywords}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <Chip
+                    item={item}
+                    onPress={handleChipPress}
+                    selected={selectedChipsId.includes(item.id)}
                   />
                 )}
                 contentContainerStyle={styles.chipContainer}
@@ -273,19 +345,19 @@ const Search = ({ navigation }) => {
             contentContainerStyle={styles.chipContainer}
           />*/}
         </View>
-        {validArray(data) ? (
+        {validArray(data?.SearchResult) ? (
           <>
-           <FlatList
-            data={data}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TopicsCard item={item} onPress={handleCardPressed} />
-            )}
-            contentContainerStyle={styles.topicsContainer}
-          />
+            <FlatList
+              data={data?.SearchResult}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <TopicsCard item={item} onPress={handleCardPressed} />
+              )}
+              contentContainerStyle={styles.topicsContainer}
+            />
           </>
-          
-        ) : Array.isArray(data) && data?.length <= 0 ? (
+        ) : Array.isArray(data?.SearchResult) &&
+          data?.SearchResult?.length <= 0 ? (
           <View style={styles.emptyView}>
             <Text>Oops! No information available!</Text>
           </View>
@@ -368,8 +440,6 @@ const styles = StyleSheet.create({
     color: THEMES.colors.black,
     fontSize: THEMES.fonts.font14,
     fontFamily: THEMES.fontFamily.semiBold,
-    paddingTop: moderateScale(20),
-    paddingBottom: moderateScale(5),
   },
   sameTimeForDayText: {
     fontFamily: THEMES.fontFamily.medium,
@@ -418,6 +488,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
+  },
+  clearText: {
+    fontFamily: THEMES.fontFamily.medium,
+    color: "#323232",
+    fontSize: THEMES.fonts.font14,
   },
 });
 

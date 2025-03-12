@@ -46,12 +46,15 @@ const TrendingTopics = (props) => {
     };
     let res = await getMyTopics(obj);
     if (res?.data?.data) {
-      let dataArray = res?.data?.data;
-      const firstFiveObjects = dataArray.slice(0, 5);
-      setTrendingTopics(firstFiveObjects);
-      if (dataArray?.length > 5) {
-        setTopicList(dataArray);
+      let dataArray = res?.data?.data?.SearchResult;
+      if(dataArray?.length){
+        const firstFiveObjects = dataArray?.slice(0, 5);
+        setTrendingTopics(firstFiveObjects);
+        if (dataArray?.length > 5) {
+          setTopicList(dataArray);
+        }
       }
+      
     }
     contextValue?.setLoader(false);
   };

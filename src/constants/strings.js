@@ -56,7 +56,7 @@ const Strings = {
   enterPrice: "Enter price",
   perDaySessionInMin: "Per day session time (In min)*",
   perDaySession: "Enter per day session",
-  perMonthSession: "Per month session details",
+  perMonthSession: "Charges per month",
   paymentDetails: "Payments details",
   workingDays: "Working Days*",
   workingTime: "Working Time*",

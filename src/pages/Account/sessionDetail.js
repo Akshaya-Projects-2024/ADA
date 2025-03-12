@@ -27,6 +27,7 @@ import { useSelector } from "react-redux";
 import ModalDropdown from "../../components/ModalDropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "../../api/UserContext";
+import { isValidNumber, validateMinutes } from "../../utils/validation";
 const SESSION_AVAILABILITY = {
   home: "Home Visit",
   center: "At Center Service",
@@ -53,7 +54,7 @@ const SessionDetail = (props) => {
   const [selectedServiceProvider, setServiceProviderValue] = useState();
   const [selectedServiceMonthProvider, setServiceProviderMonthValue] =
     useState();
-    const { userData, apiInitCall } = useUser();
+  const { userData, apiInitCall } = useUser();
 
   useEffect(() => {
     initData();
@@ -123,9 +124,10 @@ const SessionDetail = (props) => {
       setSessionTime(ProviderSession?.sessiontime);
     }
 
+      console.log("sessionRateDetails",sessionRateDetails)
     if (validArray(sessionRateDetails)) {
       sessionRateDetails.forEach((rateDetail) => {
-        if (rateDetail.sessioncharges && rateDetail.sessioncharges !== "0.00") {
+        if (rateDetail.sessioncharges && rateDetail.sessioncharges !== "0") {
           const matchedService = serviceProviderRoleData?.find(
             (service) => service.id == rateDetail.servicecode
           );
@@ -134,7 +136,7 @@ const SessionDetail = (props) => {
           }
           setSessionCharges(rateDetail.sessioncharges);
         }
-        if (rateDetail.monthcharges && rateDetail.monthcharges !== "0.00") {
+        if (rateDetail.monthcharges && rateDetail.monthcharges !== "0") {
           const matchedService = serviceProviderRoleData?.find(
             (service) => service.id == rateDetail.servicecode
           );
@@ -184,28 +186,36 @@ const SessionDetail = (props) => {
         showToast("error", "Please select service name for session");
       } else if (perSession && !sessionCharges) {
         showToast("error", "Please enter charges for session");
+      } else if (perSession && !isValidNumber(sessionCharges)) {
+        showToast("error", "Please enter valid charges for session");
       } else if (perSession && !sessionTime) {
         showToast("error", "Please enter time for session");
+      } else if (perSession && !validateMinutes(sessionTime)) {
+        showToast("error", "Please enter valid time for session");
       } else if (perMonth && !selectedServiceMonthProvider?.length) {
         showToast("error", "Please select service name for per month");
       } else if (perMonth && !monthCharges) {
         showToast("error", "Please enter charges for month");
+      } else if (perMonth &&  !isValidNumber(monthCharges)) {
+        showToast("error", "Please enter valid month charges");
       } else if (perMonth && !monthTime) {
         showToast("error", "Please enter time for month");
+      } else if (perMonth && !validateMinutes(monthTime)) { 
+        showToast("error", "Please enter valid time for month session");
       } else {
         sessionData.availableat = getAvailability();
         sessionData.ispermonth = perMonth ? 1 : 0;
         sessionData.ispersession = perSession ? 1 : 0;
-        sessionData.sessiontime = sessionTime ? sessionTime : "0";
-        sessionData.monthtime = monthTime ? monthTime : "0";
+        sessionData.sessiontime = sessionTime ? sessionTime : null;
+        sessionData.monthtime = monthTime ? monthTime : null;
 
         if (perSession) {
           let obj = {
             servicecode: selectedServiceProvider.length
               ? selectedServiceProvider?.[0].id
-              : "",
-            sessioncharges: sessionCharges ? sessionCharges : "0",
-            monthcharges: "0",
+              : null,
+            sessioncharges: sessionCharges ? sessionCharges : null,
+            monthcharges: null,
           };
           sessionRateArray.push(obj);
         }
@@ -214,9 +224,9 @@ const SessionDetail = (props) => {
           let obj = {
             servicecode: selectedServiceMonthProvider.length
               ? selectedServiceMonthProvider?.[0].id
-              : "",
-            sessioncharges: "0",
-            monthcharges: monthCharges ? monthCharges : "0",
+              : null,
+            sessioncharges: null,
+            monthcharges: monthCharges ? monthCharges : null,
           };
           sessionRateArray.push(obj);
         }
@@ -225,6 +235,7 @@ const SessionDetail = (props) => {
           userid: userId,
           sessionrate: sessionRateArray,
         };
+        console.log("sess", sessionData,sessionCharge)
         const responses = await Promise.all([
           saveSession(sessionData),
           saveSessionCharges(sessionCharge),
@@ -245,7 +256,7 @@ const SessionDetail = (props) => {
             sessionRes?.data?.message || sessionChargesRes?.data?.message
           );
         }
-        apiInitCall()
+        apiInitCall();
       }
     } catch (error) {
       showToast("error", "Something went wrong!!!");

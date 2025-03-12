@@ -41,6 +41,7 @@ import { getAdoptionCategory } from "../../redux-store/actions/commonApis";
 import { useDebounce } from "../../hooks/useDebounce";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { contextValue } from "../../components/Loader";
+import { isValidNumber } from "../../utils/validation";
 
 const GENDER = { male: "Male", female: "Female" };
 
@@ -70,7 +71,6 @@ const PetDetail = (props) => {
   const [registerModal, setRegisterModal] = useState(false);
   const { parentProfie } = useSelector((state) => state?.commonReducer);
   const { petDetails } = parentProfie;
-  console.log(petDetails[0]?.id)
 
   const [submitDocumentData, setSubmitDocumentData] = useState([]);
 
@@ -141,7 +141,7 @@ const PetDetail = (props) => {
       if (firstPet?.weight) {
         setPetWeight(firstPet?.weight);
       }
- 
+
       if (firstPet?.documents) {
         const profilePhoto = firstPet?.documents?.filter(
           (item) => item.documenttype === "profilePhoto"
@@ -201,12 +201,14 @@ const PetDetail = (props) => {
   const handlePetImg = async (image) => {
     const extension = image?.uri?.split(".").pop();
     const userId = await decryptService("userId");
-    let payload = [{
-      userid: userId,
-      documenttype: "profilePhoto",
-      extention: extension,
-      document: image?.fileData,
-    }];
+    let payload = [
+      {
+        userid: userId,
+        documenttype: "profilePhoto",
+        extention: extension,
+        document: image?.fileData,
+      },
+    ];
     setPetImage(image?.fileData);
     setPetProfilePhoto(payload);
   };
@@ -289,12 +291,16 @@ const PetDetail = (props) => {
       showToast("error", "Please select pet image");
     } else if (!petName) {
       showToast("error", "Please enter pet name");
+    } else if (!isValidName(petName)) {
+      showToast("error", "Please enter valid pet name");
     } else if (!selectedPetType || !selectedPetType[0]?.label) {
       showToast("error", "Please select pet type");
     } else if (!selectPetBreed || !selectPetBreed[0]?.label) {
       showToast("error", "Please select pet breed");
     } else if (!petAge) {
       showToast("error", "Please enter pet age");
+    } else if (!isValidNumber(petAge)) {
+      showToast("error", "Please enter valid pet age");
     } else if (!selectedGender) {
       showToast("error", "Please select pet gender");
     } else {
@@ -313,7 +319,6 @@ const PetDetail = (props) => {
           breed: selectPetBreed[0]?.label,
           weight: petWeight,
         };
-        console.log(params,"params")
         const res = await savePetDetails(params);
         if (res?.data?.status_code == 200) {
           if (route === "parentAccount") {
@@ -327,7 +332,7 @@ const PetDetail = (props) => {
         apiInitCall();
         contextValue?.setLoader(false);
       } catch (error) {
-        console.log("er", error)
+        console.log("er", error);
         contextValue?.setLoader(false);
         showToast("error", error);
       }
@@ -436,7 +441,7 @@ const PetDetail = (props) => {
                   justifyContent: "center",
                 }}
               >
-                {Boolean(petImage?.length)  ? (
+                {Boolean(petImage?.length) ? (
                   checkType(petImage) ? (
                     <Image
                       style={{
@@ -451,7 +456,7 @@ const PetDetail = (props) => {
                       source={{ uri: petImage }}
                     />
                   ) : (
-                    (<Image
+                    <Image
                       style={{
                         width: 100,
                         height: 100,
@@ -462,7 +467,7 @@ const PetDetail = (props) => {
                       }}
                       resizeMode="contain"
                       source={getBase64Obj(petImage)}
-                    />)
+                    />
                   )
                 ) : (
                   <ProfileDummy />

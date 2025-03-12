@@ -58,5 +58,6 @@ export const urlList = {
   deletePetDocument: "register/pet/deletedocument",
   shareTopic: "provider/topic/share",
   addTopicKeyword: "provider/topic/addkeyword",
-  getKeyword:'provider/topic/getkeyword'
+  getKeyword:'provider/topic/getkeyword',
+  clearKeyword:'provider/topic/clearkeyword'
 };

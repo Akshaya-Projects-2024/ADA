@@ -33,6 +33,11 @@ import { StackActions } from "@react-navigation/native";
 import { dispatchUserData } from "../../redux-store/actions/registerAction";
 import { useUser } from "../../api/UserContext";
 import { contextValue } from "../../components/Loader";
+import {
+  isValidName,
+  validateIndianPostalCode,
+  validateInput,
+} from "../../utils/validation";
 
 const ParentDetails = (props) => {
   const route = props?.route?.params?.route;
@@ -137,24 +142,30 @@ const ParentDetails = (props) => {
     }
   };
 
-
-
   const onSubmit = async () => {
-    contextValue?.setLoader(true)
+    contextValue?.setLoader(true);
     if (!parentImg) {
       showToast("error", "Please upload parent profile picture");
     } else if (!parentName) {
       showToast("error", "Please enter your parent name");
+    } else if (!isValidName(businessValue)) {
+      showToast("error", "Please enter valid parent name");
     } else if (!description) {
       showToast("error", "Please enter description");
     } else if (!mobileNumber) {
       showToast("error", "Please enter mobile number");
+    } else if (validateInput(mobileNumber) == "invalid") {
+      showToast("error", "Please enter valid mobile number");
     } else if (!emailId) {
       showToast("error", "Please enter email Id");
+    } else if (validateInput(emailId) == "invalid") {
+      showToast("error", "Please enter valid email Id");
     } else if (!address) {
       showToast("error", "Please enter address");
     } else if (!pinCode) {
       showToast("error", "Please enter pincode");
+    } else if (!validateIndianPostalCode(postalCode)) {
+      showToast("error", "Please enter valid postal code");
     } else {
       try {
         const userId = await decryptService("userId");
@@ -179,7 +190,6 @@ const ParentDetails = (props) => {
         if (res?.data?.status_code == 200) {
           if (route === "parentAccount") {
             props.navigation.dispatch(StackActions.pop(1));
-
           } else {
             props.navigation.navigate(
               "petDetail",
