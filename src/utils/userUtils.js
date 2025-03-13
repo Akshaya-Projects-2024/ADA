@@ -114,17 +114,17 @@ export const validateServiceProfile = (
   ) {
     return { flag: false, navigateTo: "mediaLink", partiallyCompleted: true };
   }
-  if (
-    !excludePayment &&
-    (!userData?.providerProfile?.subscription?.status ||
-      userData?.providerProfile?.subscription?.status === "inactive")
-  ) {
-    return {
-      flag: false,
-      navigateTo: "paymentsSubscription",
-      partiallyCompleted: true,
-    };
-  }
+  // if (
+  //   !excludePayment &&
+  //   (!userData?.providerProfile?.subscription?.status ||
+  //     userData?.providerProfile?.subscription?.status === "inactive")
+  // ) {
+  //   return {
+  //     flag: false,
+  //     navigateTo: "paymentsSubscription",
+  //     partiallyCompleted: true,
+  //   };
+  // }
   return { flag: true, partiallyCompleted: true };
 };
 
@@ -192,14 +192,14 @@ export const validateCompleteServiceProfile = (userData) => {
     output.partiallyCompleted = true;
     output.modules.push("mediaLink");
   }
-  if (
-    !userData?.providerProfile?.subscription?.status ||
-    userData?.providerProfile?.subscription?.status === "inactive"
-  ) {
-    output.flag = false;
-    output.partiallyCompleted = true;
-    output.modules.push("paymentsSubscription");
-  }
+  // if (
+  //   !userData?.providerProfile?.subscription?.status ||
+  //   userData?.providerProfile?.subscription?.status === "inactive"
+  // ) {
+  //   output.flag = false;
+  //   output.partiallyCompleted = true;
+  //   output.modules.push("paymentsSubscription");
+  // }
   return output;
 };
 
