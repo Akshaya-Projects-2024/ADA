@@ -360,7 +360,6 @@ const Home = (props) => {
       isToday: true,
     });
   };
-  console.log(userData);
 
   const handleAttended = async () => {
     try {

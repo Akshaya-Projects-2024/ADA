@@ -46,10 +46,11 @@ const PaymentsSubscription = (props) => {
   const [subscriptionDetails, setSubscriptionDetails] = useState();
   const profile = useSelector((state) => state?.commonReducer);
   const userAlreadySubscribed = useRef(
-    profile?.providerProfile?.subscription?.subscriptioncode &&
-      profile?.providerProfile?.subscription?.status === "active"
+    Boolean(
+      profile?.providerProfile?.subscription?.subscriptioncode &&
+        profile?.providerProfile?.subscription?.status === "active"
+    )
   );
-
   useEffect(() => {
     initData();
   }, [initData]);
