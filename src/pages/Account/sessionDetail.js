@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -41,20 +41,13 @@ const SessionDetail = (props) => {
   const [onlineConsultation, setOnlineConsultation] = useState(false);
   const [perSession, setPerSession] = useState(true);
   const [perMonth, setPerMonth] = useState(false);
-  const [sessionServiceName, setSessionServiceName] = useState("");
-  const [sessionCharges, setSessionCharges] = useState("");
-  const [sessionTime, setSessionTime] = useState("");
-  const [monthServiceName, setMonthServiceName] = useState("");
-  const [monthCharges, setMonthCharges] = useState("");
-  const [monthTime, setMonthTime] = useState("");
   const { providerProfile } = useSelector((state) => state?.commonReducer);
   const { ProviderSession, sessionRateDetails } = providerProfile;
-  const { serviceProviderRoleData } = useSelector(({ register }) => register);
-  const [serviceProviderRole, setServiceProviderRole] = useState();
-  const [selectedServiceProvider, setServiceProviderValue] = useState();
-  const [selectedServiceMonthProvider, setServiceProviderMonthValue] =
-    useState();
   const { userData, apiInitCall } = useUser();
+  const [sessionData, setSessionData] = useState({
+    perSession: [],
+    perMonth: [],
+  });
 
   useEffect(() => {
     initData();
@@ -77,17 +70,11 @@ const SessionDetail = (props) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (serviceProviderRoleData.length) {
-      setServiceProviderRole(serviceProviderRoleData);
-    }
-  }, [serviceProviderRoleData]);
-
   const initData = () => {
     //TODO remove this once api is working properly
-    if (ProviderSession?.availableat) {
-      setHomeVisit(true);
-    }
+    // if (ProviderSession?.availableat) {
+    //   setHomeVisit(true);
+    // }
     //TODO Uncomment this once api is working properly
     if (validArray(ProviderSession?.availableat)) {
       for (
@@ -108,43 +95,48 @@ const SessionDetail = (props) => {
       }
     }
 
-    if (ProviderSession?.ispermonth == 1) {
-      setPerMonth(true);
-    }
-    if (ProviderSession?.ispersession == 1) {
-      setPerSession(true);
-    }
-
-    if (ProviderSession?.monthtime) {
-      setMonthTime(
-        ProviderSession?.monthtime ? ProviderSession?.monthtime : "0"
-      );
-    }
-    if (ProviderSession?.sessiontime) {
-      setSessionTime(ProviderSession?.sessiontime);
-    }
-
-      console.log("sessionRateDetails",sessionRateDetails)
-    if (validArray(sessionRateDetails)) {
-      sessionRateDetails.forEach((rateDetail) => {
-        if (rateDetail.sessioncharges && rateDetail.sessioncharges !== "0") {
-          const matchedService = serviceProviderRoleData?.find(
-            (service) => service.id == rateDetail.servicecode
-          );
-          if (matchedService) {
-            setServiceProviderValue([matchedService]);
+    setPerMonth(ProviderSession?.ispermonth == 1);
+    setPerSession(ProviderSession?.ispersession == 1);
+    if (userData?.providerProfile?.providerBusiness?.services?.length) {
+      const temp1 = [],
+        temp2 = [];
+      userData?.providerProfile?.providerBusiness?.services?.map((item) => {
+        const list = sessionRateDetails?.filter(
+          (x) => x.servicecode == item.code
+        );
+        list?.map((listItem) => {
+          let sessioncharges = "";
+          let sessiontime = "";
+          let monthcharges = "";
+          let monthtime = "";
+          sessioncharges =
+            listItem?.sessioncharges !== "0" ? listItem?.sessioncharges : "";
+          sessiontime =
+            listItem?.sessiontime !== "0" ? listItem?.sessiontime : "";
+          monthcharges =
+            listItem?.monthcharges !== "0" ? listItem?.monthcharges : "";
+          monthtime = listItem?.monthtime !== "0" ? listItem?.monthtime : "";
+          if (sessioncharges) {
+            temp1.push({
+              serviceName: item.service,
+              serviceCode: item.code,
+              sessioncharges,
+              sessiontime,
+            });
           }
-          setSessionCharges(rateDetail.sessioncharges);
-        }
-        if (rateDetail.monthcharges && rateDetail.monthcharges !== "0") {
-          const matchedService = serviceProviderRoleData?.find(
-            (service) => service.id == rateDetail.servicecode
-          );
-          if (matchedService) {
-            setServiceProviderMonthValue([matchedService]);
+          if (monthcharges) {
+            temp2.push({
+              serviceName: item.service,
+              serviceCode: item.code,
+              monthcharges,
+              monthtime,
+            });
           }
-          setMonthCharges(rateDetail.monthcharges);
-        }
+        });
+      });
+      setSessionData({
+        perSession: ProviderSession?.ispersession == 1 ? temp1 : [],
+        perMonth: ProviderSession?.ispermonth == 1 ? temp2 : [],
       });
     }
   };
@@ -170,7 +162,7 @@ const SessionDetail = (props) => {
     try {
       const userId = await decryptService("userId");
       let sessionRateArray = [];
-      const sessionData = {
+      const sessionDataObj = {
         userid: userId,
         ...(ProviderSession?.id ? { id: ProviderSession?.id } : {}),
       };
@@ -182,62 +174,73 @@ const SessionDetail = (props) => {
         );
       } else if (!perSession && !perMonth) {
         showToast("error", "Please select at least one option for charges");
-      } else if (perSession && !selectedServiceProvider?.length) {
-        showToast("error", "Please select service name for session");
-      } else if (perSession && !sessionCharges) {
+      } else if (
+        perSession &&
+        sessionData.perSession.some((item) => !item.sessioncharges)
+      ) {
         showToast("error", "Please enter charges for session");
-      } else if (perSession && !isValidNumber(sessionCharges)) {
+      } else if (
+        perSession &&
+        sessionData.perSession.some(
+          (item) => !isValidNumber(item.sessioncharges)
+        )
+      ) {
         showToast("error", "Please enter valid charges for session");
-      } else if (perSession && !sessionTime) {
+      } else if (
+        perSession &&
+        sessionData.perSession.some((item) => !item.sessiontime)
+      ) {
         showToast("error", "Please enter time for session");
-      } else if (perSession && !validateMinutes(sessionTime)) {
+      } else if (
+        perSession &&
+        sessionData.perSession.some(
+          (item) => !validateMinutes(item.sessiontime)
+        )
+      ) {
         showToast("error", "Please enter valid time for session");
-      } else if (perMonth && !selectedServiceMonthProvider?.length) {
-        showToast("error", "Please select service name for per month");
-      } else if (perMonth && !monthCharges) {
+      } else if (
+        perMonth &&
+        sessionData.perMonth.some((item) => !item.monthcharges)
+      ) {
         showToast("error", "Please enter charges for month");
-      } else if (perMonth &&  !isValidNumber(monthCharges)) {
+      } else if (
+        perMonth &&
+        sessionData.perMonth.some((item) => !isValidNumber(item.monthcharges))
+      ) {
         showToast("error", "Please enter valid month charges");
-      } else if (perMonth && !monthTime) {
+      } else if (
+        perMonth &&
+        sessionData.perMonth.some((item) => !item.monthtime)
+      ) {
         showToast("error", "Please enter time for month");
-      } else if (perMonth && !validateMinutes(monthTime)) { 
-        showToast("error", "Please enter valid time for month session");
+      } else if (
+        perMonth &&
+        sessionData.perMonth.some((item) => !validateMinutes(item.monthtime))
+      ) {
+        showToast("error", "Please enter valid time for month");
       } else {
-        sessionData.availableat = getAvailability();
-        sessionData.ispermonth = perMonth ? 1 : 0;
-        sessionData.ispersession = perSession ? 1 : 0;
-        sessionData.sessiontime = sessionTime ? sessionTime : null;
-        sessionData.monthtime = monthTime ? monthTime : null;
+        sessionDataObj.availableat = getAvailability();
+        sessionDataObj.ispermonth = perMonth ? 1 : 0;
+        sessionDataObj.ispersession = perSession ? 1 : 0;
+        sessionDataObj.sessiontime = "0";
+        sessionDataObj.monthtime = "0";
 
-        if (perSession) {
-          let obj = {
-            servicecode: selectedServiceProvider.length
-              ? selectedServiceProvider?.[0].id
-              : null,
-            sessioncharges: sessionCharges ? sessionCharges : null,
-            monthcharges: null,
-          };
-          sessionRateArray.push(obj);
-        }
-
-        if (perMonth) {
-          let obj = {
-            servicecode: selectedServiceMonthProvider.length
-              ? selectedServiceMonthProvider?.[0].id
-              : null,
-            sessioncharges: null,
-            monthcharges: monthCharges ? monthCharges : null,
-          };
-          sessionRateArray.push(obj);
-        }
-
+        [...sessionData.perSession, ...sessionData.perMonth].forEach((item) => {
+          sessionRateArray.push({
+            servicecode: item.serviceCode,
+            sessioncharges: item.sessioncharges || "0",
+            monthcharges: item.monthcharges || "0",
+            sessiontime: item.sessiontime || "0",
+            monthtime: item.monthtime || "0",
+          });
+        });
         const sessionCharge = {
           userid: userId,
           sessionrate: sessionRateArray,
         };
-        console.log("sess", sessionData,sessionCharge)
+        console.log("sess", sessionData, sessionCharge);
         const responses = await Promise.all([
-          saveSession(sessionData),
+          saveSession(sessionDataObj),
           saveSessionCharges(sessionCharge),
         ]);
         const sessionRes = responses[0];
@@ -263,6 +266,11 @@ const SessionDetail = (props) => {
     }
   };
 
+  const handleSessionChange = (parent, key, index, value) => {
+    const tempSession = { ...sessionData };
+    tempSession[parent][index][key] = value;
+    setSessionData({ ...tempSession });
+  };
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -350,7 +358,22 @@ const SessionDetail = (props) => {
               <CheckBox
                 checkedImage={<Checked />}
                 unCheckedImage={<UnChecked />}
-                onClick={() => setPerSession(!perSession)}
+                onClick={() => {
+                  setPerSession(!perSession);
+                  setSessionData({
+                    ...sessionData,
+                    perSession: !perSession
+                      ? userData?.providerProfile?.providerBusiness?.services?.map(
+                          (item) => ({
+                            serviceName: item.service,
+                            serviceCode: item.code,
+                            sessioncharges: "",
+                            sessiontime: "",
+                          })
+                        )
+                      : [],
+                  });
+                }}
                 isChecked={perSession}
                 style={styles.flex}
                 rightTextStyle={{
@@ -363,7 +386,6 @@ const SessionDetail = (props) => {
               <CheckBox
                 checkedImage={<Checked />}
                 unCheckedImage={<UnChecked />}
-                onClick={() => setPerMonth(!perMonth)}
                 isChecked={perMonth}
                 style={styles.flex}
                 rightText={"Per Month"}
@@ -372,82 +394,122 @@ const SessionDetail = (props) => {
                   fontSize: THEMES.fonts.font12,
                   fontFamily: THEMES.fontFamily.semiBold,
                 }}
+                onClick={() => {
+                  setPerMonth(!perMonth);
+                  setSessionData({
+                    ...sessionData,
+                    perMonth: !perMonth
+                      ? userData?.providerProfile?.providerBusiness?.services?.map(
+                          (item) => ({
+                            serviceName: item.service,
+                            serviceCode: item.code,
+                            monthcharges: "",
+                            monthtime: "",
+                          })
+                        )
+                      : [],
+                  });
+                }}
               />
             </View>
-            {perSession && (
-              <>
-                <View style={styles.contentView}>
-                  <Text style={styles.availableText}>
-                    {Strings.perSessionCharges}{" "}
-                  </Text>
-                </View>
-                <View style={{ paddingTop: moderateScale(16) }}>
-                  <ModalDropdown
-                    placeholder="Service provider Role*"
-                    data={serviceProviderRole}
-                    title={"Select service role"}
-                    setSelectedValue={setServiceProviderValue}
-                    selectedValue={selectedServiceProvider}
-                    noPadding
-                  />
-                </View>
-                <View style={{ paddingTop: moderateScale(16) }}>
-                  <InputField
-                    keyboardType="phone-pad"
-                    label={Strings.chargesPerSession}
-                    placeholderText={Strings.enterPrice}
-                    value={sessionCharges}
-                    onChange={setSessionCharges}
-                  />
-                </View>
-                <View style={{ paddingTop: moderateScale(16) }}>
-                  <InputField
-                    keyboardType="phone-pad"
-                    label={Strings.perDaySessionInMin}
-                    placeholderText={Strings.perDaySession}
-                    value={sessionTime}
-                    onChange={setSessionTime}
-                  />
-                </View>
-              </>
-            )}
-            {perMonth && (
-              <>
-                <View style={styles.contentView}>
-                  <Text style={styles.availableText}>
-                    {Strings.perMonthSession}{" "}
-                  </Text>
-                </View>
-                <View style={{ paddingTop: moderateScale(16) }}>
-                  <ModalDropdown
-                    placeholder="Service provider Role*"
-                    data={serviceProviderRole}
-                    title={"Select service role"}
-                    setSelectedValue={setServiceProviderMonthValue}
-                    selectedValue={selectedServiceMonthProvider}
-                    noPadding
-                  />
-                </View>
-                <View style={{ paddingTop: moderateScale(16) }}>
-                  <InputField
-                    keyboardType="phone-pad"
-                    label={Strings.chargesPerSession}
-                    placeholderText={Strings.enterPrice}
-                    value={monthCharges}
-                    onChange={setMonthCharges}
-                  />
-                </View>
-                <View style={{ paddingTop: moderateScale(16) }}>
-                  <InputField
-                    keyboardType="phone-pad"
-                    label={Strings.perDaySessionInMin}
-                    placeholderText={Strings.perDaySession}
-                    value={monthTime}
-                    onChange={setMonthTime}
-                  />
-                </View>
-              </>
-            )}
+            {perSession &&
+              sessionData?.perSession?.map((item, index) => (
+                <>
+                  <View style={styles.contentView}>
+                    <Text style={styles.availableText}>
+                      {Strings.perSessionCharges}{" "}
+                    </Text>
+                  </View>
+                  <View style={{ paddingTop: moderateScale(16) }}>
+                    <InputField
+                      label="Service provider Role*"
+                      value={item?.serviceName}
+                      editable={false}
+                    />
+                  </View>
+                  <View style={{ paddingTop: moderateScale(16) }}>
+                    <InputField
+                      keyboardType="phone-pad"
+                      label={Strings.chargesPerSession}
+                      placeholderText={Strings.enterPrice}
+                      value={item?.sessioncharges}
+                      onChange={(value) => {
+                        handleSessionChange(
+                          "perSession",
+                          "sessioncharges",
+                          index,
+                          value
+                        );
+                      }}
+                    />
+                  </View>
+                  <View style={{ paddingTop: moderateScale(16) }}>
+                    <InputField
+                      keyboardType="phone-pad"
+                      label={Strings.perDaySessionInMin}
+                      placeholderText={Strings.perDaySession}
+                      value={item?.sessiontime}
+                      onChange={(value) => {
+                        handleSessionChange(
+                          "perSession",
+                          "sessiontime",
+                          index,
+                          value
+                        );
+                      }}
+                    />
+                  </View>
+                </>
+              ))}
+            {perMonth &&
+              sessionData?.perMonth?.map((item, index) => (
+                <>
+                  <View style={styles.contentView}>
+                    <Text style={styles.availableText}>
+                      {Strings.perMonthSession}{" "}
+                    </Text>
+                  </View>
+                  <View style={{ paddingTop: moderateScale(16) }}>
+                    <InputField
+                      label="Service provider Role*"
+                      value={item?.serviceName}
+                      editable={false}
+                    />
+                  </View>
+                  <View style={{ paddingTop: moderateScale(16) }}>
+                    <InputField
+                      keyboardType="phone-pad"
+                      label={Strings.chargesPerSession}
+                      placeholderText={Strings.enterPrice}
+                      value={item?.monthcharges}
+                      onChange={(value) => {
+                        handleSessionChange(
+                          "perMonth",
+                          "monthcharges",
+                          index,
+                          value
+                        );
+                      }}
+                    />
+                  </View>
+                  <View style={{ paddingTop: moderateScale(16) }}>
+                    <InputField
+                      keyboardType="phone-pad"
+                      label={Strings.perDaySessionInMin}
+                      placeholderText={Strings.perDaySession}
+                      value={item?.monthtime}
+                      onChange={(value) => {
+                        handleSessionChange(
+                          "perMonth",
+                          "monthtime",
+                          index,
+                          value
+                        );
+                      }}
+                    />
+                  </View>
+                </>
+              ))}
 
             <View
               style={{

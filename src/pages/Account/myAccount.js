@@ -46,12 +46,14 @@ import { contextValue } from "../../components/Loader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import HolidayMenuIcon from "../../assets/svg/HolidayMenuIcon";
 import Dialog from "../../components/Dialog";
+import { useUser } from "../../api/UserContext";
 
 const MyAccount = (props) => {
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const profile = useSelector((state) => state?.commonReducer);
   const [deleteAccountModal, setDeleteAccountModal] = useState(false);
   const [loogutModal, setLogoutModal] = useState(false);
+  const { userData } = useUser();
 
   const profileServices = useMemo(
     () =>
@@ -67,8 +69,6 @@ const MyAccount = (props) => {
     const validProviderProfile = validateServiceProfile(profile, false, true);
     return validProviderProfile;
   }, [profile]);
-
-
 
   const MenuItem = ({
     bgColor,
@@ -134,7 +134,7 @@ const MyAccount = (props) => {
     if (filteredAsyncStorage?.length > 0) {
       await AsyncStorage.multiRemove(filteredAsyncStorage);
     }
-    setLogoutModal(false)
+    setLogoutModal(false);
     resetNavigation("app");
   };
 
@@ -154,9 +154,20 @@ const MyAccount = (props) => {
           if (route == "deleteAccount") {
             setDeleteAccountModal(true);
           } else if (route == "logout") {
-            setLogoutModal(true)
+            setLogoutModal(true);
           } else {
-            props.navigation.navigate(route, { route: "myprofile" });
+            console.log("userData?.providerProfile?.sessionDetails",userData?.providerProfile?.sessionDetails)
+            if (
+              userData?.providerProfile?.providerBusiness?.id !== 0 &&
+              userData?.providerProfile?.providerContact?.id !== 0 &&
+              userData?.providerProfile?.ProviderSession?.id !== 0 &&
+              userData?.providerProfile?.sessionDetails?.length
+            ) {
+              props.navigation.navigate(route, { route: "myprofile" });
+            } else {
+              const validProviderProfile = validateServiceProfile(userData);
+              props.navigation.navigate(validProviderProfile?.navigateTo);
+            }
           }
         }}
         style={[
@@ -207,7 +218,7 @@ const MyAccount = (props) => {
       });
     }
   };
-
+  
   return (
     <LinearGradient
       locations={[0, 0.5, 0.6]}
@@ -418,7 +429,7 @@ const MyAccount = (props) => {
           onClose={() => setDeleteAccountModal(false)}
         />
 
-<Dialog
+        <Dialog
           title={"Logout Account"}
           flag={loogutModal}
           description={Strings.logoutAccount}

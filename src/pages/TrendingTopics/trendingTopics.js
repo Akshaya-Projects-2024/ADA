@@ -94,7 +94,7 @@ const TrendingTopics = (props) => {
           }}
         >
           <Text
-            numberOfLines={2}
+            numberOfLines={1}
             style={{
               fontFamily: THEMES.fontFamily.semiBold,
               color: THEMES.colors.black,

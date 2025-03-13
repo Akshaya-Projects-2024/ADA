@@ -22,7 +22,7 @@ import {
 } from "../../utils/userUtils";
 import { LoginModules } from "../../constants/enums";
 import DeviceInfo from "react-native-device-info";
-
+import { getCurrentLocation } from "../../utils/geolocationUtils";
 
 const Splash = (props) => {
   const timeoutRef = useRef();
@@ -58,11 +58,14 @@ const Splash = (props) => {
 
   useEffect(() => {
     if (isFocused) {
-
       dispatch(getServiceProviderRole());
       checkIfUserExits();
     }
   }, [isFocused, checkIfUserExits, dispatch]);
+
+  useEffect(async () => {
+    const res = await getCurrentLocation();
+  }, []);
 
   const initData = useCallback(() => {
     return new Promise(async (resolve) => {
@@ -152,12 +155,33 @@ const Splash = (props) => {
         !validProviderProfile?.flag &&
         validProviderProfile?.partiallyCompleted
       ) {
-        showToast("error", "Please complete your registration");
-        delay(() =>
-          props.navigation.navigate("auth", {
-            screen: validProviderProfile?.navigateTo,
-          })
-        );
+        const val = await decryptService("isRegisterLater");
+        if (val) {
+          delay(() =>
+            props.navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: "auth",
+                  state: {
+                    routes: [
+                      {
+                        name: "home",
+                      },
+                    ],
+                  },
+                },
+              ],
+            })
+          );
+        } else {
+          showToast("error", "Please complete your registration");
+          delay(() =>
+            props.navigation.navigate("auth", {
+              screen: validProviderProfile?.navigateTo,
+            })
+          );
+        }
       } else if (!validProfile?.flag && validProfile?.partiallyCompleted) {
         delay(() =>
           props.navigation.navigate(validProfile?.navigateTo, {

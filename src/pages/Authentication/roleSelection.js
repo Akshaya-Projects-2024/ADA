@@ -17,6 +17,7 @@ import Cross from "../../assets/svg/cross.svg";
 import { useDispatch } from "react-redux";
 import { dispathGuestUser } from "../../redux-store/actions/userActions";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { decryptService, encryptService } from "../../utils/storageFunc";
 
 const RoleSelection = (props) => {
   const { top } = useSafeAreaInsets();
@@ -25,6 +26,7 @@ const RoleSelection = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const onLaterPressed = () => {
+    encryptService("isRegisterLater", true);
     dispatch(dispathGuestUser(true));
     setModalVisible(false);
     setTimeout(() => {
@@ -117,8 +119,11 @@ const RoleSelection = (props) => {
           >
             <TouchableOpacity
               style={{ alignItems: "center" }}
-              onPress={() => {
-                setModalVisible(true);
+              onPress={async () => {
+                const val = await decryptService("isRegisterLater");
+                if (val !== undefined) {
+                  setModalVisible(true);
+                }
                 setSelected("parent");
               }}
             >
@@ -174,9 +179,12 @@ const RoleSelection = (props) => {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => {
+              onPress={async () => {
                 setSelected("service");
-                setModalVisible(true);
+                const val = await decryptService("isRegisterLater");
+                if (val !== undefined) {
+                  setModalVisible(true);
+                }
               }}
               style={{ marginLeft: moderateScale(43), alignItems: "center" }}
             >
@@ -266,7 +274,7 @@ const RoleSelection = (props) => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    setSelected("")
+                    setSelected("");
                     setModalVisible(false);
                   }}
                 >
@@ -306,6 +314,7 @@ const RoleSelection = (props) => {
                   <Button
                     title="Register"
                     onPress={() => {
+                      encryptService("isRegisterLater", false);
                       setModalVisible(false);
                       setTimeout(() => {
                         if (selected == "service") {

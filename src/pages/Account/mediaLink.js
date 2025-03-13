@@ -75,32 +75,33 @@ const MediaLink = (props) => {
   };
 
   const onSubmit = async () => {
-    if (link && instaLink && fbLink && weblink) {
-      try {
-        contextValue?.setLoader(true);
-        const userId = await decryptService("userId");
-        const postData = {
-          userid: userId,
-          onlinelink: link,
-          instagram: instaLink,
-          facebook: fbLink,
-          website: weblink,
-          ...(MediaLinks?.id ? { id: MediaLinks?.id } : {}),
-        };
-        const res = await saveMediaLinks(postData);
-        if (res?.status == 200) {
-          setModal(true);
+    try {
+      contextValue?.setLoader(true);
+      const userId = await decryptService("userId");
+      const postData = {
+        userid: userId,
+        onlinelink: link,
+        instagram: instaLink,
+        facebook: fbLink,
+        website: weblink,
+        ...(MediaLinks?.id ? { id: MediaLinks?.id } : {}),
+      };
+      const res = await saveMediaLinks(postData);
+      if (res?.status == 200) {
+        if (userData?.providerProfile?.MediaLinks?.id !== 0) {
+          handleNavigation();
         } else {
-          showToast("error", res?.data?.message);
+          setModal(true);
         }
-        contextValue?.setLoader(false);
-      } catch (error) {
-        console.log("error", error);
-        showToast("error", "Something went wrong!!!");
+      } else {
+        showToast("error", res?.data?.message);
       }
-      apiInitCall();
+      contextValue?.setLoader(false);
+    } catch (error) {
+      console.log("error", error);
+      showToast("error", "Something went wrong!!!");
     }
-    handleNavigation();
+    apiInitCall();
   };
 
   const handleNavigation = () => {
@@ -109,7 +110,18 @@ const MediaLink = (props) => {
     } else {
       props.navigation.reset({
         index: 0,
-        routes: [{ name: "paymentsSubscription" }],
+        routes: [
+          {
+            name: "auth",
+            state: {
+              routes: [
+                {
+                  name: "home",
+                },
+              ],
+            },
+          },
+        ],
       });
     }
   };
@@ -236,15 +248,19 @@ const MediaLink = (props) => {
         </View>
       </View>
       <Dialog
-        flag={"Registration Complete! 🎉"}
-        title={"No slots Available"}
+        flag={modal}
+        title={"Registration Complete! 🎉"}
         description={
           "Thank you for registering on ADA. Your profile will be validated and activated within 48 hours. Happy exploring!"
         }
         rightButtonText="Close"
-        rightButtonPressed={() => setModal(false)}
+        rightButtonPressed={() => {
+          setModal(false);
+          handleNavigation();
+        }}
         onClose={() => {
           setModal(false);
+          handleNavigation();
         }}
       />
     </SafeAreaView>

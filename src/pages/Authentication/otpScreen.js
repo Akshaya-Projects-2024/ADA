@@ -12,6 +12,7 @@ import {
   Keyboard,
   PermissionsAndroid,
   Alert,
+  Linking,
 } from "react-native";
 import { moderateScale, ms } from "react-native-size-matters";
 
@@ -98,7 +99,7 @@ const OtpScreen = (props) => {
       );
 
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        console.log("not granted");
+        Linking.openSettings();
       }
     } catch (error) {
       console.log("error", error);

@@ -359,7 +359,8 @@ const Home = (props) => {
       isToday: true,
     });
   };
-
+  console.log(userData);
+  
   const handleAttended = async () => {
     try {
       contextValue?.setLoader(true);
@@ -435,6 +436,7 @@ const Home = (props) => {
       selectedItem: selectedItem,
     });
   };
+  console.log("userData", userData);
 
   return (
     <LinearGradient
@@ -486,6 +488,7 @@ const Home = (props) => {
                   fontSize: THEMES.fonts.font20,
                   textAlign: "center",
                 }}
+                numberOfLines={1}
               >
                 {`Hi ${
                   guestUser
