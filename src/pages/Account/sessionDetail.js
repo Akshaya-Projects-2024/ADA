@@ -76,68 +76,67 @@ const SessionDetail = (props) => {
     //   setHomeVisit(true);
     // }
     //TODO Uncomment this once api is working properly
+    // Check session availability efficiently
     if (validArray(ProviderSession?.availableat)) {
-      for (
-        let index = 0;
-        index < ProviderSession?.availableat.length;
-        index++
-      ) {
-        const element = ProviderSession?.availableat[index];
-        if (element === SESSION_AVAILABILITY.home) {
-          setHomeVisit(true);
-        }
-        if (element === SESSION_AVAILABILITY.center) {
-          setCenterService(true);
-        }
-        if (element === SESSION_AVAILABILITY.online) {
-          setOnlineConsultation(true);
-        }
-      }
+      const availableAt = ProviderSession.availableat;
+      setHomeVisit(availableAt.includes(SESSION_AVAILABILITY.home));
+      setCenterService(availableAt.includes(SESSION_AVAILABILITY.center));
+      setOnlineConsultation(availableAt.includes(SESSION_AVAILABILITY.online));
     }
 
-    setPerMonth(ProviderSession?.ispermonth == 1);
-    setPerSession(ProviderSession?.ispersession == 1);
-    if (userData?.providerProfile?.providerBusiness?.services?.length) {
-      const temp1 = [],
-        temp2 = [];
-      userData?.providerProfile?.providerBusiness?.services?.map((item) => {
-        const list = sessionRateDetails?.filter(
-          (x) => x.servicecode == item.code
-        );
-        list?.map((listItem) => {
-          let sessioncharges = "";
-          let sessiontime = "";
-          let monthcharges = "";
-          let monthtime = "";
-          sessioncharges =
-            listItem?.sessioncharges !== "0" ? listItem?.sessioncharges : "";
-          sessiontime =
-            listItem?.sessiontime !== "0" ? listItem?.sessiontime : "";
-          monthcharges =
-            listItem?.monthcharges !== "0" ? listItem?.monthcharges : "";
-          monthtime = listItem?.monthtime !== "0" ? listItem?.monthtime : "";
-          if (sessioncharges) {
-            temp1.push({
-              serviceName: item.service,
-              serviceCode: item.code,
-              sessioncharges,
-              sessiontime,
-            });
+    const isPerSession = !!ProviderSession?.ispersession;
+    const isPerMonth = !!ProviderSession?.ispermonth;
+    setPerSession(isPerSession);
+    setPerMonth(isPerMonth);
+    const services = userData?.providerProfile?.providerBusiness?.services;
+    if (services?.length) {
+      const { perSession, perMonth } = services.reduce(
+        (acc, { code: serviceCode, service: serviceName }) => {
+          const matchingRates =
+            sessionRateDetails?.filter((x) => x.servicecode === serviceCode) ||
+            [];
+
+          if (matchingRates.length) {
+            matchingRates.forEach(
+              ({ sessioncharges, sessiontime, monthcharges, monthtime }) => {
+                if (sessioncharges !== "0")
+                  acc.perSession.push({
+                    serviceName,
+                    serviceCode,
+                    sessioncharges,
+                    sessiontime,
+                  });
+                if (monthcharges !== "0")
+                  acc.perMonth.push({
+                    serviceName,
+                    serviceCode,
+                    monthcharges,
+                    monthtime,
+                  });
+              }
+            );
+          } else {
+            if (isPerSession)
+              acc.perSession.push({
+                serviceName,
+                serviceCode,
+                sessioncharges: "",
+                sessiontime: "",
+              });
+            if (isPerMonth)
+              acc.perMonth.push({
+                serviceName,
+                serviceCode,
+                monthcharges: "",
+                monthtime: "",
+              });
           }
-          if (monthcharges) {
-            temp2.push({
-              serviceName: item.service,
-              serviceCode: item.code,
-              monthcharges,
-              monthtime,
-            });
-          }
-        });
-      });
-      setSessionData({
-        perSession: ProviderSession?.ispersession == 1 ? temp1 : [],
-        perMonth: ProviderSession?.ispermonth == 1 ? temp2 : [],
-      });
+          return acc;
+        },
+        { perSession: [], perMonth: [] }
+      );
+
+      setSessionData({ perSession, perMonth });
     }
   };
 
