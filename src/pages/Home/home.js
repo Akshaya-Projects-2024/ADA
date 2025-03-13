@@ -506,6 +506,9 @@ const Home = (props) => {
             >
               <Bell onPress={() => props.navigation.navigate("notification")} />
               <TouchableButtonWithPermission
+                customMsgForRegistration={
+                  "Complete your Registration and Subscribe to the app to create new topics."
+                }
                 onPress={() => props.navigation.navigate("createEvent")}
               >
                 <Event style={{ marginLeft: moderateScale(17) }} />
@@ -559,6 +562,9 @@ const Home = (props) => {
                 </View>
                 <TouchableButtonWithPermission
                   hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
+                  customMsgForRegistration={
+                    "Complete your Registration and Subscribe to the app to create new appointments."
+                  }
                   onPress={() =>
                     handlePremiumActionPressed(() => {
                       setAppointmentVisible(true);
@@ -756,6 +762,9 @@ const Home = (props) => {
           </View>
           <View>
             <TouchableButtonWithPermission
+              customMsgForRegistration={
+                "Get Registered and subscribe to enjoy all exciting features of ADA app."
+              }
               activeOpacity={1}
               onPress={() => props.navigation.navigate("clientReview")}
               style={styles.headerView}

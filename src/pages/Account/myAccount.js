@@ -152,6 +152,7 @@ const MyAccount = (props) => {
     console.log(route);
     return (
       <TouchableButtonWithPermission
+      customMsgForRegistration={"Get Registered and subscribe to enjoy all exciting features of ADA app."}
         checkPermission={checkPermission}
         onPress={() => {
           if (route == "deleteAccount") {

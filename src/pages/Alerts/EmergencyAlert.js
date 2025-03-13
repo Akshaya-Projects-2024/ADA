@@ -347,6 +347,9 @@ const EmergencyAlert = (props) => {
 
           <View style={{ paddingVertical: moderateScale(20) }}>
             <TouchableButtonWithPermission
+              customMsgForRegistration={
+                "Complete your Registration and Subscribe to the app to create new alerts."
+              }
               useButton={true}
               title="Submit"
               onPress={() => onSubmit()}

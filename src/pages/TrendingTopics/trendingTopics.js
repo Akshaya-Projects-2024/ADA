@@ -48,21 +48,23 @@ const TrendingTopics = (props) => {
     let res = await getMyTopics(obj);
     if (res?.data?.data) {
       let dataArray = res?.data?.data?.SearchResult;
-      if(dataArray?.length){
+      if (dataArray?.length) {
         const firstFiveObjects = dataArray?.slice(0, 5);
         setTrendingTopics(firstFiveObjects);
         if (dataArray?.length > 5) {
           setTopicList(dataArray);
         }
       }
-      
     }
     contextValue?.setLoader(false);
   };
 
   const renderItem = ({ item, index }) => {
     return (
-      <TouchableOpacity
+      <TouchableButtonWithPermission
+      customMsgForRegistration={
+        "Get Registered and subscribe to enjoy all exciting features of ADA app."
+      }
         onPress={() =>
           props.navigation.navigate("trendDetail", { selectedData: item })
         }
@@ -120,13 +122,16 @@ const TrendingTopics = (props) => {
             {item?.author}
           </Text>
         </View>
-      </TouchableOpacity>
+      </TouchableButtonWithPermission>
     );
   };
 
   const renderDataItem = ({ item, onPress }) => {
     return (
       <TouchableButtonWithPermission
+        customMsgForRegistration={
+          "Get Registered and subscribe to enjoy all exciting features of ADA app."
+        }
         onPress={() =>
           props.navigation.navigate("trendDetail", { selectedData: item })
         }
@@ -305,6 +310,9 @@ const TrendingTopics = (props) => {
             </View>
 
             <TouchableButtonWithPermission
+              customMsgForRegistration={
+                "Complete your Registration and Subscribe to the app to create new topics."
+              }
               onPress={() =>
                 props.navigation.navigate("auth", {
                   screen: "newTopic",

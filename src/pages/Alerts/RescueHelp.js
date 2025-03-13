@@ -38,6 +38,7 @@ import { AddLostPetAlert } from "../../redux-store/actions/alerts";
 import { err } from "react-native-svg";
 import { goBack } from "../../navigations/rootNavigationRef";
 import { contextValue } from "../../components/Loader";
+import { validateInput } from "../../utils/validation";
 
 const RescueHelp = (props) => {
   const [selectedGender, setSelectedGender] = useState(null);
@@ -69,7 +70,7 @@ const RescueHelp = (props) => {
   };
 
   const handlePetImg = async (image) => {
-    contextValue?.setLoader(true)
+    contextValue?.setLoader(true);
     const extension = image?.fileName?.split(".").pop();
     const userId = await decryptService("userId");
     let payload = {
@@ -92,11 +93,11 @@ const RescueHelp = (props) => {
         const dataId = [...petId];
         dataId.push({ id: res?.data?.data?.reqId });
         setPetId(dataId);
-        contextValue?.setLoader(false)
+        contextValue?.setLoader(false);
         showToast("success", "Successfully uploaded the image");
       }
     } catch (error) {
-      contextValue?.setLoader(false)
+      contextValue?.setLoader(false);
       showToast("error", error.message);
     }
   };
@@ -111,7 +112,7 @@ const RescueHelp = (props) => {
 
   const shareImageBase64 = async (image, platforms = []) => {
     try {
-      contextValue?.setLoader(false)
+      contextValue?.setLoader(false);
       for (const platform of platforms) {
         if (platform == "FACEBOOK") {
           const shareData = {
@@ -162,10 +163,12 @@ const RescueHelp = (props) => {
         showToast("error", "Please enter help description");
       } else if (!contactNo) {
         showToast("error", "Please enter contact No");
+      } else if (validateInput(contactNo) == "invalid") {
+        showToast("error", "Please enter valid mobile number");
       } else if (!agree) {
         showToast("error", "Please select the terms and condition");
       } else {
-        contextValue?.setLoader(true)
+        contextValue?.setLoader(true);
         const currentPosition = await getCurrentLocation();
         let obj = {
           userid: await decryptService("userId"),
@@ -192,7 +195,7 @@ const RescueHelp = (props) => {
         }
       }
     } catch (error) {
-      contextValue?.setLoader(false)
+      contextValue?.setLoader(false);
       console.log("err", error);
     }
   };

@@ -38,6 +38,7 @@ import { AddLostPetAlert } from "../../redux-store/actions/alerts";
 import { err } from "react-native-svg";
 import { goBack } from "../../navigations/rootNavigationRef";
 import { contextValue } from "../../components/Loader";
+import { validateInput } from "../../utils/validation";
 
 const MedicalHelp = (props) => {
   const [selectedGender, setSelectedGender] = useState(null);
@@ -161,6 +162,8 @@ const MedicalHelp = (props) => {
         showToast("error", "Please enter help description");
       } else if (!contactNo) {
         showToast("error", "Please enter contact No");
+      } else if (validateInput(contactNo) == "invalid") {
+        showToast("error", "Please enter valid mobile number");
       } else if (!agree) {
         showToast("error", "Please select the terms and condition");
       } else {

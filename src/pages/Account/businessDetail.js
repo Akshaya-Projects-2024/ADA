@@ -114,7 +114,7 @@ const BusinessDetail = (props) => {
       showToast("error", "Please enter Business name or person name");
     } else if (!isValidName(businessValue)) {
       showToast("error", "Please enter valid business name");
-    } else if (!selectedServiceProvider) {
+    } else if (!selectedServiceProvider || selectedServiceProvider?.length == 0) {
       showToast("error", "Please select service provider role");
     } else if (selectedServiceProvider?.some(item => item.label == "Other" && !isValidName(serviceProviderForOther))) {
       showToast("error", "Please enter valid service provider role");
@@ -140,7 +140,6 @@ const BusinessDetail = (props) => {
           others:selectedServiceProvider?.some(item => item.label == "Other") ? serviceProviderForOther : "",
           ...(providerBusiness?.id ? { id: providerBusiness?.id } : {}),
         };
-        console.log("formattedServices",formattedServices)
         const res = await saveBusinessDetails(postData);
         if (res?.data?.status_code == 200) {
           if (route === "myprofile") {

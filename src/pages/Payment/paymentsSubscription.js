@@ -473,6 +473,9 @@ const PaymentsSubscription = (props) => {
             {!userAlreadySubscribed.current && (
               <View style={[styles.btnView, { paddingTop: moderateScale(20) }]}>
                 <TouchableButtonWithPermission
+                  customMsgForRegistration={
+                    "Get Registered and subscribe to enjoy all exciting features of ADA app."
+                  }
                   useButton={true}
                   onPress={handlePayment}
                   title={Strings.payNow}

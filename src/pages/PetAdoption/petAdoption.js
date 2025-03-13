@@ -136,6 +136,9 @@ const PetAdoption = (props) => {
   const renderItem = ({ item }) => {
     return (
       <TouchableButtonWithPermission
+      customMsgForRegistration={
+        "Get Registered and subscribe to enjoy all exciting features of ADA app."
+      }
         onPress={() => handlePremiumActionPressed(item)}
         style={{
           borderWidth: 1,
