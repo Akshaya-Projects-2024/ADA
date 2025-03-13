@@ -19,17 +19,25 @@ const TouchableButtonWithPermission = ({
     if (checkPermission) {
       console.log(userData?.providerProfile?.subscription);
       if (userData?.logindetails?.providerstatus === "PENDING") {
-        setTitle(Strings.approvalAlertForRegistration);
+        setTitle(
+          customMsgForRegistration
+            ? customMsgForRegistration
+            : Strings.approvalAlertForRegistration
+        );
       } else if (
         userData?.logindetails?.providerstatus === "AAPPROVALPENDING"
       ) {
-        setTitle(Strings.approvaltError);
+        setTitle(
+          customMsgForApproval ? customMsgForApproval : Strings.approvaltError
+        );
       } else if (
         checkPayment &&
         userData?.logindetails?.providerstatus === "APPROVED" &&
         userData?.providerProfile?.subscription?.status !== "active"
       ) {
-        setTitle(Strings.paymentError);
+        setTitle(
+          customMsgForPayment ? customMsgForPayment : Strings.paymentError
+        );
       } else {
         rest?.onPress?.();
       }

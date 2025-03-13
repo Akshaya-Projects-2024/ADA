@@ -492,8 +492,9 @@ const Home = (props) => {
                 numberOfLines={1}
               >
                 {`Hi ${
-                  profile?.providerProfile?.providerBusiness?.name ??
-                  Strings.guest
+                  profile?.providerProfile?.providerBusiness?.name
+                    ? profile?.providerProfile?.providerBusiness?.name
+                    : Strings.guest
                 }`}
               </Text>
             </View>
