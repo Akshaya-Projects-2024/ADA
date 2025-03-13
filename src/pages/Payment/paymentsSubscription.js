@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -28,11 +28,12 @@ import RazorpayCheckout from "react-native-razorpay";
 import { getProfile } from "../../redux-store/actions/auth";
 import { dispatchUserData } from "../../redux-store/actions/registerAction";
 import { validateServiceProfile } from "../../utils/userUtils";
-import {  validArray, validObject } from "../../utils/utils";
+import { validArray, validObject } from "../../utils/utils";
 import SubscriptionError from "./subscriptionError";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
 import Logo from "../../assets/images/roundIcon.png";
+import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 
 const PaymentsSubscription = (props) => {
   const dispatch = useDispatch();
@@ -44,6 +45,10 @@ const PaymentsSubscription = (props) => {
   const [subscriptionData, setSubscriptionData] = useState();
   const [subscriptionDetails, setSubscriptionDetails] = useState();
   const profile = useSelector((state) => state?.commonReducer);
+  const userAlreadySubscribed = useRef(
+    profile?.providerProfile?.subscription?.subscriptioncode &&
+      profile?.providerProfile?.subscription?.status === "active"
+  );
 
   useEffect(() => {
     initData();
@@ -188,7 +193,7 @@ const PaymentsSubscription = (props) => {
     try {
       const userData = await getUserData();
       const options = {
-        image: 'https://d2jswhakxkta9i.cloudfront.net/logos/logo.png', //roundIcon.png
+        image: "https://d2jswhakxkta9i.cloudfront.net/logos/logo.png", //roundIcon.png
         currency: subscriptionDetails?.currency,
         key: "rzp_test_PECnHmfOdkRLhw", // Replace with your Razorpay Key ID
         amount: subscriptionDetails?.amount,
@@ -296,7 +301,20 @@ const PaymentsSubscription = (props) => {
               <ArrowRight />
             </TouchableOpacity>
           </View> */}
-            <Text style={styles.joinTheFunText}>{Strings.joinTheFun}</Text>
+            <Text
+              style={[
+                styles.joinTheFunText,
+                {
+                  color: userAlreadySubscribed.current
+                    ? THEMES.colors.cyan
+                    : THEMES.colors.black,
+                },
+              ]}
+            >
+              {userAlreadySubscribed.current
+                ? Strings.youAreAlreadySubscribed
+                : Strings.joinTheFun}
+            </Text>
 
             <View style={styles.rowContainer}>
               <ScrollView
@@ -314,6 +332,7 @@ const PaymentsSubscription = (props) => {
                       return (
                         <View key={plan?.id}>
                           <TouchableOpacity
+                            disabled={userAlreadySubscribed.current}
                             style={[
                               styles.card,
                               selectedCard?.id === plan?.id
@@ -450,22 +469,16 @@ const PaymentsSubscription = (props) => {
                 {Strings.viewBreakup}
               </Text>
             </View>
-            <View style={[styles.btnView, { paddingTop: moderateScale(20) }]}>
-              <Button
-                onPress={
-                  profile?.providerProfile?.subscription?.subscriptioncode &&
-                  profile?.providerProfile?.subscription?.status === "active"
-                    ? handleSubscriptionSuccess
-                    : handlePayment
-                }
-                title={
-                  profile?.providerProfile?.subscription?.subscriptioncode &&
-                  profile?.providerProfile?.subscription?.status === "active"
-                    ? Strings.goToDashboard
-                    : Strings.payNow
-                }
-              />
-            </View>
+            {!userAlreadySubscribed.current && (
+              <View style={[styles.btnView, { paddingTop: moderateScale(20) }]}>
+                <TouchableButtonWithPermission
+                  useButton={true}
+                  onPress={handlePayment}
+                  title={Strings.payNow}
+                  checkPayment={false}
+                />
+              </View>
+            )}
           </View>
           <Modal
             isVisible={isModalVisible}

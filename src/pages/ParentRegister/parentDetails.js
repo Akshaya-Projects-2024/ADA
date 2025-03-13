@@ -164,7 +164,7 @@ const ParentDetails = (props) => {
       showToast("error", "Please enter address");
     } else if (!pinCode) {
       showToast("error", "Please enter pincode");
-    } else if (!validateIndianPostalCode(postalCode)) {
+    } else if (!validateIndianPostalCode(pinCode)) {
       showToast("error", "Please enter valid postal code");
     } else {
       try {

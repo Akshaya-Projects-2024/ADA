@@ -24,6 +24,7 @@ import { getBase64Obj } from "../../utils/documentUtils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { findDifferenceByDays } from "../../utils/utils";
 import { contextValue } from "../../components/Loader";
+import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 
 const TrendingTopics = (props) => {
   const { colors, fontFamily, fonts } = THEMES;
@@ -125,7 +126,7 @@ const TrendingTopics = (props) => {
 
   const renderDataItem = ({ item, onPress }) => {
     return (
-      <TouchableOpacity
+      <TouchableButtonWithPermission
         onPress={() =>
           props.navigation.navigate("trendDetail", { selectedData: item })
         }
@@ -150,7 +151,7 @@ const TrendingTopics = (props) => {
             </Text>
           </View>
         </View>
-      </TouchableOpacity>
+      </TouchableButtonWithPermission>
     );
   };
 
@@ -303,7 +304,7 @@ const TrendingTopics = (props) => {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
+            <TouchableButtonWithPermission
               onPress={() =>
                 props.navigation.navigate("auth", {
                   screen: "newTopic",
@@ -319,7 +320,7 @@ const TrendingTopics = (props) => {
               }}
             >
               <Plus stroke={"#fff"} />
-            </TouchableOpacity>
+            </TouchableButtonWithPermission>
           </View>
 
           {topicList?.length || trendingTopics?.length ? (

@@ -167,7 +167,10 @@ const Strings = {
     "All appointments scheduled on the selected holiday will be automatically canceled.",
   appointmentConfirm: "Appointment has been accepted",
   deleteAcccount:"Are you sure you want to delete this account?",
-  logoutAccount:"Are you sure you want to logout?"
+  logoutAccount:"Are you sure you want to logout?",
+  approvalAlertForRegistration:
+  "Complete your Registration and Subscribe to the app to access amazing features.",
+  youAreAlreadySubscribed: "You are already subscribed."
 };
 
 export default Strings;

@@ -22,6 +22,7 @@ import { useSelector } from "react-redux";
 import { showToast } from "../../utils/utils";
 import CheckBox from "react-native-check-box";
 import { LoginModules } from "../../constants/enums";
+import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 
 const EmergencyAlert = (props) => {
   const [agree, setAgree] = useState(false);
@@ -48,7 +49,7 @@ const EmergencyAlert = (props) => {
     }
   }, []);
 
-  onSubmit = () => {
+  const onSubmit = () => {
     if (!alertType) {
       showToast("error", "Please select the alert type");
     } else if (!type && !provider) {
@@ -79,7 +80,7 @@ const EmergencyAlert = (props) => {
           props.navigation.navigate("otherRescueHelpAlert");
         }
       }
-      setAgree(false)
+      setAgree(false);
       setAlertType();
       setType();
     }
@@ -345,7 +346,11 @@ const EmergencyAlert = (props) => {
           </View> */}
 
           <View style={{ paddingVertical: moderateScale(20) }}>
-            <Button title="Submit" onPress={() => onSubmit()}></Button>
+            <TouchableButtonWithPermission
+              useButton={true}
+              title="Submit"
+              onPress={() => onSubmit()}
+            ></TouchableButtonWithPermission>
           </View>
         </View>
       </View>

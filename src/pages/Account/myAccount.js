@@ -47,6 +47,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import HolidayMenuIcon from "../../assets/svg/HolidayMenuIcon";
 import Dialog from "../../components/Dialog";
 import { useUser } from "../../api/UserContext";
+import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 
 const MyAccount = (props) => {
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
@@ -144,24 +145,26 @@ const MyAccount = (props) => {
     title,
     addBottom,
     route,
-    showPending = false
+    showPending = false,
+    checkPermission = false
   ) => {
     const Icon = icon;
     console.log(route);
     return (
-      <TouchableOpacity
+      <TouchableButtonWithPermission
+        checkPermission={checkPermission}
         onPress={() => {
           if (route == "deleteAccount") {
             setDeleteAccountModal(true);
           } else if (route == "logout") {
             setLogoutModal(true);
           } else {
-            console.log("userData?.providerProfile?.sessionDetails",userData?.providerProfile?.sessionDetails)
             if (
-              userData?.providerProfile?.providerBusiness?.id !== 0 &&
-              userData?.providerProfile?.providerContact?.id !== 0 &&
-              userData?.providerProfile?.ProviderSession?.id !== 0 &&
-              userData?.providerProfile?.sessionDetails?.length
+              (userData?.providerProfile?.providerBusiness?.id !== 0 &&
+                userData?.providerProfile?.providerContact?.id !== 0 &&
+                userData?.providerProfile?.ProviderSession?.id !== 0 &&
+                userData?.providerProfile?.sessionDetails?.length) ||
+              title !== "My Profile"
             ) {
               props.navigation.navigate(route, { route: "myprofile" });
             } else {
@@ -188,7 +191,7 @@ const MyAccount = (props) => {
           {showPending && <Text style={styles.pendingText}>Pending</Text>}
           <RightArrow stroke={THEMES.colors.boulder} />
         </View>
-      </TouchableOpacity>
+      </TouchableButtonWithPermission>
     );
   };
   const onParentClick = () => {
@@ -218,7 +221,7 @@ const MyAccount = (props) => {
       });
     }
   };
-  
+
   return (
     <LinearGradient
       locations={[0, 0.5, 0.6]}
@@ -327,21 +330,27 @@ const MyAccount = (props) => {
                     <BottomOpenCheck stroke={THEMES.colors.california} />,
                     Strings.myBookings,
                     "",
-                    "myBookings"
+                    "myBookings",
+                    false,
+                    true
                   )}
                   {renderItem(
                     THEMES.colors.sandyBeach,
                     <HolidayMenuIcon />,
                     Strings.markHoliday,
                     "",
-                    "markHoliday"
+                    "markHoliday",
+                    false,
+                    true
                   )}
                   {renderItem(
                     THEMES.colors.hawkesBlue,
                     <Star />,
                     Strings.clientReviews,
                     "addBottom",
-                    "clientReview"
+                    "clientReview",
+                    false,
+                    true
                   )}
                 </View>
               </View>

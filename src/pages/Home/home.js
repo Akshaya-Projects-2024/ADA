@@ -53,6 +53,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUser } from "../../api/UserContext";
 import SessionsForAppointment from "../../components/SessionsForAppointment";
 import { SESSION_TYPE } from "../Services/selectAppointment";
+import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 
 const Home = (props) => {
   const { top } = useSafeAreaInsets();
@@ -360,7 +361,7 @@ const Home = (props) => {
     });
   };
   console.log(userData);
-  
+
   const handleAttended = async () => {
     try {
       contextValue?.setLoader(true);
@@ -491,9 +492,8 @@ const Home = (props) => {
                 numberOfLines={1}
               >
                 {`Hi ${
-                  guestUser
-                    ? Strings.guest
-                    : profile?.providerProfile?.providerBusiness?.name
+                  profile?.providerProfile?.providerBusiness?.name ??
+                  Strings.guest
                 }`}
               </Text>
             </View>
@@ -505,14 +505,11 @@ const Home = (props) => {
               }}
             >
               <Bell onPress={() => props.navigation.navigate("notification")} />
-              <Event
-                onPress={() =>
-                  handlePremiumActionPressed(() =>
-                    props.navigation.navigate("createEvent")
-                  )
-                }
-                style={{ marginLeft: moderateScale(17) }}
-              />
+              <TouchableButtonWithPermission
+                onPress={() => props.navigation.navigate("createEvent")}
+              >
+                <Event style={{ marginLeft: moderateScale(17) }} />
+              </TouchableButtonWithPermission>
             </View>
           </View>
           <View
@@ -560,7 +557,7 @@ const Home = (props) => {
                   </Text>
                   <Right />
                 </View>
-                <TouchableOpacity
+                <TouchableButtonWithPermission
                   hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
                   onPress={() =>
                     handlePremiumActionPressed(() => {
@@ -578,7 +575,7 @@ const Home = (props) => {
                   }}
                 >
                   <Plus stroke={THEMES.colors.white} />
-                </TouchableOpacity>
+                </TouchableButtonWithPermission>
               </View>
               <View style={{ paddingTop: moderateScale(23) }}>
                 <View
@@ -758,7 +755,7 @@ const Home = (props) => {
             </Text>
           </View>
           <View>
-            <TouchableOpacity
+            <TouchableButtonWithPermission
               activeOpacity={1}
               onPress={() => props.navigation.navigate("clientReview")}
               style={styles.headerView}
@@ -816,7 +813,7 @@ const Home = (props) => {
                   />
                 </View>
               </View>
-            </TouchableOpacity>
+            </TouchableButtonWithPermission>
           </View>
         </ScrollView>
       </View>

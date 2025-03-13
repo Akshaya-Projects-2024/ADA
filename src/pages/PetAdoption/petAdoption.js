@@ -30,6 +30,7 @@ import SearchIcon from "../../assets/svg/search.svg";
 import { useDebounce } from "../../hooks/useDebounce";
 import ProfileDummy from "../../assets/svg/user.svg";
 import Dialog from "../../components/Dialog";
+import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 
 const PetAdoption = (props) => {
   const [data, setData] = useState([]);
@@ -120,21 +121,21 @@ const PetAdoption = (props) => {
   };
 
   const handlePremiumActionPressed = (item) => {
-    if (loggedInModule === LoginModules.parent || paymentCompleted?.flag) {
+    // if (loggedInModule === LoginModules.parent || paymentCompleted?.flag) {
       props.navigation.navigate("auth", {
         screen: "adoptionDetail",
         params: {
           selectedData: item,
         },
       });
-    } else {
-      setPaymentModal(true);
-    }
+    // } else {
+    //   setPaymentModal(true);
+    // }
   };
 
   const renderItem = ({ item }) => {
     return (
-      <TouchableOpacity
+      <TouchableButtonWithPermission
         onPress={() => handlePremiumActionPressed(item)}
         style={{
           borderWidth: 1,
@@ -209,7 +210,7 @@ const PetAdoption = (props) => {
             {item.breed} | {item.location}
           </Text>
         </View>
-      </TouchableOpacity>
+      </TouchableButtonWithPermission>
     );
   };
 
