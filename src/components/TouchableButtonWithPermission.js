@@ -10,6 +10,9 @@ const TouchableButtonWithPermission = ({
   useButton = false,
   checkPermission = true,
   children,
+  customMsgForRegistration = "",
+  customMsgForApproval = "",
+  customMsgForPayment = "",
   ...rest
 }) => {
   const { userData } = useUser();
