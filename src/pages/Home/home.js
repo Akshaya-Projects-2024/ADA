@@ -79,6 +79,7 @@ const Home = (props) => {
   const [clientName, setClientName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const { userData, apiInitCall } = useUser();
+  const [modal, setModal] = useState(false);
 
   const handleSubmit = async (
     selectedDate,
@@ -436,7 +437,14 @@ const Home = (props) => {
       selectedItem: selectedItem,
     });
   };
-  console.log("userData", userData);
+
+  const handleSwitch = () => {
+    if (profile?.parentProfie?.parentContact?.id) {
+      switchProfile();
+    } else {
+      setModal(true);
+    }
+  };
 
   return (
     <LinearGradient
@@ -467,7 +475,7 @@ const Home = (props) => {
             <View style={{ width: "20%" }}>
               <Toggle
                 state={loggedInModule === LoginModules.provider}
-                onPress={switchProfile}
+                onPress={handleSwitch}
               />
               {/* <SwitchIcon /> */}
             </View>
@@ -1062,6 +1070,18 @@ const Home = (props) => {
         }}
         onClose={() => {
           setPaymentModal(false);
+        }}
+      />
+      <Dialog
+        flag={modal}
+        title={"Info"}
+        description={"Do you want to continue as Pet Parent?"}
+        rightButtonText="Yes"
+        leftButtonText="Close"
+        leftButtonPressed={() => setModal(false)}
+        rightButtonPressed={switchProfile}
+        onClose={() => {
+          setModal(false);
         }}
       />
     </LinearGradient>

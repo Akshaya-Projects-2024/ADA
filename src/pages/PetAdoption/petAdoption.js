@@ -20,7 +20,6 @@ import { getAdoption } from "../../redux-store/actions/auth";
 import { showToast, validArray } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
 import { useIsFocused } from "@react-navigation/native";
-import { getBase64Obj } from "../../utils/documentUtils";
 import CrossIcon from "../../assets/svg/CrossIcon";
 import { useSelector } from "react-redux";
 import { ApprovalStatus, LoginModules } from "../../constants/enums";
@@ -109,7 +108,6 @@ const PetAdoption = (props) => {
       }
       contextValue?.setLoader(false);
     } catch (error) {
-      console.log("🚀 ~ initData ~ error:", error);
       contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
@@ -122,12 +120,12 @@ const PetAdoption = (props) => {
 
   const handlePremiumActionPressed = (item) => {
     // if (loggedInModule === LoginModules.parent || paymentCompleted?.flag) {
-      props.navigation.navigate("auth", {
-        screen: "adoptionDetail",
-        params: {
-          selectedData: item,
-        },
-      });
+    props.navigation.navigate("auth", {
+      screen: "adoptionDetail",
+      params: {
+        selectedData: item,
+      },
+    });
     // } else {
     //   setPaymentModal(true);
     // }
@@ -136,9 +134,9 @@ const PetAdoption = (props) => {
   const renderItem = ({ item }) => {
     return (
       <TouchableButtonWithPermission
-      customMsgForRegistration={
-        "Get Registered and subscribe to enjoy all exciting features of ADA app."
-      }
+        customMsgForRegistration={
+          "Get Registered and subscribe to enjoy all exciting features of ADA app."
+        }
         onPress={() => handlePremiumActionPressed(item)}
         style={{
           borderWidth: 1,
@@ -224,12 +222,12 @@ const PetAdoption = (props) => {
           style={{
             color: "#000",
             fontSize: moderateScale(16),
-            marginHorizontal:moderateScale(10),
+            marginHorizontal: moderateScale(10),
             fontWeight: 500,
-            textAlign:'center'
+            textAlign: "center",
           }}
         >
-         Hey, No pet for adoption.Hope everyone got their home
+          Hey, No pet for adoption.Hope everyone got their home
         </Text>
       </View>
     );
@@ -311,7 +309,7 @@ const PetAdoption = (props) => {
                 </View>
 
                 {loggedInModule === LoginModules.parent && !guestUser ? (
-                  <TouchableOpacity
+                  <TouchableButtonWithPermission
                     onPress={() =>
                       props.navigation.navigate("auth", {
                         screen: "addAdoption",
@@ -330,7 +328,7 @@ const PetAdoption = (props) => {
                     }}
                   >
                     <Plus stroke={"#EC559C"} />
-                  </TouchableOpacity>
+                  </TouchableButtonWithPermission>
                 ) : null}
               </View>
 

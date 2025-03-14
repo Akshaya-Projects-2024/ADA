@@ -58,14 +58,18 @@ const Splash = (props) => {
 
   useEffect(() => {
     if (isFocused) {
-      dispatch(getServiceProviderRole());
       checkIfUserExits();
+      dispatch(getServiceProviderRole());
     }
   }, [isFocused, checkIfUserExits, dispatch]);
 
   useEffect(async () => {
-    const res = await getCurrentLocation();
+    fetchLocation();
   }, []);
+
+  const fetchLocation = async () => {
+    const location = await getCurrentLocation();
+  };
 
   const initData = useCallback(() => {
     return new Promise(async (resolve) => {
@@ -79,11 +83,41 @@ const Splash = (props) => {
         }
         resolve(response?.data?.data ? response?.data?.data : false);
       } catch (error) {
-        console.log("err111", error);
         resolve(false);
       }
     });
   }, [dispatch]);
+
+  const navigateToHome = () => {
+    delay(() =>
+      props.navigation.reset({
+        index: 0,
+        routes: [
+          {
+            name: "auth",
+            state: {
+              routes: [
+                {
+                  name: "home",
+                },
+              ],
+            },
+          },
+        ],
+      })
+    );
+  };
+
+  const navigateToParentApp = () =>
+    delay(() =>
+      props.navigation.reset({
+        index: 0,
+        routes: [{ name: "petParentAppStack" }],
+      })
+    );
+
+  const navigateToAuth = (screen) =>
+    delay(() => props.navigation.navigate("auth", { screen }));
 
   const checkIfUserExits = useCallback(async () => {
     const data = await decryptService("accessToken");
@@ -94,30 +128,9 @@ const Splash = (props) => {
       const validProviderProfile = validateServiceProfile(userData); //pass true as an argument for testing purpose till payment part is done
       if (validProfile?.flag && validProviderProfile?.flag) {
         if (loggedInModule && loggedInModule === LoginModules.parent) {
-          delay(() =>
-            props.navigation.reset({
-              index: 0,
-              routes: [{ name: "petParentAppStack" }],
-            })
-          );
+          navigateToParentApp();
         } else {
-          delay(() =>
-            props.navigation.reset({
-              index: 0,
-              routes: [
-                {
-                  name: "auth",
-                  state: {
-                    routes: [
-                      {
-                        name: "home",
-                      },
-                    ],
-                  },
-                },
-              ],
-            })
-          );
+          navigateToHome();
         }
       } else if (
         !validProfile?.flag &&
@@ -127,53 +140,16 @@ const Splash = (props) => {
       ) {
         delay(() => props?.navigation.replace("auth"));
       } else if (validProviderProfile?.flag) {
-        delay(() =>
-          props.navigation.reset({
-            index: 0,
-            routes: [
-              {
-                name: "auth",
-                state: {
-                  routes: [
-                    {
-                      name: "home",
-                    },
-                  ],
-                },
-              },
-            ],
-          })
-        );
+        navigateToHome();
       } else if (validProfile?.flag) {
-        delay(() =>
-          props.navigation.reset({
-            index: 0,
-            routes: [{ name: "petParentAppStack" }],
-          })
-        );
+        navigateToParentApp();
       } else if (
         !validProviderProfile?.flag &&
         validProviderProfile?.partiallyCompleted
       ) {
         const val = await decryptService("isRegisterLater");
         if (val) {
-          delay(() =>
-            props.navigation.reset({
-              index: 0,
-              routes: [
-                {
-                  name: "auth",
-                  state: {
-                    routes: [
-                      {
-                        name: "home",
-                      },
-                    ],
-                  },
-                },
-              ],
-            })
-          );
+          navigateToHome();
         } else {
           showToast("error", "Please complete your registration");
           delay(() =>
@@ -183,11 +159,13 @@ const Splash = (props) => {
           );
         }
       } else if (!validProfile?.flag && validProfile?.partiallyCompleted) {
-        delay(() =>
-          props.navigation.navigate(validProfile?.navigateTo, {
-            route: "parentAccount",
-          })
+        const isRegisterLater = await decryptService(
+          "isPetParentRegisterLater"
         );
+        return isRegisterLater
+          ? navigateToParentApp()
+          : (showToast("error", "Please complete your registration"),
+            navigateToAuth(validProfile?.navigateTo));
       } else {
         delay(() => props?.navigation.replace("auth"));
       }

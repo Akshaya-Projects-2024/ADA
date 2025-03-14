@@ -4,6 +4,8 @@ import { useUser } from "../api/UserContext";
 import Strings from "../constants/strings";
 import Dialog from "./Dialog";
 import Button from "./Button";
+import { useSelector } from "react-redux";
+import { LoginModules } from "../constants/enums";
 
 const TouchableButtonWithPermission = ({
   checkPayment = true,
@@ -15,28 +17,35 @@ const TouchableButtonWithPermission = ({
   customMsgForPayment = "",
   ...rest
 }) => {
+  const { loggedInModule } = useSelector((state) => state?.register);
   const { userData } = useUser();
   const [title, setTitle] = useState("");
+  const isServiceProvider = loggedInModule === LoginModules.provider;
 
   const handlePress = async () => {
     if (checkPermission) {
-      console.log(userData?.providerProfile?.subscription);
-      if (userData?.logindetails?.providerstatus === "PENDING") {
+      const registrationStatus =
+        userData?.logindetails?.[
+          isServiceProvider ? "providerstatus" : "parentstatus"
+        ];
+      const paymentStatus =
+        userData?.[isServiceProvider ? "providerProfile" : "parentProfie"]
+          ?.subscription?.status;
+
+      if (registrationStatus === "PENDING") {
         setTitle(
           customMsgForRegistration
             ? customMsgForRegistration
             : Strings.approvalAlertForRegistration
         );
-      } else if (
-        userData?.logindetails?.providerstatus === "AAPPROVALPENDING"
-      ) {
+      } else if (registrationStatus === "AAPPROVALPENDING") {
         setTitle(
           customMsgForApproval ? customMsgForApproval : Strings.approvaltError
         );
       } else if (
         checkPayment &&
-        userData?.logindetails?.providerstatus === "APPROVED" &&
-        userData?.providerProfile?.subscription?.status !== "active"
+        registrationStatus === "APPROVED" &&
+        paymentStatus !== "active"
       ) {
         setTitle(
           customMsgForPayment ? customMsgForPayment : Strings.paymentError
@@ -48,7 +57,6 @@ const TouchableButtonWithPermission = ({
       rest?.onPress?.();
     }
   };
-  console.log(userData);
 
   return (
     <>

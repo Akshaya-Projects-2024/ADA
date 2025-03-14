@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -42,6 +42,9 @@ import { deleteAccountApi } from "../../redux-store/actions/auth";
 import { resetNavigation } from "../../navigations/rootNavigationRef";
 import { showToast } from "../../utils/utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Dialog from "../../components/Dialog";
+import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
+import { decryptService } from "../../utils/storageFunc";
 
 const MenuItem = ({
   bgColor,
@@ -118,8 +121,10 @@ const handleDeleteAccount = async () => {
     };
     let res = await deleteAccountApi(obj);
     if (res?.data?.status_code == 200) {
-      handleLogout();
-      resetNavigation("app");
+      setTimeout(() => {
+        handleLogout();
+        resetNavigation("app");
+      }, 300);
     } else {
       showToast("Error", "Something went wrong!! Please try again later.");
     }
@@ -142,6 +147,7 @@ const handleLogout = async () => {
 const ParentAccount = (props) => {
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const profile = useSelector((state) => state?.commonReducer);
+  const [modal, setModal] = useState(false);
 
   const renderItem = (
     bgColor,
@@ -149,11 +155,13 @@ const ParentAccount = (props) => {
     title,
     addBottom,
     route,
-    showPending = false
+    showPending = false,
+    checkPermission = false
   ) => {
     const Icon = icon;
     return (
-      <TouchableOpacity
+      <TouchableButtonWithPermission
+        checkPermission={checkPermission}
         onPress={() => {
           if (route == "deleteAccount") {
             deleteAccountMethod();
@@ -182,7 +190,7 @@ const ParentAccount = (props) => {
 
           <RightArrow stroke={THEMES.colors.boulder} />
         </View>
-      </TouchableOpacity>
+      </TouchableButtonWithPermission>
     );
   };
 
@@ -231,6 +239,14 @@ const ParentAccount = (props) => {
     return validParentProfile?.flag;
   }, [profile]);
 
+  const handleSwitch = () => {
+    if (profile?.providerProfile?.providerBusiness?.id) {
+      switchProfile();
+    } else {
+      setModal(true);
+    }
+  };
+
   return (
     <LinearGradient
       locations={[0, 0.5, 0.6]}
@@ -242,7 +258,7 @@ const ParentAccount = (props) => {
           customIcon={
             <Toggle
               state={loggedInModule === LoginModules.provider}
-              onPress={switchProfile}
+              onPress={handleSwitch}
             />
           }
           // showBack
@@ -290,9 +306,9 @@ const ParentAccount = (props) => {
               </View>
               <View style={styles.nameView}>
                 <Text style={styles.nameText}>
-                  {guestUser
-                    ? Strings.guest
-                    : profile?.parentProfie?.parentContact?.name}
+                  {profile?.parentProfie?.parentContact?.name
+                    ? profile?.parentProfie?.parentContact?.name
+                    : Strings.guest}
                 </Text>
                 <Text style={styles.premiumMemberText}>
                   {guestUser ? Strings.guestUser : Strings.premiumMemmber}
@@ -304,18 +320,22 @@ const ParentAccount = (props) => {
                     bgColor={THEMES.colors.lightCyan}
                     icon={<ProfileImg />}
                     title={Strings.myProfile}
-                    showPending={guestUser || !profileStatus}
-                    onPress={() =>
-                      props.navigation.navigate("parentDetails", {
-                        route: "parentAccount",
-                      })
-                    }
+                    showPending={!profileStatus}
+                    onPress={() => {
+                      if (profileStatus) {
+                        props.navigation.navigate("parentDetails", {
+                          route: "parentAccount",
+                        });
+                      } else {
+                        props.navigation.navigate("parentDetails");
+                      }
+                    }}
                   />
                   <MenuItem
                     bgColor={THEMES.colors.zanah}
                     icon={<PawPrint />}
                     title={Strings.myPetProfile}
-                    showPending={guestUser || !profileStatus}
+                    showPending={!profileStatus}
                     onPress={() =>
                       props.navigation.navigate("petDetail", {
                         route: "parentAccount",
@@ -339,14 +359,18 @@ const ParentAccount = (props) => {
                     <BottomOpenCheck stroke={THEMES.colors.california} />,
                     Strings.myBookings,
                     "",
-                    "myBookings"
+                    "myBookings",
+                    false,
+                    true
                   )}
                   {renderItem(
                     THEMES.colors.hawkesBlue,
                     <Star />,
                     "Reviews",
                     "addBottom",
-                    "parentReviews"
+                    "parentReviews",
+                    false,
+                    true
                   )}
                   {/* {renderItem(
                     THEMES.colors.peach,
@@ -442,6 +466,18 @@ const ParentAccount = (props) => {
             </View>
           </View>
         </ScrollView>
+        <Dialog
+          flag={modal}
+          title={"Info"}
+          description={"Do you want to continue as Service Provider?"}
+          rightButtonText="Yes"
+          leftButtonText="Close"
+          leftButtonPressed={() => setModal(false)}
+          rightButtonPressed={switchProfile}
+          onClose={() => {
+            setModal(false);
+          }}
+        />
       </SafeAreaView>
     </LinearGradient>
   );

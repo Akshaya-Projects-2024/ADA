@@ -25,12 +25,11 @@ const RoleSelection = (props) => {
   const [selected, setSelected] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
-  const onLaterPressed = () => {
-    encryptService("isRegisterLater", true);
+  const onLaterPressed = (type) => {
     dispatch(dispathGuestUser(true));
     setModalVisible(false);
     setTimeout(() => {
-      if (selected === "service") {
+      if (type === "service") {
         props.navigation.reset({
           index: 0,
           routes: [
@@ -120,11 +119,13 @@ const RoleSelection = (props) => {
             <TouchableOpacity
               style={{ alignItems: "center" }}
               onPress={async () => {
-                const val = await decryptService("isRegisterLater");
-                if (val !== undefined) {
-                  setModalVisible(true);
-                }
                 setSelected("parent");
+                const val = await decryptService("isPetParentRegisterLater");
+                if (val == undefined) {
+                  setModalVisible(true);
+                } else {
+                  onLaterPressed("parent");
+                }
               }}
             >
               <Image
@@ -181,9 +182,11 @@ const RoleSelection = (props) => {
             <TouchableOpacity
               onPress={async () => {
                 setSelected("service");
-                const val = await decryptService("isRegisterLater");
-                if (val !== undefined) {
+                const val = await decryptService("isPetProviderRegisterLater");
+                if (typeof val !== "boolean") {
                   setModalVisible(true);
+                } else {
+                  onLaterPressed("service");
                 }
               }}
               style={{ marginLeft: moderateScale(43), alignItems: "center" }}
@@ -307,14 +310,27 @@ const RoleSelection = (props) => {
                     textColor="#000"
                     onlyBorder
                     title="Later"
-                    onPress={onLaterPressed}
+                    onPress={() => {
+                      encryptService(
+                        selected == "service"
+                          ? "isPetProviderRegisterLater"
+                          : "isPetParentRegisterLater",
+                        true
+                      );
+                      onLaterPressed(selected);
+                    }}
                   />
                 </View>
                 <View style={{ width: "45%" }}>
                   <Button
                     title="Register"
                     onPress={() => {
-                      encryptService("isRegisterLater", false);
+                      encryptService(
+                        selected == "service"
+                          ? "isPetProviderRegisterLater"
+                          : "isPetParentRegisterLater",
+                        false
+                      );
                       setModalVisible(false);
                       setTimeout(() => {
                         if (selected == "service") {

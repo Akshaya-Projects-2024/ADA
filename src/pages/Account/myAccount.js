@@ -55,6 +55,7 @@ const MyAccount = (props) => {
   const [deleteAccountModal, setDeleteAccountModal] = useState(false);
   const [loogutModal, setLogoutModal] = useState(false);
   const { userData } = useUser();
+  const [modal, setModal] = useState(false);
 
   const profileServices = useMemo(
     () =>
@@ -70,6 +71,14 @@ const MyAccount = (props) => {
     const validProviderProfile = validateServiceProfile(profile, false, true);
     return validProviderProfile;
   }, [profile]);
+
+  const handleSwitch = () => {
+    if (profile?.parentProfie?.parentContact?.id) {
+      switchProfile();
+    } else {
+      setModal(true);
+    }
+  };
 
   const MenuItem = ({
     bgColor,
@@ -152,7 +161,9 @@ const MyAccount = (props) => {
     console.log(route);
     return (
       <TouchableButtonWithPermission
-      customMsgForRegistration={"Get Registered and subscribe to enjoy all exciting features of ADA app."}
+        customMsgForRegistration={
+          "Get Registered and subscribe to enjoy all exciting features of ADA app."
+        }
         checkPermission={checkPermission}
         onPress={() => {
           if (route == "deleteAccount") {
@@ -239,7 +250,7 @@ const MyAccount = (props) => {
           customIcon={
             <Toggle
               state={loggedInModule === LoginModules.provider}
-              onPress={switchProfile}
+              onPress={handleSwitch}
             />
           }
           // showBack
@@ -448,6 +459,18 @@ const MyAccount = (props) => {
           leftButtonPressed={() => setLogoutModal(false)}
           rightButtonPressed={handleLogout}
           onClose={() => setLogoutModal(false)}
+        />
+        <Dialog
+          flag={modal}
+          title={"Info"}
+          description={"Do you want to continue as Pet Parent?"}
+          rightButtonText="Yes"
+          leftButtonText="Close"
+          leftButtonPressed={() => setModal(false)}
+          rightButtonPressed={switchProfile}
+          onClose={() => {
+            setModal(false);
+          }}
         />
       </SafeAreaView>
     </LinearGradient>

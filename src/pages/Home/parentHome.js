@@ -19,10 +19,6 @@ import Clock from "../../assets/svg/clock.svg";
 import Bell from "../../assets/svg/bell.svg";
 import Event from "../../assets/svg/event.svg";
 import Search from "../../assets/svg/search.svg";
-import Trainer from "../../assets/svg/trainer.svg";
-import Walker from "../../assets/svg/walker.svg";
-import Behaviourist from "../../assets/svg/behaviour.svg";
-import Groomer from "../../assets/svg/groomer.svg";
 import Toggle from "../../components/Toggle";
 import {
   setLoggedInMoodule,
@@ -46,6 +42,8 @@ import { getMyTopics } from "../../redux-store/actions/topics";
 import { SvgUri } from "react-native-svg";
 import { getAllEventsApi } from "../../redux-store/actions/events";
 import { vh, vw } from "../../utils/dimensions";
+import Dialog from "../../components/Dialog";
+import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 const { width: screenWidth } = Dimensions.get("window");
 
 const { width } = Dimensions.get("window");
@@ -60,6 +58,7 @@ const ParentHome = (props) => {
   const [serviceListData, setServiceData] = useState([]);
   const [trendingTopics, setTrendingTopics] = useState([]);
   const [eventData, setEventData] = useState([]);
+  const [modal, setModal] = useState(false);
 
   useEffect(() => {
     if (isFocused) {
@@ -77,7 +76,6 @@ const ParentHome = (props) => {
     };
     let res = await getAllEventsApi(obj);
     if (res?.data?.data?.length) {
-      console.log(res?.data?.data);
       setEventData(res?.data?.data);
     }
   };
@@ -98,7 +96,6 @@ const ParentHome = (props) => {
       }
       contextValue?.setLoader(false);
     } catch (error) {
-      console.log("🚀 ~ initData ~ error:", error);
       contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
@@ -499,6 +496,14 @@ const ParentHome = (props) => {
     }
   };
 
+  const handleSwitch = () => {
+    if (profile?.providerBusiness?.id) {
+      switchProfile();
+    } else {
+      setModal(true);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
       <StatusBar
@@ -525,7 +530,7 @@ const ParentHome = (props) => {
             {/* <SwitchIcon /> */}
             <Toggle
               state={loggedInModule === LoginModules.provider}
-              onPress={switchProfile}
+              onPress={handleSwitch}
             />
           </View>
           <View style={{ width: "55%", alignItems: "center" }}>
@@ -561,12 +566,14 @@ const ParentHome = (props) => {
             }}
           >
             <Bell />
-            <Event
+            <TouchableButtonWithPermission
+              isServiceProvider={false}
               onPress={() =>
                 props.navigation.navigate("auth", { screen: "createEvent" })
               }
-              style={{ marginLeft: moderateScale(17) }}
-            />
+            >
+              <Event style={{ marginLeft: moderateScale(17) }} />
+            </TouchableButtonWithPermission>
           </View>
         </View>
         {appointmentData?.length ? (
@@ -712,6 +719,18 @@ const ParentHome = (props) => {
             />
           </View>
         ) : null}
+        <Dialog
+          flag={Boolean(modal)}
+          title={"Info"}
+          description={"Do you want to continue as Service Provider?"}
+          rightButtonText="Yes"
+          leftButtonText="Close"
+          leftButtonPressed={() => setModal(false)}
+          rightButtonPressed={switchProfile}
+          onClose={() => {
+            setModal(false);
+          }}
+        />
       </ScrollView>
     </SafeAreaView>
   );
