@@ -45,6 +45,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Dialog from "../../components/Dialog";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 import { decryptService } from "../../utils/storageFunc";
+import Badge from "../../assets/svg/badgeCheck.svg";
 
 const MenuItem = ({
   bgColor,
@@ -53,10 +54,12 @@ const MenuItem = ({
   addBottom,
   showPending = false,
   onPress,
+  checkPermission = false,
 }) => {
   const Icon = icon;
   return (
-    <TouchableOpacity
+    <TouchableButtonWithPermission
+      checkPermission={checkPermission}
       onPress={onPress}
       style={[
         styles.flexRow,
@@ -73,10 +76,9 @@ const MenuItem = ({
       </View>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         {showPending && <Text style={styles.pendingText}>Pending</Text>}
-
         <RightArrow stroke={THEMES.colors.boulder} />
       </View>
-    </TouchableOpacity>
+    </TouchableButtonWithPermission>
   );
 };
 
@@ -167,6 +169,10 @@ const ParentAccount = (props) => {
             deleteAccountMethod();
           } else if (route == "logout") {
             logoutMethod();
+          } else if (route == "paymentsSubscription") {
+            props.navigation.navigate("auth", {
+              screen: "paymentsSubscription",
+            });
           } else {
             props.navigation.navigate(route, { route: "parentAccount" });
           }
@@ -203,7 +209,6 @@ const ParentAccount = (props) => {
     } else {
       props.navigation.navigate("auth", {
         screen: validProviderProfile?.navigateTo,
-        params: { route: "myprofile" },
       });
     }
   };
@@ -229,7 +234,6 @@ const ParentAccount = (props) => {
     } else {
       props.navigation.navigate("auth", {
         screen: validProviderProfile?.navigateTo,
-        params: { route: "myprofile" },
       });
     }
   };
@@ -381,18 +385,20 @@ const ParentAccount = (props) => {
                   )} */}
                 </View>
               </View>
-              {/* 
-            <View style={styles.padding12}>
-              <View style={styles.contentView}>
-                {renderItem(
-                  THEMES.colors.cornFlowerBlue,
-                  <Badge />,
-                  Strings.paymentSubScription,
-                  "addBottom",
-                  "paymentsSubscription"
-                )}
+
+              <View style={styles.padding12}>
+                <View style={styles.contentView}>
+                  {renderItem(
+                    THEMES.colors.cornFlowerBlue,
+                    <Badge />,
+                    Strings.paymentSubScription,
+                    "addBottom",
+                    "paymentsSubscription",
+                    profile?.parentProfie?.subscription?.status !== "active",
+                    false
+                  )}
+                </View>
               </View>
-            </View> */}
 
               <View style={styles.padding12}>
                 <View style={styles.contentView}>

@@ -491,13 +491,12 @@ const ParentHome = (props) => {
     } else {
       props.navigation.navigate("auth", {
         screen: validProviderProfile?.navigateTo,
-        params: { route: "myprofile" },
       });
     }
   };
 
   const handleSwitch = () => {
-    if (profile?.providerBusiness?.id) {
+    if (profile?.providerProfile?.providerBusiness?.id) {
       switchProfile();
     } else {
       setModal(true);

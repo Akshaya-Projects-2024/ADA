@@ -9,6 +9,8 @@ import {
   PROFILE_DATA,
 } from "../types";
 import Api from "../../api/Api";
+import { decryptService } from "../../utils/storageFunc";
+import { getProfile } from "./auth";
 
 export const saveRegisterData = (data) => {
   return async (dispatch) => {
@@ -71,5 +73,19 @@ export const getServiceProviderRole = () => {
         payload: [],
       });
     }
+  };
+};
+
+export const fetchUserProfileData = () => {
+  return async (dispatch) => {
+    try {
+      const obj = {
+        userid: await decryptService("userId"),
+      };
+      const response = await getProfile(obj);
+      if (response?.data?.status_code === 200) {
+        dispatch(dispatchUserData(response?.data?.data));
+      }
+    } catch (error) {}
   };
 };

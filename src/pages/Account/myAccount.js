@@ -31,7 +31,7 @@ import {
   validateParentProfile,
   validateServiceProfile,
 } from "../../utils/userUtils";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileDummy from "../../assets/svg/user.svg";
 import Toggle from "../../components/Toggle";
@@ -48,6 +48,8 @@ import HolidayMenuIcon from "../../assets/svg/HolidayMenuIcon";
 import Dialog from "../../components/Dialog";
 import { useUser } from "../../api/UserContext";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
+import { useFocusEffect } from "@react-navigation/native";
+import { fetchUserProfileData } from "../../redux-store/actions/registerAction";
 
 const MyAccount = (props) => {
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
@@ -56,6 +58,13 @@ const MyAccount = (props) => {
   const [loogutModal, setLogoutModal] = useState(false);
   const { userData } = useUser();
   const [modal, setModal] = useState(false);
+  const dispatch = useDispatch();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      dispatch(fetchUserProfileData());
+    }, [])
+  );
 
   const profileServices = useMemo(
     () =>
@@ -113,7 +122,7 @@ const MyAccount = (props) => {
       </TouchableOpacity>
     );
   };
-
+  
   const handleDeleteAccount = async () => {
     try {
       setDeleteAccountModal(false);
@@ -323,9 +332,7 @@ const MyAccount = (props) => {
                     Strings.myProfile,
                     "",
                     "myProfile",
-                    guestUser ||
-                      (!profileStatus?.flag &&
-                        profileStatus?.navigateTo !== "paymentsSubscription")
+                    !profileStatus?.flag
                   )}
                   {renderItem(
                     THEMES.colors.cornFlowerBlue,
@@ -333,9 +340,7 @@ const MyAccount = (props) => {
                     Strings.paymentSubScription,
                     "",
                     "paymentsSubscription",
-                    guestUser ||
-                      (!profileStatus?.flag &&
-                        profileStatus?.navigateTo === "paymentsSubscription")
+                    profile?.providerProfile?.subscription?.status !== "active"
                   )}
                   {renderItem(
                     THEMES.colors.sandyBeach,

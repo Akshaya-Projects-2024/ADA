@@ -26,14 +26,21 @@ import {
 import { decryptService } from "../../utils/storageFunc";
 import RazorpayCheckout from "react-native-razorpay";
 import { getProfile } from "../../redux-store/actions/auth";
-import { dispatchUserData } from "../../redux-store/actions/registerAction";
-import { validateServiceProfile } from "../../utils/userUtils";
+import {
+  dispatchUserData,
+  fetchUserProfileData,
+} from "../../redux-store/actions/registerAction";
+import {
+  validateParentProfile,
+  validateServiceProfile,
+} from "../../utils/userUtils";
 import { validArray, validObject } from "../../utils/utils";
 import SubscriptionError from "./subscriptionError";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
 import Logo from "../../assets/images/roundIcon.png";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
+import { useFocusEffect } from "@react-navigation/native";
 
 const PaymentsSubscription = (props) => {
   const dispatch = useDispatch();
@@ -45,12 +52,18 @@ const PaymentsSubscription = (props) => {
   const [subscriptionData, setSubscriptionData] = useState();
   const [subscriptionDetails, setSubscriptionDetails] = useState();
   const profile = useSelector((state) => state?.commonReducer);
+  const { loggedInModule } = useSelector((state) => state?.register);
+  const [refresh, setRefresh] = useState(false);
+
+  const userKey =
+    loggedInModule === "parent" ? "parentProfie" : "providerProfile";
   const userAlreadySubscribed = useRef(
     Boolean(
-      profile?.providerProfile?.subscription?.subscriptioncode &&
-        profile?.providerProfile?.subscription?.status === "active"
+      profile?.[userKey]?.subscription?.subscriptioncode &&
+        profile?.[userKey]?.subscription?.status === "active"
     )
   );
+
   useEffect(() => {
     initData();
   }, [initData]);
@@ -58,6 +71,20 @@ const PaymentsSubscription = (props) => {
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      dispatch(fetchUserProfileData());
+    }, [])
+  );
+
+  useEffect(() => {
+    userAlreadySubscribed.current = Boolean(
+      profile?.[userKey]?.subscription?.subscriptioncode &&
+        profile?.[userKey]?.subscription?.status === "active"
+    );
+    setRefresh(!refresh);
+  }, [profile]);
 
   const getUserData = useCallback(() => {
     return new Promise(async (resolve) => {
@@ -68,32 +95,65 @@ const PaymentsSubscription = (props) => {
           userData = response?.data;
         } else {
           const validProviderProfile = validateServiceProfile(profile, true);
-          if (validProviderProfile?.flag) {
-            userData = profile?.providerProfile;
+          const validProfile = validateParentProfile(profile);
+          if (loggedInModule === "provider") {
+            if (validProviderProfile?.flag) {
+              userData = validProviderProfile?.data;
+            }
+          }
+          if (loggedInModule === "parent") {
+            if (validProfile?.flag) {
+              userData = validProfile?.data;
+            }
           }
         }
         if (validObject(userData)) {
-          resolve({
-            flag: true,
-            description: "Pet Service Provider Payment",
-            prefill: {
-              ...(userData?.providerProfile?.providerContact?.email
-                ? {
-                    email: userData?.providerProfile?.providerContact?.email,
-                  }
-                : {}),
-              ...(userData?.providerProfile?.providerContact?.mobile
-                ? {
-                    contact: userData?.providerProfile?.providerContact?.mobile,
-                  }
-                : {}),
-              ...(userData?.providerProfile?.providerBusiness?.name
-                ? {
-                    name: userData?.providerProfile?.providerBusiness?.name,
-                  }
-                : {}),
-            },
-          });
+          if (loggedInModule === "provider") {
+            resolve({
+              flag: true,
+              description: "Pet Service Provider Payment",
+              prefill: {
+                ...(userData?.providerProfile?.providerContact?.email
+                  ? {
+                      email: userData?.providerProfile?.providerContact?.email,
+                    }
+                  : {}),
+                ...(userData?.providerProfile?.providerContact?.mobile
+                  ? {
+                      contact:
+                        userData?.providerProfile?.providerContact?.mobile,
+                    }
+                  : {}),
+                ...(userData?.providerProfile?.providerBusiness?.name
+                  ? {
+                      name: userData?.providerProfile?.providerBusiness?.name,
+                    }
+                  : {}),
+              },
+            });
+          } else {
+            resolve({
+              flag: true,
+              description: "Pet Parent Payment",
+              prefill: {
+                ...(userData?.parentProfie?.parentContact?.email
+                  ? {
+                      email: userData?.parentProfie?.parentContact?.email,
+                    }
+                  : {}),
+                ...(userData?.parentProfie?.parentContact?.mobile
+                  ? {
+                      contact: userData?.parentProfie?.parentContact?.mobile,
+                    }
+                  : {}),
+                ...(userData?.parentProfie?.parentProfile?.name
+                  ? {
+                      name: userData?.parentProfie?.parentProfile?.name,
+                    }
+                  : {}),
+              },
+            });
+          }
         }
         resolve({ flag: false });
       } catch (error) {
@@ -126,7 +186,7 @@ const PaymentsSubscription = (props) => {
       const token = await decryptService("accessToken");
       const obj = {
         userId: await decryptService("userId"),
-        usertype: "provider", // parent or provider
+        usertype: loggedInModule, // parent or provider
       };
       const res = await getSubscriptionPlan(obj);
       if (res.status === 200) {
@@ -136,19 +196,18 @@ const PaymentsSubscription = (props) => {
           setSubscriptionData(outputArray);
           setSubscriptionDetails(outputArray[0]);
           if (
-            profile?.providerProfile?.subscription?.subscriptioncode &&
-            profile?.providerProfile?.subscription?.status === "active"
+            profile?.[userKey]?.subscription?.subscriptioncode &&
+            profile?.[userKey]?.subscription?.status === "active"
           ) {
             selectedSub = outputArray.find(
               (sub) =>
-                sub?.code ===
-                profile?.providerProfile?.subscription?.subscriptioncode
+                sub?.code === profile?.[userKey]?.subscription?.subscriptioncode
             );
           } else {
             selectedSub = outputArray[0];
             const obj1 = {
               userId: await decryptService("userId"),
-              usertype: "provider", // parent or provider
+              usertype: loggedInModule, // parent or provider
               subscriptioncode: selectedSub?.code,
               promocode: "",
             };
@@ -159,17 +218,21 @@ const PaymentsSubscription = (props) => {
               }
             }
           }
+
+          selectedSub = {
+            ...selectedSub,
+            details: selectedSub?.details?.split(","),
+          };
           setSelectedCard(selectedSub);
         }
         contextValue?.setLoader(false);
       }
     } catch (error) {
       contextValue?.setLoader(false);
-      console.log("🚀 ~ initData ~ error:", error?.message);
     }
   }, [
-    profile?.providerProfile?.subscription?.status,
-    profile?.providerProfile?.subscription?.subscriptioncode,
+    profile?.[userKey]?.subscription?.status,
+    profile?.[userKey]?.subscription?.subscriptioncode,
   ]);
 
   const navigateToHome = async () => {
@@ -201,6 +264,7 @@ const PaymentsSubscription = (props) => {
         name: "ADA",
         order_id: subscriptionDetails?.id, //Replace this with an order_id created using Orders API.
         theme: { color: "#53a20e" },
+        usertype: loggedInModule,
       };
       const paymentResponse = await RazorpayCheckout.open({
         ...options,
@@ -252,14 +316,20 @@ const PaymentsSubscription = (props) => {
 
   const onCardClick = async (plan) => {
     try {
-      setSelectedCard(plan);
+      setSelectedCard({
+        ...plan,
+        details:
+          typeof plan?.details === "string"
+            ? plan?.details?.split(",")
+            : plan?.details,
+      });
       if (
-        !profile?.providerProfile?.subscription?.subscriptioncode ||
-        profile?.providerProfile?.subscription?.status === "inactive"
+        !profile?.[userKey]?.subscription?.subscriptioncode ||
+        profile?.[userKey]?.subscription?.status === "inactive"
       ) {
         let obj = {
           userId: await decryptService("userId"),
-          usertype: "provider",
+          usertype: loggedInModule,
           subscriptioncode: plan?.code,
           promocode: "",
         };
@@ -431,17 +501,19 @@ const PaymentsSubscription = (props) => {
               </Text>
             </View>
             <View>
-              {selectedCard && (
-                <>
-                  <View style={styles.listItem}>
-                    {/* Bullet Point */}
-                    <View style={styles.bullet}>
-                      <Text style={styles.bulletText}>{"\u2022"}</Text>
+              {selectedCard?.details && (
+                <View style={{ marginBottom: moderateScale(5) }}>
+                  {selectedCard?.details?.map((item) => (
+                    <View style={styles.listItem}>
+                      {/* Bullet Point */}
+                      <View style={styles.bullet}>
+                        <Text style={styles.bulletText}>{"\u2022"}</Text>
+                      </View>
+                      {/* List Text */}
+                      <Text style={styles.listText}>{item}</Text>
                     </View>
-                    {/* List Text */}
-                    <Text style={styles.listText}>{selectedCard?.details}</Text>
-                  </View>
-                </>
+                  ))}
+                </View>
               )}
             </View>
           </ScrollView>
@@ -579,7 +651,6 @@ const styles = StyleSheet.create({
   listItem: {
     flexDirection: "row", // Align items in a row
     alignItems: "flex-start", // Align bullet and text from top
-    marginBottom: moderateScale(5), // Space between list items
     paddingTop: moderateScale(10),
   },
   bullet: {

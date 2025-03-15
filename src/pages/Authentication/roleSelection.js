@@ -121,7 +121,7 @@ const RoleSelection = (props) => {
               onPress={async () => {
                 setSelected("parent");
                 const val = await decryptService("isPetParentRegisterLater");
-                if (val == undefined) {
+                if (typeof val !== "boolean") {
                   setModalVisible(true);
                 } else {
                   onLaterPressed("parent");
