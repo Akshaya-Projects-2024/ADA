@@ -47,7 +47,6 @@ const navOptionHandler = () => ({
 
 const Routes = (props) => {
   const onMessage = async (notification) => {
-    console.log("🚀 ~ onMessage ~ notification:", notification);
     try {
       if (notification && notification?.data) {
         showNotification(notification);
@@ -58,7 +57,6 @@ const Routes = (props) => {
   };
 
   const notificationAction = async (notification) => {
-    console.log("🚀 ~ notificationAction ~ notification:", notification);
     try {
       if (notification?.data) {
         // TODO DO YOUR WORK HERE

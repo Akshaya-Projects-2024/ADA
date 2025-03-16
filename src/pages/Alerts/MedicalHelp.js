@@ -253,7 +253,6 @@ const MedicalHelp = (props) => {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
         <StatusBar backgroundColor={THEMES.colors.white} />
-        {console.log("Route", Route)}
         <Header title={"Medical Help"} fontColor="#000" showBack />
 
         <ScrollView style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>

@@ -48,7 +48,6 @@ const AdoptionDetail = (props) => {
   };
 
   const shareImageBase64 = async () => {
-    console.log(":image", image);
     if (image) {
       const shareData = {
         title: "Share",

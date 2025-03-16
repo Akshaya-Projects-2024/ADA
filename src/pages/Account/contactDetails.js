@@ -89,10 +89,6 @@ const ContactDetails = (props) => {
   };
 
   const onSubmit = async () => {
-    console.log(
-      "validateIndianPostalCode(postalCode)",
-      validateIndianPostalCode(postalCode)
-    );
     if (!mobileNo) {
       showToast("error", "Please enter mobile number");
     } else if (validateInput(mobileNo) == "invalid") {

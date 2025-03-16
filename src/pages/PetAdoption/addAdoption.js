@@ -143,7 +143,6 @@ const AddAdoption = (props) => {
   const shareImageBase64 = async (image, platforms = []) => {
     try {
       for (const platform of platforms) {
-        console.log("platform", platform);
         if (platform == "FACEBOOK") {
           const shareData = {
             title: "Share on Facebook",
@@ -223,7 +222,6 @@ const AddAdoption = (props) => {
           weight: weight,
           description: description,
         };
-        console.log(params);
         const response = await addAdoption(params);
         if (response?.status === 200) {
     
@@ -236,7 +234,6 @@ const AddAdoption = (props) => {
         contextValue?.setLoader(false);
       }
     } catch (error) {
-      console.log("🚀 ~ initData ~ error:", error);
       contextValue?.setLoader(false);
       showToast("error", error?.message);
     }

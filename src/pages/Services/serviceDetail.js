@@ -497,10 +497,6 @@ const ServiceDetail = ({ navigation, route }) => {
                   })}
                 </ScrollView>
               </View>
-              {console.log(
-                "selectedProvider",
-                selectedProvider?.profile?.sessionDetails[0]
-              )}
               <View style={{ paddingTop: moderateScale(40) }}>
                 <Button
                   title="Book Appointment"

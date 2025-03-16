@@ -1,6 +1,6 @@
-import * as React from 'react';
+import * as React from "react";
 
-import { CommonActions } from '@react-navigation/native';
+import { CommonActions } from "@react-navigation/native";
 
 export const navigationRef = React.createRef();
 
@@ -20,13 +20,38 @@ export function dispatch(name, params) {
   navigationRef.current?.navigate?.dispatch(
     CommonActions.reset({
       index: 0,
-      routes: [{name, params}],
-    }),
+      routes: [{ name, params }],
+    })
   );
 }
 export function resetNavigation(name) {
-  navigationRef.current.reset({ 
+  navigationRef.current.reset({
     index: 0,
-    routes: [{name}],
+    routes: [{ name }],
   });
 }
+
+export function navigateToParent(name, navigation) {
+  navigation.reset({
+    index: 0,
+    routes: [{ name }],
+  });
+}
+
+export const navigateToServiceProvider = (navigation) => {
+  navigation.reset({
+    index: 0,
+    routes: [
+      {
+        name: "auth",
+        state: {
+          routes: [
+            {
+              name: "home",
+            },
+          ],
+        },
+      },
+    ],
+  });
+};

@@ -40,7 +40,7 @@ export const verifyOtp = async (obj) => {
 export const getProfile = async (obj) => {
   try {
     const res = await Api.POST(urlList.getProfile, obj);
-    console.log('Res', obj)
+    console.log("Res", obj);
     if (!res || res?.data?.error || res?.data?.errorCode) {
       throw new Error(
         res?.data?.message || res?.data?.error || "Something went wrong!"
@@ -166,9 +166,9 @@ export const saveSessionDetails = async (obj) => {
 
 export const refreshToken = async (params) => {
   try {
-    console.log('Res', params)
+    console.log("Res", params);
     const res = await Api.POST(urlList.refreshToken, params);
-  
+
     if (!res || res?.data?.error || res?.data?.errorCode) {
       throw new Error(
         res?.data?.message || res?.data?.error || "Something went wrong!"
@@ -670,7 +670,6 @@ export const shareAdoption = async (params) => {
   }
 };
 
-
 export const shareProfileApi = async (params) => {
   try {
     const res = await Api.POST(urlList.shareProfile, params);
@@ -689,7 +688,6 @@ export const shareProfileApi = async (params) => {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
-
 
 export const bookmarkApi = async (params) => {
   try {
@@ -729,4 +727,21 @@ export const deletePetDocumentApi = async (params) => {
   }
 };
 
+export const deletePet = async (params) => {
+  try {
+    const res = await Api.POST(urlList.deletePet, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
 
+    if (res?.data) {
+      return res?.data;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("shareProfileApi Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};

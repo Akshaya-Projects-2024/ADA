@@ -9,10 +9,8 @@ const getNotificationToken = async () => {
       enabled = await messaging().requestPermission();
     }
     const fcmToken = await messaging().getToken();
-    console.log("getNotificationToken");
     return fcmToken;
   } catch (error) {
-    console.log(error);
     return;
   }
 };
@@ -21,7 +19,6 @@ const deleteFcmToken = async () => {
   try {
     await messaging().deleteToken();
   } catch (error) {
-    console.log(error);
     return;
   }
 };
@@ -43,10 +40,6 @@ const createNotificationChannel = () => {
             vibrate: true, // (optional) default: true. Creates the default vibration pattern if true.
           },
           (created) => {
-            console.log(
-              "🚀 ~ PushNotification.channelExists ~ created:",
-              created
-            );
             if (created) {
               res(true);
             }

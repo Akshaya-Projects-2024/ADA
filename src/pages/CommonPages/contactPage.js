@@ -37,7 +37,6 @@ const ContactPage = (props) => {
 
   const openWhatsApp = () => {
     const url = `whatsapp://send?phone=${`+91${mobileNo}`}&text=${encodeURIComponent("Hello, how can I help you?")}`;
-    console.log("url", url)
     Linking.canOpenURL(url)
       .then((supported) => {
         if (supported) {

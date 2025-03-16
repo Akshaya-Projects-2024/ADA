@@ -35,7 +35,6 @@ function App() {
       async (response) => {
         const originalRequest = response.config;
         if (response?.status === 403 && !originalRequest._retry) {
-          // console.log("🚀 ~ response 403:", response);
           originalRequest._retry = true;
           const token = await decryptService("tokenId");
           const deviceId = await decryptService("deviceId");
@@ -67,12 +66,10 @@ function App() {
           }
           return response;
         } else {
-          // console.log("🚀 ~ response:", response);
           return response;
         }
       },
       (error) => {
-        // console.log("🚀 ~ error:", error);
         return error;
       }
     );
@@ -90,7 +87,6 @@ function App() {
     const permission = await requestNotificationPermission();
     if (permission) {
       const op = await createNotificationChannel();
-      console.log("🚀 ~ initPermissions ~ op:", op);
     }
   };
 

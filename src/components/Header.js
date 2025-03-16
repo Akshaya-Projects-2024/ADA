@@ -23,6 +23,8 @@ const Header = (props) => {
     arrowColor,
     noBack,
   } = props;
+  const isRightPanelPresent = showFilter || showSearch || right;
+  const widthStyle = isRightPanelPresent ? { width: "20%" } : {};
   return (
     <View
       style={[
@@ -33,11 +35,12 @@ const Header = (props) => {
       ]}
     >
       {noBack ? (
-        <TouchableOpacity></TouchableOpacity>
+        <TouchableOpacity style={widthStyle}></TouchableOpacity>
       ) : (
         <TouchableOpacity
           hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
           onPress={() => (onBackPress ? onBackPress() : goBack())}
+          style={widthStyle}
         >
           {showBack ? (
             <Back stroke={arrowColor ? arrowColor : "#000"} />
@@ -49,7 +52,12 @@ const Header = (props) => {
         </TouchableOpacity>
       )}
 
-      <View>
+      <View
+        style={{
+          width: isRightPanelPresent ? "60%" : "80%",
+          alignItems: "center",
+        }}
+      >
         <Text
           style={[
             styles.title,
@@ -62,7 +70,7 @@ const Header = (props) => {
           {title}
         </Text>
       </View>
-      <View>
+      <View style={widthStyle}>
         {showFilter ? <Filter /> : showSearch ? <Search /> : null}
         {right}
       </View>

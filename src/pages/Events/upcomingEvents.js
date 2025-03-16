@@ -186,7 +186,6 @@ const UpcomingEvents = () => {
                 {item.audience}
               </Text>
             </View>
-            {console.log("ite",item)}
             <View style={{ width: "30%", alignItems: "flex-end" }}>
               <TouchableOpacity
                  onPress={() =>

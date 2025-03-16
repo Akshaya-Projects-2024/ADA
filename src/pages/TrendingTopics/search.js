@@ -76,12 +76,6 @@ const Search = ({ navigation }) => {
   }, []);
 
   const Chip = ({ item, onPress, selected, isTrending }) => {
-    console.log(
-      "selected",
-      item?.keyword == selectedChip,
-      item?.keyword,
-      selectedChip
-    );
     return (
       <TouchableOpacity
         style={{
@@ -185,7 +179,6 @@ const Search = ({ navigation }) => {
       };
       let res = await clearKeywordApi(obj);
       if (res?.status_code == 200) {
-        console.log("inner");
         setSelectedChipsId([]);
         setSearchText("");
         setData((prevData) => ({

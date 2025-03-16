@@ -189,7 +189,6 @@ const CreateEvent = () => {
           userId: userId,
           documents: posterImg.map((item) => item.id).join(","), //TODO
         };
-        console.log("obj", obj)
         let res = await createEvent(obj);
         if (res?.data?.status_code == 200) {
           contextValue?.setLoader(false);

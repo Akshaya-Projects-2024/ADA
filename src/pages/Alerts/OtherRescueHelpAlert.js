@@ -189,7 +189,6 @@ const OtherRescueHelpAlert = (props) => {
       }
     } catch (error) {
       contextValue?.setLoader(false);
-      console.log("err", error);
     }
   };
 

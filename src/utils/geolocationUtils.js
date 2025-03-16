@@ -13,7 +13,6 @@ const getCurrentLocation = () => {
             res(info);
           },
           (err) => {
-            console.log(err.message);
             res(false);
           }
         );
@@ -39,7 +38,6 @@ const getCurrentLocation = () => {
         );
       }
     } catch (err) {
-      console.log("err", err);
       res(false);
     }
   });

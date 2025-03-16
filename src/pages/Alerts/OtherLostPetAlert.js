@@ -113,7 +113,6 @@ const OtherLostPetAlert = (props) => {
     try {
       contextValue?.setLoader(false);
       for (const platform of platforms) {
-        console.log("platform", platform);
         if (platform == "FACEBOOK") {
           const shareData = {
             title: "Attention Required !!",
@@ -144,7 +143,6 @@ const OtherLostPetAlert = (props) => {
       }
     } catch (error) {
       contextValue?.setLoader(false);
-      console.log("Error sharing image:", error);
     }
   };
 
@@ -196,7 +194,6 @@ const OtherLostPetAlert = (props) => {
       }
     } catch (error) {
       contextValue?.setLoader(false);
-      console.log("err", error);
     }
   };
 

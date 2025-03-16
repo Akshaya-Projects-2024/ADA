@@ -237,7 +237,6 @@ const SessionDetail = (props) => {
           userid: userId,
           sessionrate: sessionRateArray,
         };
-        console.log("sess", sessionData, sessionCharge);
         const responses = await Promise.all([
           saveSession(sessionDataObj),
           saveSessionCharges(sessionCharge),

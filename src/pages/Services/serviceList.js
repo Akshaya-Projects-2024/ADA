@@ -52,7 +52,6 @@ const ServiceList = (props) => {
   };
 
   const renderService = ({ item }) => {
-    console.log("it", item)
     return (
       <TouchableOpacity
         style={styles.itemContainer}

@@ -179,7 +179,6 @@ const UploadImagesDocs = (props) => {
 
   const renderItem = (item) => {
     const photoItem = item?.item.fileData;
-    console.log(item?.item)
     return (
       <View style={styles.imgContent}>
         <Image

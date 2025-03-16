@@ -89,7 +89,6 @@ const BusinessDetail = (props) => {
   }, []);
 
   const initData = () => {
-    console.log("providerBusiness",providerBusiness)
     if (providerBusiness?.name) {
       setBusinessValue(providerBusiness?.name);
     }

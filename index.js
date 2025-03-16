@@ -9,7 +9,6 @@ import messaging from "@react-native-firebase/messaging";
 import { showNotification } from "./src/utils/pushNotificationUtils";
 
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-  console.log("Message handled in the background!", remoteMessage);
   if (remoteMessage && remoteMessage?.data) {
     showNotification(remoteMessage);
   }
