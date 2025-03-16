@@ -17,9 +17,8 @@ import { showToast, validArray } from "../../utils/utils";
 import { getServices } from "../../redux-store/actions/auth";
 import { SvgUri } from "react-native-svg";
 import { contextValue } from "../../components/Loader";
-import EmptyView from "../../components/EmptyView";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 
 const { width } = Dimensions.get("window");
 
@@ -53,7 +52,9 @@ const ServiceList = (props) => {
 
   const renderService = ({ item }) => {
     return (
-      <TouchableOpacity
+      <TouchableButtonWithPermission
+        customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+        customMsgForPayment="Please  subscribe to get best services for your lovely pets."
         style={styles.itemContainer}
         onPress={() =>
           props.navigation.navigate("service", { selectedService: item })
@@ -63,40 +64,60 @@ const ServiceList = (props) => {
           <SvgUri width={35} height={35} uri={item?.logo} />
         </View>
         <Text style={styles.itemText}>{item?.service}</Text>
-      </TouchableOpacity>
+      </TouchableButtonWithPermission>
+    );
+  };
+
+  const EmptyContentView = () => {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text
+          style={{
+            color: "#000",
+            fontSize: moderateScale(16),
+            marginHorizontal: moderateScale(50),
+            fontWeight: 500,
+            textAlign: "center",
+          }}
+        >
+          Oops! No service list available currently.
+        </Text>
+      </View>
     );
   };
 
   return (
-
     <SafeAreaView style={{ flex: 1 }}>
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header
-        title={Strings.services}
-        showBack
-        fontColor="#EC559C"
-        bgColor="transparent"
-      />
-      <View
-        style={{
-          paddingTop: moderateScale(20),
-          paddingHorizontal: moderateScale(10),
-          flex: 1,
-        }}
-      >
-        <FlatList
-          data={services}
-          renderItem={renderService}
-          keyExtractor={(item) => item?.id.toString()}
-          numColumns={3} // Number of columns for the grid
-          columnWrapperStyle={styles.row}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-          ListEmptyComponent={EmptyView}
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header
+          title={Strings.services}
+          showBack
+          fontColor="#EC559C"
+          bgColor="transparent"
         />
+        <View
+          style={{
+            paddingTop: moderateScale(20),
+            paddingHorizontal: moderateScale(10),
+            flex: 1,
+          }}
+        >
+          {services?.length ? (
+            <FlatList
+              data={services}
+              renderItem={renderService}
+              keyExtractor={(item) => item?.id.toString()}
+              numColumns={3} // Number of columns for the grid
+              columnWrapperStyle={styles.row}
+              contentContainerStyle={styles.listContent}
+              showsVerticalScrollIndicator={false}
+            />
+          ) : (
+            EmptyContentView()
+          )}
+        </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 };

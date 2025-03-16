@@ -67,7 +67,9 @@ const ServiceDetail = ({ navigation, route }) => {
         };
         await ShareApp.open(shareData);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log("ero", error)
+    }
   };
 
   const getDates = useCallback(async () => {
@@ -94,6 +96,7 @@ const ServiceDetail = ({ navigation, route }) => {
         provider: selectedProvider?.profile?.providerBusiness?.userid,
         isactive: 1,
       };
+
       let res = await bookmarkApi(obj);
       if (res) {
         setBookmark(true);
@@ -107,7 +110,7 @@ const ServiceDetail = ({ navigation, route }) => {
   };
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
+      <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
         <StatusBar backgroundColor={THEMES.colors.white} />
         <View
           style={{
@@ -221,7 +224,7 @@ const ServiceDetail = ({ navigation, route }) => {
                   selectedProvider?.profile?.sessionRateDetails[0]
                     ?.sessioncharges ||
                   selectedProvider?.profile?.monthcharges[0]?.sessioncharges ||
-                  "0.00"
+                  "0"
                 }/Per session`}
               </Text>
             </View>
@@ -231,6 +234,8 @@ const ServiceDetail = ({ navigation, route }) => {
               backgroundColor: "#fff6cf",
               marginTop: moderateScale(16),
               flex: 1,
+              borderTopRightRadius: 50,
+              
             }}
           >
             <View
@@ -348,9 +353,9 @@ const ServiceDetail = ({ navigation, route }) => {
             <View
               style={{
                 flex: 1,
-                borderTopRightRadius: 70,
+                borderTopRightRadius: 50,
                 padding: moderateScale(23),
-                backgroundColor: "#FFFDF5",
+                backgroundColor: "#fff",
               }}
             >
               <Text
@@ -447,7 +452,7 @@ const ServiceDetail = ({ navigation, route }) => {
                   >
                     Address
                   </Text>
-                  <Text
+                  {/* <Text
                     style={{
                       fontFamily: THEMES.fontFamily.semiBold,
                       color: THEMES.colors.cyan,
@@ -455,7 +460,7 @@ const ServiceDetail = ({ navigation, route }) => {
                     }}
                   >
                     View on Map
-                  </Text>
+                  </Text> */}
                 </View>
                 <Text
                   style={{

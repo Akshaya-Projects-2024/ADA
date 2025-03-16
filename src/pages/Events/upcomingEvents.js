@@ -85,6 +85,7 @@ const UpcomingEvents = () => {
           marginBottom: moderateScale(12),
         }}
       >
+
         <Image
            resizeMode="cover"
            style={{
@@ -110,7 +111,7 @@ const UpcomingEvents = () => {
             color: THEMES.colors.black,
           }}
         >
-          Event name : {item.name}
+          {item.name}
         </Text>
         <View
           style={{
@@ -223,7 +224,7 @@ const UpcomingEvents = () => {
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
         title={"Upcoming events"}
-        fontColor="#FF6437"
+        fontColor="#EC559C"
         showBack
         bgColor="transparent"
       />

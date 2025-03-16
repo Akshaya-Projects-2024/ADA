@@ -28,6 +28,7 @@ import ProviderFallback from "../../assets/svg/ProviderFallback";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Bookmark from "../../assets/svg/bookmark.svg";
 import { useIsFocused } from "@react-navigation/native";
+import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 
 const Service = ({ navigation, route }) => {
   const selectedService = route?.params?.selectedService;
@@ -51,6 +52,7 @@ const Service = ({ navigation, route }) => {
       const response = await getProviderByService(params);
       if (response?.status === 200) {
         const output = response?.data?.data;
+        console.log("out", output);
         if (validArray(output)) {
           setData(output);
           setFilteredData(output);
@@ -82,7 +84,9 @@ const Service = ({ navigation, route }) => {
       (it) => it?.servicecode === selectedService?.code
     );
     return (
-      <TouchableOpacity
+      <TouchableButtonWithPermission
+      customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+        customMsgForPayment="Please  subscribe to get best services for your lovely pets."
         onPress={() =>
           navigation.navigate("serviceDetail", {
             selectedProvider: item,
@@ -186,7 +190,7 @@ const Service = ({ navigation, route }) => {
                   fontSize: THEMES.fonts.font10,
                   paddingTop: moderateScale(3),
                   maxWidth: moderateScale(260),
-                  width:'90%',
+                  width: "90%",
                 }}
               >
                 {`${selectedService?.service} | ${item?.profile?.providerBusiness?.experience} Years exp`}
@@ -233,7 +237,25 @@ const Service = ({ navigation, route }) => {
             </Text>
           </View>
         </View>
-      </TouchableOpacity>
+      </TouchableButtonWithPermission>
+    );
+  };
+
+  const EmptyContentView = () => {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text
+          style={{
+            color: "#000",
+            fontSize: moderateScale(16),
+            marginHorizontal: moderateScale(50),
+            fontWeight: 500,
+            textAlign: "center",
+          }}
+        >
+          Oops! No {selectedService?.service} available currently.
+        </Text>
+      </View>
     );
   };
 
@@ -247,80 +269,58 @@ const Service = ({ navigation, route }) => {
           showBack
           bgColor="transparent"
         />
-        <View
-          style={{
-            width: "90%",
-            alignSelf: "center",
-            paddingTop: moderateScale(10),
-            marginBottom: moderateScale(20),
-          }}
-        >
+        {
+          filteredData?.length ?   <>
           <View
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "#F2F2F2",
-              borderRadius: 25, // Rounded input
-              borderWidth: 1, // To add a border like in the image
-              borderColor: "#D9D9D9", // Border color to match the design
-              paddingHorizontal: 10, // Spacing around the text and icons
-              height: 45,
+              width: "90%",
+              alignSelf: "center",
+              paddingTop: moderateScale(10),
+              marginBottom: moderateScale(20),
             }}
           >
-            <Search />
-            <TextInput
-              value={searchText}
-              onChangeText={handleSearch}
-              placeholder="Search"
+            <View
               style={{
-                flex: 1, // Allow input to take full width except for icons
-                fontSize: THEMES.fonts.font14, // Adjust font size to match the design
-                color: "#000",
-                paddingHorizontal: moderateScale(10),
+                flexDirection: "row",
+                alignItems: "center",
+                borderColor: "#bebebd",
+                borderRadius: 25,
+                borderWidth: 1.5,
+                backgroundColor: "#f5f5f5",
+                paddingHorizontal: 10, // Spacing around the text and icons
+                height: 45,
               }}
-            />
-            {searchText.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchText("")}>
-                <Cross style={{ width: 20, height: 20 }} />
-              </TouchableOpacity>
-            )}
+            >
+              <Search />
+              <TextInput
+                value={searchText}
+                onChangeText={handleSearch}
+                placeholder="Search"
+                style={{
+                  flex: 1, // Allow input to take full width except for icons
+                  fontSize: THEMES.fonts.font12, // Adjust font size to match the design
+                  color: "#000",
+                  paddingHorizontal: moderateScale(10),
+                }}
+              />
+              {searchText.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchText("")}>
+                  <Cross style={{ width: 20, height: 20 }} />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
-          {/* <TouchableOpacity
-          style={{
-            padding: moderateScale(8),
-            borderRadius: 25,
-            borderWidth: 1,
-            backgroundColor: "#f5f5f5",
-            borderColor: "#bebebd",
-            flexDirection: "row",
-            alignItems: "center",
-          }}
-        >
-          <Search />
-          <Text
-            style={{
-              paddingLeft: moderateScale(8),
-              fontSize: THEMES.fonts.font12,
-              color: THEMES.colors.darkGrey,
-              width: "85%",
-            }}
-          >
-            Search
-          </Text>
-          <View style={{ alignItems: "flex-end" }}>
-            <Cross style={{ width: 20, height: 20 }} />
-          </View>
-        </TouchableOpacity> */}
-        </View>
 
-        <FlatList
-          data={filteredData}
-          showsVerticalScrollIndicator={false}
-          bounces={false}
-          renderItem={renderItem}
-          ListEmptyComponent={EmptyView}
-          contentContainerStyle={{ flexGrow: 1 }}
-        />
+          <FlatList
+            data={filteredData}
+            showsVerticalScrollIndicator={false}
+            bounces={false}
+            renderItem={renderItem}
+            contentContainerStyle={{ flexGrow: 1 }}
+          />
+        </> : EmptyContentView()
+        }
+       
       </View>
     </SafeAreaView>
   );

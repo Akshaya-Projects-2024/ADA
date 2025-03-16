@@ -38,7 +38,7 @@ import ProfileDummy from "../../assets/svg/user.svg";
 import { getAdoptionCategory } from "../../redux-store/actions/commonApis";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { contextValue } from "../../components/Loader";
-import { isValidName, isValidNumber } from "../../utils/validation";
+import { isValidName, isValidNumber, validatePetAge } from "../../utils/validation";
 import PetCarousel from "../../components/PetCarousel";
 import Plus from "../../assets/svg/plus.svg";
 import Delete from "../../assets/svg/delete.svg";
@@ -315,7 +315,7 @@ const PetDetail = (props) => {
       showToast("error", "Please select pet breed");
     } else if (!petAge) {
       showToast("error", "Please enter pet age");
-    } else if (!isValidNumber(petAge)) {
+    } else if (validatePetAge(petAge) == "invalid") {
       showToast("error", "Please enter valid pet age");
     } else if (!selectedGender) {
       showToast("error", "Please select pet gender");
@@ -350,13 +350,14 @@ const PetDetail = (props) => {
             setRegisterModal(true);
           }
         } else {
+          console.log("res?.data",res?.data)
           showToast("error", res?.data?.message);
         }
         apiInitCall();
         contextValue?.setLoader(false);
       } catch (error) {
         contextValue?.setLoader(false);
-        showToast("error", error);
+        showToast("error", error?.message);
       }
     }
   };
@@ -621,6 +622,7 @@ const PetDetail = (props) => {
                 value={petAge}
                 onChange={setPetAge}
                 keyboardType="phone-pad"
+                maxLength={2}
               />
             </View>
             <View style={styles.toggleContainer}>
@@ -690,6 +692,7 @@ const PetDetail = (props) => {
                 value={petWeight}
                 onChange={setPetWeight}
                 keyboardType="phone-pad"
+                maxLength={2}
               />
             </View>
             <View

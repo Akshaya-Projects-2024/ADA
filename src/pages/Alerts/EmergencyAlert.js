@@ -90,7 +90,7 @@ const EmergencyAlert = (props) => {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
         <StatusBar backgroundColor={THEMES.colors.white} />
-        <Header title="Create Emergency Alert" fontColor="#000" showBack />
+        <Header title="Create Emergency Alert" fontColor="#0e96ea" showBack />
         <ScrollView style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
           <View
             style={{

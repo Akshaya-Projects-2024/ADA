@@ -21,7 +21,7 @@ const Notification = (props) => {
         translucent
         barStyle={"dark-content"}
       />
-       <Header title={"Notifications"} showBack bgColor="transparent" />
+       <Header title={"Notifications"} showBack bgColor="transparent"  fontColor="#EC559C" />
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <Text
           style={{

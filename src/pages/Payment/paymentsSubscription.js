@@ -22,6 +22,7 @@ import {
   acknowledgeSubscription,
   getSubscription,
   getSubscriptionPlan,
+  getSubscriptionDetailsApi,
 } from "../../redux-store/actions/payment";
 import { decryptService } from "../../utils/storageFunc";
 import RazorpayCheckout from "react-native-razorpay";
@@ -34,7 +35,7 @@ import {
   validateParentProfile,
   validateServiceProfile,
 } from "../../utils/userUtils";
-import { validArray, validObject } from "../../utils/utils";
+import { calculateDiscount, validArray, validObject } from "../../utils/utils";
 import SubscriptionError from "./subscriptionError";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
@@ -258,7 +259,7 @@ const PaymentsSubscription = (props) => {
         image: "https://d2jswhakxkta9i.cloudfront.net/logos/logo.png", //roundIcon.png
         currency: subscriptionDetails?.currency,
         key: "rzp_test_PECnHmfOdkRLhw", // Replace with your Razorpay Key ID
-        amount: subscriptionDetails?.amount,
+        amount: selectedCard?.amount,
         name: "ADA",
         order_id: subscriptionDetails?.id, //Replace this with an order_id created using Orders API.
         theme: { color: "#53a20e" },
@@ -372,17 +373,20 @@ const PaymentsSubscription = (props) => {
             showsVerticalScrollIndicator={false}
             bounces={false}
           >
-            {/* <View style={styles.paymentDetailsView}>
-            <TouchableOpacity
-              onPress={() => props.navigation.navigate("paymentDetails")}
-              style={styles.paymentDetailsBtn}
-            >
-              <Text style={styles.paymentDetailsText}>
-                {Strings.paymentDetails}
-              </Text>
-              <ArrowRight />
-            </TouchableOpacity>
-          </View> */}
+            <View style={styles.paymentDetailsView}>
+              <TouchableButtonWithPermission
+                customMsgForRegistration={
+                  "Get Registered and subscribe to enjoy all exciting features of ADA app."
+                }
+                onPress={() => props.navigation.navigate("paymentDetails")}
+                style={styles.paymentDetailsBtn}
+              >
+                <Text style={styles.paymentDetailsText}>
+                  {Strings.paymentDetails}
+                </Text>
+                <ArrowRight />
+              </TouchableButtonWithPermission>
+            </View>
             <Text
               style={[
                 styles.joinTheFunText,
@@ -538,13 +542,17 @@ const PaymentsSubscription = (props) => {
               marginBottom: moderateScale(20),
             }}
           >
-            {subscriptionDetails?.amount ? (
+            {subscriptionDetails?.amount && selectedCard?.flatdiscount ? (
               <View style={styles.subscriptionView}>
                 <Text style={styles.subscriptionText}>
                   {Strings.subscriptionCost}:{" "}
-                  <Text
-                    style={styles.subscriptionCost}
-                  >{`₹${subscriptionDetails?.amount}`}</Text>
+                  <Text style={styles.subscriptionCost}>
+                    {"₹" +
+                      calculateDiscount(
+                        `${selectedCard?.amount}`,
+                        `${selectedCard?.flatdiscount}`
+                      )}
+                  </Text>
                 </Text>
               </View>
             ) : null}
@@ -580,7 +588,7 @@ const PaymentsSubscription = (props) => {
                   {Strings.subscriptionCost}:
                 </Text>
                 <Text numberOfLines={1} style={styles.subscriptionPrice}>
-                  ₹ {subscriptionData?.[0]?.amount}
+                  ₹ {selectedCard?.amount}
                 </Text>
               </View>
               <View style={styles.TaxView}>
@@ -596,7 +604,11 @@ const PaymentsSubscription = (props) => {
               <View style={styles.totalRow}>
                 <Text style={styles.totalText}>{Strings.total}:</Text>
                 <Text numberOfLines={1} style={styles.totalPrice}>
-                  ₹ {subscriptionDetails?.amount}
+                  {"₹" +
+                    calculateDiscount(
+                      `${selectedCard?.amount}`,
+                      `${selectedCard?.flatdiscount}`
+                    )}
                 </Text>
               </View>
               <View
@@ -636,7 +648,6 @@ const styles = StyleSheet.create({
   },
   paymentDetailsView: {
     paddingTop: moderateScale(32),
-    paddingBottom: moderateScale(14),
   },
   paymentDetailsBtn: {
     backgroundColor: THEMES.colors.white,

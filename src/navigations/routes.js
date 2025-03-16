@@ -37,6 +37,7 @@ import OtherMedicalAlert from "../pages/Alerts/otherMedicalAlert";
 import RescueHelp from "../pages/Alerts/RescueHelp";
 import OtherRescueHelpAlert from "../pages/Alerts/OtherRescueHelpAlert";
 import Notification from "../pages/Notification/notification";
+import PaymentDetails from "../pages/Payment/paymentDetails";
 
 const Stack = createStackNavigator();
 
@@ -263,6 +264,12 @@ const Routes = (props) => {
         <Stack.Screen
           name="notification"
           component={Notification}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="paymentDetails"
+          component={PaymentDetails}
           options={navOptionHandler}
         />
       </Stack.Navigator>

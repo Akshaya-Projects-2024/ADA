@@ -467,7 +467,7 @@ const MyAccount = (props) => {
         <Dialog
           flag={modal}
           title={"Info"}
-          description={"Do you want to continue as Pet Parent?"}
+          description={"Do you want to register as Pet Parent?"}
           rightButtonText="Yes"
           leftButtonText="Close"
           leftButtonPressed={() => setModal(false)}

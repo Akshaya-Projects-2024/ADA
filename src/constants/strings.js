@@ -40,7 +40,7 @@ const Strings = {
   enterAddress: "Enter Address*",
   location: "Location name as per API available*",
   enterLocation: "Enter Location",
-  postalCode: "Postal code",
+  postalCode: "Postal code*",
   enterPostalCode: "Enter postal code*",
   contactDetails: "Contact Details",
   uploadImagesDoc: "Uploaded Images & Documents",
@@ -76,7 +76,7 @@ const Strings = {
   joinTheFun: "Join the Fun! Subscribe Now!",
   months: "Months",
   unlockPremiumFeature: "Unlock Premium Features!",
-  subscriptionCost: " Subscription Cost",
+  subscriptionCost: "Subscription Cost",
   viewBreakup: "View Breakup",
   tax: "Tax",
   total: "Total",
@@ -170,7 +170,7 @@ const Strings = {
   logoutAccount:"Are you sure you want to logout?",
   approvalAlertForRegistration:
   "Complete your Registration and Subscribe to the app to access amazing features.",
-  youAreAlreadySubscribed: "You are already subscribed."
+youAreAlreadySubscribed: "You are already subscribed."
 };
 
 export default Strings;

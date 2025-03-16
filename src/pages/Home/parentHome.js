@@ -116,7 +116,7 @@ const ParentHome = (props) => {
     };
     let res = await getMyTopics(obj);
     if (res?.data?.data) {
-      let dataArray = res?.data?.data;
+      let dataArray = res?.data?.data?.SearchResult;
       const firstFiveObjects = dataArray?.slice(0, 5);
       setTrendingTopics(firstFiveObjects);
     }
@@ -153,7 +153,9 @@ const ParentHome = (props) => {
 
   const renderTrendingItem = ({ item, index }) => {
     return (
-      <TouchableOpacity
+      <TouchableButtonWithPermission
+        customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+        customMsgForPayment="Please subscribe to get best services for your lovely pets."
         onPress={() =>
           props.navigation.navigate("trendDetail", { selectedData: item })
         }
@@ -186,7 +188,7 @@ const ParentHome = (props) => {
           }}
         >
           <Text
-            numberOfLines={2}
+            numberOfLines={1}
             style={{
               fontFamily: THEMES.fontFamily.semiBold,
               color: THEMES.colors.black,
@@ -198,7 +200,7 @@ const ParentHome = (props) => {
             {item?.subject}
           </Text>
           <Text
-            numberOfLines={2}
+            numberOfLines={1}
             style={{
               fontFamily: THEMES.fontFamily.semiBold,
               color: THEMES.colors.darkGrey,
@@ -211,7 +213,7 @@ const ParentHome = (props) => {
             {item?.author}
           </Text>
         </View>
-      </TouchableOpacity>
+      </TouchableButtonWithPermission>
     );
   };
 
@@ -219,7 +221,9 @@ const ParentHome = (props) => {
     return (
       <>
         {item?.documentlist?.url ? (
-          <TouchableOpacity
+          <TouchableButtonWithPermission
+            customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+            customMsgForPayment="Please subscribe to get best services for your lovely pets."
             onPress={() => props.navigation.navigate("upComingEvents")}
             style={{
               alignItems: "center",
@@ -247,7 +251,7 @@ const ParentHome = (props) => {
                 source={{ uri: item?.documentlist?.url }}
               />
             ) : null}
-          </TouchableOpacity>
+          </TouchableButtonWithPermission>
         ) : null}
       </>
     );
@@ -257,7 +261,9 @@ const ParentHome = (props) => {
     return (
       <View key={`${item?.id}_${index}`}>
         {item.type == "Banner" ? (
-          <TouchableOpacity
+          <TouchableButtonWithPermission
+            customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+            customMsgForPayment="Please subscribe to get best services for your lovely pets."
             onPress={() => props.navigation.navigate("upComingEvents")}
             style={{
               alignItems: "center",
@@ -293,9 +299,11 @@ const ParentHome = (props) => {
                 source={require("../../assets/images/banner.png")}
               />
             )}
-          </TouchableOpacity>
+          </TouchableButtonWithPermission>
         ) : (
-          <TouchableOpacity
+          <TouchableButtonWithPermission
+            customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+            customMsgForPayment="Please subscribe to get best services for your lovely pets."
             onPress={() => props.navigation.navigate("serviceDetail")}
             style={{
               alignItems: "center",
@@ -450,7 +458,7 @@ const ParentHome = (props) => {
                 </Text>
               </View>
             </View>
-          </TouchableOpacity>
+          </TouchableButtonWithPermission>
         )}
       </View>
     );
@@ -560,12 +568,12 @@ const ParentHome = (props) => {
               flexDirection: "row",
             }}
           >
-            <Bell />
+            <Bell onPress={() => props.navigation.navigate("notification")} />
             <TouchableButtonWithPermission
+              customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+              customMsgForPayment="Please subscribe to get best services for your lovely pets."
               isServiceProvider={false}
-              onPress={() =>
-                props.navigation.navigate("auth", { screen: "createEvent" })
-              }
+              onPress={() => props.navigation.navigate("upComingEvents")}
             >
               <Event style={{ marginLeft: moderateScale(17) }} />
             </TouchableButtonWithPermission>
@@ -598,7 +606,9 @@ const ParentHome = (props) => {
               marginTop: moderateScale(30),
             }}
           >
-            <TouchableOpacity
+            <TouchableButtonWithPermission
+              customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+              customMsgForPayment="Please subscribe to get best services for your lovely pets."
               onPress={() =>
                 props.navigation.navigate("auth", { screen: "search" })
               }
@@ -622,7 +632,7 @@ const ParentHome = (props) => {
               >
                 Search
               </Text>
-            </TouchableOpacity>
+            </TouchableButtonWithPermission>
           </View>
         </View>
         <View
@@ -665,7 +675,9 @@ const ParentHome = (props) => {
           {Boolean(serviceListData) && serviceListData?.length
             ? serviceListData?.map((item, index) => {
                 return (
-                  <TouchableOpacity
+                  <TouchableButtonWithPermission
+                    customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+                    customMsgForPayment="Please subscribe to get best services for your lovely pets."
                     style={styles.itemContainer}
                     onPress={() =>
                       props.navigation.navigate("service", {
@@ -679,7 +691,7 @@ const ParentHome = (props) => {
                     <Text numberOfLines={1} style={styles.itemText}>
                       {item?.service}
                     </Text>
-                  </TouchableOpacity>
+                  </TouchableButtonWithPermission>
                 );
               })
             : null}
@@ -717,7 +729,7 @@ const ParentHome = (props) => {
         <Dialog
           flag={Boolean(modal)}
           title={"Info"}
-          description={"Do you want to continue as Service Provider?"}
+          description={"Do you want to register as Service Provider?"}
           rightButtonText="Yes"
           leftButtonText="Close"
           leftButtonPressed={() => setModal(false)}

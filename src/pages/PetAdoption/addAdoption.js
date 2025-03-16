@@ -42,6 +42,12 @@ import { getAdoptionCategory } from "../../redux-store/actions/commonApis";
 import { contextValue } from "../../components/Loader";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Share from "react-native-share";
+import {
+  isValidName,
+  isValidNumber,
+  validateInput,
+  validatePetAge,
+} from "../../utils/validation";
 
 const AddAdoption = (props) => {
   const { navigation } = props;
@@ -184,8 +190,12 @@ const AddAdoption = (props) => {
         showToast("error", "Please select breed");
       } else if (!age) {
         showToast("error", "Please enter age");
+      } else if (validatePetAge(age) == "invalid") {
+        showToast("error", "Please enter valid age");
       } else if (!weight) {
         showToast("error", "Please enter weight");
+      } else if (!isValidNumber(weight)) {
+        showToast("error", "Please enter valid weight");
       } else if (!location) {
         showToast("error", "Please enter location");
       } else if (!description) {
@@ -196,12 +206,16 @@ const AddAdoption = (props) => {
         showToast("error", "Please enter medical condition");
       } else if (!name) {
         showToast("error", "Please enter pet name");
+      } else if (!isValidName(name)) {
+        showToast("error", "Please enter valid pet name");
       } else if (!selectedGender) {
         showToast("error", "Please select gender");
       } else if (!petImage?.length) {
         showToast("error", "Please add pet images");
       } else if (!contactNumber) {
         showToast("error", "Please enter contact Number");
+      } else if (validateInput(contactNumber) == "invalid") {
+        showToast("error", "Please enter valid contact number");
       } else if (!agree) {
         showToast("error", "Please select terms and conditions");
       } else {
@@ -224,9 +238,8 @@ const AddAdoption = (props) => {
         };
         const response = await addAdoption(params);
         if (response?.status === 200) {
-    
           if (selectedPlatforms) {
-            await shareImageBase64( response?.data?.data, selectedPlatforms);
+            await shareImageBase64(response?.data?.data, selectedPlatforms);
           }
           showToast("success", "Data Added Successfully");
           navigation.goBack();
@@ -318,7 +331,7 @@ const AddAdoption = (props) => {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
         <StatusBar backgroundColor={THEMES.colors.white} />
-        <Header title="Add Pet Adoption" fontColor="#000" showBack />
+        <Header title="Add Pet Adoption" fontColor="#ed65a5" showBack />
         <ScrollView style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
           <View
             style={{

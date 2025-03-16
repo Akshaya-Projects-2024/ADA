@@ -35,6 +35,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { deleteDocument, uploadDocument } from "../../redux-store/actions/auth";
 import { contextValue } from "../../components/Loader";
 import Dialog from "../../components/Dialog";
+import { validateInput } from "../../utils/validation";
 
 const CreateEvent = () => {
   const [isStartTimeModalVisible, setStartTimeModalVisible] = useState(false);
@@ -111,10 +112,9 @@ const CreateEvent = () => {
     }
   };
 
-
   const onCancel = async (doc) => {
     try {
-      contextValue?.setLoader(true)
+      contextValue?.setLoader(true);
       const userId = await decryptService("userId");
       const postData = {
         userid: userId,
@@ -124,11 +124,11 @@ const CreateEvent = () => {
       if (res?.status === 200) {
         const removeItemById = posterImg?.filter((it) => it?.id !== doc?.id);
         setPosterImg(removeItemById);
-        contextValue?.setLoader(false)
+        contextValue?.setLoader(false);
         showToast("success", "Successfully deleted the image");
       }
     } catch (error) {
-      contextValue?.setLoader(false)
+      contextValue?.setLoader(false);
       showToast("error", error.message);
     }
   };
@@ -170,7 +170,9 @@ const CreateEvent = () => {
     } else if (!endTime) {
       showToast("error", "Please enter end time");
     } else if (!contactNo) {
-      showToast("error", "Please enter contact no");
+      showToast("error", "Please enter contact number");
+    } else if (validateInput(contactNo) == "invalid") {
+      showToast("error", "Please enter valid mobile number");
     } else {
       try {
         contextValue?.setLoader(true);
@@ -184,7 +186,7 @@ const CreateEvent = () => {
           starttime: startTime ? startTime?.replace(/:AM|:PM/, "") : "",
           endtime: endTime ? endTime?.replace(/:AM|:PM/, "") : "",
           contact: contactNo,
-          registrationlink: registrationlink,
+          registrationlink: registrationlink ? registrationlink :"",
           audience: audience,
           userId: userId,
           documents: posterImg.map((item) => item.id).join(","), //TODO

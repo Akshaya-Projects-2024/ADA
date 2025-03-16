@@ -22,10 +22,11 @@ import { getBase64Obj } from "../../utils/documentUtils";
 import SearchImg from "../../assets/svg/search.svg";
 import TrendingTopicIc from "../../assets/svg/trendingTopics.svg";
 import { clearKeywordApi } from "../../redux-store/actions/topics";
+import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 
 const TopicsCard = ({ item, onPress }) => {
   return (
-    <TouchableOpacity
+    <TouchableButtonWithPermission
       style={styles.topicsCard}
       onPress={() => {
         onPress(item);
@@ -50,7 +51,7 @@ const TopicsCard = ({ item, onPress }) => {
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </TouchableButtonWithPermission>
   );
 };
 
@@ -352,7 +353,17 @@ const Search = ({ navigation }) => {
         ) : Array.isArray(data?.SearchResult) &&
           data?.SearchResult?.length <= 0 ? (
           <View style={styles.emptyView}>
-            <Text>Oops! No information available!</Text>
+            <Text
+              style={{
+                color: "#000",
+                fontSize: moderateScale(16),
+                marginHorizontal: moderateScale(20),
+                fontWeight: 500,
+                textAlign: "center",
+              }}
+            >
+              Oops! No information available!
+            </Text>
           </View>
         ) : null}
       </SafeAreaView>

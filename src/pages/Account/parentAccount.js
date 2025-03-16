@@ -85,74 +85,51 @@ const MenuItem = ({
   );
 };
 
-const deleteAccountMethod = () => {
-  Alert.alert(
-    "Delete Account",
-    "Are you sure you want to delete your Account ??",
-    [
-      {
-        text: "Cancel",
-        onPress: () => {},
-        style: "cancel",
-      },
-      { text: "Ok", onPress: () => handleDeleteAccount() },
-    ],
-    { cancelable: false }
-  );
-};
 
-const logoutMethod = () => {
-  Alert.alert(
-    "Logout",
-    "Are you sure you want to logout ??",
-    [
-      {
-        text: "Cancel",
-        onPress: () => {},
-        style: "cancel",
-      },
-      { text: "Ok", onPress: () => handleLogout() },
-    ],
-    { cancelable: false }
-  );
-};
 
-const handleDeleteAccount = async () => {
-  try {
-    contextValue.setLoader(true);
-    let obj = {
-      userId: await decryptService("userId"),
-      userType: "parent",
-    };
-    let res = await deleteAccountApi(obj);
-    if (res?.data?.status_code == 200) {
-      setTimeout(() => {
-        handleLogout();
-        resetNavigation("app");
-      }, 300);
-    } else {
-      showToast("Error", "Something went wrong!! Please try again later.");
-    }
-    contextValue.setLoader(false);
-  } catch (error) {
-    showToast("Error", "Something went wrong!! Please try again later.");
-    contextValue.setLoader(false);
-  }
-};
 
-const handleLogout = async () => {
-  const asyncStorageKeys = await AsyncStorage.getAllKeys();
-  let filteredAsyncStorage = asyncStorageKeys;
-  if (filteredAsyncStorage?.length > 0) {
-    await AsyncStorage.multiRemove(filteredAsyncStorage);
-  }
-  resetNavigation("app");
-};
 
 const ParentAccount = (props) => {
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const profile = useSelector((state) => state?.commonReducer);
   const [modal, setModal] = useState(false);
+  const [deleteAccountModal, setDeleteAccountModal] = useState(false);
+  const [loogutModal, setLogoutModal] = useState(false);
+
+
+  const handleDeleteAccount = async () => {
+    try {
+      setDeleteAccountModal(false);
+      contextValue.setLoader(true);
+      let obj = {
+        userId: await decryptService("userId"),
+        userType: "parent",
+      };
+      let res = await deleteAccountApi(obj);
+      if (res?.data?.status_code == 200) {
+        setTimeout(() => {
+          handleLogout();
+          resetNavigation("app");
+        }, 300);
+      } else {
+        showToast("Error", "Something went wrong!! Please try again later.");
+      }
+      contextValue.setLoader(false);
+    } catch (error) {
+      showToast("Error", "Something went wrong!! Please try again later.");
+      contextValue.setLoader(false);
+    }
+  };
+  
+  const handleLogout = async () => {
+    const asyncStorageKeys = await AsyncStorage.getAllKeys();
+    let filteredAsyncStorage = asyncStorageKeys;
+    if (filteredAsyncStorage?.length > 0) {
+      await AsyncStorage.multiRemove(filteredAsyncStorage);
+    }
+    setLogoutModal(false);
+    resetNavigation("app");
+  };
 
   const renderItem = (
     bgColor,
@@ -169,9 +146,9 @@ const ParentAccount = (props) => {
         checkPermission={checkPermission}
         onPress={() => {
           if (route == "deleteAccount") {
-            deleteAccountMethod();
+            setDeleteAccountModal(true);
           } else if (route == "logout") {
-            logoutMethod();
+            setLogoutModal(true);
           } else if (route == "paymentsSubscription") {
             props.navigation.navigate("auth", {
               screen: "paymentsSubscription",
@@ -478,9 +455,30 @@ const ParentAccount = (props) => {
           </View>
         </ScrollView>
         <Dialog
+          title={"Delete Account"}
+          flag={deleteAccountModal}
+          description={Strings.deleteAcccount}
+          leftButtonText="No"
+          rightButtonText="Yes"
+          leftButtonPressed={() => setDeleteAccountModal(false)}
+          rightButtonPressed={handleDeleteAccount}
+          onClose={() => setDeleteAccountModal(false)}
+        />
+
+        <Dialog
+          title={"Logout Account"}
+          flag={loogutModal}
+          description={Strings.logoutAccount}
+          leftButtonText="No"
+          rightButtonText="Yes"
+          leftButtonPressed={() => setLogoutModal(false)}
+          rightButtonPressed={handleLogout}
+          onClose={() => setLogoutModal(false)}
+        />
+        <Dialog
           flag={modal}
           title={"Info"}
-          description={"Do you want to continue as Service Provider?"}
+          description={"Do you want to register as Service Provider?"}
           rightButtonText="Yes"
           leftButtonText="Close"
           leftButtonPressed={() => setModal(false)}

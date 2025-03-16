@@ -41,3 +41,19 @@ export const validateMinutes = (value) => {
 export const isValidNumber = (value) => {
   return /^[0-9]+$/.test(value);
 };
+
+export const validatePetAge = (age) => {
+  const petAge = Number(age);
+
+  if (isNaN(petAge)) {
+    return "invalid";
+  }
+  if (petAge < 0) {
+    return "invalid"
+  }
+  if (petAge > 30) {
+     return "invalid"
+  }
+  
+  return ""; // Valid age
+}

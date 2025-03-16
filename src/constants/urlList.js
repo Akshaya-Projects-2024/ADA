@@ -61,4 +61,6 @@ export const urlList = {
   getKeyword:'provider/topic/getkeyword',
   clearKeyword:'provider/topic/clearkeyword',
   deletePet: 'register/pet/delete',
+  paymentSubscriptionList:'payment/subscription',
+  paymentInvoice:'payment/invoice'
 };

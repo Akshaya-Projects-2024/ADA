@@ -257,14 +257,13 @@ const PetAdoption = (props) => {
                   <View
                     style={{
                       flexDirection: "row",
-                      paddingHorizontal: moderateScale(8),
-                      borderColor: "#bebebd",
-                      borderWidth: 1.5,
-                      borderRadius: 25,
-                      marginBottom: ms(5),
-                      backgroundColor: "#f5f5f5",
-                      elevation: 1,
                       alignItems: "center",
+                      borderColor: "#bebebd",
+                      borderRadius: 25,
+                      borderWidth: 1.5,
+                      backgroundColor: "#f5f5f5",
+                      paddingHorizontal: 10, // Spacing around the text and icons
+                      height: 45,
                     }}
                   >
                     <View style={{ paddingRight: 10 }}>

@@ -1,76 +1,127 @@
-import React from 'react';
-import {View, Text, StatusBar, StyleSheet, FlatList} from 'react-native';
-import {THEMES} from '../../assets/theme/themes';
-import Header from '../../components/Header';
-import Strings from '../../constants/strings';
-import {moderateScale} from 'react-native-size-matters';
-import Download from '../../assets/svg/download.svg';
-
-const paymentData = [
-  {
-    transactionId: '1234567891',
-    Amount: '₹ 300',
-    paymentMode: 'UPI',
-    subscriptionPeriod: '5 Jun, 2024 to Nov 5 Jun, 2025',
-  },
-  {
-    transactionId: '1234567891',
-    Amount: '₹ 300',
-    paymentMode: 'UPI',
-    subscriptionPeriod: '5 Jun, 2024 to Nov 5 Jun, 2025',
-  },
-  {
-    transactionId: '1234567891',
-    Amount: '₹ 300',
-    paymentMode: 'UPI',
-    subscriptionPeriod: '5 Jun, 2024 to Nov 5 Jun, 2025',
-  },
-  {
-    transactionId: '1234567891',
-    Amount: '₹ 300',
-    paymentMode: 'UPI',
-    subscriptionPeriod: '5 Jun, 2024 to Nov 5 Jun, 2025',
-  },
-  {
-    transactionId: '1234567891',
-    Amount: '₹ 300',
-    paymentMode: 'UPI',
-    subscriptionPeriod: '5 Jun, 2024 to Nov 5 Jun, 2025',
-  },
-];
+import React, { useEffect, useState } from "react";
+import { View, Text, StatusBar, StyleSheet, FlatList } from "react-native";
+import { THEMES } from "../../assets/theme/themes";
+import Header from "../../components/Header";
+import Strings from "../../constants/strings";
+import { moderateScale } from "react-native-size-matters";
+import Download from "../../assets/svg/download.svg";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { contextValue } from "../../components/Loader";
+import {
+  getInvoiceApi,
+  getSubscriptionDetailsApi,
+} from "../../redux-store/actions/payment";
+import { useSelector } from "react-redux";
+import { decryptService } from "../../utils/storageFunc";
+import moment from "moment";
+import RNFS from "react-native-fs";
+import Dialog from "../../components/Dialog";
 
 const PaymentDetails = () => {
-  
-  const renderItem = () => {
+  const [paymentDetailsData, setPaymentDetailsData] = useState([]);
+  const { loggedInModule } = useSelector((state) => state?.register);
+  const [successDownload, setSuccessDownload] = useState(false);
+
+  useEffect(() => {
+    getSubscriptionDetails();
+  }, []);
+
+  const getSubscriptionDetails = async () => {
+    try {
+      contextValue?.setLoader(true);
+      const obj = {
+        userId: await decryptService("userId"),
+        usertype: loggedInModule,
+      };
+
+      let res = await getSubscriptionDetailsApi(obj);
+
+      if (res?.length !== 0) {
+        setPaymentDetailsData(res);
+      } else {
+        setPaymentDetailsData([]);
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {
+      console.log("err11", error);
+      contextValue?.setLoader(false);
+    }
+  };
+
+  const downloadPDF = async (base64PDF) => {
+    try {
+      const path = `${RNFS.DownloadDirectoryPath}/sample.pdf`;
+      await RNFS.writeFile(path, base64PDF, "base64");
+      setSuccessDownload(true);
+      contextValue.setLoader(false);
+    } catch (error) {
+      setSuccessDownload(false);
+      contextValue.setLoader(false);
+      console.log("Download Error:", error);
+    }
+  };
+
+  const getInvoice = async (id) => {
+    try {
+      contextValue.setLoader(true);
+      const obj = {
+        userId: await decryptService("userId"),
+        usertype: loggedInModule,
+        invoicetype: "subscription",
+        id: id,
+      };
+      let res = await getInvoiceApi(obj);
+      if (res?.status_code == 200) {
+        downloadPDF(res?.data);
+      } else {
+        contextValue.setLoader(false);
+      }
+    } catch (error) {
+      contextValue.setLoader(false);
+    }
+  };
+
+  const renderItem = ({ item, index }) => {
+    const paymentItem = item?.paymentdetails;
+    const subscriptionItem = item?.subscription;
     return (
       <View style={styles.mainView}>
         <View style={styles.row}>
           <View style={styles.w80}>
-            <Text numberOfLines={1} style={styles.transactionText}>
-              {Strings.transactionId}: 1234567891
+            <Text numberOfLines={2} style={styles.transactionText}>
+              {Strings.transactionId}: {paymentItem?.paymentid}
             </Text>
-            <Text style={styles.dateText}>5 June 2024, 9:30 AM</Text>
+            <Text style={styles.dateText}>
+              {moment(subscriptionItem?.startdate).format("DD MMM YYYY h:mm A")}
+            </Text>
           </View>
 
-          <View style={styles.downloadIcon}>
+          <TouchableOpacity
+            onPress={() => getInvoice(subscriptionItem?.id)}
+            style={styles.downloadIcon}
+          >
             <Download />
-          </View>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.secondRow}>
           <View>
-            <Text style={styles.amountValue}>₹ XXXX</Text>
+            <Text style={styles.amountValue}>
+              ₹ {subscriptionItem?.finalamt}
+            </Text>
             <Text style={styles.amountKey}>{Strings.amount}</Text>
           </View>
-          <View style={{marginLeft: moderateScale(32)}}>
-            <Text style={styles.upikey}>UPI</Text>
+          <View style={{ marginLeft: moderateScale(32) }}>
+            <Text style={styles.upikey}>{paymentItem?.method}</Text>
             <Text style={styles.paymentMode}>{Strings.paymentMode}</Text>
           </View>
         </View>
 
-        <View style={{paddingTop: moderateScale(16)}}>
+        <View style={{ paddingTop: moderateScale(16) }}>
           <Text style={styles.subscribeDate}>
-            5 Jun, 2024 to Nov 5 Jun, 2025
+            {moment(subscriptionItem?.startdate).format("DD MMM YYYY")} to{" "}
+            {moment(subscriptionItem?.enddate).format("DD MMM YYYY")}
           </Text>
           <Text style={styles.subscribeText}>{Strings.subscriptionPeriod}</Text>
         </View>
@@ -78,27 +129,62 @@ const PaymentDetails = () => {
     );
   };
 
+  const EmptyContentView = () => {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text
+          style={{
+            color: "#000",
+            fontSize: moderateScale(16),
+            fontWeight: 500,
+          }}
+        >
+          Oops! No information available.
+        </Text>
+      </View>
+    );
+  };
   return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header
-        title={Strings.paymentDetails}
-        showBack
-        bgColor="transparent"
-        fontColor={THEMES.colors.black}
-      />
-      <View style={styles.content}>
-        <View style={styles.flatlistView}>
-          <FlatList
-            data={paymentData}
-            showsVerticalScrollIndicator={false}
-            bounces={false}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-          />
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header
+          title={Strings.paymentDetails}
+          showBack
+          bgColor="transparent"
+          fontColor={THEMES.colors.black}
+        />
+        <View style={styles.content}>
+          {
+            paymentDetailsData?.length ?  <View style={styles.flatlistView}>
+            <FlatList
+              data={paymentDetailsData}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+       
+            />
+          </View> : EmptyContentView()
+          }
+          
         </View>
       </View>
-    </View>
+      <Dialog
+        flag={successDownload}
+        title={"Download Complete "}
+        description={
+          "Your invoice has been successfully downloaded. You can find it in your Downloads folder."
+        }
+        rightButtonText="Close"
+        rightButtonPressed={() => {
+          setSuccessDownload(false);
+        }}
+        onClose={() => {
+          setSuccessDownload(false);
+        }}
+      />
+    </SafeAreaView>
   );
 };
 
@@ -122,25 +208,25 @@ const styles = StyleSheet.create({
     borderColor: THEMES.colors.alto,
     backgroundColor: THEMES.colors.wildSand,
     shadowColor: THEMES.colors.mercury,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: moderateScale(20),
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   w80: {
-    width: '80%',
+    width: "90%",
   },
   transactionText: {
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.bold,
-    fontSize: THEMES.fonts.font14,
+    fontSize: THEMES.fonts.font12,
   },
   dateText: {
     color: THEMES.colors.black,
@@ -155,9 +241,9 @@ const styles = StyleSheet.create({
     padding: moderateScale(10),
   },
   secondRow: {
-    flexDirection: 'row',
-    paddingTop: moderateScale(26),
-    alignItems: 'center',
+    flexDirection: "row",
+    paddingTop: moderateScale(15),
+    alignItems: "center",
   },
   amountValue: {
     color: THEMES.colors.black,
@@ -173,6 +259,7 @@ const styles = StyleSheet.create({
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.bold,
     fontSize: THEMES.fonts.font12,
+    textTransform: "capitalize",
   },
   paymentMode: {
     color: THEMES.colors.black,

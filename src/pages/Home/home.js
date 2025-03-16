@@ -515,9 +515,9 @@ const Home = (props) => {
               }}
             >
               <Bell onPress={() => props.navigation.navigate("notification")} />
-              <TouchableButtonWithPermission
+            <TouchableButtonWithPermission
                 customMsgForRegistration={
-                  "Complete your Registration and Subscribe to the app to create new topics."
+                  "Complete your Registration and Subscribe to the app to create new events."
                 }
                 onPress={() => props.navigation.navigate("createEvent")}
               >
@@ -1077,7 +1077,7 @@ const Home = (props) => {
       <Dialog
         flag={modal}
         title={"Info"}
-        description={"Do you want to continue as Pet Parent?"}
+        description={"Do you want to register as Pet Parent?"}
         rightButtonText="Yes"
         leftButtonText="Close"
         leftButtonPressed={() => setModal(false)}

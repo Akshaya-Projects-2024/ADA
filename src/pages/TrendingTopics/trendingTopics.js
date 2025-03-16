@@ -25,12 +25,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { findDifferenceByDays } from "../../utils/utils";
 import { contextValue } from "../../components/Loader";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
+import { LoginModules } from "../../constants/enums";
+import { useSelector } from "react-redux";
 
 const TrendingTopics = (props) => {
   const { colors, fontFamily, fonts } = THEMES;
   const isFocused = useIsFocused();
   const [trendingTopics, setTrendingTopics] = useState();
   const [topicList, setTopicList] = useState([]);
+  const { loggedInModule } = useSelector((state) => state?.register);
 
   useEffect(() => {
     if (isFocused) {
@@ -62,9 +65,9 @@ const TrendingTopics = (props) => {
   const renderItem = ({ item, index }) => {
     return (
       <TouchableButtonWithPermission
-      customMsgForRegistration={
-        "Get Registered and subscribe to enjoy all exciting features of ADA app."
-      }
+        customMsgForRegistration={
+          "Get Registered and subscribe to enjoy all exciting features of ADA app."
+        }
         onPress={() =>
           props.navigation.navigate("trendDetail", { selectedData: item })
         }
@@ -109,7 +112,7 @@ const TrendingTopics = (props) => {
             {item?.subject}
           </Text>
           <Text
-            numberOfLines={2}
+            numberOfLines={1}
             style={{
               fontFamily: THEMES.fontFamily.semiBold,
               color: THEMES.colors.darkGrey,
@@ -253,7 +256,7 @@ const TrendingTopics = (props) => {
             fontWeight: 500,
           }}
         >
-          Oops! No information available.
+          Oops! No Payment details available.
         </Text>
       </View>
     );
@@ -279,7 +282,7 @@ const TrendingTopics = (props) => {
               paddingTop: moderateScale(13),
             }}
           >
-            <View style={{ width: "87%" }}>
+            <View style={{ width: loggedInModule === LoginModules.provider ?  "87%" : '100%' }}>
               <TouchableOpacity
                 onPress={() =>
                   props.navigation.navigate("auth", {
@@ -309,26 +312,28 @@ const TrendingTopics = (props) => {
               </TouchableOpacity>
             </View>
 
-            <TouchableButtonWithPermission
-              customMsgForRegistration={
-                "Complete your Registration and Subscribe to the app to create new topics."
-              }
-              onPress={() =>
-                props.navigation.navigate("auth", {
-                  screen: "newTopic",
-                })
-              }
-              style={{
-                backgroundColor: THEMES.colors.cyan,
-                padding: moderateScale(11),
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: moderateScale(8),
-                borderBottomLeftRadius: moderateScale(0),
-              }}
-            >
-              <Plus stroke={"#fff"} />
-            </TouchableButtonWithPermission>
+            {loggedInModule === LoginModules.provider && (
+              <TouchableButtonWithPermission
+                customMsgForRegistration={
+                  "Complete your Registration and Subscribe to the app to create new topics."
+                }
+                onPress={() =>
+                  props.navigation.navigate("auth", {
+                    screen: "newTopic",
+                  })
+                }
+                style={{
+                  backgroundColor: THEMES.colors.cyan,
+                  padding: moderateScale(11),
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: moderateScale(8),
+                  borderBottomLeftRadius: moderateScale(0),
+                }}
+              >
+                <Plus stroke={"#fff"} />
+              </TouchableButtonWithPermission>
+            )}
           </View>
 
           {topicList?.length || trendingTopics?.length ? (

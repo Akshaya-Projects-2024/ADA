@@ -32,14 +32,14 @@ export function resetNavigation(name) {
 }
 
 export function navigateToParent(name, navigation) {
-  navigation.reset({
+  navigation?.reset({
     index: 0,
     routes: [{ name }],
   });
 }
 
 export const navigateToServiceProvider = (navigation) => {
-  navigation.reset({
+  navigation?.reset({
     index: 0,
     routes: [
       {
