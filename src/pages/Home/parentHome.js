@@ -637,7 +637,7 @@ const ParentHome = (props) => {
         </View>
         <View
           style={{
-            marginTop: moderateScale(13),
+            marginTop: moderateScale(32),
             marginHorizontal: moderateScale(16),
             flexDirection: "row",
             justifyContent: "space-between",
@@ -667,7 +667,7 @@ const ParentHome = (props) => {
         <View
           style={{
             flexDirection: "row",
-            marginTop: moderateScale(32),
+            marginTop: moderateScale(16),
             alignItems: "center",
             justifyContent: "center",
           }}
