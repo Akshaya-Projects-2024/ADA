@@ -36,6 +36,8 @@ const Header = (props) => {
     >
       {noBack ? (
         <TouchableOpacity style={widthStyle}></TouchableOpacity>
+      ) : customIcon ? (
+        <View>{customIcon}</View>
       ) : (
         <TouchableOpacity
           hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}

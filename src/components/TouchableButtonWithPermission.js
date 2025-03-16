@@ -18,18 +18,18 @@ const TouchableButtonWithPermission = ({
   ...rest
 }) => {
   const { loggedInModule } = useSelector((state) => state?.register);
-  const { userData } = useUser();
   const [title, setTitle] = useState("");
   const isServiceProvider = loggedInModule === LoginModules.provider;
+  const profile = useSelector((state) => state?.commonReducer);
 
   const handlePress = async () => {
     if (checkPermission) {
       const registrationStatus =
-        userData?.logindetails?.[
+        profile?.logindetails?.[
           isServiceProvider ? "providerstatus" : "parentstatus"
         ];
       const paymentStatus =
-        userData?.[isServiceProvider ? "providerProfile" : "parentProfie"]
+        profile?.[isServiceProvider ? "providerProfile" : "parentProfie"]
           ?.subscription?.status;
 
       if (registrationStatus === "PENDING") {

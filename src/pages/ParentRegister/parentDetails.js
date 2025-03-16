@@ -62,7 +62,7 @@ const ParentDetails = (props) => {
     providerProfile?.providerContact?.email || undefined
   );
   const [pinCode, setPincode] = useState();
-  const { userData, apiInitCall } = useUser();
+  const { apiInitCall } = useUser();
 
   useEffect(() => {
     initData();

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,6 @@ import {
   StatusBar,
   StyleSheet,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import LinearGradient from "react-native-linear-gradient";
@@ -36,11 +35,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileDummy from "../../assets/svg/user.svg";
 import Toggle from "../../components/Toggle";
 import { LoginModules } from "../../constants/enums";
-import { getContactDetails } from "../../redux-store/actions/commonApis";
 import { decryptService } from "../../utils/storageFunc";
 import { deleteAccountApi } from "../../redux-store/actions/auth";
-import { StackActions, NavigationActions } from "react-navigation";
-import { resetNavigation } from "../../navigations/rootNavigationRef";
+import {
+  navigateToParent,
+  resetNavigation,
+} from "../../navigations/rootNavigationRef";
 import { showToast } from "../../utils/utils";
 import { contextValue } from "../../components/Loader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -122,7 +122,7 @@ const MyAccount = (props) => {
       </TouchableOpacity>
     );
   };
-  
+
   const handleDeleteAccount = async () => {
     try {
       setDeleteAccountModal(false);
@@ -167,7 +167,6 @@ const MyAccount = (props) => {
     checkPermission = false
   ) => {
     const Icon = icon;
-    console.log(route);
     return (
       <TouchableButtonWithPermission
         customMsgForRegistration={
@@ -218,10 +217,7 @@ const MyAccount = (props) => {
   const onParentClick = () => {
     const validParentProfile = validateParentProfile(profile);
     if (validParentProfile?.flag) {
-      props.navigation.reset({
-        index: 0,
-        routes: [{ name: "petParentAppStack" }],
-      });
+      navigateToParent("petParentAppStack", props.navigation);
     } else {
       props.navigation.navigate(validParentProfile?.navigateTo, {
         route: "myAccount",
@@ -231,14 +227,17 @@ const MyAccount = (props) => {
 
   const switchProfile = () => {
     const validParentProfile = validateParentProfile(profile);
+    modal && setModal(false);
     if (validParentProfile?.flag) {
-      props.navigation.reset({
-        index: 0,
-        routes: [{ name: "petParentAppStack" }],
-      });
+      navigateToParent("petParentAppStack", props.navigation);
     } else {
+      // props.navigation.navigate(validParentProfile?.navigateTo, {
+      //   route: "parentAccount",
+      //   redirectFunc: () =>
+      //     navigateToParent("petParentAppStack", props.navigation),
+      // });
       props.navigation.navigate(validParentProfile?.navigateTo, {
-        route: "parentAccount",
+        route: "myAccount",
       });
     }
   };

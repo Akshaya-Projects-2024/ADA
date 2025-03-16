@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -25,7 +25,7 @@ import {
   validateServiceProfile,
 } from "../../utils/userUtils";
 import { AppointmentStatus, LoginModules } from "../../constants/enums";
-import { useIsFocused } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import Strings from "../../constants/strings";
 import { showToast, validArray } from "../../utils/utils";
@@ -44,6 +44,8 @@ import { getAllEventsApi } from "../../redux-store/actions/events";
 import { vh, vw } from "../../utils/dimensions";
 import Dialog from "../../components/Dialog";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
+import { navigateToServiceProvider } from "../../navigations/rootNavigationRef";
+import { fetchUserProfileData } from "../../redux-store/actions/registerAction";
 const { width: screenWidth } = Dimensions.get("window");
 
 const { width } = Dimensions.get("window");
@@ -69,6 +71,10 @@ const ParentHome = (props) => {
       dispatch(setLoggedInMoodule(LoginModules.parent));
     }
   }, [isFocused, dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchUserProfileData());
+  }, [profile.refreshUserData]);
 
   const getEvents = async () => {
     let obj = {
@@ -472,25 +478,15 @@ const ParentHome = (props) => {
 
   const switchProfile = () => {
     const validProviderProfile = validateServiceProfile(profile);
+    modal && setModal(false);
     if (validProviderProfile?.flag) {
-      props.navigation.reset({
-        index: 0,
-        routes: [
-          {
-            name: "auth",
-            state: {
-              routes: [
-                {
-                  name: "home",
-                },
-              ],
-            },
-          },
-        ],
-      });
+      navigateToServiceProvider(props.navigation);
     } else {
       props.navigation.navigate("auth", {
         screen: validProviderProfile?.navigateTo,
+        params: {
+          redirectFunc: () => navigateToServiceProvider(props.navigation),
+        },
       });
     }
   };
@@ -551,9 +547,9 @@ const ParentHome = (props) => {
               }}
             >
               {`Hi ${
-                guestUser
-                  ? Strings.guest
-                  : profile?.parentProfie?.parentContact?.name
+                profile?.parentProfie?.parentContact?.name
+                  ? profile?.parentProfie?.parentContact?.name
+                  : Strings.guest
               }`}
             </Text>
           </View>

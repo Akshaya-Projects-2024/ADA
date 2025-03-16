@@ -39,7 +39,10 @@ import { LoginModules } from "../../constants/enums";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
 import { deleteAccountApi } from "../../redux-store/actions/auth";
-import { resetNavigation } from "../../navigations/rootNavigationRef";
+import {
+  navigateToServiceProvider,
+  resetNavigation,
+} from "../../navigations/rootNavigationRef";
 import { showToast } from "../../utils/utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Dialog from "../../components/Dialog";
@@ -206,6 +209,7 @@ const ParentAccount = (props) => {
       props.navigation.navigate("auth", {
         screen: "home",
       });
+      // navigateToServiceProvider(props.navigation);
     } else {
       props.navigation.navigate("auth", {
         screen: validProviderProfile?.navigateTo,
@@ -215,6 +219,7 @@ const ParentAccount = (props) => {
 
   const switchProfile = () => {
     const validProviderProfile = validateServiceProfile(profile);
+    modal && setModal(false);
     if (validProviderProfile?.flag) {
       props.navigation.reset({
         index: 0,
@@ -340,11 +345,11 @@ const ParentAccount = (props) => {
                     icon={<PawPrint />}
                     title={Strings.myPetProfile}
                     showPending={!profileStatus}
-                    onPress={() =>
+                    onPress={() => {
                       props.navigation.navigate("petDetail", {
                         route: "parentAccount",
-                      })
-                    }
+                      });
+                    }}
                   />
                   <MenuItem
                     bgColor={THEMES.colors.hawkesBlue}

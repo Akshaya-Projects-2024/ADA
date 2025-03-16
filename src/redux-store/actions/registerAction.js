@@ -7,6 +7,7 @@ import {
   SERVICE_PROVIDER_ROLE_SUCCESS,
   SERVICE_PROVIDER_ROLE_ERROR,
   PROFILE_DATA,
+  REFRESH_USER_DATA,
 } from "../types";
 import Api from "../../api/Api";
 import { decryptService } from "../../utils/storageFunc";
@@ -87,5 +88,14 @@ export const fetchUserProfileData = () => {
         dispatch(dispatchUserData(response?.data?.data));
       }
     } catch (error) {}
+  };
+};
+
+export const updateProfileData = (data) => {
+  return async (dispatch) => {
+    dispatch({
+      type: REFRESH_USER_DATA,
+      payload: [],
+    });
   };
 };

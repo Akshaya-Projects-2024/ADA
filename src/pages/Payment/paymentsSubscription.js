@@ -41,6 +41,7 @@ import { contextValue } from "../../components/Loader";
 import Logo from "../../assets/images/roundIcon.png";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 import { useFocusEffect } from "@react-navigation/native";
+import { navigateToParent } from "../../navigations/rootNavigationRef";
 
 const PaymentsSubscription = (props) => {
   const dispatch = useDispatch();
@@ -54,15 +55,9 @@ const PaymentsSubscription = (props) => {
   const profile = useSelector((state) => state?.commonReducer);
   const { loggedInModule } = useSelector((state) => state?.register);
   const [refresh, setRefresh] = useState(false);
-
   const userKey =
     loggedInModule === "parent" ? "parentProfie" : "providerProfile";
-  const userAlreadySubscribed = useRef(
-    Boolean(
-      profile?.[userKey]?.subscription?.subscriptioncode &&
-        profile?.[userKey]?.subscription?.status === "active"
-    )
-  );
+  const [userAlreadySubscribed, setAlreadySubscribed] = useState(false);
 
   useEffect(() => {
     initData();
@@ -79,11 +74,12 @@ const PaymentsSubscription = (props) => {
   );
 
   useEffect(() => {
-    userAlreadySubscribed.current = Boolean(
-      profile?.[userKey]?.subscription?.subscriptioncode &&
-        profile?.[userKey]?.subscription?.status === "active"
+    setAlreadySubscribed(
+      Boolean(
+        profile?.[userKey]?.subscription?.subscriptioncode &&
+          profile?.[userKey]?.subscription?.status === "active"
+      )
     );
-    setRefresh(!refresh);
   }, [profile]);
 
   const getUserData = useCallback(() => {
@@ -214,7 +210,10 @@ const PaymentsSubscription = (props) => {
             const res1 = await getSubscription(obj1);
             if (res1.status === 200) {
               if (res1?.data?.data) {
-                setSubscriptionDetails(res1?.data?.data);
+                setSubscriptionDetails({
+                  ...res1?.data?.data,
+                  amount: selectedSub?.amount,
+                });
               }
             }
           }
@@ -252,7 +251,6 @@ const PaymentsSubscription = (props) => {
       ],
     });
   };
-
   const handlePayment = async () => {
     try {
       const userData = await getUserData();
@@ -306,12 +304,16 @@ const PaymentsSubscription = (props) => {
 
   const handleSubscriptionSuccess = () => {
     setSubscription(false);
-    navigateToHome();
+    loggedInModule === "provider"
+      ? navigateToHome()
+      : navigateToParent(props?.navigation);
   };
 
   const handleSubscriptionError = () => {
     setError(false);
-    navigateToHome();
+    loggedInModule === "provider"
+      ? navigateToHome()
+      : navigateToParent(props?.navigation);
   };
 
   const onCardClick = async (plan) => {
@@ -345,6 +347,15 @@ const PaymentsSubscription = (props) => {
     }
   };
 
+  const checkStatus = () => {
+    const validProviderProfile = validateServiceProfile(profile, true);
+    const validProfile = validateParentProfile(profile);
+    return loggedInModule === "parent"
+      ? !validProfile.flag
+      : !validProviderProfile.flag;
+  };
+  console.log(checkStatus(), userKey, loggedInModule);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -376,13 +387,13 @@ const PaymentsSubscription = (props) => {
               style={[
                 styles.joinTheFunText,
                 {
-                  color: userAlreadySubscribed.current
+                  color: userAlreadySubscribed
                     ? THEMES.colors.cyan
                     : THEMES.colors.black,
                 },
               ]}
             >
-              {userAlreadySubscribed.current
+              {userAlreadySubscribed
                 ? Strings.youAreAlreadySubscribed
                 : Strings.joinTheFun}
             </Text>
@@ -403,7 +414,7 @@ const PaymentsSubscription = (props) => {
                       return (
                         <View key={plan?.id}>
                           <TouchableOpacity
-                            disabled={userAlreadySubscribed.current}
+                            disabled={userAlreadySubscribed}
                             style={[
                               styles.card,
                               selectedCard?.id === plan?.id
@@ -542,7 +553,7 @@ const PaymentsSubscription = (props) => {
                 {Strings.viewBreakup}
               </Text>
             </View>
-            {!userAlreadySubscribed.current && (
+            {!userAlreadySubscribed && (
               <View style={[styles.btnView, { paddingTop: moderateScale(20) }]}>
                 <TouchableButtonWithPermission
                   customMsgForRegistration={
@@ -551,7 +562,7 @@ const PaymentsSubscription = (props) => {
                   useButton={true}
                   onPress={handlePayment}
                   title={Strings.payNow}
-                  checkPayment={false}
+                  checkPermission={checkStatus()}
                 />
               </View>
             )}

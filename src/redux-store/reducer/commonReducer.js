@@ -1,10 +1,11 @@
-import { PROFILE_DATA } from "../types";
+import { PROFILE_DATA, REFRESH_USER_DATA } from "../types";
 
 const initialState = {
   logindetails: {},
   parentProfie: {},
   providerProfile: {},
   profileData: {},
+  refreshUserData: false,
 };
 
 export const commonReducer = (state = initialState, action) => {
@@ -13,7 +14,10 @@ export const commonReducer = (state = initialState, action) => {
     case PROFILE_DATA:
       return {
         ...state,
-        profileData: payload?.logindetails?.isprovider !== 0 ?  payload?.providerProfile : payload?.parentProfie, 
+        profileData:
+          payload?.logindetails?.isprovider !== 0
+            ? payload?.providerProfile
+            : payload?.parentProfie,
         logindetails: payload?.logindetails,
         ...(payload?.parentProfie
           ? { parentProfie: payload?.parentProfie }
@@ -21,6 +25,11 @@ export const commonReducer = (state = initialState, action) => {
         ...(payload?.providerProfile
           ? { providerProfile: payload?.providerProfile }
           : {}),
+      };
+    case REFRESH_USER_DATA:
+      return {
+        ...state,
+        refreshUserData: !state.refreshUserData,
       };
     default:
       return state;

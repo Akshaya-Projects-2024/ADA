@@ -10,7 +10,7 @@ import {
   Image,
   FlatList,
 } from "react-native";
-import { moderateScale, s } from "react-native-size-matters";
+import { moderateScale } from "react-native-size-matters";
 
 import Strings from "../../constants/strings";
 import Header from "../../components/Header";
@@ -18,30 +18,33 @@ import ModalDropdown from "../../components/ModalDropdown";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import Stepper from "../../components/Stepper";
-import Paw from "../../assets/svg/paw.svg";
 import Pencil from "../../assets/svg/pencil.svg";
 import UploadImageModal from "../../components/UploadImageModal";
 import CrossCircle from "../../assets/svg/crossCircle.svg";
 import Cross from "../../assets/svg/cross.svg";
 import { THEMES } from "../../assets/theme/themes";
 import { decryptService } from "../../utils/storageFunc";
-import { BREEDS } from "../../constants/mockData";
 import { showToast, validArray } from "../../utils/utils";
 import {
+  deletePet,
   deletePetDocumentApi,
   savePetDetails,
-  uploadDocument,
 } from "../../redux-store/actions/auth";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
 import { useUser } from "../../api/UserContext";
 import ProfileDummy from "../../assets/svg/user.svg";
 import { getAdoptionCategory } from "../../redux-store/actions/commonApis";
-import { useDebounce } from "../../hooks/useDebounce";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { contextValue } from "../../components/Loader";
 import { isValidName, isValidNumber } from "../../utils/validation";
+import PetCarousel from "../../components/PetCarousel";
+import Plus from "../../assets/svg/plus.svg";
+import Delete from "../../assets/svg/delete.svg";
+import Dialog from "../../components/Dialog";
+import { goBack } from "../../navigations/rootNavigationRef";
+import { updateProfileData } from "../../redux-store/actions/registerAction";
 
 const GENDER = { male: "Male", female: "Female" };
 
@@ -49,7 +52,9 @@ export const IMAGE_TYPE = { photo: "photo", certificate: "certificate" };
 
 const PetDetail = (props) => {
   const route = props?.route?.params?.route;
-  const [petImage, setPetImage] = useState([]);
+  const addNew = props?.route?.params?.addNew;
+  const redirectFunc = props?.route?.params?.redirectFunc;
+  const [petImage, setPetImage] = useState();
   const [petImagesVisible, setPetImageVisible] = useState(false);
   const [petName, setPetName] = useState("");
   const [petAge, setPetAge] = useState("");
@@ -60,7 +65,7 @@ const PetDetail = (props) => {
   const [petTypeData, setPetTypeData] = useState();
   const [petData, setPetData] = useState();
   const [petPhotoVisible, setPetPhotoVisible] = useState();
-  const { userData, apiInitCall } = useUser();
+  const { apiInitCall } = useUser();
   const [breedList, setBreedList] = useState([]);
   const [selectPetBreed, setSelectedPetBreed] = useState(); // breed
 
@@ -71,9 +76,11 @@ const PetDetail = (props) => {
   const [registerModal, setRegisterModal] = useState(false);
   const { parentProfie } = useSelector((state) => state?.commonReducer);
   const { petDetails } = parentProfie;
+  const [selectedPet, setSelectedPet] = useState();
+  const [deleteModal, setDeleteModal] = useState(false);
 
   const [submitDocumentData, setSubmitDocumentData] = useState([]);
-
+  const dispatch = useDispatch()
   const isURL = (str) => /^(https?:\/\/|file:\/\/)/.test(str);
 
   const isBase64 = (str) =>
@@ -92,9 +99,9 @@ const PetDetail = (props) => {
     initData();
   }, []);
 
-  const getPetData = (result, data) => {
+  const getPetData = () => {
     if (validArray(petDetails)) {
-      const firstPet = petDetails[0];
+      const firstPet = { ...selectedPet };
       if (firstPet?.about) {
         setPetDescription(firstPet?.about);
       }
@@ -103,15 +110,19 @@ const PetDetail = (props) => {
       }
 
       if (firstPet?.type) {
-        const selectedType = result?.filter((it) => it.label == firstPet?.type);
+        const selectedType = petTypeData?.filter(
+          (it) => it.label == firstPet?.type
+        );
         if (selectedType) {
           setSelectedPetType(selectedType);
         }
       }
 
       if (firstPet?.breed) {
-        const selectedType = result?.filter((it) => it.label == firstPet?.type);
-        const selectedData = data?.find(
+        const selectedType = petTypeData?.filter(
+          (it) => it.label == firstPet?.type
+        );
+        const selectedData = petData?.find(
           (item) => item.category == selectedType?.[0]?.label
         );
 
@@ -163,6 +174,12 @@ const PetDetail = (props) => {
     }
   };
 
+  useEffect(() => {
+    if (selectedPet && petData?.length && petTypeData?.length) {
+      getPetData();
+    }
+  }, [selectedPet, petData, petTypeData]);
+
   const initData = async () => {
     try {
       contextValue?.setLoader(true);
@@ -178,7 +195,7 @@ const PetDetail = (props) => {
       if (result?.length) {
         setPetTypeData(result);
       }
-      getPetData(result, data);
+      !addNew && setSelectedPet(petDetails[0]);
       contextValue?.setLoader(false);
     } catch (error) {
       contextValue?.setLoader(false);
@@ -286,7 +303,6 @@ const PetDetail = (props) => {
     }
   };
   const onSubmit = async () => {
-    const firstPet = petDetails[0];
     if (!petImage) {
       showToast("error", "Please select pet image");
     } else if (!petName) {
@@ -308,7 +324,6 @@ const PetDetail = (props) => {
         contextValue?.setLoader(true);
         const userId = await decryptService("userId");
         const params = {
-          id: petDetails[0]?.id,
           userid: userId,
           name: petName,
           type: selectedPetType[0]?.label || null,
@@ -319,10 +334,18 @@ const PetDetail = (props) => {
           breed: selectPetBreed[0]?.label,
           weight: petWeight,
         };
+        if (!addNew) {
+          params.id = selectedPet?.id;
+        }
         const res = await savePetDetails(params);
         if (res?.data?.status_code == 200) {
+          showToast("success", res?.data?.message);
           if (route === "parentAccount") {
-            props.navigation.dispatch(StackActions.pop(1));
+            if (redirectFunc) {
+              redirectFunc();
+            } else {
+              props.navigation.dispatch(StackActions.pop(addNew ? 2 : 1));
+            }
           } else {
             setRegisterModal(true);
           }
@@ -332,7 +355,6 @@ const PetDetail = (props) => {
         apiInitCall();
         contextValue?.setLoader(false);
       } catch (error) {
-        console.log("er", error);
         contextValue?.setLoader(false);
         showToast("error", error);
       }
@@ -374,6 +396,27 @@ const PetDetail = (props) => {
     );
   };
 
+  const deletePetData = async () => {
+    try {
+      const userId = await decryptService("userId");
+      let obj = {
+        id: selectedPet?.id,
+        userid: userId,
+      };
+      let res = await deletePet(obj);
+      setDeleteModal(false);
+      if (res?.status_code == 200) {
+        showToast("success", res?.data?.message);
+        dispatch(updateProfileData())
+        goBack()
+      } else {
+        showToast("error", res?.data?.message);
+      }
+    } catch (error) {
+      console.log(error, "wdwd");
+    }
+  };
+
   const renderDocumentItem = (item, index) => {
     const photo = item?.item.document;
     return (
@@ -406,8 +449,47 @@ const PetDetail = (props) => {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <StatusBar backgroundColor={THEMES.colors.bgColor} />
-        <Header title={"Pet details"} showBack bgColor="transparent" />
-        {route !== "parentAccount" && (
+        <Header
+          title={"Pet details"}
+          showBack
+          bgColor="transparent"
+          right={
+            !addNew && validArray(petDetails) ? (
+              <View
+                style={{ flexDirection: "row", justifyContent: "flex-end" }}
+              >
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 10,
+                    paddingHorizontal: 6,
+                    marginRight: 3,
+                  }}
+                  onPress={() => {
+                    props.navigation.replace("petDetail", {
+                      addNew: true,
+                      route: "parentAccount",
+                    });
+                  }}
+                >
+                  <Plus stroke={THEMES.colors.cyan} strokeWidth={2} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    paddingVertical: 10,
+                    paddingHorizontal: 6,
+                    paddingRight: 0,
+                  }}
+                  onPress={() => setDeleteModal(true)}
+                >
+                  <Delete />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <></>
+            )
+          }
+        />
+        {route !== "parentAccount" && !addNew && (
           <View
             style={{
               borderTopWidth: 1,
@@ -419,6 +501,13 @@ const PetDetail = (props) => {
           >
             <Stepper currentStep={2} totalSteps={2} />
           </View>
+        )}
+        {Boolean(selectedPet) && (
+          <PetCarousel
+            pets={petDetails}
+            onSelectPet={(pet) => setSelectedPet(pet)}
+            selectedPet={selectedPet}
+          />
         )}
 
         <View style={{ flex: 1 }}>
@@ -441,7 +530,7 @@ const PetDetail = (props) => {
                   justifyContent: "center",
                 }}
               >
-                {Boolean(petImage?.length) ? (
+                {Boolean(petImage) ? (
                   checkType(petImage) ? (
                     <Image
                       style={{
@@ -814,6 +903,20 @@ const PetDetail = (props) => {
             </View>
           </View>
         </Modal>
+        <Dialog
+          flag={Boolean(deleteModal)}
+          title={"Delete"}
+          description={`Are u sure you want to delete the pet?`}
+          leftButtonText="No"
+          rightButtonText="Yes"
+          rightButtonPressed={deletePetData}
+          leftButtonPressed={() => {
+            setDeleteModal(false);
+          }}
+          onClose={() => {
+            setDeleteModal(false);
+          }}
+        />
       </View>
     </SafeAreaView>
   );

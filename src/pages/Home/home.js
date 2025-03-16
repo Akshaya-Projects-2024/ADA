@@ -54,6 +54,7 @@ import { useUser } from "../../api/UserContext";
 import SessionsForAppointment from "../../components/SessionsForAppointment";
 import { SESSION_TYPE } from "../Services/selectAppointment";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
+import { navigateToParent, resetNavigation } from "../../navigations/rootNavigationRef";
 
 const Home = (props) => {
   const { top } = useSafeAreaInsets();
@@ -335,14 +336,15 @@ const Home = (props) => {
 
   const switchProfile = () => {
     const validParentProfile = validateParentProfile(profile);
+    modal && setModal(false);
     if (validParentProfile?.flag) {
-      props.navigation.reset({
-        index: 0,
-        routes: [{ name: "petParentAppStack" }],
-      });
+      navigateToParent("petParentAppStack", props.navigation);
     } else {
       props.navigation.navigate(validParentProfile?.navigateTo, {
         route: "parentAccount",
+        redirectFunc: () => {
+          navigateToParent("petParentAppStack", props.navigation);
+        },
       });
     }
   };
