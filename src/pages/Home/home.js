@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
   Dimensions,
   StatusBar,
 } from "react-native";
@@ -54,7 +53,9 @@ import { useUser } from "../../api/UserContext";
 import SessionsForAppointment from "../../components/SessionsForAppointment";
 import { SESSION_TYPE } from "../Services/selectAppointment";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
-import { navigateToParent, resetNavigation } from "../../navigations/rootNavigationRef";
+import {
+  navigateToParent,
+} from "../../navigations/rootNavigationRef";
 
 const Home = (props) => {
   const { top } = useSafeAreaInsets();
@@ -338,12 +339,12 @@ const Home = (props) => {
     const validParentProfile = validateParentProfile(profile);
     modal && setModal(false);
     if (validParentProfile?.flag) {
-      navigateToParent("petParentAppStack", props.navigation);
+      navigateToParent(props.navigation);
     } else {
       props.navigation.navigate(validParentProfile?.navigateTo, {
         route: "parentAccount",
         redirectFunc: () => {
-          navigateToParent("petParentAppStack", props.navigation);
+          navigateToParent(props.navigation);
         },
       });
     }
@@ -515,7 +516,7 @@ const Home = (props) => {
               }}
             >
               <Bell onPress={() => props.navigation.navigate("notification")} />
-            <TouchableButtonWithPermission
+              <TouchableButtonWithPermission
                 customMsgForRegistration={
                   "Complete your Registration and Subscribe to the app to create new events."
                 }

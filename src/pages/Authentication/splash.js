@@ -23,6 +23,7 @@ import {
 import { LoginModules } from "../../constants/enums";
 import DeviceInfo from "react-native-device-info";
 import { getCurrentLocation } from "../../utils/geolocationUtils";
+import SharedPreferences from "react-native-shared-preferences";
 
 const Splash = (props) => {
   const timeoutRef = useRef();
@@ -37,21 +38,24 @@ const Splash = (props) => {
 
   const delay = useCallback(
     async (func) => {
-      const firstBootCompleted = await decryptService("firstBootCompleted");
-      if (firstBootCompleted) {
-        if (timeoutRef?.current) {
-          clearTimeout(timeoutRef.current);
+      // const firstBootCompleted = await decryptService("firstBootCompleted");
+      SharedPreferences.getItem("firstBootCompleted", (value) => {
+        const firstBootCompleted = JSON.parse(value);
+        if (firstBootCompleted) {
+          if (timeoutRef?.current) {
+            clearTimeout(timeoutRef.current);
+          }
+          timeoutRef.current = setTimeout(func, 1500);
+        } else {
+          timeoutRef.current = setTimeout(
+            () =>
+              props?.navigation.replace("intro", {
+                func: func,
+              }),
+            1500
+          );
         }
-        timeoutRef.current = setTimeout(func, 1500);
-      } else {
-        timeoutRef.current = setTimeout(
-          () =>
-            props?.navigation.navigate("intro", {
-              func: func,
-            }),
-          1500
-        );
-      }
+      });
     },
     [props?.navigation]
   );
@@ -63,7 +67,7 @@ const Splash = (props) => {
     }
   }, [isFocused, checkIfUserExits, dispatch]);
 
-  useEffect(async () => {
+  useEffect(() => {
     fetchLocation();
   }, []);
 
@@ -117,7 +121,7 @@ const Splash = (props) => {
     );
 
   const navigateToAuth = (screen) =>
-    delay(() => props.navigation.navigate("auth", { screen }));
+    delay(() => props.navigation.replace("auth", { screen }));
 
   const checkIfUserExits = useCallback(async () => {
     const data = await decryptService("accessToken");
@@ -126,46 +130,47 @@ const Splash = (props) => {
       const userData = await initData();
       const validProfile = validateParentProfile(userData);
       const validProviderProfile = validateServiceProfile(userData); //pass true as an argument for testing purpose till payment part is done
+      const isProviderRegisterLater = await decryptService(
+        "isPetProviderRegisterLater"
+      );
+      const isPetParentRegisterLater = await decryptService(
+        "isPetParentRegisterLater"
+      );
       if (validProfile?.flag && validProviderProfile?.flag) {
         if (loggedInModule && loggedInModule === LoginModules.parent) {
           navigateToParentApp();
         } else {
           navigateToHome();
         }
-      } else if (
-        !validProfile?.flag &&
-        !validProfile?.partiallyCompleted &&
-        !validProviderProfile?.flag &&
-        !validProviderProfile?.partiallyCompleted
-      ) {
-        delay(() => props?.navigation.replace("auth"));
-      } else if (validProviderProfile?.flag) {
+      } else if (validProviderProfile?.flag && loggedInModule === "provider") {
         navigateToHome();
-      } else if (validProfile?.flag) {
+      } else if (validProfile?.flag && loggedInModule === "parent") {
         navigateToParentApp();
       } else if (
-        !validProviderProfile?.flag &&
-        validProviderProfile?.partiallyCompleted
+        (!validProviderProfile?.flag &&
+          validProviderProfile?.partiallyCompleted) ||
+        loggedInModule === "provider"
       ) {
-        const val = await decryptService("isRegisterLater");
-        if (val) {
-          navigateToHome();
-        } else {
+        if (isProviderRegisterLater == false) {
           showToast("error", "Please complete your registration");
           delay(() =>
-            props.navigation.navigate("auth", {
+            props.navigation.replace("auth", {
               screen: validProviderProfile?.navigateTo,
             })
           );
+        } else {
+          navigateToHome();
         }
-      } else if (!validProfile?.flag && validProfile?.partiallyCompleted) {
-        const isRegisterLater = await decryptService(
-          "isPetParentRegisterLater"
-        );
-        return isRegisterLater
-          ? navigateToParentApp()
-          : (showToast("error", "Please complete your registration"),
-            navigateToAuth(validProfile?.navigateTo));
+      } else if (
+        (!validProfile?.flag && validProfile?.partiallyCompleted) ||
+        loggedInModule === "parent"
+      ) {
+        if (isPetParentRegisterLater == false) {
+          showToast("error", "Please complete your registration");
+          navigateToAuth(validProfile?.navigateTo);
+        } else {
+          navigateToParentApp();
+        }
       } else {
         delay(() => props?.navigation.replace("auth"));
       }

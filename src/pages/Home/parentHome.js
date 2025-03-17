@@ -126,7 +126,6 @@ const ParentHome = (props) => {
   const initData = async () => {
     try {
       contextValue?.setLoader(true);
-
       const userId = await decryptService("userId");
       const params = {
         userid: userId,
@@ -610,7 +609,7 @@ const ParentHome = (props) => {
               customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
               customMsgForPayment="Please subscribe to get best services for your lovely pets."
               onPress={() =>
-                props.navigation.navigate("auth", { screen: "search" })
+                props.navigation.navigate("service", { isSearch: true })
               }
               style={{
                 padding: moderateScale(8),

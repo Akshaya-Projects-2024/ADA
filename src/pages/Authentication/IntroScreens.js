@@ -15,7 +15,7 @@ import Carousel from "react-native-snap-carousel";
 import { encryptService } from "../../utils/storageFunc";
 import { vh, vw } from "../../utils/dimensions";
 import PaginationDots from "react-native-pagination-dots";
-
+import SharedPreferences from "react-native-shared-preferences";
 
 const Intro1 = ({ func }) => {
   const { width } = useWindowDimensions();
@@ -48,7 +48,7 @@ const Intro2 = ({ func }) => {
         <Text style={styles.label2Style}>{Images[1].label2}</Text>
       ) : null}
       <Text style={styles.descStyle}>{Images[1].desc}</Text>
-      <Image style={[styles.image1,{top:vh(350)}]} source={Images[1].url} />
+      <Image style={[styles.image1, { top: vh(350) }]} source={Images[1].url} />
     </View>
   );
 };
@@ -106,7 +106,8 @@ const IntroScreens = (props) => {
       <Component
         func={async () => {
           func();
-          await encryptService("firstBootCompleted", true);
+          // await encryptService("firstBootCompleted", true);
+          SharedPreferences.setItem("firstBootCompleted", JSON.stringify(true));
         }}
       />
     );
@@ -133,7 +134,7 @@ const IntroScreens = (props) => {
         itemWidth={width}
         onSnapToItem={(index) => setCurrentIndex(index)} // Track active slide index
       />
-       <View style={styles.paginationContainer}>
+      <View style={styles.paginationContainer}>
         <PaginationDots
           length={Images?.length} // Total steps
           activeIndex={currentIndex} // Current index
@@ -142,7 +143,6 @@ const IntroScreens = (props) => {
           size={8} // Adjust dot size
         />
       </View>
-
     </View>
   );
 };
@@ -160,7 +160,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: ms(30),
     top: vh(25),
-   
   },
   container: { flexGrow: 1 },
   container2: { flex: 1 },
@@ -169,7 +168,7 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font45,
     color: THEMES.colors.white,
     textAlign: "center",
-    marginHorizontal:moderateScale(10)
+    marginHorizontal: moderateScale(10),
   },
   label2Style: {
     fontFamily: THEMES.fontFamily.bold,
@@ -186,7 +185,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginHorizontal: ms(45),
     lineHeight: ms(24),
-
   },
   image1: { position: "absolute", bottom: 0, right: 0 },
   image3: { position: "absolute", bottom: 0, left: 0, top: 350 },
@@ -194,10 +192,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 70,
     alignSelf: "flex-start",
-    flexDirection:'row',
-    marginHorizontal:vw(20)
-
+    flexDirection: "row",
+    marginHorizontal: vw(20),
   },
-
 });
-

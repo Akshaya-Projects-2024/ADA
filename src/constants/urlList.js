@@ -24,7 +24,7 @@ export const urlList = {
   addAdoption: "parent/addadoptionrequest",
   getPetCategory: "master/getpetcategory",
   getTopics: "provider/getmytopics",
-  getProviderByService: "provider/getproviderbyservicecode",
+  getProviderByService: "provider/search/getprovider",
   uploadCommonDocument: "document/upload",
   deleteCommonDocument: "document/delete",
   getProviderTimeSlots: "appointment/gettimeslot",

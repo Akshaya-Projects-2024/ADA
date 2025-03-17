@@ -32,6 +32,7 @@ import TouchableButtonWithPermission from "../../components/TouchableButtonWithP
 
 const Service = ({ navigation, route }) => {
   const selectedService = route?.params?.selectedService;
+  const isSearch = route?.params?.isSearch;
   const [searchText, setSearchText] = useState("");
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // Data after filtering
@@ -41,22 +42,21 @@ const Service = ({ navigation, route }) => {
     initData();
   }, [isFocused]);
 
-  const initData = async () => {
+  const initData = async (text) => {
     contextValue?.setLoader(true);
     try {
       const userId = await decryptService("userId");
       const params = {
         userid: userId,
-        servicecode: selectedService?.code,
+        searchby: isSearch ? "name" : "service",
+        filter: isSearch ? text : selectedService?.code,
       };
+
       const response = await getProviderByService(params);
       if (response?.status === 200) {
         const output = response?.data?.data;
-        console.log("out", output);
-        if (validArray(output)) {
-          setData(output);
-          setFilteredData(output);
-        }
+        setData(output);
+        setFilteredData(output);
       }
       contextValue?.setLoader(false);
     } catch (error) {
@@ -68,14 +68,10 @@ const Service = ({ navigation, route }) => {
 
   const handleSearch = (text) => {
     setSearchText(text);
-    if (text.trim() === "") {
-      setFilteredData(data);
+    if (text.length > 2) {
+      initData(text);
     } else {
-      const filtered = data.filter((item) => {
-        const businessName = item?.profile?.providerBusiness?.name || "";
-        return businessName.toLowerCase().includes(text.toLowerCase());
-      });
-      setFilteredData(filtered);
+      setFilteredData([]);
     }
   };
 
@@ -85,7 +81,7 @@ const Service = ({ navigation, route }) => {
     );
     return (
       <TouchableButtonWithPermission
-      customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+        customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
         customMsgForPayment="Please  subscribe to get best services for your lovely pets."
         onPress={() =>
           navigation.navigate("serviceDetail", {
@@ -193,7 +189,7 @@ const Service = ({ navigation, route }) => {
                   width: "90%",
                 }}
               >
-                {`${selectedService?.service} | ${item?.profile?.providerBusiness?.experience} Years exp`}
+                {`${item?.profile?.providerBusiness?.name} | ${item?.profile?.providerBusiness?.experience} Years exp`}
               </Text>
               <View
                 style={{
@@ -253,7 +249,11 @@ const Service = ({ navigation, route }) => {
             textAlign: "center",
           }}
         >
-          Oops! No {selectedService?.service} available currently.
+          {searchText && searchText.length < 3
+            ? ""
+            : `Oops! No ${
+                selectedService?.service ?? "Services"
+              } available currently`}
         </Text>
       </View>
     );
@@ -264,13 +264,12 @@ const Service = ({ navigation, route }) => {
       <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
         <StatusBar backgroundColor={THEMES.colors.white} />
         <Header
-          title={selectedService?.service}
+          title={selectedService?.service ?? "Search"}
           fontColor="#EC559C"
           showBack
           bgColor="transparent"
         />
-        {
-          filteredData?.length ?   <>
+        <>
           <View
             style={{
               width: "90%",
@@ -317,10 +316,9 @@ const Service = ({ navigation, route }) => {
             bounces={false}
             renderItem={renderItem}
             contentContainerStyle={{ flexGrow: 1 }}
+            ListEmptyComponent={EmptyContentView}
           />
-        </> : EmptyContentView()
-        }
-       
+        </>
       </View>
     </SafeAreaView>
   );

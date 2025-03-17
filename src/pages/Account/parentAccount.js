@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -6,12 +6,9 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
-  TouchableOpacity,
-  Alert,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import LinearGradient from "react-native-linear-gradient";
-import Header from "../../components/Header";
 import BadgeCheck from "../../assets/svg/badge.svg";
 import ProfileImg from "../../assets/svg/profile.svg";
 import RightArrow from "../../assets/svg/rightArrow.svg";
@@ -26,7 +23,7 @@ import Logout from "../../assets/svg/logout.svg";
 import ContactUs from "../../assets/svg/contactUs.svg";
 import AboutUs from "../../assets/svg/aboutUs.svg";
 import Strings from "../../constants/strings";
-import { moderateScale, s } from "react-native-size-matters";
+import { moderateScale } from "react-native-size-matters";
 import Activity from "../../assets/svg/activity.svg";
 import { useSelector } from "react-redux";
 import {
@@ -34,21 +31,20 @@ import {
   validateServiceProfile,
 } from "../../utils/userUtils";
 import ProfileDummy from "../../assets/svg/user.svg";
-import Toggle from "../../components/Toggle";
-import { LoginModules } from "../../constants/enums";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
 import { deleteAccountApi } from "../../redux-store/actions/auth";
 import {
-  navigateToServiceProvider,
+  navigate,
   resetNavigation,
 } from "../../navigations/rootNavigationRef";
 import { showToast } from "../../utils/utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Dialog from "../../components/Dialog";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
-import { decryptService } from "../../utils/storageFunc";
+import { decryptService, encryptService } from "../../utils/storageFunc";
 import Badge from "../../assets/svg/badgeCheck.svg";
+import HeaderWithSearch from "./featureSearch";
 
 const MenuItem = ({
   bgColor,
@@ -85,17 +81,13 @@ const MenuItem = ({
   );
 };
 
-
-
-
-
 const ParentAccount = (props) => {
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const profile = useSelector((state) => state?.commonReducer);
   const [modal, setModal] = useState(false);
   const [deleteAccountModal, setDeleteAccountModal] = useState(false);
   const [loogutModal, setLogoutModal] = useState(false);
-
+  const [featureList, setFeatureList] = useState([]);
 
   const handleDeleteAccount = async () => {
     try {
@@ -120,7 +112,7 @@ const ParentAccount = (props) => {
       contextValue.setLoader(false);
     }
   };
-  
+
   const handleLogout = async () => {
     const asyncStorageKeys = await AsyncStorage.getAllKeys();
     let filteredAsyncStorage = asyncStorageKeys;
@@ -130,6 +122,77 @@ const ParentAccount = (props) => {
     setLogoutModal(false);
     resetNavigation("app");
   };
+
+  useEffect(() => {
+    setFeatureList([
+      {
+        label: Strings.myProfile,
+        onPress: () => {
+          if (profileStatus) {
+            navigate("parentDetails", {
+              route: "parentAccount",
+            });
+          } else {
+            navigate("parentDetails");
+          }
+        },
+      },
+      {
+        label: Strings.myPetProfile,
+        onPress: () =>
+          navigate("petDetail", {
+            route: "parentAccount",
+          }),
+      },
+      {
+        label: "Activity tracker",
+        onPress: () => {},
+      },
+      {
+        label: Strings.myBookings,
+        onPress: () => navigate("myBookings", { route: "parentAccount" }),
+      },
+      {
+        label: "Reviews",
+        onPress: () => navigate("parentReviews", { route: "parentAccount" }),
+      },
+      {
+        label: Strings.paymentSubScription,
+        onPress: () =>
+          navigate("auth", {
+            screen: "paymentsSubscription",
+          }),
+      },
+      {
+        label: "Register as a Service provider",
+        onPress: () => onProviderClick(),
+      },
+      {
+        label: Strings.refundCancellationPolicy,
+        onPress: () => navigate("commonScreen", { route: "parentAccount" }),
+      },
+      {
+        label: Strings.privacyPolicy,
+        onPress: () => navigate("commonScreen", { route: "parentAccount" }),
+      },
+      {
+        label: Strings.contactUs,
+        onPress: () => navigate("contactPage", { route: "parentAccount" }),
+      },
+      {
+        label: Strings.aboutUs,
+        onPress: () => navigate("commonScreen", { route: "parentAccount" }),
+      },
+      {
+        label: Strings.deleteAccount,
+        onPress: () => setDeleteAccountModal(true),
+      },
+      {
+        label: Strings.logout,
+        onPress: () => setLogoutModal(true),
+      },
+    ]);
+  }, [profile]);
 
   const renderItem = (
     bgColor,
@@ -214,6 +277,7 @@ const ParentAccount = (props) => {
         ],
       });
     } else {
+      encryptService("isPetProviderRegisterLater", true);
       props.navigation.navigate("auth", {
         screen: validProviderProfile?.navigateTo,
       });
@@ -240,27 +304,21 @@ const ParentAccount = (props) => {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        <Header
-          customIcon={
-            <Toggle
-              state={loggedInModule === LoginModules.provider}
-              onPress={handleSwitch}
-            />
-          }
-          // showBack
-          title={Strings.myAccount}
-          bgColor="transparent"
-        />
         <StatusBar
           backgroundColor="transparent"
           translucent
           barStyle={"dark-content"}
         />
+        <HeaderWithSearch
+          loggedInModule={loggedInModule}
+          handleSwitch={handleSwitch}
+          featureList={featureList}
+        />
         <ScrollView
           bounces={false}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          style={{ flex: 1 }}
+          style={{ flex: 1, zIndex: -1 }}
         >
           <View style={styles.container}>
             <View>

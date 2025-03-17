@@ -32,7 +32,11 @@ export default function BottomTabNavigation() {
         component={PetAdoption}
         options={navOptionHandler}
       />
-      <Tab.Screen name="emergencyAlert" component={EmergencyAlert} options={navOptionHandler} />
+      <Tab.Screen
+        name="emergencyAlert"
+        component={EmergencyAlert}
+        options={navOptionHandler}
+      />
       <Tab.Screen
         name="myAccount"
         component={MyAccount}

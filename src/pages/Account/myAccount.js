@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -35,9 +35,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileDummy from "../../assets/svg/user.svg";
 import Toggle from "../../components/Toggle";
 import { LoginModules } from "../../constants/enums";
-import { decryptService } from "../../utils/storageFunc";
+import { decryptService, encryptService } from "../../utils/storageFunc";
 import { deleteAccountApi } from "../../redux-store/actions/auth";
 import {
+  navigate,
   navigateToParent,
   resetNavigation,
 } from "../../navigations/rootNavigationRef";
@@ -50,6 +51,7 @@ import { useUser } from "../../api/UserContext";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 import { useFocusEffect } from "@react-navigation/native";
 import { fetchUserProfileData } from "../../redux-store/actions/registerAction";
+import HeaderWithSearch from "./featureSearch";
 
 const MyAccount = (props) => {
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
@@ -58,6 +60,7 @@ const MyAccount = (props) => {
   const [loogutModal, setLogoutModal] = useState(false);
   const { userData } = useUser();
   const [modal, setModal] = useState(false);
+  const [featureList, setFeatureList] = useState([]);
   const dispatch = useDispatch();
 
   useFocusEffect(
@@ -65,6 +68,92 @@ const MyAccount = (props) => {
       dispatch(fetchUserProfileData());
     }, [])
   );
+
+  useEffect(() => {
+    setFeatureList([
+      {
+        label: Strings.myProfile,
+        onPress: () => {
+          const validProviderProfile = validateServiceProfile(userData);
+          navigate(validProviderProfile?.navigateTo);
+        },
+      },
+      {
+        label: Strings.businessDetails,
+        onPress: () => {
+          navigate("businessDetail", { route: "myprofile" });
+        }, // Define onPress actions as needed
+      },
+      {
+        label: Strings.contactDetails,
+        onPress: () => {
+          navigate("contactDetails", { route: "myprofile" });
+        },
+      },
+      {
+        label: Strings.uploadImages,
+        onPress: () => {
+          navigate("uploadImagesDocs", { route: "myprofile" });
+        },
+      },
+      {
+        label: Strings.sessionDetails,
+        onPress: () => {
+          navigate("sessionDetail", { route: "myprofile" });
+        },
+      },
+      {
+        label: Strings.mediaLinks,
+        onPress: () => {
+          navigate("mediaLink", { route: "myprofile" });
+        },
+      },
+      {
+        label: Strings.paymentSubScription,
+        onPress: () => navigate("paymentsSubscription", { route: "myprofile" }),
+      },
+      {
+        label: Strings.myBookings,
+        onPress: () => navigate("myBookings", { route: "myprofile" }),
+      },
+      {
+        label: Strings.markHoliday,
+        onPress: () => navigate("markHoliday", { route: "myprofile" }),
+      },
+      {
+        label: "Client Reviews",
+        onPress: () => navigate("clientReview", { route: "myprofile" }),
+      },
+      {
+        label: "Register as a Pet Parent",
+        onPress: () => onParentClick(),
+      },
+      {
+        label: Strings.refundCancellationPolicy,
+        onPress: () => navigate("commonScreen", { route: "myprofile" }),
+      },
+      {
+        label: Strings.privacyPolicy,
+        onPress: () => navigate("commonScreen", { route: "myprofile" }),
+      },
+      {
+        label: Strings.contactUs,
+        onPress: () => navigate("contactPage", { route: "myprofile" }),
+      },
+      {
+        label: Strings.aboutUs,
+        onPress: () => navigate("commonScreen", { route: "myprofile" }),
+      },
+      {
+        label: Strings.deleteAccount,
+        onPress: () => setDeleteAccountModal(true),
+      },
+      {
+        label: Strings.logout,
+        onPress: () => setLogoutModal(true),
+      },
+    ]);
+  }, [profile]);
 
   const profileServices = useMemo(
     () =>
@@ -217,7 +306,7 @@ const MyAccount = (props) => {
   const onParentClick = () => {
     const validParentProfile = validateParentProfile(profile);
     if (validParentProfile?.flag) {
-      navigateToParent("petParentAppStack", props.navigation);
+      navigateToParent(props.navigation);
     } else {
       props.navigation.navigate(validParentProfile?.navigateTo, {
         route: "myAccount",
@@ -229,13 +318,14 @@ const MyAccount = (props) => {
     const validParentProfile = validateParentProfile(profile);
     modal && setModal(false);
     if (validParentProfile?.flag) {
-      navigateToParent("petParentAppStack", props.navigation);
+      navigateToParent(props.navigation);
     } else {
       // props.navigation.navigate(validParentProfile?.navigateTo, {
       //   route: "parentAccount",
       //   redirectFunc: () =>
       //     navigateToParent("petParentAppStack", props.navigation),
       // });
+      encryptService("isPetParentRegisterLater",true);
       props.navigation.navigate(validParentProfile?.navigateTo, {
         route: "myAccount",
       });
@@ -254,17 +344,11 @@ const MyAccount = (props) => {
     >
       <SafeAreaView style={{ flex: 1 }}>
         {/* <StatusBar backgroundColor={THEMES.colors.lightCyan} /> */}
-        <Header
-          customIcon={
-            <Toggle
-              state={loggedInModule === LoginModules.provider}
-              onPress={handleSwitch}
-            />
-          }
-          // showBack
-          title={Strings.myAccount}
-          // showSearch
-          bgColor="transparent"
+
+        <HeaderWithSearch
+          loggedInModule={loggedInModule}
+          handleSwitch={handleSwitch}
+          featureList={featureList}
         />
         <StatusBar
           backgroundColor="transparent"
