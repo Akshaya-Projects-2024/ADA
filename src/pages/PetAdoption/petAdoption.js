@@ -103,7 +103,7 @@ const PetAdoption = (props) => {
           const result = new Set(
             output.map((adoptionData) => adoptionData.category)
           );
-          setPetCategories([Strings.clear, ...result]);
+          setPetCategories([...result]);
         }
       }
       contextValue?.setLoader(false);
@@ -344,6 +344,40 @@ const PetAdoption = (props) => {
                   showsHorizontalScrollIndicator={false}
                   showsVerticalScrollIndicator={false}
                 >
+                  {filterCategory ? ( // Show "Clear" only when a filter is applied
+                    <Pressable
+                      onPress={() => {
+                        setFilterCategory("");
+                        setSearchText("");
+                        setFilteredData(data); // Reset data to original
+                      }}
+                      style={{
+                        paddingHorizontal: moderateScale(10),
+                        paddingVertical: moderateScale(5),
+                        borderWidth: 1,
+                        borderColor: THEMES.colors.red,
+                        borderRadius: 20,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginRight: moderateScale(10),
+                      }}
+                    >
+                      <CrossIcon
+                        width={moderateScale(15)}
+                        height={moderateScale(15)}
+                        color={THEMES.colors.red}
+                        style={{ marginRight: moderateScale(5) }}
+                      />
+                      <Text
+                        style={{
+                          fontFamily: THEMES.fontFamily.semiBold,
+                          color: THEMES.colors.red,
+                        }}
+                      >
+                        Clear
+                      </Text>
+                    </Pressable>
+                  ) : null}
                   {petCategories?.map((item, index) => {
                     return (
                       <Pressable
@@ -369,15 +403,6 @@ const PetAdoption = (props) => {
                           alignItems: "center",
                         }}
                       >
-                        {index === 0 ? (
-                          <View style={styles.iconStyle}>
-                            <CrossIcon
-                              width={moderateScale(15)}
-                              height={moderateScale(15)}
-                              color={THEMES.colors.black}
-                            />
-                          </View>
-                        ) : null}
                         <Text
                           style={{
                             fontFamily: THEMES.fontFamily.semiBold,

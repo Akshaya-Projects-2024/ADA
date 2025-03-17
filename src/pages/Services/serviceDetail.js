@@ -68,7 +68,7 @@ const ServiceDetail = ({ navigation, route }) => {
         await ShareApp.open(shareData);
       }
     } catch (error) {
-      console.log("ero", error)
+      console.log("ero", error);
     }
   };
 
@@ -140,7 +140,7 @@ const ServiceDetail = ({ navigation, route }) => {
               onPress={() => share()}
               style={{ marginLeft: moderateScale(20) }}
             >
-              <Share/>
+              <Share />
             </TouchableOpacity>
           </View>
         </View>
@@ -190,6 +190,7 @@ const ServiceDetail = ({ navigation, route }) => {
                 </View>
               )}
             </View>
+            {console.log("selectedProvider",selectedProvider)}
             <View style={{ paddingLeft: moderateScale(19), width: "80%" }}>
               <Text
                 numberOfLines={1}
@@ -201,7 +202,7 @@ const ServiceDetail = ({ navigation, route }) => {
               >
                 {selectedProvider?.profile?.providerBusiness?.name}
               </Text>
-              {/* <Text
+              <Text
               numberOfLines={1}
               style={{
                 fontFamily: THEMES.fontFamily.medium,
@@ -209,8 +210,8 @@ const ServiceDetail = ({ navigation, route }) => {
                 fontSize: THEMES.fonts.font14,
               }}
             >
-              Degree, Profession name
-            </Text> */}
+              {selectedProvider?.profile?.providerBusiness?.services?.map(item => item.service).join(", ")}
+            </Text>
               <Text
                 numberOfLines={1}
                 style={{
@@ -235,7 +236,6 @@ const ServiceDetail = ({ navigation, route }) => {
               marginTop: moderateScale(16),
               flex: 1,
               borderTopRightRadius: 50,
-              
             }}
           >
             <View
@@ -399,20 +399,23 @@ const ServiceDetail = ({ navigation, route }) => {
                   >
                     {`${selectedProvider?.profile?.providerRating?.totalratingcount} Reviews`}
                   </Text>
-                  <Text
-                    onPress={() =>
-                      navigation.navigate("parentReviews", {
-                        selectedService: selectedProvider,
-                      })
-                    }
-                    style={{
-                      fontFamily: THEMES.fontFamily.semiBold,
-                      color: THEMES.colors.cyan,
-                      fontSize: THEMES.fonts.font12,
-                    }}
-                  >
-                    View all
-                  </Text>
+                  {selectedProvider?.profile?.providerRating
+                    ?.totalratingcount !== 0 && (
+                    <Text
+                      onPress={() =>
+                        navigation.navigate("parentReviews", {
+                          selectedService: selectedProvider,
+                        })
+                      }
+                      style={{
+                        fontFamily: THEMES.fontFamily.semiBold,
+                        color: THEMES.colors.cyan,
+                        fontSize: THEMES.fonts.font12,
+                      }}
+                    >
+                      View all
+                    </Text>
+                  )}
                 </View>
                 <Text
                   style={{

@@ -18,6 +18,9 @@ const Tab = createBottomTabNavigator();
 
 const PetParentAppStack = () => (
   <Tab.Navigator
+    tabBarOptions={{
+      keyboardHidesTabBar: false,
+    }}
     initialRouteName="parentHome"
     tabBar={(props) => <PetParentBottoTabbarItem {...props} />}
   >
@@ -36,14 +39,16 @@ const PetParentAppStack = () => (
       component={PetAdoption}
       options={navOptionHandler}
     />
-    <Tab.Screen name="emergencyAlert" component={EmergencyAlert} options={navOptionHandler} />
+    <Tab.Screen
+      name="emergencyAlert"
+      component={EmergencyAlert}
+      options={navOptionHandler}
+    />
     <Tab.Screen
       name="parentAccount"
       component={ParentAccount}
       options={navOptionHandler}
     />
-
-    
   </Tab.Navigator>
 );
 

@@ -17,6 +17,9 @@ const navOptionHandler = () => ({
 export default function BottomTabNavigation() {
   return (
     <Tab.Navigator
+    tabBarOptions={{
+      keyboardHidesTabBar: false,
+    }}
       initialRouteName="home"
       tabBar={(props) => <BottomTabBarItem {...props} />}
     >

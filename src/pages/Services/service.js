@@ -180,6 +180,7 @@ const Service = ({ navigation, route }) => {
                 {item?.profile?.providerBusiness?.name}
               </Text>
               <Text
+                numberOfLines={1}
                 style={{
                   color: THEMES.colors.darkGrey,
                   fontFamily: THEMES.fontFamily.medium,
@@ -189,7 +190,7 @@ const Service = ({ navigation, route }) => {
                   width: "90%",
                 }}
               >
-                {`${item?.profile?.providerBusiness?.name} | ${item?.profile?.providerBusiness?.experience} Years exp`}
+                {`${item?.profile?.providerBusiness?.services?.map(item => item.service).join(", ")} | ${item?.profile?.providerBusiness?.experience} Years exp`}
               </Text>
               <View
                 style={{
@@ -200,6 +201,7 @@ const Service = ({ navigation, route }) => {
               >
                 <Star />
                 <Text
+                  numberOfLines={1}
                   style={{
                     color: "#000",
                     fontFamily: THEMES.fontFamily.semiBold,
