@@ -21,6 +21,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { decryptService } from "../../utils/storageFunc";
 import {
   deleteDocument,
+  deleteProviderDocument,
   uploadProviderDocument,
 } from "../../redux-store/actions/auth";
 import { useSelector } from "react-redux";
@@ -153,7 +154,7 @@ const UploadImagesDocs = (props) => {
         userid: userId,
         id: doc?.id,
       };
-      const res = await deleteDocument(postData);
+      const res = await deleteProviderDocument(postData);
       if (res?.status == 200) {
         if (type === DOCUMENT_TYPES.logo) {
           setPhoto(null);
@@ -430,7 +431,7 @@ const UploadImagesDocs = (props) => {
                   route ? { route: route } : {}
                 );
               }
-              apiInitCall()
+              apiInitCall();
             }}
           />
         </View>

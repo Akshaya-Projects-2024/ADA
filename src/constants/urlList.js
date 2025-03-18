@@ -58,9 +58,10 @@ export const urlList = {
   deletePetDocument: "register/pet/deletedocument",
   shareTopic: "provider/topic/share",
   addTopicKeyword: "provider/topic/addkeyword",
-  getKeyword:'provider/topic/getkeyword',
-  clearKeyword:'provider/topic/clearkeyword',
-  deletePet: 'register/pet/delete',
-  paymentSubscriptionList:'payment/subscription',
-  paymentInvoice:'payment/invoice'
+  getKeyword: "provider/topic/getkeyword",
+  clearKeyword: "provider/topic/clearkeyword",
+  deletePet: "register/pet/delete",
+  paymentSubscriptionList: "payment/subscription",
+  paymentInvoice: "payment/invoice",
+  deleteProviderDoc: "register/provider/deletedocument",
 };

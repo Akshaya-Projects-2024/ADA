@@ -29,9 +29,10 @@ const AppointmentCard = ({
 
   const petImage = useMemo(
     () =>
-      item?.petdetails?.documents?.find((it) => it?.documenttype === "photo"),
-    [item?.petdetails?.documents]
+      item?.petdetails?.documents?.find((it) => it?.documenttype === "profilePhoto"),
+    [item]
   );
+
   const itemBackgroundColor = useMemo(() => {
     if (item?.status === AppointmentStatus.cancelled) {
       return "#fee9e9";

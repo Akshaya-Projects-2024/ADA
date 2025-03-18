@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -20,12 +20,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { decryptService } from "../../utils/storageFunc";
 import { getAppointmentById } from "../../redux-store/actions/auth";
 import { contextValue } from "../../components/Loader";
+import { useSelector } from "react-redux";
 
-
-const AppointmentDetail = (props) => { 
+const AppointmentDetail = (props) => {
   const selectedData = props?.route?.params?.selectedItem;
   const [appointmentData, setAppointmentData] = useState();
   const [document, setDocument] = useState();
+  const profile = useSelector((state) => state?.commonReducer);
 
   useEffect(() => {
     initData();
@@ -57,11 +58,19 @@ const AppointmentDetail = (props) => {
     }
   };
 
+  const petImage = useMemo(
+    () =>
+      appointmentData?.petdetails?.documents?.find(
+        (it) => it?.documenttype === "profilePhoto"
+      ),
+    [appointmentData?.petdetails?.documents]
+  );
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <ImageBackground
-          source={{ uri: appointmentData?.petdetails?.documents?.[0]?.url }}
+          source={{ uri: petImage?.url }}
           resizeMode="cover"
           style={styles.imgBackground}
         >
@@ -134,7 +143,7 @@ const AppointmentDetail = (props) => {
                       showsHorizontalScrollIndicator={false}
                       showsVerticalScrollIndicator={false}
                     >
-                      {document?.length &&
+                      {Boolean(document?.length) &&
                         document?.map((item, index) => {
                           return (
                             <TouchableOpacity
@@ -158,11 +167,11 @@ const AppointmentDetail = (props) => {
                   <View style={styles.moreView}>
                     <More />
                   </View>
-                 
+
                   <View style={styles.cardView}>
                     <View style={styles.imgView}>
                       <Image
-                        source={{uri:appointmentData?.petdetails?.documents?.[0]?.url}}
+                        source={{ uri: profile?.logindetails?.parentphoto }}
                         style={styles.img}
                       />
                     </View>
@@ -431,7 +440,7 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.bold,
     fontSize: THEMES.fonts.font14,
     paddingTop: moderateScale(3),
-    textTransform:'capitalize'
+    textTransform: "capitalize",
   },
   rowDetail: {
     flexDirection: "row",

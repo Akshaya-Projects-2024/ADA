@@ -166,7 +166,6 @@ export const saveSessionDetails = async (obj) => {
 
 export const refreshToken = async (params) => {
   try {
-    console.log("Res", params);
     const res = await Api.POST(urlList.refreshToken, params);
 
     if (!res || res?.data?.error || res?.data?.errorCode) {
@@ -180,7 +179,7 @@ export const refreshToken = async (params) => {
     throw new Error("Something went wrong!");
   } catch (error) {
     console.log("refreshToken Error11! ", error);
-    throw new Error(error?.message || error || "Opps! Something went wrong!");
+    // throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
 
@@ -742,6 +741,24 @@ export const deletePet = async (params) => {
     throw new Error("Something went wrong!");
   } catch (error) {
     console.log("shareProfileApi Error! ", error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const deleteProviderDocument = async (params) => {
+  try {
+    const res = await Api.POST(urlList.deleteProviderDoc, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log("deleteDocument Error! ", error);
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };

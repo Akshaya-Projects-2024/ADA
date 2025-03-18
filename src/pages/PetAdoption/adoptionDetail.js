@@ -58,6 +58,8 @@ const AdoptionDetail = (props) => {
     }
   };
 
+  // first image in array to display as per requiremeny
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>

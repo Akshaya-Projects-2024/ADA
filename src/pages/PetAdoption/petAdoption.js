@@ -131,6 +131,8 @@ const PetAdoption = (props) => {
     // }
   };
 
+  // first image in array to display as per requiremeny
+
   const renderItem = ({ item }) => {
     return (
       <TouchableButtonWithPermission
@@ -244,41 +246,39 @@ const PetAdoption = (props) => {
           fontColor={"#ed65a5"}
         />
         <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
-          {filteredData?.length || data?.length ? (
-            <>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <View style={{ flex: 1 }}>
               <View
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  justifyContent: "space-between",
+                  borderColor: "#bebebd",
+                  borderRadius: 25,
+                  borderWidth: 1.5,
+                  backgroundColor: "#f5f5f5",
+                  paddingHorizontal: 10, // Spacing around the text and icons
+                  height: 45,
                 }}
               >
-                <View style={{ flex: 1 }}>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      borderColor: "#bebebd",
-                      borderRadius: 25,
-                      borderWidth: 1.5,
-                      backgroundColor: "#f5f5f5",
-                      paddingHorizontal: 10, // Spacing around the text and icons
-                      height: 45,
-                    }}
-                  >
-                    <View style={{ paddingRight: 10 }}>
-                      <SearchIcon />
-                    </View>
+                <View style={{ paddingRight: 10 }}>
+                  <SearchIcon />
+                </View>
 
-                    <TextInput
-                      style={styles.searchBar}
-                      placeholder="Search..."
-                      placeholderTextColor={"#000"}
-                      value={searchText}
-                      onChangeText={handleSearchChange}
-                    />
-                  </View>
-                  {/* <TouchableOpacity
+                <TextInput
+                  style={styles.searchBar}
+                  placeholder="Search..."
+                  placeholderTextColor={"#000"}
+                  value={searchText}
+                  onChangeText={handleSearchChange}
+                />
+              </View>
+              {/* <TouchableOpacity
                   onPress={() =>
                     props.navigation.navigate("auth", {
                       screen: "search",
@@ -305,136 +305,134 @@ const PetAdoption = (props) => {
                     Search
                   </Text>
                 </TouchableOpacity> */}
-                </View>
+            </View>
 
-                {loggedInModule === LoginModules.parent && !guestUser ? (
-                  <TouchableButtonWithPermission
-                    onPress={() =>
-                      props.navigation.navigate("auth", {
-                        screen: "addAdoption",
-                      })
-                    }
-                    style={{
-                      marginLeft: moderateScale(13),
-                      backgroundColor: THEMES.colors.white,
-                      padding: moderateScale(11),
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderColor: "#EC559C",
-                      borderWidth: 1,
-                      borderRadius: moderateScale(8),
-                      borderBottomLeftRadius: moderateScale(0),
-                    }}
-                  >
-                    <Plus stroke={"#EC559C"} />
-                  </TouchableButtonWithPermission>
-                ) : null}
-              </View>
-
-              <View
+            {loggedInModule === LoginModules.parent && !guestUser ? (
+              <TouchableButtonWithPermission
+                onPress={() =>
+                  props.navigation.navigate("auth", {
+                    screen: "addAdoption",
+                  })
+                }
                 style={{
-                  paddingVertical: moderateScale(28),
-                  flexDirection: "row",
+                  marginLeft: moderateScale(13),
+                  backgroundColor: THEMES.colors.white,
+                  padding: moderateScale(11),
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderColor: "#EC559C",
+                  borderWidth: 1,
+                  borderRadius: moderateScale(8),
+                  borderBottomLeftRadius: moderateScale(0),
                 }}
               >
-                <ScrollView
-                  horizontal={true}
-                  style={{ flex: 1 }}
-                  bounces={false}
-                  showsHorizontalScrollIndicator={false}
-                  showsVerticalScrollIndicator={false}
+                <Plus stroke={"#EC559C"} />
+              </TouchableButtonWithPermission>
+            ) : null}
+          </View>
+
+          <View
+            style={{
+              paddingVertical: moderateScale(28),
+              flexDirection: "row",
+            }}
+          >
+            <ScrollView
+              horizontal={true}
+              style={{ flex: 1 }}
+              bounces={false}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+            >
+              {filterCategory ? ( // Show "Clear" only when a filter is applied
+                <Pressable
+                  onPress={() => {
+                    setFilterCategory("");
+                    setSearchText("");
+                    setFilteredData(data); // Reset data to original
+                  }}
+                  style={{
+                    paddingHorizontal: moderateScale(10),
+                    paddingVertical: moderateScale(5),
+                    borderWidth: 1,
+                    borderColor: THEMES.colors.red,
+                    borderRadius: 20,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginRight: moderateScale(10),
+                  }}
                 >
-                  {filterCategory ? ( // Show "Clear" only when a filter is applied
-                    <Pressable
-                      onPress={() => {
-                        setFilterCategory("");
-                        setSearchText("");
-                        setFilteredData(data); // Reset data to original
-                      }}
+                  <CrossIcon
+                    width={moderateScale(15)}
+                    height={moderateScale(15)}
+                    color={THEMES.colors.red}
+                    style={{ marginRight: moderateScale(5) }}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: THEMES.fontFamily.semiBold,
+                      color: THEMES.colors.red,
+                    }}
+                  >
+                    Clear
+                  </Text>
+                </Pressable>
+              ) : null}
+              {petCategories?.map((item, index) => {
+                return (
+                  <Pressable
+                    key={`${item}_${index}`}
+                    onPress={() => {
+                      setSearchText("");
+                      setFilterCategory(item);
+                    }}
+                    style={{
+                      paddingHorizontal: moderateScale(12),
+                      marginLeft: index === 0 ? 0 : moderateScale(10),
+                      paddingVertical: moderateScale(6),
+                      borderWidth: 1,
+                      borderColor:
+                        index === 0
+                          ? THEMES.colors.silver
+                          : filterCategory === item
+                          ? THEMES.colors.adoptionPink
+                          : THEMES.colors.silver,
+                      borderRadius: 20,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
                       style={{
-                        paddingHorizontal: moderateScale(10),
-                        paddingVertical: moderateScale(5),
-                        borderWidth: 1,
-                        borderColor: THEMES.colors.red,
-                        borderRadius: 20,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        marginRight: moderateScale(10),
+                        fontFamily: THEMES.fontFamily.semiBold,
+                        color:
+                          index === 0
+                            ? THEMES.colors.black
+                            : filterCategory === item
+                            ? THEMES.colors.adoptionPink
+                            : THEMES.colors.black,
+                        fontSize: THEMES.fonts.font12,
                       }}
                     >
-                      <CrossIcon
-                        width={moderateScale(15)}
-                        height={moderateScale(15)}
-                        color={THEMES.colors.red}
-                        style={{ marginRight: moderateScale(5) }}
-                      />
-                      <Text
-                        style={{
-                          fontFamily: THEMES.fontFamily.semiBold,
-                          color: THEMES.colors.red,
-                        }}
-                      >
-                        Clear
-                      </Text>
-                    </Pressable>
-                  ) : null}
-                  {petCategories?.map((item, index) => {
-                    return (
-                      <Pressable
-                        key={`${item}_${index}`}
-                        onPress={() => {
-                          setSearchText("");
-                          setFilterCategory(item);
-                        }}
-                        style={{
-                          paddingHorizontal: moderateScale(12),
-                          marginLeft: index === 0 ? 0 : moderateScale(10),
-                          paddingVertical: moderateScale(6),
-                          borderWidth: 1,
-                          borderColor:
-                            index === 0
-                              ? THEMES.colors.silver
-                              : filterCategory === item
-                              ? THEMES.colors.adoptionPink
-                              : THEMES.colors.silver,
-                          borderRadius: 20,
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontFamily: THEMES.fontFamily.semiBold,
-                            color:
-                              index === 0
-                                ? THEMES.colors.black
-                                : filterCategory === item
-                                ? THEMES.colors.adoptionPink
-                                : THEMES.colors.black,
-                            fontSize: THEMES.fonts.font12,
-                          }}
-                        >
-                          {item}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </ScrollView>
-              </View>
-              <View style={{ flex: 1 }}>
-                <FlatList
-                  showsVerticalScrollIndicator={false}
-                  data={validArray(filteredData) ? filteredData : data}
-                  bounces={false}
-                  renderItem={renderItem}
-                  keyExtractor={(item) => item.id}
-                />
-              </View>
-            </>
-          ) : (
-            EmptyContentView()
-          )}
+                      {item}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
+          <View style={{ flex: 1 }}>
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              data={validArray(filteredData) ? filteredData : data}
+              bounces={false}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+              ListEmptyComponent={EmptyContentView}
+              contentContainerStyle={{flexGrow:1}}
+            />
+          </View>
         </View>
       </SafeAreaView>
 

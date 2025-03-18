@@ -26,20 +26,11 @@ import Share from "react-native-share";
 
 const TrendDetail = (props) => {
   const { width } = useWindowDimensions();
-  const [profileImg, setProfileImg] = useState();
   const data = props.route.params.selectedData;
   const { providerProfile, profileData } = useSelector(
     ({ commonReducer }) => commonReducer
   );
   const [shareImg, setShareImg] = useState();
-
-  useEffect(() => {
-    if (Boolean(profileData)) {
-      if (profileData?.providerDocument?.[0]?.url) {
-        setProfileImg(profileData?.providerDocument?.[0]?.url);
-      }
-    }
-  }, [profileData]);
 
   useEffect(() => {
     initData();
@@ -125,12 +116,12 @@ const TrendDetail = (props) => {
             </View>
             <View style={styles.profileView}>
               <View style={styles.profile}>
-                {Boolean(profileImg) ? (
+                {Boolean(data?.authorImage) ? (
                   <Image
                     resizeMode="contain"
                     style={styles.profile}
                     source={{
-                      uri: profileImg,
+                      uri: data?.authorImage,
                     }}
                   />
                 ) : (

@@ -61,6 +61,7 @@ const MyAccount = (props) => {
   const { userData } = useUser();
   const [modal, setModal] = useState(false);
   const [featureList, setFeatureList] = useState([]);
+  const [profilePhoto, setProfilePhoto] = useState("");
   const dispatch = useDispatch();
 
   useFocusEffect(
@@ -153,6 +154,11 @@ const MyAccount = (props) => {
         onPress: () => setLogoutModal(true),
       },
     ]);
+    setProfilePhoto(
+      profile?.providerProfile?.providerDocument?.find(
+        (x) => x.documenttype === "companylogo" && x.isactive == 1
+      )?.url
+    );
   }, [profile]);
 
   const profileServices = useMemo(
@@ -325,7 +331,7 @@ const MyAccount = (props) => {
       //   redirectFunc: () =>
       //     navigateToParent("petParentAppStack", props.navigation),
       // });
-      encryptService("isPetParentRegisterLater",true);
+      encryptService("isPetParentRegisterLater", true);
       props.navigation.navigate(validParentProfile?.navigateTo, {
         route: "myAccount",
       });
@@ -364,12 +370,12 @@ const MyAccount = (props) => {
           <View style={styles.container}>
             <View>
               <View style={styles.profileView}>
-                {profile?.providerProfile?.providerDocument?.[0]?.url ? (
+                {profilePhoto ? (
                   <Image
                     resizeMode="contain"
                     style={styles.profile}
                     source={{
-                      uri: profile?.providerProfile?.providerDocument?.[0]?.url,
+                      uri: profilePhoto,
                     }}
                   />
                 ) : (

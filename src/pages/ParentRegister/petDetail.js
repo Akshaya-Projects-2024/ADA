@@ -350,7 +350,6 @@ const PetDetail = (props) => {
             setRegisterModal(true);
           }
         } else {
-          console.log("res?.data",res?.data)
           showToast("error", res?.data?.message);
         }
         apiInitCall();

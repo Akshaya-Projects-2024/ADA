@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -34,8 +34,6 @@ const EmergencyAlert = (props) => {
     (state) => state?.register
   );
   const profile = useSelector((state) => state?.commonReducer);
-
-
 
   const alertOptions = [
     { type: "Rescue", image: require("../../assets/images/rescue.png") },
@@ -87,6 +85,14 @@ const EmergencyAlert = (props) => {
       setType();
     }
   };
+
+  const petImage = useMemo(
+    () =>
+      profile?.parentProfie?.petDetails?.[0]?.documents?.find(
+        (it) => it?.documenttype === "profilePhoto"
+      ),
+    [profile?.parentProfie?.petDetails]
+  );
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -202,8 +208,7 @@ const EmergencyAlert = (props) => {
                         marginTop: 5,
                       }}
                       source={{
-                        uri: profile?.parentProfie?.petDetails?.[0]
-                          ?.documents?.[0]?.url,
+                        uri: petImage?.url
                       }}
                     />
 

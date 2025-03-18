@@ -127,8 +127,12 @@ const MarkHoliday = () => {
       ) {
         setEndDate(res?.data?.data?.end_date);
         setStartDate(res?.data?.data?.start_date);
-        setEndTime(res?.data?.data?.end_time);
-        setStartTime(res?.data?.data?.start_time);
+        setEndTime(
+          moment(res?.data?.data?.end_time, "HH:mm").format("hh:mm A")
+        );
+        setStartTime(
+          moment(res?.data?.data?.start_time, "HH:mm").format("hh:mm A")
+        );
       }
       if (res2?.status === 200 && validArray(res2?.data?.data?.weeklyholiday)) {
         for (
@@ -270,8 +274,8 @@ const MarkHoliday = () => {
         provider_id: userId,
         start_date: startDate,
         end_date: endDate,
-        start_time: startTime,
-        end_time: endTime,
+        start_time: moment(startTime, "hh:mm A").format("HH:mm"),
+        end_time: moment(endTime, "hh:mm A").format("HH:mm"),
         isfullday: applyForAllDays ? 1 : 0,
         notes: "Scheduled maintenance",
       };

@@ -83,7 +83,6 @@ const PaymentDetails = () => {
   const downloadPDF = async (base64PDF) => {
     try {
       const hasPermission = await requestStoragePermission();
-      console.log(hasPermission)
       if (hasPermission) {
         const path = `${RNFS.DownloadDirectoryPath}/sample.pdf`;
         await RNFS.writeFile(path, base64PDF, "base64");

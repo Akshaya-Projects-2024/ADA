@@ -34,11 +34,8 @@ import ProfileDummy from "../../assets/svg/user.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
 import { deleteAccountApi } from "../../redux-store/actions/auth";
-import {
-  navigate,
-  resetNavigation,
-} from "../../navigations/rootNavigationRef";
-import { showToast } from "../../utils/utils";
+import { navigate, resetNavigation } from "../../navigations/rootNavigationRef";
+import { showToast, validArray } from "../../utils/utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Dialog from "../../components/Dialog";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
@@ -364,7 +361,7 @@ const ParentAccount = (props) => {
                     bgColor={THEMES.colors.lightCyan}
                     icon={<ProfileImg />}
                     title={Strings.myProfile}
-                    showPending={!profileStatus}
+                    showPending={!profile?.parentProfie?.parentContact?.name}
                     onPress={() => {
                       if (profileStatus) {
                         props.navigation.navigate("parentDetails", {
@@ -379,11 +376,15 @@ const ParentAccount = (props) => {
                     bgColor={THEMES.colors.zanah}
                     icon={<PawPrint />}
                     title={Strings.myPetProfile}
-                    showPending={!profileStatus}
+                    showPending={!validArray(profile?.parentProfie?.petDetails)}
                     onPress={() => {
-                      props.navigation.navigate("petDetail", {
-                        route: "parentAccount",
-                      });
+                      if (profileStatus) {
+                        props.navigation.navigate("petDetail", {
+                          route: "parentAccount",
+                        });
+                      } else {
+                        props.navigation.navigate("parentDetails");
+                      }
                     }}
                   />
                   <MenuItem

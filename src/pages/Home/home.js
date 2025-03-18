@@ -53,9 +53,7 @@ import { useUser } from "../../api/UserContext";
 import SessionsForAppointment from "../../components/SessionsForAppointment";
 import { SESSION_TYPE } from "../Services/selectAppointment";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
-import {
-  navigateToParent,
-} from "../../navigations/rootNavigationRef";
+import { navigateToParent } from "../../navigations/rootNavigationRef";
 
 const Home = (props) => {
   const { top } = useSafeAreaInsets();
@@ -82,6 +80,7 @@ const Home = (props) => {
   const [mobileNumber, setMobileNumber] = useState("");
   const { userData, apiInitCall } = useUser();
   const [modal, setModal] = useState(false);
+  const [refresh, setRefresh] = useState(true);
 
   const handleSubmit = async (
     selectedDate,
@@ -367,6 +366,7 @@ const Home = (props) => {
 
   const handleAttended = async () => {
     try {
+      setRefresh(false);
       contextValue?.setLoader(true);
       if (!selectedItem) {
         throw new Error("Please select the appointment!");
@@ -381,6 +381,8 @@ const Home = (props) => {
         };
         const res = await completeAppointment(params);
         if (res?.status === 200) {
+          setRefresh(true);
+          setActiveIndex(0);
           setVisible(false);
           setAttendedModal(false);
           setAppointmentConfirm(false);
@@ -744,13 +746,16 @@ const Home = (props) => {
                 justifyContent: "center",
               }}
             >
-              <Carousel
-                data={appointmentData}
-                renderItem={renderItem}
-                sliderWidth={screenWidth}
-                itemWidth={screenWidth * 0.9}
-                onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
-              />
+              {Boolean(refresh) && (
+                <Carousel
+                  data={appointmentData}
+                  renderItem={renderItem}
+                  sliderWidth={screenWidth}
+                  itemWidth={screenWidth * 0.9}
+                  onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
+                />
+              )}
+
               {paginationDots()}
             </View>
           </View>

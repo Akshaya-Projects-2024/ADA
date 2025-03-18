@@ -42,7 +42,7 @@ const OtpScreen = (props) => {
   const { top } = useSafeAreaInsets();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputs = useRef([]);
-  const value = props.route.params.loginValue;
+  const value = props?.route?.params?.loginValue;
   const [isMobileNumber, setIsMobileNumber] = useState(false);
   const [isRefresh, setIsRefresh] = useState(false);
   const dispatch = useDispatch();

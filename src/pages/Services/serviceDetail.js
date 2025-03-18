@@ -190,7 +190,6 @@ const ServiceDetail = ({ navigation, route }) => {
                 </View>
               )}
             </View>
-            {console.log("selectedProvider",selectedProvider)}
             <View style={{ paddingLeft: moderateScale(19), width: "80%" }}>
               <Text
                 numberOfLines={1}

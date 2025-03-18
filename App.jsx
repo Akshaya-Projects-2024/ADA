@@ -26,6 +26,7 @@ import {
   getNotificationToken,
 } from "./src/utils/pushNotificationUtils";
 import { UserProvider } from "./src/api/UserContext";
+import { navigate } from "./src/navigations/rootNavigationRef";
 
 const store = configureStore();
 
@@ -63,6 +64,8 @@ function App() {
               AccessToken: `${res?.data?.data?.token}`,
             };
             Api.defaultHeader(header);
+          } else {
+            navigate("app");
           }
           return response;
         } else {
@@ -104,7 +107,7 @@ function App() {
             <GestureHandlerRootView style={{ flex: 1 }}>
               <Loader>
                 <Routes />
-                 </Loader>
+              </Loader>
               <Toast />
             </GestureHandlerRootView>
           </UserProvider>
