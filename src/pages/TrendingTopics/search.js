@@ -23,6 +23,7 @@ import SearchImg from "../../assets/svg/search.svg";
 import TrendingTopicIc from "../../assets/svg/trendingTopics.svg";
 import { clearKeywordApi } from "../../redux-store/actions/topics";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
+import Feather from 'react-native-vector-icons/Feather'
 
 const TopicsCard = ({ item, onPress }) => {
   return (
@@ -77,14 +78,11 @@ const Search = ({ navigation }) => {
   }, []);
 
   const Chip = ({ item, onPress, selected, isTrending }) => {
+    const data = item?.keyword ? item?.keyword : item;
     return (
       <TouchableOpacity
         style={{
-          backgroundColor: isTrending
-            ? item?.keyword == selectedChip
-              ? "#00BBC8"
-              : "#EAFFF6"
-            : "#ffffff",
+          backgroundColor: data == selectedChip ? "#00BBC8" : "#EAFFF6",
           borderColor: "#000000",
           borderWidth: 0.5,
           paddingHorizontal: moderateScale(12),
@@ -104,23 +102,24 @@ const Search = ({ navigation }) => {
           <TrendingTopicIc
             width={ms(19)}
             height={ms(19)}
-            stroke={item?.keyword == selectedChip ? "#fff" : "#000"}
+            stroke={data == selectedChip ? "#fff" : "#000"}
           />
         ) : (
-          <SearchImg width={ms(15)} height={ms(15)} />
+          // <SearchImg width={ms(15)} height={ms(15)} />
+          <Feather name="search" color={data == selectedChip ? "#fff" : "#000"} />
         )}
         <Text
           style={[
             styles.chipText,
             {
               color:
-                isTrending && item?.keyword == selectedChip
+                data == selectedChip
                   ? colors.white
                   : colors.black,
             },
           ]}
         >
-          {item.keyword}
+          {data}
         </Text>
       </TouchableOpacity>
     );
@@ -128,9 +127,9 @@ const Search = ({ navigation }) => {
 
   useEffect(() => {
     contextValue?.setLoader(true);
-    if (searchQuery.length >= 3) {
+    if (searchQuery?.length >= 3) {
       initData();
-    } else if (searchQuery.length === 0) {
+    } else if (searchQuery?.length === 0) {
       initData(); // Restore initial data when search is cleared
     }
   }, [searchQuery]);
@@ -163,9 +162,9 @@ const Search = ({ navigation }) => {
   };
 
   const handleChipPress = (item) => {
-    setSearchText(item?.keyword);
-    setSelectedChipsId([item?.keyword]);
-    setSelectedChip(item?.keyword);
+    setSearchText(item);
+    setSelectedChipsId([item]);
+    setSelectedChip(item);
   };
 
   const handleCardPressed = (item) => {
@@ -230,7 +229,7 @@ const Search = ({ navigation }) => {
               onChangeText={handleSearchChange}
             />
           </View>
-          {data?.Keywords?.length !== 0 && (
+          {data?.TrendingTopics?.length !== 0 && (
             <>
               <View
                 style={{
@@ -243,13 +242,13 @@ const Search = ({ navigation }) => {
                 <Text style={styles.selectTimeText}>Trending Topics</Text>
               </View>
               <FlatList
-                data={data?.Keywords}
-                keyExtractor={(item) => item.id}
+                data={data?.TrendingTopics}
+                keyExtractor={(item) => item}
                 renderItem={({ item }) => (
                   <Chip
                     item={item}
                     onPress={handleChipPress}
-                    selected={selectedChipsId.includes(item.id)}
+                    selected={selectedChipsId.includes(item)}
                     isTrending={true}
                   />
                 )}
@@ -278,7 +277,7 @@ const Search = ({ navigation }) => {
                 renderItem={({ item }) => (
                   <Chip
                     item={item}
-                    onPress={handleChipPress}
+                    onPress={() => handleChipPress(item.keyword)}
                     selected={selectedChipsId.includes(item.id)}
                   />
                 )}

@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StatusBar, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  StatusBar,
+  StyleSheet,
+  FlatList,
+  Platform,
+  Linking,
+} from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
 import Strings from "../../constants/strings";
@@ -17,6 +25,8 @@ import { decryptService } from "../../utils/storageFunc";
 import moment from "moment";
 import RNFS from "react-native-fs";
 import Dialog from "../../components/Dialog";
+import { check, PERMISSIONS, RESULTS } from "react-native-permissions";
+import { showToast } from "../../utils/utils";
 
 const PaymentDetails = () => {
   const [paymentDetailsData, setPaymentDetailsData] = useState([]);
@@ -34,9 +44,7 @@ const PaymentDetails = () => {
         userId: await decryptService("userId"),
         usertype: loggedInModule,
       };
-
       let res = await getSubscriptionDetailsApi(obj);
-
       if (res?.length !== 0) {
         setPaymentDetailsData(res);
       } else {
@@ -49,11 +57,40 @@ const PaymentDetails = () => {
     }
   };
 
+  const requestStoragePermission = async () => {
+    try {
+      if (Platform.OS === "android") {
+        const permission =
+          Platform.Version >= 33
+            ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES
+            : PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE;
+
+        const result = await check(permission);
+        if (result === RESULTS.GRANTED) {
+          return true;
+        } else {
+          const requestResult = await request(permission);
+          return requestResult === RESULTS.GRANTED;
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error("Permission error:", error);
+      return false;
+    }
+  };
+
   const downloadPDF = async (base64PDF) => {
     try {
-      const path = `${RNFS.DownloadDirectoryPath}/sample.pdf`;
-      await RNFS.writeFile(path, base64PDF, "base64");
-      setSuccessDownload(true);
+      const hasPermission = await requestStoragePermission();
+      console.log(hasPermission)
+      if (hasPermission) {
+        const path = `${RNFS.DownloadDirectoryPath}/sample.pdf`;
+        await RNFS.writeFile(path, base64PDF, "base64");
+        setSuccessDownload(true);
+      } else {
+        Linking.openSettings();
+      }
       contextValue.setLoader(false);
     } catch (error) {
       setSuccessDownload(false);
@@ -155,19 +192,19 @@ const PaymentDetails = () => {
           fontColor={THEMES.colors.black}
         />
         <View style={styles.content}>
-          {
-            paymentDetailsData?.length ?  <View style={styles.flatlistView}>
-            <FlatList
-              data={paymentDetailsData}
-              showsVerticalScrollIndicator={false}
-              bounces={false}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-       
-            />
-          </View> : EmptyContentView()
-          }
-          
+          {paymentDetailsData?.length ? (
+            <View style={styles.flatlistView}>
+              <FlatList
+                data={paymentDetailsData}
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id}
+              />
+            </View>
+          ) : (
+            EmptyContentView()
+          )}
         </View>
       </View>
       <Dialog
