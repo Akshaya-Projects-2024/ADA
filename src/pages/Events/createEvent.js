@@ -155,6 +155,8 @@ const CreateEvent = () => {
   };
 
   const onSubmit = async () => {
+    const now = new Date();
+    const currentTime = now.toTimeString().split(" ")[0];
     if (!eventName) {
       showToast("error", "Please enter Event name");
     } else if (!posterImg?.length) {
@@ -165,10 +167,18 @@ const CreateEvent = () => {
       showToast("error", "Please enter start date");
     } else if (!startTime) {
       showToast("error", "Please enter start time");
+    } else if (startTime <= currentTime) {
+      showToast("error", "Start time must be in the future.");
+    } else if (endTime && sDate >= endTime) {
+      showToast("error", "Start time must be before the end time.");
     } else if (!eDate) {
       showToast("error", "Please enter end date");
     } else if (!endTime) {
       showToast("error", "Please enter end time");
+    } else if (endTime <= currentTime) {
+      showToast("error", "End time must be in the future.");
+    } else if (startTime && eDate >= startTime) {
+      showToast("error", "End time must be before the start time.");
     } else if (!contactNo) {
       showToast("error", "Please enter contact number");
     } else if (validateInput(contactNo) == "invalid") {
@@ -186,12 +196,13 @@ const CreateEvent = () => {
           starttime: startTime ? startTime?.replace(/:AM|:PM/, "") : "",
           endtime: endTime ? endTime?.replace(/:AM|:PM/, "") : "",
           contact: contactNo,
-          registrationlink: registrationlink ? registrationlink :"",
+          registrationlink: registrationlink ? registrationlink : "",
           audience: audience,
           userId: userId,
           documents: posterImg.map((item) => item.id).join(","), //TODO
         };
         let res = await createEvent(obj);
+        console.log("res", res);
         if (res?.data?.status_code == 200) {
           contextValue?.setLoader(false);
           setModal(true);
@@ -394,12 +405,14 @@ const CreateEvent = () => {
         <DateTimePicker
           isVisible={isStartTimeModalVisible}
           mode="time"
+          display="spinner" 
           onConfirm={handleStartConfirm}
           onCancel={hideStartDatePicker}
         />
         <DateTimePicker
           isVisible={isEndTimeModalVisible}
           mode="time"
+          display="spinner" 
           onConfirm={handleEndConfirm}
           onCancel={hideEndDatePicker}
         />

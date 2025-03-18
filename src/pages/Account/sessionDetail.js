@@ -27,7 +27,7 @@ import { useSelector } from "react-redux";
 import ModalDropdown from "../../components/ModalDropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "../../api/UserContext";
-import { isValidNumber, validateMinutes } from "../../utils/validation";
+import { isValidNumber, isValidPrice, validateMinutes } from "../../utils/validation";
 const SESSION_AVAILABILITY = {
   home: "Home Visit",
   center: "At Center Service",
@@ -181,7 +181,7 @@ const SessionDetail = (props) => {
       } else if (
         perSession &&
         sessionData.perSession.some(
-          (item) => !isValidNumber(item.sessioncharges)
+          (item) => !isValidPrice(item.sessioncharges)
         )
       ) {
         showToast("error", "Please enter valid charges for session");
@@ -204,7 +204,7 @@ const SessionDetail = (props) => {
         showToast("error", "Please enter charges for month");
       } else if (
         perMonth &&
-        sessionData.perMonth.some((item) => !isValidNumber(item.monthcharges))
+        sessionData.perMonth.some((item) => !isValidPrice(item.monthcharges))
       ) {
         showToast("error", "Please enter valid month charges");
       } else if (

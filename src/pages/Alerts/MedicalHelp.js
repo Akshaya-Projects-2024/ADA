@@ -39,8 +39,11 @@ import { err } from "react-native-svg";
 import { goBack } from "../../navigations/rootNavigationRef";
 import { contextValue } from "../../components/Loader";
 import { validateInput } from "../../utils/validation";
+import { useSelector } from "react-redux";
 
 const MedicalHelp = (props) => {
+  const profile = useSelector((state) => state?.commonReducer);
+
   const [selectedGender, setSelectedGender] = useState(null);
   const [petImage, setPetImage] = useState([]);
   const [petImagesVisible, setPetImageVisible] = useState(false);
@@ -50,7 +53,9 @@ const MedicalHelp = (props) => {
   const [facebook, setFacebook] = useState();
   const [instagram, setInstagram] = useState();
   const [whatsup, setWhatsup] = useState();
-  const [petName, setPetName] = useState();
+  const [petName, setPetName] = useState(
+    profile?.parentProfie?.petDetails?.[0]?.name
+  );
   const [location, setLocation] = useState();
   const [feature, setFeature] = useState();
   const [contactNo, setContactNo] = useState();
@@ -97,7 +102,7 @@ const MedicalHelp = (props) => {
       }
     } catch (error) {
       contextValue?.setLoader(false);
-      showToast("error", error.message);
+      showToast("error", error?.message);
     }
   };
 
@@ -169,7 +174,7 @@ const MedicalHelp = (props) => {
       } else {
         contextValue?.setLoader(true);
         const currentPosition = await getCurrentLocation();
-
+        console.log("curre",currentPosition)
         let obj = {
           userid: await decryptService("userId"),
           isownpet: 1,
@@ -180,7 +185,6 @@ const MedicalHelp = (props) => {
           audience: "Public",
           features: feature,
           contactnum: contactNo,
-          message: message,
           documents: petId.map((item) => item.id).join(","),
           requesttype: "medical",
           coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
@@ -270,6 +274,9 @@ const MedicalHelp = (props) => {
               }}
             >
               <InputField
+               editable={
+                profile?.parentProfie?.petDetails?.[0]?.name ? false : true
+              }
                 label={"Pet Name*"}
                 placeholderText={"Enter Pet name"}
                 value={petName}
@@ -509,7 +516,7 @@ const MedicalHelp = (props) => {
                   }}
                   rightText={"Facebook"}
                 />
-                <CheckBox
+                {/* <CheckBox
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}
                   onClick={() => {
@@ -524,7 +531,7 @@ const MedicalHelp = (props) => {
                     fontSize: THEMES.fonts.font12,
                     fontFamily: THEMES.fontFamily.medium,
                   }}
-                />
+                /> */}
                 <CheckBox
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}

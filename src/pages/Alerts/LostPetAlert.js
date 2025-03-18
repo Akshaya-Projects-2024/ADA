@@ -39,8 +39,10 @@ import { err } from "react-native-svg";
 import { goBack } from "../../navigations/rootNavigationRef";
 import { contextValue } from "../../components/Loader";
 import { validateInput } from "../../utils/validation";
+import { useSelector } from "react-redux";
 
 const LostPetAlert = (props) => {
+  const profile = useSelector((state) => state?.commonReducer);
   const [selectedGender, setSelectedGender] = useState(null);
   const [petImage, setPetImage] = useState([]);
   const [petImagesVisible, setPetImageVisible] = useState(false);
@@ -50,7 +52,9 @@ const LostPetAlert = (props) => {
   const [facebook, setFacebook] = useState();
   const [instagram, setInstagram] = useState();
   const [whatsup, setWhatsup] = useState();
-  const [petName, setPetName] = useState();
+  const [petName, setPetName] = useState(
+    profile?.parentProfie?.petDetails?.[0]?.name
+  );
   const [location, setLocation] = useState();
   const [feature, setFeature] = useState();
   const [message, setMessage] = useState();
@@ -272,6 +276,9 @@ const LostPetAlert = (props) => {
               }}
             >
               <InputField
+                editable={
+                  profile?.parentProfie?.petDetails?.[0]?.name ? false : true
+                }
                 label={"Pet Name*"}
                 placeholderText={"Enter Pet name"}
                 value={petName}
@@ -505,7 +512,7 @@ const LostPetAlert = (props) => {
                   }}
                   rightText={"Facebook"}
                 />
-                <CheckBox
+                {/* <CheckBox
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}
                   onClick={() => {
@@ -520,7 +527,7 @@ const LostPetAlert = (props) => {
                     fontSize: THEMES.fonts.font12,
                     fontFamily: THEMES.fontFamily.medium,
                   }}
-                />
+                /> */}
                 <CheckBox
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}

@@ -432,7 +432,7 @@ const OtherRescueHelpAlert = (props) => {
                   }}
                   rightText={"Facebook"}
                 />
-                <CheckBox
+                {/* <CheckBox
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}
                   onClick={() => {
@@ -447,7 +447,7 @@ const OtherRescueHelpAlert = (props) => {
                     fontSize: THEMES.fonts.font12,
                     fontFamily: THEMES.fontFamily.medium,
                   }}
-                />
+                /> */}
                 <CheckBox
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}

@@ -238,7 +238,7 @@ const validateTimeData = (times) => {
 const validMonthSession = (ProviderSession, sessionRateDetails) => {
   const isChargesAvailable = sessionRateDetails?.some(
     (rateDetail) =>
-      rateDetail.monthcharges && rateDetail.monthcharges !== "0.00"
+      rateDetail.monthcharges && rateDetail.monthcharges !== "0"
   );
   if (
     ProviderSession?.ispermonth &&
@@ -252,7 +252,7 @@ const validMonthSession = (ProviderSession, sessionRateDetails) => {
 const validPerSession = (ProviderSession, sessionRateDetails) => {
   const isChargesAvailable = sessionRateDetails?.some(
     (rateDetail) =>
-      rateDetail.sessioncharges && rateDetail.sessioncharges !== "0.00"
+      rateDetail.sessioncharges && rateDetail.sessioncharges !== "0"
   );
   if (
     ProviderSession?.ispermonth &&

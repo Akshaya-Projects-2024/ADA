@@ -431,7 +431,7 @@ const OtherLostPetAlert = (props) => {
                   }}
                   rightText={"Facebook"}
                 />
-                <CheckBox
+                {/* <CheckBox
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}
                   onClick={() => {
@@ -446,7 +446,7 @@ const OtherLostPetAlert = (props) => {
                     fontSize: THEMES.fonts.font12,
                     fontFamily: THEMES.fontFamily.medium,
                   }}
-                />
+                /> */}
                 <CheckBox
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}

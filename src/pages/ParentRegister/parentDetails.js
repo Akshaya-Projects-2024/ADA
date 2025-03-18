@@ -85,7 +85,16 @@ const ParentDetails = (props) => {
     };
   }, []);
 
-  const initData = () => {
+  const initData = async() => {
+    let userId = await decryptService("userId");
+    let input = validateInput(userId);
+
+    if (input == "email") {
+      setEmailId(userId);
+    } else {
+      setMobileNumber(userId);
+    }
+
     if (parentContact?.about) {
       setDescription(parentContact?.about);
     }

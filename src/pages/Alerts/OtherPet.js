@@ -235,7 +235,7 @@ const OtherPet = () => {
                 }}
                 rightText={"Facebook"}
               />
-              <CheckBox
+              {/* <CheckBox
                 checkedImage={<Checked />}
                 unCheckedImage={<UnChecked />}
                 onClick={() => setInstagram(!instagram)}
@@ -247,7 +247,7 @@ const OtherPet = () => {
                   fontSize: THEMES.fonts.font12,
                   fontFamily: THEMES.fontFamily.medium,
                 }}
-              />
+              /> */}
               <CheckBox
                 checkedImage={<Checked />}
                 unCheckedImage={<UnChecked />}

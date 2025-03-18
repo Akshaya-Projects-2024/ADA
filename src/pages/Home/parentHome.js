@@ -82,7 +82,12 @@ const ParentHome = (props) => {
     };
     let res = await getAllEventsApi(obj);
     if (res?.data?.data?.length) {
-      setEventData(res?.data?.data);
+      const event = res?.data?.data;
+      const updatedEvents = event.map((event) => ({
+        ...event,
+        type: "banner",
+      }));
+      setEventData(updatedEvents);
     }
   };
 
@@ -216,10 +221,10 @@ const ParentHome = (props) => {
     );
   };
 
-  const renderBannerItem = ({ item, index }) => {
+  const renderItem = ({ item, index }) => {
     return (
-      <>
-        {item?.documentlist?.url ? (
+      <View key={`${item?.id}_${index}`}>
+        {item.type == "banner" ? (
           <TouchableButtonWithPermission
             customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
             customMsgForPayment="Please subscribe to get best services for your lovely pets."
@@ -251,59 +256,8 @@ const ParentHome = (props) => {
               />
             ) : null}
           </TouchableButtonWithPermission>
-        ) : null}
-      </>
-    );
-  };
-
-  const renderItem = ({ item, index }) => {
-    return (
-      <View key={`${item?.id}_${index}`}>
-        {item.type == "Banner" ? (
-          <TouchableButtonWithPermission
-            customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
-            customMsgForPayment="Please subscribe to get best services for your lovely pets."
-            onPress={() => props.navigation.navigate("upComingEvents")}
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              paddingVertical: moderateScale(15),
-              borderRadius: 12,
-              borderBottomLeftRadius: 0,
-              backgroundColor: "#fff",
-              alignContent: "center",
-              borderColor: THEMES.colors.lightGrey,
-              borderWidth: 1,
-              marginTop: moderateScale(28),
-            }}
-          >
-            {item.image ? (
-              <Image
-                style={{
-                  borderRadius: 11,
-                  width: "90%",
-                  borderColor: THEMES.colors.lightGrey,
-                  borderWidth: 1,
-                }}
-                source={{ uri: item.image }}
-              />
-            ) : (
-              <Image
-                style={{
-                  borderRadius: 11,
-                  width: "90%",
-                  borderColor: THEMES.colors.lightGrey,
-                  borderWidth: 1,
-                }}
-                source={require("../../assets/images/banner.png")}
-              />
-            )}
-          </TouchableButtonWithPermission>
         ) : (
-          <TouchableButtonWithPermission
-            customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
-            customMsgForPayment="Please subscribe to get best services for your lovely pets."
-            onPress={() => props.navigation.navigate("serviceDetail")}
+          <View
             style={{
               alignItems: "center",
               justifyContent: "center",
@@ -457,16 +411,17 @@ const ParentHome = (props) => {
                 </Text>
               </View>
             </View>
-          </TouchableButtonWithPermission>
+          </View>
         )}
       </View>
     );
   };
 
   const paginationDots = () => {
+    let paginationData = [...appointmentData, ...eventData]
     return (
       <View style={styles.paginationContainer}>
-        {appointmentData?.map((_, index) => (
+        {paginationData?.map((_, index) => (
           <View
             key={index}
             style={[
@@ -578,7 +533,15 @@ const ParentHome = (props) => {
             </TouchableButtonWithPermission>
           </View>
         </View>
-        {appointmentData?.length ? (
+
+        <Carousel
+          data={[...appointmentData, ...eventData]}
+          renderItem={renderItem}
+          sliderWidth={screenWidth}
+          itemWidth={screenWidth * 0.9}
+          onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
+        />
+        {/* {!appointmentData?.length ? (
           <Carousel
             data={appointmentData}
             renderItem={renderItem}
@@ -594,7 +557,7 @@ const ParentHome = (props) => {
             itemWidth={screenWidth * 0.9}
             onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
           />
-        )}
+        )} */}
 
         {paginationDots()}
         <View>

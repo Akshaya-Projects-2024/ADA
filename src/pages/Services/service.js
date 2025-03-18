@@ -180,14 +180,14 @@ const Service = ({ navigation, route }) => {
                 {item?.profile?.providerBusiness?.name}
               </Text>
               <Text
-                numberOfLines={1}
+                numberOfLines={2}
                 style={{
                   color: THEMES.colors.darkGrey,
                   fontFamily: THEMES.fontFamily.medium,
                   fontSize: THEMES.fonts.font10,
                   paddingTop: moderateScale(3),
                   maxWidth: moderateScale(260),
-                  width: "90%",
+                  width: "80%",
                 }}
               >
                 {`${item?.profile?.providerBusiness?.services?.map(item => item.service).join(", ")} | ${item?.profile?.providerBusiness?.experience} Years exp`}
@@ -196,7 +196,7 @@ const Service = ({ navigation, route }) => {
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  paddingTop: moderateScale(3),
+                  paddingTop: moderateScale(5),
                 }}
               >
                 <Star />
@@ -225,12 +225,12 @@ const Service = ({ navigation, route }) => {
             >
               {`₹ ${
                 foundService?.sessioncharges &&
-                foundService?.sessioncharges !== "0.00"
+                foundService?.sessioncharges !== "0"
                   ? foundService?.sessioncharges
                   : foundService?.monthcharges &&
-                    foundService?.monthcharges !== "0.00"
+                    foundService?.monthcharges !== "0"
                   ? foundService?.monthcharges
-                  : "0.00"
+                  : "0"
               }`}
             </Text>
           </View>

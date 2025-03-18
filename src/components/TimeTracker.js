@@ -476,6 +476,7 @@ const TimeTracker = ({
       <DateTimePickerModal
         isVisible={isDatePickerVisible}
         mode="time"
+        display="spinner" 
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
       />

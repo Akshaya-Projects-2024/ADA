@@ -220,6 +220,7 @@ const RescheduleAppointment = ({ navigation, route }) => {
       <DateTimePicker
         isVisible={isDatePickerVisible}
         mode="time"
+        display="spinner" 
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
       />

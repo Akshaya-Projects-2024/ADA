@@ -35,6 +35,8 @@ const EmergencyAlert = (props) => {
   );
   const profile = useSelector((state) => state?.commonReducer);
 
+
+
   const alertOptions = [
     { type: "Rescue", image: require("../../assets/images/rescue.png") },
     { type: "Lost Pet", image: require("../../assets/images/lost.png") },
@@ -161,7 +163,7 @@ const EmergencyAlert = (props) => {
               ))}
             </View>
 
-            {!provider ? (
+            {!provider && profile?.profileData?.petDetails?.length ? (
               <>
                 <View style={{ paddingTop: moderateScale(30) }}>
                   <Text

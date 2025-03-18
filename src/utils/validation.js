@@ -42,6 +42,10 @@ export const isValidNumber = (value) => {
   return /^[0-9]+$/.test(value);
 };
 
+export const isValidPrice = (value) => {
+  return /^[1-9][0-9]*$/.test(value);
+};
+
 export const validatePetAge = (age) => {
   const petAge = Number(age);
 

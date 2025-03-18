@@ -22,15 +22,17 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { getAllEventsApi } from "../../redux-store/actions/events";
 import { decryptService } from "../../utils/storageFunc";
 import { vh, vw } from "../../utils/dimensions";
+import { useIsFocused } from "@react-navigation/native";
 
 
 
 const UpcomingEvents = () => {
   const [eventData, setEventData] = useState([]);
+  const isFocused = useIsFocused();
 
   useEffect(()=>{
     getEvents()
-  },[])
+  },[isFocused])
 
   const getEvents = async () => {
     let obj = {
@@ -218,6 +220,23 @@ const UpcomingEvents = () => {
     );
   };
 
+  const EmptyContentView = () => {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text
+          style={{
+            color: "#000",
+            fontSize: moderateScale(16),
+            fontWeight: 500,
+          }}
+        >
+          Oops! No events available at this moment.
+        </Text>
+      </View>
+    );
+  };
+
+
   return (
     <SafeAreaView style={{flex:1}}>
     <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
@@ -235,13 +254,16 @@ const UpcomingEvents = () => {
           backgroundColor: THEMES.colors.bgColor,
         }}
       >
-        <FlatList
+        {
+          eventData?.length ? <FlatList
           showsVerticalScrollIndicator={false}
           data={eventData}
           bounces={false}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
-        />
+        /> : EmptyContentView()
+        }
+        
       </View>
     </View>
     </SafeAreaView>

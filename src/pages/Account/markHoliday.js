@@ -654,6 +654,7 @@ const MarkHoliday = () => {
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
           mode="time"
+          display="spinner" 
           onConfirm={handleConfirm}
           onCancel={hideDatePicker}
           minimumDate={new Date()}
@@ -675,12 +676,14 @@ const MarkHoliday = () => {
         <DateTimePickerModal
           isVisible={startTimeVisible}
           mode="time"
+          display="spinner" 
           onConfirm={handleStartTime}
           onCancel={hideStartTime}
         />
         <DateTimePickerModal
           isVisible={endTimeVisible}
           mode="time"
+          display="spinner" 
           onConfirm={handleEndTime}
           onCancel={hideEndTime}
         />

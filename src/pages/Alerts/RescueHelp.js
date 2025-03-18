@@ -39,8 +39,11 @@ import { err } from "react-native-svg";
 import { goBack } from "../../navigations/rootNavigationRef";
 import { contextValue } from "../../components/Loader";
 import { validateInput } from "../../utils/validation";
+import { useSelector } from "react-redux";
 
 const RescueHelp = (props) => {
+  const profile = useSelector((state) => state?.commonReducer);
+
   const [selectedGender, setSelectedGender] = useState(null);
   const [petImage, setPetImage] = useState([]);
   const [petImagesVisible, setPetImageVisible] = useState(false);
@@ -50,7 +53,7 @@ const RescueHelp = (props) => {
   const [facebook, setFacebook] = useState();
   const [instagram, setInstagram] = useState();
   const [whatsup, setWhatsup] = useState();
-  const [petName, setPetName] = useState();
+  const [petName, setPetName] = useState(profile?.parentProfie?.petDetails?.[0]?.name);
   const [location, setLocation] = useState();
   const [feature, setFeature] = useState();
   const [message, setMessage] = useState();
@@ -113,6 +116,12 @@ const RescueHelp = (props) => {
   const shareImageBase64 = async (image, platforms = []) => {
     try {
       contextValue?.setLoader(false);
+      // const shareData = {
+      //   title: "Attention Required !!",
+      //   message: message,
+      //   url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
+      // };
+      // await Share.open(shareData);
       for (const platform of platforms) {
         if (platform == "FACEBOOK") {
           const shareData = {
@@ -270,6 +279,7 @@ const RescueHelp = (props) => {
               }}
             >
               <InputField
+                editable={profile?.parentProfie?.petDetails?.[0]?.name ? false : true}
                 label={"Pet Name*"}
                 placeholderText={"Enter Pet name"}
                 value={petName}
@@ -384,7 +394,7 @@ const RescueHelp = (props) => {
               }}
             >
               <InputField
-                label={"Location"}
+                label={"Location*"}
                 placeholderText={"Enter location name"}
                 value={location}
                 onChange={setLocation}
@@ -420,7 +430,7 @@ const RescueHelp = (props) => {
                           },
                         ]}
                       >
-                        Help needed date
+                        Help needed date*
                       </Text>
                       <Text style={styles.dateValue}>{date}</Text>
                     </>
@@ -435,7 +445,7 @@ const RescueHelp = (props) => {
                           },
                         ]}
                       >
-                        Help needed date
+                        Help needed date*
                       </Text>
                       <Text style={styles.datePlaceholderText}>
                         {Strings.ddMMYYYY}
@@ -509,7 +519,7 @@ const RescueHelp = (props) => {
                   }}
                   rightText={"Facebook"}
                 />
-                <CheckBox
+                {/* <CheckBox
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}
                   onClick={() => {
@@ -524,7 +534,7 @@ const RescueHelp = (props) => {
                     fontSize: THEMES.fonts.font12,
                     fontFamily: THEMES.fontFamily.medium,
                   }}
-                />
+                /> */}
                 <CheckBox
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}
