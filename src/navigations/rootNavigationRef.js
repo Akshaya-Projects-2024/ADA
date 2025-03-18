@@ -31,7 +31,7 @@ export function resetNavigation(name) {
   });
 }
 
-export function navigateToParent(name, navigation) {
+export function navigateToParent(navigation) {
   navigation?.reset({
     index: 0,
     routes: [{ name: "petParentAppStack" }],
