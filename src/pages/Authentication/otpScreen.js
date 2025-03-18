@@ -36,6 +36,7 @@ import {
 import { contextValue } from "../../components/Loader";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getNotificationToken } from "../../utils/pushNotificationUtils";
+import { validateInput } from "../../utils/validation";
 
 const OtpScreen = (props) => {
   const { top } = useSafeAreaInsets();
@@ -47,8 +48,10 @@ const OtpScreen = (props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (validateInput(value) == "mobile") {
+      requestSmsPermission();
+    }
     // Request SMS permission on Android
-    requestSmsPermission();
     // Start listening for SMS messages
     const subscription = SmsListener.addListener((message) => {
       const otpMatch = message.body.match(/\b\d{6}\b/);
@@ -71,7 +74,9 @@ const OtpScreen = (props) => {
       setIsMobileNumber(false);
     }
 
-    requestSmsPermission();
+    if (validateInput(value) == "mobile") {
+      requestSmsPermission();
+    }
     // Start listening for SMS messages
     const subscription = SmsListener.addListener((message) => {
       const otpMatch = message.body.match(/\b\d{6}\b/);
@@ -329,9 +334,7 @@ const OtpScreen = (props) => {
                 paddingHorizontal: moderateScale(10),
               }}
             >
-              {`An ${
-                isMobileNumber ? "OTP" : "email"
-              } has been sent to`}
+              {`An ${isMobileNumber ? "OTP" : "email"} has been sent to`}
 
               <Text
                 style={{
