@@ -162,8 +162,7 @@ const EmergencyAlert = (props) => {
                 </>
               ))}
             </View>
-
-            {!provider && profile?.profileData?.petDetails?.length ? (
+            {!provider && profile?.parentProfie?.petDetails?.length ? (
               <>
                 <View style={{ paddingTop: moderateScale(30) }}>
                   <Text
