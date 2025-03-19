@@ -14,7 +14,8 @@ const getCurrentLocation = () => {
           },
           (err) => {
             res(false);
-          }
+          },
+          { timeout: 10000, maximumAge: 0, enableHighAccuracy: true }
         );
       } else {
         Alert.alert(

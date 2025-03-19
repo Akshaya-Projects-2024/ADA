@@ -25,8 +25,7 @@ import { decryptService } from "../../utils/storageFunc";
 import moment from "moment";
 import RNFS from "react-native-fs";
 import Dialog from "../../components/Dialog";
-import { check, PERMISSIONS, RESULTS } from "react-native-permissions";
-import { showToast } from "../../utils/utils";
+import { check, PERMISSIONS, request, RESULTS } from "react-native-permissions";
 
 const PaymentDetails = () => {
   const [paymentDetailsData, setPaymentDetailsData] = useState([]);
@@ -64,7 +63,6 @@ const PaymentDetails = () => {
           Platform.Version >= 33
             ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES
             : PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE;
-
         const result = await check(permission);
         if (result === RESULTS.GRANTED) {
           return true;

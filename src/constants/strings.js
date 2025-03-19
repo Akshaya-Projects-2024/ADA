@@ -166,11 +166,12 @@ const Strings = {
   cancelAppointmentsDescription:
     "All appointments scheduled on the selected holiday will be automatically canceled.",
   appointmentConfirm: "Appointment has been accepted",
-  deleteAcccount:"Are you sure you want to delete this account?",
-  logoutAccount:"Are you sure you want to logout?",
+  deleteAcccount: "Are you sure you want to delete this account?",
+  logoutAccount: "Are you sure you want to logout?",
   approvalAlertForRegistration:
-  "Complete your Registration and Subscribe to the app to access amazing features.",
-youAreAlreadySubscribed: "You are already subscribed."
+    "Complete your Registration and Subscribe to the app to access amazing features.",
+  youAreAlreadySubscribed: "You are already subscribed.",
+  timeError: "Please select valid time",
 };
 
 export default Strings;
