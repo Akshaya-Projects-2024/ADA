@@ -63,6 +63,8 @@ const Strings = {
   fullDay: "Full Day",
   twoShiftInADay: "Two Shifts in a Day",
   selectTime: "Select Time*",
+  selectStartTime: "Select Start Time*",
+  selectEndTime: "Select End Time*",
   sameTimeForDay: "Same time for all days",
   firstHalf: "First Half",
   secondHalf: "Second Half",

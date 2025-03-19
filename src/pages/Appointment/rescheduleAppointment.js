@@ -51,8 +51,11 @@ const RescheduleAppointment = ({ navigation, route }) => {
   const [isAM, setIsAM] = useState(true);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
   const [isDateVisible, setDateVisibility] = useState(false);
   const [time, setTime] = useState();
+  const [isEndAM, setEndIsAM] = useState(true);
+  const [endTime, setEndTime] = useState();
   const [date, selectedDate] = useState();
   const [reason, setReason] = useState("");
   const [appointments, setAppointments] = useState({ label: "", data: [] });
@@ -81,6 +84,10 @@ const RescheduleAppointment = ({ navigation, route }) => {
     setDatePickerVisibility(false);
   };
 
+  const hideEndDatePicker = () => {
+    setEndDatePickerVisibility(false);
+  };
+
   const handleConfirm = (pickedTime) => {
     const formattedTime = moment(pickedTime).format("HH:mm");
     const formattedPeriod = moment(pickedTime).format("A");
@@ -91,6 +98,18 @@ const RescheduleAppointment = ({ navigation, route }) => {
       setIsAM(true);
     }
     hideDatePicker();
+  };
+
+  const handleEndTimeConfirm = (pickedTime) => {
+    const formattedTime = moment(pickedTime).format("HH:mm");
+    const formattedPeriod = moment(pickedTime).format("A");
+    setEndTime(formattedTime);
+    if (formattedPeriod == "PM") {
+      setEndIsAM(false);
+    } else {
+      setEndIsAM(true);
+    }
+    hideEndDatePicker();
   };
 
   const hideDatePickerCancel = () => {
@@ -110,6 +129,8 @@ const RescheduleAppointment = ({ navigation, route }) => {
         throw new Error("Please select valid date");
       } else if (!time) {
         throw new Error("Please provide valid time");
+      } else if (!endTime) {
+        throw new Error("Please provide valid end time");
       } else if (!reason) {
         throw new Error("Please provide valid reason");
       } else {
@@ -119,7 +140,7 @@ const RescheduleAppointment = ({ navigation, route }) => {
           provider_id: selectedItem?.provider_id,
           appointment_date: moment(date, "DD/MM/YYYY").format("YYYY-MM-DD"),
           start_time: time,
-          end_time: moment(time, "HH:mm").add(1, "hours").format("HH:mm"),
+          end_time: endTime,
           status: "rescheduled",
           notes: reason,
           requestedby: "provider",
@@ -192,7 +213,9 @@ const RescheduleAppointment = ({ navigation, route }) => {
           </View>
           <View style={{ paddingTop: moderateScale(45) }}>
             <View style={styles.selectTimeRow}>
-              <Text style={styles.selectTimeText}>{Strings.selectTime}</Text>
+              <Text style={styles.selectTimeText}>
+                {Strings.selectStartTime}
+              </Text>
               <View>
                 <View style={styles.rowStyle}>
                   <TouchableOpacity
@@ -239,6 +262,56 @@ const RescheduleAppointment = ({ navigation, route }) => {
             </View>
           </View>
           <View style={{ paddingTop: moderateScale(45) }}>
+            <View style={styles.selectTimeRow}>
+              <Text style={styles.selectTimeText}>{Strings.selectEndTime}</Text>
+              <View>
+                <View style={styles.rowStyle}>
+                  <TouchableOpacity
+                    onPress={() => setEndDatePickerVisibility(true)}
+                    style={[
+                      styles.timeContainer,
+                      {
+                        paddingHorizontal: endTime
+                          ? moderateScale(15)
+                          : moderateScale(10),
+                      },
+                    ]}
+                  >
+                    {endTime ? (
+                      <Text style={styles.timeValueText}>{endTime}</Text>
+                    ) : (
+                      <Text style={styles.hourMinPlaceHolder}>
+                        {Strings.hhmm}
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                  <View style={styles.btncontainer}>
+                    <TouchableOpacity
+                      disabled={endTime ? true : false}
+                      style={[styles.button, isEndAM && styles.activeButton]}
+                      onPress={() => setEndIsAM(true)}
+                    >
+                      <Text style={[styles.text, isEndAM && styles.activeText]}>
+                        {Strings.am}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      disabled={endTime ? true : false}
+                      style={[styles.button, !isEndAM && styles.activeButton]}
+                      onPress={() => setEndIsAM(false)}
+                    >
+                      <Text
+                        style={[styles.text, !isEndAM && styles.activeText]}
+                      >
+                        {Strings.pm}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+          <View style={{ paddingTop: moderateScale(45) }}>
             <InputField
               label={""}
               placeholderText={Strings.writeAMessageForReschedule}
@@ -271,6 +344,13 @@ const RescheduleAppointment = ({ navigation, route }) => {
           display="spinner"
           onConfirm={handleConfirm}
           onCancel={hideDatePicker}
+        />
+        <DateTimePicker
+          isVisible={isEndDatePickerVisible}
+          mode="time"
+          display="spinner"
+          onConfirm={handleEndTimeConfirm}
+          onCancel={hideDatePickerCancel}
         />
         <DateTimePicker
           isVisible={isDateVisible}
