@@ -501,6 +501,7 @@ const ParentHome = (props) => {
               Hello,
             </Text>
             <Text
+              numberOfLines={2}
               style={{
                 color: "#EC407A",
                 fontFamily: THEMES.fontFamily.bold,

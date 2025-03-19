@@ -16,7 +16,7 @@ export const isValidName = (name) => {
 };
 
 export const validateInput = (input) => {
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Simple email validation
+  const emailRegex =  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Simple email validation
   const phoneRegex = /^(\+?\d{1,4}[\s-])?(\(?\d{3}\)?[\s-]?)?[\d\s-]{7,10}$/; // Mobile numbers (10-15 digits)
 
   if (emailRegex.test(input)) {

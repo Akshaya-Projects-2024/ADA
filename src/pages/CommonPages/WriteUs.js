@@ -19,6 +19,7 @@ import { WriteToUsApi } from "../../redux-store/actions/commonApis";
 import { contextValue } from "../../components/Loader";
 import { showToast } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
+import { validateInput } from "../../utils/validation";
 
 const WriteUs = (props) => {
   const [description, setDescription] = useState();
@@ -50,7 +51,11 @@ const WriteUs = (props) => {
       if (!description) {
         showToast("error", "Please enter description");
       } else if (!mobileNo) {
-        showToast("error", "Please enter Mobile No");
+        showToast("error", "Please enter contact information");
+      } else if (!mobileNo) {
+        showToast("error", "Please enter contact information");
+      } else if (validateInput(mobileNo) == "invalid") {
+        showToast("error", "Please enter valid contact information");
       } else {
         contextValue?.setLoader(true);
         let obj = {

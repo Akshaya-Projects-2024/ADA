@@ -614,6 +614,7 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font16,
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.bold,
+    textAlign:'center'
   },
   nameView: {
     alignItems: "center",

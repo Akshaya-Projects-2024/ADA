@@ -152,7 +152,6 @@ const ParentDetails = (props) => {
   };
 
   const onSubmit = async () => {
-    
     if (!parentImg) {
       showToast("error", "Please upload parent profile picture");
     } else if (!parentName) {

@@ -23,7 +23,7 @@ import SearchImg from "../../assets/svg/search.svg";
 import TrendingTopicIc from "../../assets/svg/trendingTopics.svg";
 import { clearKeywordApi } from "../../redux-store/actions/topics";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
-import Feather from 'react-native-vector-icons/Feather'
+import Feather from "react-native-vector-icons/Feather";
 
 const TopicsCard = ({ item, onPress }) => {
   return (
@@ -106,16 +106,16 @@ const Search = ({ navigation }) => {
           />
         ) : (
           // <SearchImg width={ms(15)} height={ms(15)} />
-          <Feather name="search" color={data == selectedChip ? "#fff" : "#000"} />
+          <Feather
+            name="search"
+            color={data == selectedChip ? "#fff" : "#000"}
+          />
         )}
         <Text
           style={[
             styles.chipText,
             {
-              color:
-                data == selectedChip
-                  ? colors.white
-                  : colors.black,
+              color: data == selectedChip ? colors.white : colors.black,
             },
           ]}
         >
@@ -130,7 +130,9 @@ const Search = ({ navigation }) => {
     if (searchQuery?.length >= 3) {
       initData();
     } else if (searchQuery?.length === 0) {
-      initData(); // Restore initial data when search is cleared
+      initData();
+      setSelectedChip();
+      // Restore initial data when search is cleared
     }
   }, [searchQuery]);
 
@@ -180,11 +182,13 @@ const Search = ({ navigation }) => {
       let res = await clearKeywordApi(obj);
       if (res?.status_code == 200) {
         setSelectedChipsId([]);
+        setSelectedChip();
         setSearchText("");
         setData((prevData) => ({
           ...prevData,
           Keywords: [],
           SearchResult: [],
+          TrendingTopics: [],
         }));
         contextValue?.setLoader(true);
       }
