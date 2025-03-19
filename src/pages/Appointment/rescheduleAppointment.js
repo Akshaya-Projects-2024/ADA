@@ -5,23 +5,46 @@ import {
   StatusBar,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   Keyboard,
-  ActivityIndicator,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
 import Header from "../../components/Header";
-import { moderateScale, s } from "react-native-size-matters";
+import { moderateScale } from "react-native-size-matters";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import Calendars from "../../assets/svg/calendar.svg";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import moment from "moment";
 import { rescheduleAppointment } from "../../redux-store/actions/auth";
-import { showToast } from "../../utils/utils";
+import { showToast, validArray, validObject } from "../../utils/utils";
 import { contextValue } from "../../components/Loader";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+const AppointmentSlotItem = ({ slot, index }) => {
+  return (
+    <View
+      key={`${slot?.start_time}_${index}`}
+      style={[
+        styles.timeSlot,
+        !slot?.isavailable && styles.disabledSlot,
+        slot?.isbooked && styles.bookedSlot,
+      ]}
+    >
+      <Text
+        style={StyleSheet.flatten([
+          slot?.isbooked ? styles.disabledText : {},
+          styles.startTimeText,
+          {
+            color: slot?.isavailable || slot?.isbooked ? "#000" : "#fff",
+          },
+        ])}
+      >
+        {slot?.start_time}
+      </Text>
+    </View>
+  );
+};
 
 const RescheduleAppointment = ({ navigation, route }) => {
   const selectedItem = route?.params?.selectedItem;
@@ -32,6 +55,7 @@ const RescheduleAppointment = ({ navigation, route }) => {
   const [time, setTime] = useState();
   const [date, selectedDate] = useState();
   const [reason, setReason] = useState("");
+  const [appointments, setAppointments] = useState({ label: "", data: [] });
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -103,6 +127,18 @@ const RescheduleAppointment = ({ navigation, route }) => {
         const res = await rescheduleAppointment(params);
         if (res?.status === 200) {
           navigation.goBack();
+        } else if (validObject(res?.data)) {
+          showToast("error", res?.message);
+          const entries = Object.entries(res?.data);
+          if (validArray(entries)) {
+            const firstEntry = entries?.[0];
+            if (validArray(firstEntry)) {
+              setAppointments({
+                label: moment(firstEntry[0], "YYYY-MM-DD").format("DD/MM/YYYY"),
+                data: firstEntry[1],
+              });
+            }
+          }
         }
       }
       contextValue?.setLoader(false);
@@ -111,127 +147,142 @@ const RescheduleAppointment = ({ navigation, route }) => {
       showToast("error", error?.message);
     }
   };
+
   return (
-    <SafeAreaView style={{flex:1}}>
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header
-        title={Strings.rescheduleAppointment}
-        showBack
-        bgColor="transparent"
-        fontColor={THEMES.colors.black}
-      />
-      <View style={styles.mainContent}>
-        <View style={styles.rowContent}>
-          <Text style={styles.selectDateText}>{Strings.selectDate}</Text>
-          <View>
-            <View style={styles.flexRow}>
-              <View
-                style={[
-                  styles.dateContainer,
-                  {
-                    paddingHorizontal: date
-                      ? moderateScale(15)
-                      : moderateScale(10),
-                  },
-                ]}
-              >
-                {date ? (
-                  <Text style={styles.dateValue}>{date}</Text>
-                ) : (
-                  <Text style={styles.datePlaceholderText}>
-                    {Strings.ddMMYYYY}
-                  </Text>
-                )}
-              </View>
-              <TouchableOpacity
-                onPress={() => setDateVisibility(true)}
-                style={styles.calendarIcon}
-              >
-                <Calendars />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-        <View style={{ paddingTop: moderateScale(45) }}>
-          <View style={styles.selectTimeRow}>
-            <Text style={styles.selectTimeText}>{Strings.selectTime}</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header
+          title={Strings.rescheduleAppointment}
+          showBack
+          bgColor="transparent"
+          fontColor={THEMES.colors.black}
+        />
+        <View style={styles.mainContent}>
+          <View style={styles.rowContent}>
+            <Text style={styles.selectDateText}>{Strings.selectDate}</Text>
             <View>
-              <View style={styles.rowStyle}>
-                <TouchableOpacity
-                  onPress={() => setDatePickerVisibility(true)}
+              <View style={styles.flexRow}>
+                <View
                   style={[
-                    styles.timeContainer,
+                    styles.dateContainer,
                     {
-                      paddingHorizontal: time
+                      paddingHorizontal: date
                         ? moderateScale(15)
                         : moderateScale(10),
                     },
                   ]}
                 >
-                  {time ? (
-                    <Text style={styles.timeValueText}>{time}</Text>
+                  {date ? (
+                    <Text style={styles.dateValue}>{date}</Text>
                   ) : (
-                    <Text style={styles.hourMinPlaceHolder}>
-                      {Strings.hhmm}
+                    <Text style={styles.datePlaceholderText}>
+                      {Strings.ddMMYYYY}
                     </Text>
                   )}
+                </View>
+                <TouchableOpacity
+                  onPress={() => setDateVisibility(true)}
+                  style={styles.calendarIcon}
+                >
+                  <Calendars />
                 </TouchableOpacity>
-                <View style={styles.btncontainer}>
+              </View>
+            </View>
+          </View>
+          <View style={{ paddingTop: moderateScale(45) }}>
+            <View style={styles.selectTimeRow}>
+              <Text style={styles.selectTimeText}>{Strings.selectTime}</Text>
+              <View>
+                <View style={styles.rowStyle}>
                   <TouchableOpacity
-                    disabled={time ? true : false}
-                    style={[styles.button, isAM && styles.activeButton]}
-                    onPress={() => setIsAM(true)}
+                    onPress={() => setDatePickerVisibility(true)}
+                    style={[
+                      styles.timeContainer,
+                      {
+                        paddingHorizontal: time
+                          ? moderateScale(15)
+                          : moderateScale(10),
+                      },
+                    ]}
                   >
-                    <Text style={[styles.text, isAM && styles.activeText]}>
-                      {Strings.am}
-                    </Text>
+                    {time ? (
+                      <Text style={styles.timeValueText}>{time}</Text>
+                    ) : (
+                      <Text style={styles.hourMinPlaceHolder}>
+                        {Strings.hhmm}
+                      </Text>
+                    )}
                   </TouchableOpacity>
-
-                  <TouchableOpacity
-                    disabled={time ? true : false}
-                    style={[styles.button, !isAM && styles.activeButton]}
-                    onPress={() => setIsAM(false)}
-                  >
-                    <Text style={[styles.text, !isAM && styles.activeText]}>
-                      {Strings.pm}
-                    </Text>
-                  </TouchableOpacity>
+                  <View style={styles.btncontainer}>
+                    <TouchableOpacity
+                      disabled={time ? true : false}
+                      style={[styles.button, isAM && styles.activeButton]}
+                      onPress={() => setIsAM(true)}
+                    >
+                      <Text style={[styles.text, isAM && styles.activeText]}>
+                        {Strings.am}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      disabled={time ? true : false}
+                      style={[styles.button, !isAM && styles.activeButton]}
+                      onPress={() => setIsAM(false)}
+                    >
+                      <Text style={[styles.text, !isAM && styles.activeText]}>
+                        {Strings.pm}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </View>
           </View>
+          <View style={{ paddingTop: moderateScale(45) }}>
+            <InputField
+              label={""}
+              placeholderText={Strings.writeAMessageForReschedule}
+              multiline={true}
+              value={reason}
+              onChange={setReason}
+            />
+          </View>
+          {validArray(appointments?.data) ? (
+            <View style={styles.slotsContainer}>
+              <Text style={styles.selectTimeText}>
+                {`${Strings.availableSlots}${appointments?.label}`}
+              </Text>
+              <View style={styles.timeSlotRow}>
+                {appointments?.data?.map((it, indx) => {
+                  return <AppointmentSlotItem index={indx} slot={it} />;
+                })}
+              </View>
+            </View>
+          ) : null}
         </View>
-        <View style={{ paddingTop: moderateScale(45) }}>
-          <InputField
-            label={""}
-            placeholderText={Strings.writeAMessageForReschedule}
-            multiline={true}
-            value={reason}
-            onChange={setReason}
-          />
-        </View>
+        {!isKeyboardVisible && (
+          <View style={styles.submitButton}>
+            <Button title={Strings.sendRequest} onPress={onSubmit} />
+          </View>
+        )}
+        <DateTimePicker
+          isVisible={isDatePickerVisible}
+          mode="time"
+          display="spinner"
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
+        />
+        <DateTimePicker
+          isVisible={isDateVisible}
+          mode="date"
+          onConfirm={handleDateConfirm}
+          onCancel={hideDatePickerCancel}
+          minimumDate={moment(
+            selectedItem?.appointment_date,
+            "YYYY-MM-DD"
+          ).toDate()}
+        />
       </View>
-      {!isKeyboardVisible && (
-        <View style={styles.submitButton}>
-          <Button title={Strings.sendRequest} onPress={onSubmit} />
-        </View>
-      )}
-      <DateTimePicker
-        isVisible={isDatePickerVisible}
-        mode="time"
-        display="spinner" 
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-
-      <DateTimePicker
-        isVisible={isDateVisible}
-        mode="date"
-        onConfirm={handleDateConfirm}
-        onCancel={hideDatePickerCancel}
-      />
-    </View>
     </SafeAreaView>
   );
 };
@@ -352,7 +403,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center ",
     justifyContent: "center",
-    borderRadius: 8,
     height: 40,
     borderWidth: 0.8,
   },
@@ -374,6 +424,38 @@ const styles = StyleSheet.create({
     backgroundColor: THEMES.colors.cyan,
     borderWidth: 1,
   },
+  timeSlot: {
+    backgroundColor: "#ffffff",
+    borderColor: "#CFD3D4",
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: moderateScale(10),
+    paddingVertical: moderateScale(5),
+    margin: 5,
+  },
+  disabledSlot: {
+    backgroundColor: "#AAAAAA", // Gray background for disabled slots
+    borderColor: "#AAAAAA",
+  },
+  bookedSlot: {
+    backgroundColor: THEMES.colors.bookedSlot,
+    borderColor: THEMES.colors.outrageousOrange,
+  },
+  selectedSlotStyle: {
+    backgroundColor: THEMES.colors.cyan,
+  },
+  startTimeText: {
+    fontSize: THEMES.fonts.font12,
+    fontFamily: THEMES.fontFamily.medium,
+  },
+  timeSlotRow: {
+    flexDirection: "row",
+    flexWrap: "wrap", // Ensures time slots wrap to the next line
+    justifyContent: "flex-start",
+    width: "100%",
+    alignItems: "center",
+  },
+  slotsContainer: { flexGrow: 1, marginTop: moderateScale(10) },
 });
 
 export default RescheduleAppointment;

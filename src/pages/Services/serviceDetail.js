@@ -202,16 +202,18 @@ const ServiceDetail = ({ navigation, route }) => {
                 {selectedProvider?.profile?.providerBusiness?.name}
               </Text>
               <Text
-              numberOfLines={2}
-              style={{
-                fontFamily: THEMES.fontFamily.medium,
-                paddingTop: moderateScale(3),
-                fontSize: THEMES.fonts.font14,
-                width:'90%'
-              }}
-            >
-              {selectedProvider?.profile?.providerBusiness?.services?.map(item => item.service).join(", ")}
-            </Text>
+                numberOfLines={2}
+                style={{
+                  fontFamily: THEMES.fontFamily.medium,
+                  paddingTop: moderateScale(3),
+                  fontSize: THEMES.fonts.font14,
+                  width: "90%",
+                }}
+              >
+                {selectedProvider?.profile?.providerBusiness?.services
+                  ?.map((item) => item.service)
+                  .join(", ")}
+              </Text>
               <Text
                 numberOfLines={1}
                 style={{

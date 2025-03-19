@@ -29,7 +29,9 @@ const AppointmentCard = ({
 
   const petImage = useMemo(
     () =>
-      item?.petdetails?.documents?.find((it) => it?.documenttype === "profilePhoto"),
+      item?.petdetails?.documents?.find(
+        (it) => it?.documenttype === "profilePhoto"
+      ),
     [item]
   );
 

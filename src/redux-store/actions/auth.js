@@ -1,5 +1,6 @@
 import Api from "../../api/Api";
 import { urlList } from "../../constants/urlList";
+import { validObject } from "../../utils/utils";
 
 export const checkLogin = async (obj) => {
   try {
@@ -466,7 +467,9 @@ export const rescheduleAppointment = async (params) => {
     }
     throw new Error("Something went wrong!");
   } catch (error) {
-    console.log("rescheduleAppointment Error! ", error);
+    if (validObject(error?.data)) {
+      return { data: error?.data, message: error?.message };
+    }
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };

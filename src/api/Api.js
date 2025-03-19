@@ -1,5 +1,6 @@
 import axios from "axios";
 import { config } from "../constants/config";
+import { validObject } from "../utils/utils";
 
 class Api {
   normalizePath(endpoint) {
@@ -123,6 +124,9 @@ class Api {
                 response?.message ||
                 `Status: ${response?.status}` ||
                 "POSTV3 error!  Something is wrong",
+              ...(validObject(response?.data?.data)
+                ? { data: response?.data?.data }
+                : {}),
             });
           }
         })
@@ -132,6 +136,7 @@ class Api {
             error: true,
             message:
               error?.message || error || "POST error!  Something is wrong",
+            ...(validObject(error?.data) ? { data: error?.data } : {}),
           });
         });
     });
