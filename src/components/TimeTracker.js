@@ -16,6 +16,7 @@ import SwitchOff from "../assets/svg/switchOff.svg";
 import Strings from "../constants/strings";
 import RadioSelected from "../assets/svg/radioSelected.svg";
 import Radio from "../assets/svg/radio.svg";
+import { showToast } from "../utils/utils";
 
 export const DAYS = [
   { key: "Mo", value: "Monday" },
@@ -41,6 +42,7 @@ const TimeTracker = ({
   const [pickerShift, setPickerShift] = useState(null);
   const [pickerType, setPickerType] = useState(null);
   const [pickerDay, setPickerDay] = useState(null);
+  const [minDate, setMinDate] = useState(null);
 
   const showDatePicker = (day, shift, type) => {
     setPickerDay(day);
@@ -55,8 +57,10 @@ const TimeTracker = ({
 
   const handleConfirm = (date) => {
     const formattedTime = moment(date).format("HH:mm");
+    if (pickerShift === "shift1" && pickerType === "start") {
+      setMinDate(date);
+    }
     handleTimeChange(pickerDay, pickerShift, pickerType, formattedTime);
-    hideDatePicker();
   };
 
   const toggleDay = (day) => {
@@ -210,8 +214,18 @@ const TimeTracker = ({
       ...day,
       [shift]: { ...day[shift], [type]: value },
     };
+    if (
+      (type === "end" && temp[selectedDay]?.[shift]?.start >= value) ||
+      (shift === "shift2" &&
+        type === "start" &&
+        temp[selectedDay]?.shift1?.start >= value)
+    ) {
+      hideDatePicker();
+      showToast("error", Strings.timeError);
+      return;
+    }
     if (selectedForAll) {
-      temp.map((item, index) => {
+      temp.map((item) => {
         item[shift][type] = null;
       });
 
@@ -226,185 +240,112 @@ const TimeTracker = ({
       }
     }
     setTimes(temp);
+    hideDatePicker();
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.workingDayText}>{Strings.workingDays}</Text>
-      <View style={styles.weekDaysRow}>
-        {times.map((day) => (
-          <TouchableOpacity
-            key={day?.label}
-            style={[
-              styles.dayButton,
-              {
-                borderWidth: 1,
-                backgroundColor: day?.selected
-                  ? THEMES.colors.outrageousOrange
-                  : THEMES.colors.pearl,
-                borderColor: day?.selected
-                  ? THEMES.colors.outrageousOrange
-                  : THEMES.colors.darkGrey,
-              },
-            ]}
-            onPress={() => toggleDay(day)}
-          >
-            <Text
+    <>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.workingDayText}>{Strings.workingDays}</Text>
+        <View style={styles.weekDaysRow}>
+          {times.map((day) => (
+            <TouchableOpacity
+              key={day?.label}
               style={[
-                styles.dayText,
+                styles.dayButton,
                 {
-                  color: day?.selected
-                    ? THEMES.colors.white
+                  borderWidth: 1,
+                  backgroundColor: day?.selected
+                    ? THEMES.colors.outrageousOrange
+                    : THEMES.colors.pearl,
+                  borderColor: day?.selected
+                    ? THEMES.colors.outrageousOrange
                     : THEMES.colors.darkGrey,
                 },
               ]}
+              onPress={() => toggleDay(day)}
             >
-              {day?.label}
+              <Text
+                style={[
+                  styles.dayText,
+                  {
+                    color: day?.selected
+                      ? THEMES.colors.white
+                      : THEMES.colors.darkGrey,
+                  },
+                ]}
+              >
+                {day?.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <View style={styles.workingTimeView}>
+          <Text style={styles.workingTimeText}>{Strings.workingTime}</Text>
+        </View>
+        <View style={styles.radioButtonsContainer}>
+          <View style={styles.radioButton}>
+            <RadioButton
+              mode={selectedShiftType === SHIFTS.full}
+              title={Strings.fullDay}
+              onPress={() => {
+                setSelectedShiftType(SHIFTS.full);
+              }}
+            />
+          </View>
+          <View style={styles.radioButton}>
+            <RadioButton
+              mode={selectedShiftType === SHIFTS.shifts}
+              title={Strings.twoShiftInADay}
+              onPress={() => {
+                setSelectedShiftType(SHIFTS.shifts);
+              }}
+            />
+          </View>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            paddingTop: moderateScale(32),
+            justifyContent: "space-between",
+            paddingBottom:
+              selectedShiftType === SHIFTS.shifts
+                ? moderateScale(27)
+                : moderateScale(39),
+          }}
+        >
+          <Text style={styles.selectTimeText}>{Strings.selectTime}</Text>
+          <Pressable style={styles.rowSameDay} onPress={handleAllSelection}>
+            <Text style={styles.sameTimeForDayText}>
+              {Strings.sameTimeForDay}
             </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-      <View style={styles.workingTimeView}>
-        <Text style={styles.workingTimeText}>{Strings.workingTime}</Text>
-      </View>
-      <View style={styles.radioButtonsContainer}>
-        <View style={styles.radioButton}>
-          <RadioButton
-            mode={selectedShiftType === SHIFTS.full}
-            title={Strings.fullDay}
-            onPress={() => {
-              setSelectedShiftType(SHIFTS.full);
-            }}
-          />
+            {selectedForAll ? <SwitchOn /> : <SwitchOff />}
+          </Pressable>
         </View>
-        <View style={styles.radioButton}>
-          <RadioButton
-            mode={selectedShiftType === SHIFTS.shifts}
-            title={Strings.twoShiftInADay}
-            onPress={() => {
-              setSelectedShiftType(SHIFTS.shifts);
-            }}
-          />
-        </View>
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          paddingTop: moderateScale(32),
-          justifyContent: "space-between",
-          paddingBottom:
-            selectedShiftType === SHIFTS.shifts
-              ? moderateScale(27)
-              : moderateScale(39),
-        }}
-      >
-        <Text style={styles.selectTimeText}>{Strings.selectTime}</Text>
-        <Pressable style={styles.rowSameDay} onPress={handleAllSelection}>
-          <Text style={styles.sameTimeForDayText}>
-            {Strings.sameTimeForDay}
-          </Text>
-          {selectedForAll ? <SwitchOn /> : <SwitchOff />}
-        </Pressable>
-      </View>
 
-      {selectedShiftType === SHIFTS.shifts && (
-        <View style={styles.sameTimeForDayView}>
-          <Text style={styles.firstHalfText}>{Strings.firstHalf}</Text>
-          <Text style={styles.firstHalfText}>{Strings.secondHalf}</Text>
-        </View>
-      )}
+        {selectedShiftType === SHIFTS.shifts && (
+          <View style={styles.sameTimeForDayView}>
+            <Text style={styles.firstHalfText}>{Strings.firstHalf}</Text>
+            <Text style={styles.firstHalfText}>{Strings.secondHalf}</Text>
+          </View>
+        )}
 
-      <View style={styles.daysContainer}>
-        {times.map((day) => (
-          <View key={day?.label} style={styles.dayContainer}>
-            <View style={styles.dayCircle}>
-              <Text style={styles.circleText}>{day.label}</Text>
-            </View>
+        <View style={styles.daysContainer}>
+          {times.map((day) => (
+            <View key={day?.label} style={styles.dayContainer}>
+              <View style={styles.dayCircle}>
+                <Text style={styles.circleText}>{day.label}</Text>
+              </View>
 
-            <View style={styles.timeInputContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.timeInput1,
-                  !day?.selected && styles.disabledInput,
-                ]}
-                onPress={() =>
-                  day?.selected && showDatePicker(day, "shift1", "start")
-                }
-              >
-                <Text
-                  style={[
-                    styles.timeText,
-                    {
-                      color: day?.selected
-                        ? THEMES.colors.black
-                        : THEMES.colors.lightSilver,
-                    },
-                  ]}
-                >
-                  {Strings.start}
-                </Text>
-                <Text
-                  style={[
-                    styles.timeText,
-                    {
-                      fontSize: THEMES.fonts.font12,
-                      fontFamily: THEMES.fontFamily.semiBold,
-                      color: day?.selected
-                        ? THEMES.colors.black
-                        : THEMES.colors.lightSilver,
-                    },
-                  ]}
-                >
-                  {day.shift1.start || "___:___"}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.timeInput,
-                  !day?.selected && styles.disabledInput,
-                ]}
-                onPress={() =>
-                  day?.selected && showDatePicker(day, "shift1", "end")
-                }
-              >
-                <Text
-                  style={[
-                    styles.timeText,
-                    {
-                      color: day?.selected
-                        ? THEMES.colors.black
-                        : THEMES.colors.lightSilver,
-                    },
-                  ]}
-                >
-                  {Strings.close}
-                </Text>
-                <Text
-                  style={[
-                    styles.timeText,
-                    {
-                      fontSize: THEMES.fonts.font12,
-                      fontFamily: THEMES.fontFamily.semiBold,
-                      color: day?.selected
-                        ? THEMES.colors.black
-                        : THEMES.colors.lightSilver,
-                    },
-                  ]}
-                >
-                  {day.shift1.end || "___:___"}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {selectedShiftType === SHIFTS.shifts && (
               <View style={styles.timeInputContainer}>
                 <TouchableOpacity
                   style={[
                     styles.timeInput1,
                     !day?.selected && styles.disabledInput,
                   ]}
-                  onPress={() => showDatePicker(day, "shift2", "start")}
+                  onPress={() =>
+                    day?.selected && showDatePicker(day, "shift1", "start")
+                  }
                 >
                   <Text
                     style={[
@@ -430,7 +371,7 @@ const TimeTracker = ({
                       },
                     ]}
                   >
-                    {day.shift2.start || "___:___"}
+                    {day.shift1.start || "___:___"}
                   </Text>
                 </TouchableOpacity>
 
@@ -439,7 +380,9 @@ const TimeTracker = ({
                     styles.timeInput,
                     !day?.selected && styles.disabledInput,
                   ]}
-                  onPress={() => showDatePicker(day, "shift2", "end")}
+                  onPress={() =>
+                    day?.selected && showDatePicker(day, "shift1", "end")
+                  }
                 >
                   <Text
                     style={[
@@ -465,22 +408,97 @@ const TimeTracker = ({
                       },
                     ]}
                   >
-                    {day.shift2.end || "___:___"}
+                    {day.shift1.end || "___:___"}
                   </Text>
                 </TouchableOpacity>
               </View>
-            )}
-          </View>
-        ))}
-      </View>
+
+              {selectedShiftType === SHIFTS.shifts && (
+                <View style={styles.timeInputContainer}>
+                  <TouchableOpacity
+                    style={[
+                      styles.timeInput1,
+                      !day?.selected && styles.disabledInput,
+                    ]}
+                    onPress={() => showDatePicker(day, "shift2", "start")}
+                  >
+                    <Text
+                      style={[
+                        styles.timeText,
+                        {
+                          color: day?.selected
+                            ? THEMES.colors.black
+                            : THEMES.colors.lightSilver,
+                        },
+                      ]}
+                    >
+                      {Strings.start}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.timeText,
+                        {
+                          fontSize: THEMES.fonts.font12,
+                          fontFamily: THEMES.fontFamily.semiBold,
+                          color: day?.selected
+                            ? THEMES.colors.black
+                            : THEMES.colors.lightSilver,
+                        },
+                      ]}
+                    >
+                      {day.shift2.start || "___:___"}
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.timeInput,
+                      !day?.selected && styles.disabledInput,
+                    ]}
+                    onPress={() => showDatePicker(day, "shift2", "end")}
+                  >
+                    <Text
+                      style={[
+                        styles.timeText,
+                        {
+                          color: day?.selected
+                            ? THEMES.colors.black
+                            : THEMES.colors.lightSilver,
+                        },
+                      ]}
+                    >
+                      {Strings.close}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.timeText,
+                        {
+                          fontSize: THEMES.fonts.font12,
+                          fontFamily: THEMES.fontFamily.semiBold,
+                          color: day?.selected
+                            ? THEMES.colors.black
+                            : THEMES.colors.lightSilver,
+                        },
+                      ]}
+                    >
+                      {day.shift2.end || "___:___"}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          ))}
+        </View>
+      </ScrollView>
       <DateTimePickerModal
         isVisible={isDatePickerVisible}
         mode="time"
-        display="spinner" 
+        display="spinner"
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
+        date={minDate ? minDate : new Date()}
       />
-    </ScrollView>
+    </>
   );
 };
 

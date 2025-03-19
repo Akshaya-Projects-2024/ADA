@@ -22,10 +22,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
 import { useUser } from "../../api/UserContext";
 
-
 const WorkingHours = (props) => {
   const route = props?.route?.params?.route;
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  // const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [selectedShiftType, setSelectedShiftType] = useState(SHIFTS.full);
   const [selectedForAll, setSelectedForAll] = useState(true);
   const [times, setTimes] = useState(
@@ -39,29 +38,29 @@ const WorkingHours = (props) => {
       };
     })
   );
-  const { userData, apiInitCall } = useUser();
+  const { apiInitCall } = useUser();
   const { providerProfile } = useSelector((state) => state?.commonReducer);
   const { sessionDetails } = providerProfile;
 
   useEffect(() => {
     initData();
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        setKeyboardVisible(true); // Keyboard is visible
-      }
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardDidHide",
-      () => {
-        setKeyboardVisible(false); // Keyboard is hidden
-      }
-    );
+    // const keyboardDidShowListener = Keyboard.addListener(
+    //   "keyboardDidShow",
+    //   () => {
+    //     setKeyboardVisible(true); // Keyboard is visible
+    //   }
+    // );
+    // const keyboardDidHideListener = Keyboard.addListener(
+    //   "keyboardDidHide",
+    //   () => {
+    //     setKeyboardVisible(false); // Keyboard is hidden
+    //   }
+    // );
 
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
+    // return () => {
+    //   keyboardDidHideListener.remove();
+    //   keyboardDidShowListener.remove();
+    // };
   }, []);
 
   const initData = () => {
@@ -185,7 +184,7 @@ const WorkingHours = (props) => {
         } else {
           showToast("error", response?.data?.message);
         }
-        apiInitCall()
+        apiInitCall();
       }
     } catch (error) {
       console.log("🚀 ~ onSubmit ~ error:", error);
@@ -194,26 +193,18 @@ const WorkingHours = (props) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={styles.flex}>
       <View style={styles.container}>
         <StatusBar backgroundColor={THEMES.colors.bgColor} />
         <Header title={"Working Days & TIme"} showBack bgColor="transparent" />
         {route !== "myprofile" && (
-          <View
-            style={{
-              borderTopWidth: 1,
-              borderTopColor: "#B8B8B8",
-              borderBottomColor: "#B8B8B8",
-              borderBottomWidth: 1,
-              backgroundColor: "#fff",
-            }}
-          >
+          <View style={styles.stepper}>
             <Stepper currentStep={5} totalSteps={6} />
           </View>
         )}
-        <View style={{ flex: 1, paddingHorizontal: moderateScale(20) }}>
+        <View style={styles.contentStyle}>
           <ScrollView
-            style={{ flex: 1 }}
+            style={styles.flex}
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             bounces={false}
@@ -249,6 +240,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: THEMES.colors.bgColor,
   },
+  flex: {
+    flex: 1,
+  },
   contentView: {
     paddingTop: moderateScale(27),
   },
@@ -262,6 +256,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  stepper: {
+    borderTopWidth: 1,
+    borderTopColor: "#B8B8B8",
+    borderBottomColor: "#B8B8B8",
+    borderBottomWidth: 1,
+    backgroundColor: "#fff",
+  },
+  contentStyle: { flex: 1, paddingHorizontal: moderateScale(20) },
 });
 
 export default WorkingHours;

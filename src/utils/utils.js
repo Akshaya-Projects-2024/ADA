@@ -75,7 +75,6 @@ const findDifferenceByDays = (date) => {
   return difference || "";
 };
 
-
 export {
   showToast,
   validObject,
@@ -85,5 +84,5 @@ export {
   showAlert,
   showPaymentAlert,
   calculateDiscount,
-  findDifferenceByDays
+  findDifferenceByDays,
 };
