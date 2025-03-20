@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  Alert,
 } from "react-native";
 import Calendar from "../../assets/svg/calendar_event.svg";
 import Time from "../../assets/svg/circle_event.svg";
@@ -61,9 +62,15 @@ const CreateEvent = () => {
   };
 
   const handleStartConfirm = (date) => {
-    const formattedTime = moment(date).format("HH:mm:ss");
-    setStartTime(formattedTime);
-    hideStartDatePicker();
+      const now = moment();
+      const formattedTime = moment(date).format("HH:mm:ss");
+      const selectedTime = moment(date);
+      if (selectedTime.isBefore(now, "minute")) {
+        Alert.alert("Invalid Time", "You cannot select a past time.");
+      } else {
+        setStartTime(formattedTime);
+      }
+      hideStartDatePicker();
   };
 
   const hideEndDatePicker = () => {
@@ -71,8 +78,19 @@ const CreateEvent = () => {
   };
 
   const handleEndConfirm = (date) => {
+    const selectedTime = moment(date);
     const formattedTime = moment(date).format("HH:mm:ss");
-    setEndTime(formattedTime);
+    if (!startTime) {
+      Alert.alert("Select Start Time First", "Please select a start time before selecting an end time.");
+      hideEndDatePicker();
+      return;
+    }
+    if (selectedTime.isSameOrBefore(selectedTime, "minute")) {
+      Alert.alert("Invalid End Time", "End time must be after start time.");
+    } else {
+      setEndTime(formattedTime);
+    }
+
     hideEndDatePicker();
   };
 
