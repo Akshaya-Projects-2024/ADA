@@ -62,38 +62,63 @@ const CreateEvent = () => {
     setStartTimeModalVisible(false);
   };
 
-  const handleStartConfirm = (date) => {
-      const now = moment();
-      const formattedTime = moment(date).format("HH:mm:ss");
-      const selectedTime = moment(date);
-      if (selectedTime.isBefore(now, "minute")) {
-        Alert.alert("Invalid Time", "You cannot select a past time.");
-      } else {
-        setStartTime(formattedTime);
-      }
-      hideStartDatePicker();
-  };
-
   const hideEndDatePicker = () => {
     setEndTimeModalVisible(false);
   };
 
-  const handleEndConfirm = (date) => {
-    const selectedTime = moment(date);
+  const handleStartConfirm = (date) => {
+    const now = moment();
+    const selectedDate = moment(sDate, "DD/MM/YYYY");
     const formattedTime = moment(date).format("HH:mm:ss");
+    const formattedDateTime = moment(`${selectedDate.format("DD/MM/YYYY")} ${formattedTime}`, "DD/MM/YYYY HH:mm:ss");
+
+    if (!sDate) {
+      Alert.alert("", "Please Select Start Date First");
+      hideStartDatePicker();
+      return;
+    }
+
+    if (formattedDateTime.isBefore(now, "minute")) {
+      Alert.alert("Invalid Time", "You cannot select a past time.");
+      hideStartDatePicker();
+      return;
+    }
+
+    setStartTime(formattedTime);
+    hideStartDatePicker();
+  };
+
+  const handleEndConfirm = (date) => {
+    if (!sDate) {
+      Alert.alert("Select Start Date First", "Please select a start date before selecting an end time.");
+      hideEndDatePicker();
+      return;
+    }
+
     if (!startTime) {
       Alert.alert("Select Start Time First", "Please select a start time before selecting an end time.");
       hideEndDatePicker();
       return;
     }
-    if (selectedTime.isSameOrBefore(selectedTime, "minute")) {
-      Alert.alert("Invalid End Time", "End time must be after start time.");
-    } else {
-      setEndTime(formattedTime);
+
+    if (!eDate) {
+      Alert.alert("Select End Date", "Please select an end date before selecting an end time.");
+      hideEndDatePicker();
+      return;
     }
 
+    const startDateTime = moment(`${sDate} ${startTime}`, "DD/MM/YYYY HH:mm:ss");
+    const endDateTime = moment(`${eDate} ${moment(date).format("HH:mm:ss")}`, "DD/MM/YYYY HH:mm:ss");
+
+    if (endDateTime.isSameOrBefore(startDateTime, "minute")) {
+      Alert.alert("Invalid End Time", "End time must be after start time.");
+      hideEndDatePicker();
+      return;
+    }
+
+    setEndTime(moment(date).format("HH:mm:ss"));
     hideEndDatePicker();
-  };
+  }
 
   const handlePosterImages = async (image) => {
     contextValue?.setLoader(true);
@@ -186,18 +211,10 @@ const CreateEvent = () => {
       showToast("error", "Please enter start date");
     } else if (!startTime) {
       showToast("error", "Please enter start time");
-    } else if (startTime <= currentTime) {
-      showToast("error", "Start time must be in the future.");
-    } else if (endTime && sDate >= endTime) {
-      showToast("error", "Start time must be before the end time.");
-    } else if (!eDate) {
+    }  else if (!eDate) {
       showToast("error", "Please enter end date");
     } else if (!endTime) {
       showToast("error", "Please enter end time");
-    } else if (endTime <= currentTime) {
-      showToast("error", "End time must be in the future.");
-    } else if (startTime && eDate >= startTime) {
-      showToast("error", "End time must be before the start time.");
     } else if (!contactNo) {
       showToast("error", "Please enter contact number");
     } else if (validateInput(contactNo) == "invalid") {
@@ -219,6 +236,7 @@ const CreateEvent = () => {
           registrationlink: registrationlink ? registrationlink : "",
           audience: audience,
           userId: userId,
+          location: location,
           documents: posterImg.map((item) => item.id).join(","), //TODO
           latitude: currentPosition?.coords?.latitude
           ? currentPosition?.coords?.latitude?.toString()
@@ -431,14 +449,14 @@ const CreateEvent = () => {
         <DateTimePicker
           isVisible={isStartTimeModalVisible}
           mode="time"
-          display="spinner" 
+          display="spinner"
           onConfirm={handleStartConfirm}
           onCancel={hideStartDatePicker}
         />
         <DateTimePicker
           isVisible={isEndTimeModalVisible}
           mode="time"
-          display="spinner" 
+          display="spinner"
           onConfirm={handleEndConfirm}
           onCancel={hideEndDatePicker}
         />
@@ -455,6 +473,10 @@ const CreateEvent = () => {
               sDate={sDate}
               eDate={eDate}
               setSDate={setSDate}
+              updateField={() => {
+                setStartTime("");
+                setEndTime("");
+              }}
             />
           </Modal>
         )}

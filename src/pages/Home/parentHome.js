@@ -242,7 +242,7 @@ const ParentHome = (props) => {
               marginTop: moderateScale(28),
             }}
           >
-            {item?.documentlist?.url ? (
+            {item?.documentlist?.length ? (
               <Image
                 resizeMode="cover"
                 style={{
@@ -252,7 +252,7 @@ const ParentHome = (props) => {
                   borderColor: THEMES.colors.lightGrey,
                   borderWidth: 1,
                 }}
-                source={{ uri: item?.documentlist?.url }}
+                source={{ uri: item?.documentlist?.[0].url }}
               />
             ) : null}
           </TouchableButtonWithPermission>

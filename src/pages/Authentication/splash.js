@@ -126,7 +126,8 @@ const Splash = (props) => {
   const checkIfUserExits = useCallback(async () => {
     const data = await decryptService("accessToken");
     const loggedInModule = await getLoggedInMoodule();
-    if (data) {
+
+    if (Boolean(data)) {
       const userData = await initData();
       if (userData) {
         const validProfile = validateParentProfile(userData);

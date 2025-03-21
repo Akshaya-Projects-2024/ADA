@@ -21,18 +21,20 @@ import Call from "../../assets/svg/call.svg";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { getAllEventsApi } from "../../redux-store/actions/events";
 import { decryptService } from "../../utils/storageFunc";
-import { vh, vw } from "../../utils/dimensions";
+import { screenWidth, vh, vw } from "../../utils/dimensions";
 import { useIsFocused } from "@react-navigation/native";
+import Carousel from "react-native-snap-carousel";
 
 
 
 const UpcomingEvents = () => {
   const [eventData, setEventData] = useState([]);
   const isFocused = useIsFocused();
+  const [activeIndex, setActiveIndex] = useState([]);
 
-  useEffect(()=>{
+  useEffect(() => {
     getEvents()
-  },[isFocused])
+  }, [isFocused])
 
   const getEvents = async () => {
     let obj = {
@@ -40,35 +42,64 @@ const UpcomingEvents = () => {
     };
     let res = await getAllEventsApi(obj);
     if (res?.data?.data?.length) {
-      setEventData(res?.data?.data);
+      setEventData(res?.data?.data);      
+      setActiveIndex(new Array(res?.data?.data?.length).fill(0))
     }
   };
 
   const formatDateTime = (startdate, starttime) => {
     // Split the date string (format: "YYYY-MM-DD")
     const [year, month, day] = startdate.split("-");
-    
+
     // Split the time string (format: "HH:mm:ss")
     const [hoursStr, minutesStr] = starttime.split(":");
     let hours = parseInt(hoursStr, 10);
     const minutes = minutesStr; // Already in correct format
-    
+
     // Determine AM or PM and convert to 12-hour format
     const ampm = hours >= 12 ? "PM" : "AM";
     hours = hours % 12;
     if (hours === 0) hours = 12; // Convert "0" hour to "12" for midnight/noon
-    
+
     // Array of month names
     const monthNames = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ];
-    
+
     // Build and return the formatted string
     return `${day} ${monthNames[parseInt(month, 10) - 1]} ${year}, ${hours}.${minutes} ${ampm}`;
   }
 
-  const renderItem = ({item, index}) => {
+  const paginationDots = (list) => {
+    return (
+      <View style={{
+        flexDirection: "row",
+        marginTop: 10,
+        alignSelf: "center",
+      }}>
+        {list.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              {
+                borderRadius: 5,
+                marginHorizontal: 3,
+                backgroundColor: "#E7C5B3", // Default color for inactive dots
+              },
+              {
+                backgroundColor: index === activeIndex[index] ? "#FC6532" : "#E7C5B3",
+                width: index === activeIndex[index] ? 20 : 12,
+                height: 7,
+              }, // Active dot color
+            ]}
+          />
+        ))}
+      </View>
+    );
+  };
+
+  const renderItem = ({ item, index }) => {
     return (
       <View
         style={{
@@ -82,23 +113,46 @@ const UpcomingEvents = () => {
           elevation: 5,
           overflow: "hidden",
           borderRadius: 12,
-          paddingVertical: moderateScale(15),
+          paddingBottom: moderateScale(15),
           paddingHorizontal: moderateScale(13),
-          marginBottom: moderateScale(12),
+          marginBottom: moderateScale(20),
         }}
       >
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Carousel
+            data={item?.documentlist}
+            renderItem={({ item }) => (
+              <Image
+                resizeMode="cover"
+                style={{
+                  borderRadius: 11,
+                  width: "100%",
+                  height: vh(150),
+                  borderColor: THEMES.colors.lightGrey,
+                  borderWidth: 1,
+                }}
+                source={{ uri: item?.url }}
+              />
+            )}
+            sliderWidth={screenWidth}
+            itemWidth={screenWidth * 0.9}
+            onSnapToItem={(x) => {
+              console.log(activeIndex);
+              const temp = [...activeIndex];
+              temp[index] = x;
+              setActiveIndex(temp)
+            }} // Track active slide index
+          />
 
-        <Image
-           resizeMode="cover"
-           style={{
-             borderRadius: 11,
-             width: vw(320),
-             height: vh(150),
-             borderColor: THEMES.colors.lightGrey,
-             borderWidth: 1,
-           }}
-          source={{uri: item?.documentlist?.url}}
-        />
+          {paginationDots(item?.documentlist)}
+        </View>
+
+
         <View
           style={{
             paddingTop: moderateScale(17),
@@ -106,7 +160,7 @@ const UpcomingEvents = () => {
           }}
         ></View>
         <Text
-        numberOfLines={2}
+          numberOfLines={2}
           style={{
             fontFamily: THEMES.fontFamily.bold,
             fontSize: THEMES.fonts.font12,
@@ -134,7 +188,7 @@ const UpcomingEvents = () => {
                 color: THEMES.colors.black,
               }}
             >
-             {formatDateTime(item.startdate, item.starttime)}
+              {formatDateTime(item.startdate, item.starttime)}
             </Text>
           </View>
         </View>
@@ -159,7 +213,7 @@ const UpcomingEvents = () => {
                 lineHeight: moderateScale(20),
               }}
             >
-             {item.description}
+              {item.description}
             </Text>
           </View>
         </View>
@@ -191,7 +245,7 @@ const UpcomingEvents = () => {
             </View>
             <View style={{ width: "30%", alignItems: "flex-end" }}>
               <TouchableOpacity
-                 onPress={() =>
+                onPress={() =>
                   Linking.openURL(
                     `tel:${item?.contact}`
                   )
@@ -238,34 +292,34 @@ const UpcomingEvents = () => {
 
 
   return (
-    <SafeAreaView style={{flex:1}}>
-    <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header
-        title={"Upcoming events"}
-        fontColor="#EC559C"
-        showBack
-        bgColor="transparent"
-      />
-      <View
-        style={{
-          paddingHorizontal: moderateScale(16),
-          flex: 1,
-          backgroundColor: THEMES.colors.bgColor,
-        }}
-      >
-        {
-          eventData?.length ? <FlatList
-          showsVerticalScrollIndicator={false}
-          data={eventData}
-          bounces={false}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-        /> : EmptyContentView()
-        }
-        
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header
+          title={"Upcoming events"}
+          fontColor="#EC559C"
+          showBack
+          bgColor="transparent"
+        />
+        <View
+          style={{
+            paddingHorizontal: moderateScale(16),
+            flex: 1,
+            backgroundColor: THEMES.colors.bgColor,
+          }}
+        >
+          {
+            eventData?.length ? <FlatList
+              showsVerticalScrollIndicator={false}
+              data={eventData}
+              bounces={false}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+            /> : EmptyContentView()
+          }
+
+        </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 };

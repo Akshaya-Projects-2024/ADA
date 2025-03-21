@@ -42,7 +42,6 @@ export const verifyOtp = async (obj) => {
 export const getProfile = async (obj) => {
   try {
     const res = await Api.POST(urlList.getProfile, obj);
-    console.log("Res", obj);
     if (!res || res?.data?.error || res?.data?.errorCode) {
       throw new Error(
         res?.data?.message || res?.data?.error || "Something went wrong!"
@@ -180,8 +179,7 @@ export const refreshToken = async (params) => {
     }
     throw new Error("Something went wrong!");
   } catch (error) {
-    console.log("refreshToken Error11! ", error);
-    await AsyncStorage.clear();
+    await AsyncStorage.multiRemove(["accessToken", "tokenId", "refreshTokenTime"])
     resetNavigation("app");
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }

@@ -21,7 +21,7 @@ import Button from "../../components/Button";
 import moment from "moment";
 
 const CalendarScreen = (props) => {
-  const { onBack, setEDate, setSDate, sDate, eDate } = props;
+  const { onBack, setEDate, setSDate, sDate, eDate,updateField } = props;
 
   const [startDate, setStartDate] = useState(null);
 
@@ -54,6 +54,7 @@ const CalendarScreen = (props) => {
       }
     }
     setSelectingStartDate(!selectingStartDate);
+    updateField()
   };
 
   const formatDate = (dateString) => {

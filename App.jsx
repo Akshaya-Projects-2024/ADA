@@ -35,6 +35,7 @@ function App() {
       async (response) => {
         const originalRequest = response.config;
         if (response?.status === 403 && !originalRequest._retry) {
+          const userId = await decryptService("userId");
           const token = await decryptService("tokenId");
           const deviceId = await decryptService("deviceId");
           const currentPosition = await getCurrentLocation();
@@ -44,6 +45,7 @@ function App() {
             await encryptService("@fcmToken", fcmToken);
           }
           const params = {
+            userId,
             token: token,
             Deviceid: deviceId,
             sessionId: fcmToken,
@@ -54,17 +56,17 @@ function App() {
               ? currentPosition?.coords?.longitude?.toString()
               : "0",
           };
-          const res = await refreshToken(params);
-          if (res?.status === 200) {
-            originalRequest._retry = true;
-            await encryptService("accessToken", res?.data?.data?.token);
-            await encryptService("tokenId", res?.data?.data?.tokenId);
-            const header = {
-              AccessToken: `${res?.data?.data?.token}`,
-            };
-            Api.defaultHeader(header);
-          }
-          return response;
+            const res = await refreshToken(params);
+            if (res?.status === 200) {
+              originalRequest._retry = true;
+              await encryptService("accessToken", res?.data?.data?.token);
+              await encryptService("tokenId", res?.data?.data?.tokenId);
+              const header = {
+                AccessToken: `${res?.data?.data?.token}`,
+              };
+              Api.defaultHeader(header);
+            }
+            return response;
         } else {
           return response;
         }
