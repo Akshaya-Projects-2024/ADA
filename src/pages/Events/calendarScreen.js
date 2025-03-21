@@ -18,6 +18,7 @@ import { moderateScale } from "react-native-size-matters";
 import Strings from "../../constants/strings";
 import { Calendar } from "react-native-calendars";
 import Button from "../../components/Button";
+import moment from "moment";
 
 const CalendarScreen = (props) => {
   const { onBack, setEDate, setSDate, sDate, eDate } = props;
@@ -65,6 +66,16 @@ const CalendarScreen = (props) => {
     });
   };
 
+  const getDisabledDates = () => {
+    const disabledDates = {};
+    let date = moment().subtract(1, "day");
+    while (date.isAfter(moment("2024-01-01"), "day")) {
+      disabledDates[date.format("YYYY-MM-DD")] = { disabled: true, disableTouchEvent: true };
+      date.subtract(1, "day");
+    }
+    return disabledDates;
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
@@ -109,7 +120,7 @@ const CalendarScreen = (props) => {
                 <View style={styles.timeInputContainer}>
                   <View
                     style={styles.timeInput}
-                    // onPress={() => setSelectingStartDate(true)}
+                  // onPress={() => setSelectingStartDate(true)}
                   >
                     {startDate || sDate ? (
                       <>
@@ -142,11 +153,11 @@ const CalendarScreen = (props) => {
                   </View>
                   <View
                     style={[styles.timeInput]}
-                    // onPress={() => {
-                    //   if (startDate) {
-                    //     setSelectingStartDate(false);
-                    //   }
-                    // }}
+                  // onPress={() => {
+                  //   if (startDate) {
+                  //     setSelectingStartDate(false);
+                  //   }
+                  // }}
                   >
                     {endDate || eDate ? (
                       <>
@@ -181,6 +192,7 @@ const CalendarScreen = (props) => {
                 <Calendar
                   onDayPress={handleDateSelect}
                   markedDates={{
+                    ...getDisabledDates(),
                     [startDate]: {
                       startingDay: true,
                       color: "red",
@@ -193,8 +205,8 @@ const CalendarScreen = (props) => {
                     },
                     ...(!endDate &&
                       startDate && {
-                        [startDate]: { color: "red", textColor: "green" },
-                      }),
+                      [startDate]: { color: "red", textColor: "green" },
+                    }),
                   }}
                   theme={{
                     //   calendarBackground: "grey",
