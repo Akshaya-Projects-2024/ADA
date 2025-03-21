@@ -63,7 +63,6 @@ const Splash = (props) => {
   useEffect(() => {
     if (isFocused) {
       checkIfUserExits();
-      dispatch(getServiceProviderRole());
     }
   }, [isFocused, checkIfUserExits, dispatch]);
 
@@ -84,6 +83,7 @@ const Splash = (props) => {
         const response = await getProfile(obj);
         if (response?.status === 200) {
           dispatch(dispatchUserData(response?.data?.data));
+          dispatch(getServiceProviderRole());
         }
         resolve(response?.data?.data ? response?.data?.data : false);
       } catch (error) {
@@ -128,51 +128,55 @@ const Splash = (props) => {
     const loggedInModule = await getLoggedInMoodule();
     if (data) {
       const userData = await initData();
-      const validProfile = validateParentProfile(userData);
-      const validProviderProfile = validateServiceProfile(userData); //pass true as an argument for testing purpose till payment part is done
-      const isProviderRegisterLater = await decryptService(
-        "isPetProviderRegisterLater"
-      );
-      const isPetParentRegisterLater = await decryptService(
-        "isPetParentRegisterLater"
-      );
-      if (validProfile?.flag && validProviderProfile?.flag) {
-        if (loggedInModule && loggedInModule === LoginModules.parent) {
-          navigateToParentApp();
-        } else {
+      if (userData) {
+        const validProfile = validateParentProfile(userData);
+        const validProviderProfile = validateServiceProfile(userData); //pass true as an argument for testing purpose till payment part is done
+        const isProviderRegisterLater = await decryptService(
+          "isPetProviderRegisterLater"
+        );
+        const isPetParentRegisterLater = await decryptService(
+          "isPetParentRegisterLater"
+        );
+        if (validProfile?.flag && validProviderProfile?.flag) {
+          if (loggedInModule && loggedInModule === LoginModules.parent) {
+            navigateToParentApp();
+          } else {
+            navigateToHome();
+          }
+        } else if (validProviderProfile?.flag && loggedInModule === "provider") {
           navigateToHome();
-        }
-      } else if (validProviderProfile?.flag && loggedInModule === "provider") {
-        navigateToHome();
-      } else if (validProfile?.flag && loggedInModule === "parent") {
-        navigateToParentApp();
-      } else if (
-        (!validProviderProfile?.flag &&
-          validProviderProfile?.partiallyCompleted) ||
-        loggedInModule === "provider"
-      ) {
-        if (isProviderRegisterLater == false) {
-          showToast("error", "Please complete your registration");
-          delay(() =>
-            props.navigation.replace("auth", {
-              screen: validProviderProfile?.navigateTo,
-            })
-          );
-        } else {
-          navigateToHome();
-        }
-      } else if (
-        (!validProfile?.flag && validProfile?.partiallyCompleted) ||
-        loggedInModule === "parent"
-      ) {
-        if (isPetParentRegisterLater == false) {
-          showToast("error", "Please complete your registration");
-          navigateToAuth(validProfile?.navigateTo);
-        } else {
+        } else if (validProfile?.flag && loggedInModule === "parent") {
           navigateToParentApp();
+        } else if (
+          (!validProviderProfile?.flag &&
+            validProviderProfile?.partiallyCompleted) ||
+          loggedInModule === "provider"
+        ) {
+          if (isProviderRegisterLater == false) {
+            showToast("error", "Please complete your registration");
+            delay(() =>
+              props.navigation.replace("auth", {
+                screen: validProviderProfile?.navigateTo,
+              })
+            );
+          } else {
+            navigateToHome();
+          }
+        } else if (
+          (!validProfile?.flag && validProfile?.partiallyCompleted) ||
+          loggedInModule === "parent"
+        ) {
+          if (isPetParentRegisterLater == false) {
+            showToast("error", "Please complete your registration");
+            navigateToAuth(validProfile?.navigateTo);
+          } else {
+            navigateToParentApp();
+          }
+        } else {
+          delay(() => props?.navigation.replace("auth"));
         }
       } else {
-        delay(() => props?.navigation.replace("auth"));
+        delay(() => props?.navigation.replace("app"));
       }
     } else {
       delay(() => props?.navigation.replace("app"));

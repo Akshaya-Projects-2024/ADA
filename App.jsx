@@ -26,7 +26,6 @@ import {
   getNotificationToken,
 } from "./src/utils/pushNotificationUtils";
 import { UserProvider } from "./src/api/UserContext";
-import { navigate } from "./src/navigations/rootNavigationRef";
 
 const store = configureStore();
 
@@ -36,7 +35,6 @@ function App() {
       async (response) => {
         const originalRequest = response.config;
         if (response?.status === 403 && !originalRequest._retry) {
-          originalRequest._retry = true;
           const token = await decryptService("tokenId");
           const deviceId = await decryptService("deviceId");
           const currentPosition = await getCurrentLocation();
@@ -58,14 +56,13 @@ function App() {
           };
           const res = await refreshToken(params);
           if (res?.status === 200) {
+            originalRequest._retry = true;
             await encryptService("accessToken", res?.data?.data?.token);
             await encryptService("tokenId", res?.data?.data?.tokenId);
             const header = {
               AccessToken: `${res?.data?.data?.token}`,
             };
             Api.defaultHeader(header);
-          } else {
-            navigate("app");
           }
           return response;
         } else {

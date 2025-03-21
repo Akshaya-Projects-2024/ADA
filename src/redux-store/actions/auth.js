@@ -1,5 +1,7 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Api from "../../api/Api";
 import { urlList } from "../../constants/urlList";
+import { resetNavigation } from "../../navigations/rootNavigationRef";
 
 export const checkLogin = async (obj) => {
   try {
@@ -179,7 +181,9 @@ export const refreshToken = async (params) => {
     throw new Error("Something went wrong!");
   } catch (error) {
     console.log("refreshToken Error11! ", error);
-    // throw new Error(error?.message || error || "Opps! Something went wrong!");
+    await AsyncStorage.clear();
+    resetNavigation("app");
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
 
@@ -741,24 +745,6 @@ export const deletePet = async (params) => {
     throw new Error("Something went wrong!");
   } catch (error) {
     console.log("shareProfileApi Error! ", error);
-    throw new Error(error?.message || error || "Opps! Something went wrong!");
-  }
-};
-
-export const deleteProviderDocument = async (params) => {
-  try {
-    const res = await Api.POST(urlList.deleteProviderDoc, params);
-    if (!res || res?.data?.error || res?.data?.errorCode) {
-      throw new Error(
-        res?.data?.message || res?.data?.error || "Something went wrong!"
-      );
-    }
-    if (res) {
-      return res;
-    }
-    throw new Error("Something went wrong!");
-  } catch (error) {
-    console.log("deleteDocument Error! ", error);
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };

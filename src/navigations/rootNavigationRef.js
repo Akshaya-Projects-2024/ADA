@@ -17,7 +17,7 @@ export function goBack() {
 }
 
 export function dispatch(name, params) {
-  navigationRef.current?.navigate?.dispatch(
+  navigationRef.current?.dispatch(
     CommonActions.reset({
       index: 0,
       routes: [{ name, params }],
