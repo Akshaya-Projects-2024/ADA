@@ -92,3 +92,23 @@ export const feedbackApi = async (obj) => {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
+
+
+export const getAppointmentHistoryApi = async (params) => {
+  try {
+    const res = await Api.POST(urlList.getAppointmentHistory, params);
+    console.log("res",res)
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+

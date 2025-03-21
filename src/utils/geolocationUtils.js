@@ -1,7 +1,7 @@
 import Geolocation from "@react-native-community/geolocation";
-import { requestLocationPermission } from "./permissionUtils";
 import { openSettings } from "react-native-permissions";
 import { Alert } from "react-native";
+import { requestLocationPermission } from "./permissionUtils";
 
 const getCurrentLocation = () => {
   return new Promise(async (res) => {
@@ -15,7 +15,7 @@ const getCurrentLocation = () => {
           (err) => {
             res(false);
           },
-          { timeout: 10000, maximumAge: 0, enableHighAccuracy: true }
+          // { timeout: 10000, maximumAge: 0, enableHighAccuracy: true }
         );
       } else {
         Alert.alert(

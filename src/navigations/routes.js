@@ -38,6 +38,7 @@ import RescueHelp from "../pages/Alerts/RescueHelp";
 import OtherRescueHelpAlert from "../pages/Alerts/OtherRescueHelpAlert";
 import Notification from "../pages/Notification/notification";
 import PaymentDetails from "../pages/Payment/paymentDetails";
+import ServiceListReviews from "../pages/ClientReviews/ServiceListReviews";
 
 const Stack = createStackNavigator();
 
@@ -270,6 +271,11 @@ const Routes = (props) => {
         <Stack.Screen
           name="paymentDetails"
           component={PaymentDetails}
+          options={navOptionHandler}
+        />
+         <Stack.Screen
+          name="serviceListReviews"
+          component={ServiceListReviews}
           options={navOptionHandler}
         />
       </Stack.Navigator>

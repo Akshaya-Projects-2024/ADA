@@ -186,7 +186,7 @@ const UpcomingEvents = () => {
                   color: THEMES.colors.cyan,
                 }}
               >
-                {item.audience}
+                {item.location}
               </Text>
             </View>
             <View style={{ width: "30%", alignItems: "flex-end" }}>

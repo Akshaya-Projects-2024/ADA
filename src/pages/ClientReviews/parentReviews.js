@@ -27,15 +27,21 @@ import { findDifferenceByDays, showToast } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
 import { useSelector } from "react-redux";
 import { contextValue } from "../../components/Loader";
+import { AirbnbRating } from "react-native-ratings";
+import { normalize, vh } from "../../utils/dimensions";
 
 const ParentReviews = (props) => {
   const vendorId =
     props?.route?.params?.selectedService?.profile?.providerBusiness?.userid;
+  const selectedItem = props?.route?.params?.selectedItem;
+
   const [reviewList, setReviewList] = useState([]);
-  const [review, setReview] = useState([]);
+  const [review, setReview] = useState("");
   const { providerProfile, profileData, logindetails } = useSelector(
     ({ commonReducer }) => commonReducer
   );
+  const [rating, setRating] = useState(0);
+
   const profile = useSelector((state) => state?.commonReducer);
 
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
@@ -62,12 +68,14 @@ const ParentReviews = (props) => {
     try {
       let obj = {
         userId: await decryptService("userId"), //login in id
-        vendor: vendorId ? vendorId : await decryptService("userId"), // pass id
+        vendor: selectedItem?.provider_id, // pass id
         sortBy: "newest",
         pageNum: 1,
         pageSize: 50,
       };
+      console.log("obj", obj);
       let res = await getAllReviews(obj);
+      console.log("res", res);
       if (res?.reviews?.length) {
         setReviewList(res?.reviews);
       }
@@ -203,6 +211,34 @@ const ParentReviews = (props) => {
     );
   };
 
+  const handleRating = (value) => {
+    setRating(value);
+  };
+
+  const onSubmitReview = async () => {
+    try {
+      contextValue?.setLoader(true);
+      let payload = {
+        provider: selectedItem?.profile?.providerContact?.userid,
+        rating: rating.toString(),
+        remark: review,
+        createdby: await decryptService("userId"),
+      };
+
+      let res = await addReview(payload);
+      console.log("res?.data", res);
+      if (res?.status_code == 200) {
+        setReview("");
+        setRating(0);
+        showToast("success", res?.data?.message);
+        initData();
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {
+      contextValue?.setLoader(false);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
@@ -220,19 +256,68 @@ const ParentReviews = (props) => {
             paddingHorizontal: moderateScale(20),
           }}
         >
-          <View style={styles.mainView}>
-            <FlatList
-              data={reviewList}
-              showsVerticalScrollIndicator={false}
-              bounces={false}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id.toString()}
-              ListEmptyComponent={renderListEmpty}
-              contentContainerStyle={
-                reviewList?.length === 0 ? styles.flatListContainer : null
-              }
-            />
-          </View>
+          {reviewList?.length ? (
+            <View style={styles.mainView}>
+              <FlatList
+                data={reviewList}
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id.toString()}
+                ListEmptyComponent={renderListEmpty}
+                contentContainerStyle={
+                  reviewList?.length === 0 ? styles.flatListContainer : null
+                }
+              />
+            </View>
+          ) : (
+            <>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  paddingBottom: moderateScale(20),
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: normalize(14),
+                    fontFamily: "Inter-SemiBold",
+                    color: "#000",
+                  }}
+                >
+                  Rate Your Experience
+                </Text>
+                <AirbnbRating
+                  count={5} // Number of stars
+                  defaultRating={rating}
+                  size={20}
+                  showRating={false} // Hide numeric value below stars
+                  onFinishRating={handleRating}
+                />
+              </View>
+
+              <InputField
+                label={"Write review"}
+                placeholderText={"Enter review"}
+                value={review}
+                multiline={true}
+                onChange={setReview}
+              />
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  width: "100%",
+                  alignSelf: "center",
+                  marginBottom: vh(20),
+                }}
+              >
+                <Button onPress={onSubmitReview} title={"Submit"} />
+              </View>
+            </>
+          )}
 
           <Modal
             animationType="none"

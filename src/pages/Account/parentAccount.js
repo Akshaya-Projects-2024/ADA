@@ -151,7 +151,7 @@ const ParentAccount = (props) => {
       },
       {
         label: "Reviews",
-        onPress: () => navigate("parentReviews", { route: "parentAccount" }),
+        onPress: () => navigate("serviceListReviews", { route: "parentAccount" }),
       },
       {
         label: Strings.paymentSubScription,
@@ -413,7 +413,7 @@ const ParentAccount = (props) => {
                     <Star />,
                     "Reviews",
                     "addBottom",
-                    "parentReviews",
+                    "serviceListReviews",
                     false,
                     true
                   )}

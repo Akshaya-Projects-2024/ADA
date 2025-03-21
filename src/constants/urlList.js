@@ -64,4 +64,5 @@ export const urlList = {
   paymentSubscriptionList: "payment/subscription",
   paymentInvoice: "payment/invoice",
   deleteProviderDoc: "register/provider/deletedocument",
+  getAppointmentHistory:"appointment/getall"
 };
