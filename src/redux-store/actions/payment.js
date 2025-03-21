@@ -19,7 +19,7 @@ export const getSubscriptionPlan = async (params) => {
   }
 };
 
-export const getSubscription = async (params) => {
+export const postSubscription = async (params) => {
   try {
     const res = await Api.POST(urlList.subscription, params);
     if (!res || res?.data?.error || res?.data?.errorCode) {
@@ -27,8 +27,9 @@ export const getSubscription = async (params) => {
         res?.data?.message || res?.data?.error || "Something went wrong!"
       );
     }
-    if (res) {
-      return res;
+
+    if (res?.status == 200) {
+      return res?.data;
     }
     throw new Error("Something went wrong!");
   } catch (error) {
@@ -93,3 +94,24 @@ export const getInvoiceApi = async (obj) => {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
+
+export const validatePromocodeApi = async (obj) => {
+  try {
+    const res = await Api.POST(urlList.validatePromocode, obj);
+    console.log("res",res)
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+
+    if (res?.status == 200) {
+      return res?.data?.data;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    return error;
+  }
+};
+
+

@@ -63,7 +63,19 @@ const formatServiceExperience = (years) => {
 
 const calculateDiscount = (originalPrice, discountPercent) => {
   if (!originalPrice || !discountPercent) return 0;
-  return originalPrice - (originalPrice * discountPercent) / 100;
+  const data = (
+    originalPrice -
+    (originalPrice * discountPercent) / 100
+  ).toFixed(0);
+  return data;
+};
+
+const calcuateTotal = (originalPrice, discountPercent, promocode) => {
+  const add = Number(discountPercent)+ Number(promocode);
+  console.log(add, "ashish");
+  if (!originalPrice || !add) return 0;
+  const data = (originalPrice - (originalPrice * add) / 100).toFixed(0);
+  return data;
 };
 
 const findDifferenceByDays = (date) => {
@@ -75,6 +87,17 @@ const findDifferenceByDays = (date) => {
   return difference || "";
 };
 
+function calculateTax(finalAmount, taxPercent) {
+  let costWithoutTax = finalAmount / (1 + taxPercent / 100);
+  let taxAmount = finalAmount - costWithoutTax;
+  return taxAmount.toFixed(0);
+}
+
+function calculatePercentage(amount, percent) {
+  const percentamt = ((amount * percent) / 100).toFixed(0);
+  return percentamt;
+}
+
 export {
   showToast,
   validObject,
@@ -85,4 +108,7 @@ export {
   showPaymentAlert,
   calculateDiscount,
   findDifferenceByDays,
+  calculateTax,
+  calculatePercentage,
+  calcuateTotal,
 };

@@ -20,9 +20,10 @@ import Modal from "react-native-modal";
 import SubscriptionSuccess from "./subscriptionSuccess";
 import {
   acknowledgeSubscription,
-  getSubscription,
   getSubscriptionPlan,
   getSubscriptionDetailsApi,
+  validatePromocodeApi,
+  postSubscription,
 } from "../../redux-store/actions/payment";
 import { decryptService } from "../../utils/storageFunc";
 import RazorpayCheckout from "react-native-razorpay";
@@ -35,7 +36,14 @@ import {
   validateParentProfile,
   validateServiceProfile,
 } from "../../utils/userUtils";
-import { calculateDiscount, validArray, validObject } from "../../utils/utils";
+import {
+  calcuateTotal,
+  calculateDiscount,
+  calculatePercentage,
+  calculateTax,
+  validArray,
+  validObject,
+} from "../../utils/utils";
 import SubscriptionError from "./subscriptionError";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
@@ -43,6 +51,8 @@ import Logo from "../../assets/images/roundIcon.png";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 import { useFocusEffect } from "@react-navigation/native";
 import { navigateToParent } from "../../navigations/rootNavigationRef";
+import InputField from "../../components/InputField";
+import CheckCircle from "../../assets/svg/check.svg";
 
 const PaymentsSubscription = (props) => {
   const dispatch = useDispatch();
@@ -54,11 +64,17 @@ const PaymentsSubscription = (props) => {
   const [subscriptionData, setSubscriptionData] = useState();
   const [subscriptionDetails, setSubscriptionDetails] = useState();
   const profile = useSelector((state) => state?.commonReducer);
+  const { profileData } = useSelector(({ commonReducer }) => commonReducer);
   const { loggedInModule } = useSelector((state) => state?.register);
   const [refresh, setRefresh] = useState(false);
   const userKey =
     loggedInModule === "parent" ? "parentProfie" : "providerProfile";
   const [userAlreadySubscribed, setAlreadySubscribed] = useState(false);
+  const [promocodeModal, setPromoCodeModal] = useState(false);
+  const [promocode, setPromoCode] = useState("");
+  const [validation, setValidation] = useState("");
+  const [successPromocode, setSuccessPromocode] = useState("");
+  const [promocodeDetails, setPromoCodeDetails] = useState("");
 
   useEffect(() => {
     initData();
@@ -68,11 +84,106 @@ const PaymentsSubscription = (props) => {
     setModalVisible(!isModalVisible);
   };
 
+  const togglePromoCodeModal = () => {
+    setPromoCodeModal(!promocodeModal);
+    setValidation("");
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       dispatch(fetchUserProfileData());
     }, [])
   );
+
+  const handlePromoCodeSubmit = () => {
+    if (!promocode) {
+      setValidation("Promo code is required");
+    } else {
+      validatePromocode();
+    }
+  };
+
+  const handleRemovePromoCode = () => {
+    setPromoCodeDetails("");
+    setSuccessPromocode("");
+    setValidation("");
+    setPromoCode("");
+  };
+
+  const validatePromocode = async () => {
+    try {
+      contextValue?.setLoader(true);
+      let payload = {
+        userId: await decryptService("userId"),
+        promocode: promocode,
+      };
+      const res = await validatePromocodeApi(payload);
+      if (!Boolean(res?.error)) {
+        const message = "Promo code has been applied successfully";
+        setPromoCodeDetails(res);
+        setSuccessPromocode(message);
+        setPromoCodeModal(false)
+      } else {
+        const message = res?.message;
+        setValidation(message);
+        setPromoCode("");
+      }
+
+      contextValue?.setLoader(false);
+    } catch (error) {
+      contextValue?.setLoader(false);
+    }
+  };
+
+  const getSubscriptionApi = async () => {
+    try {
+      let obj = {
+        userId: await decryptService("userId"),
+        usertype: loggedInModule,
+        subscriptioncode: selectedCard?.code,
+        promocode: promocode,
+      };
+      let res = await postSubscription(obj);
+      if (Boolean(res?.data)) {
+        const options = {
+          image: res?.data?.logo, //roundIcon.png
+          currency: res?.data?.currency,
+          key: "rzp_test_PECnHmfOdkRLhw", // Replace with your Razorpay Key ID
+          amount: selectedCard?.amount,
+          name: "ADA",
+          order_id: res?.data?.id, //Replace this with an order_id created using Orders API.
+          theme: { color: "#53a20e" },
+          usertype: loggedInModule,
+        };
+
+        const paymentResponse = await RazorpayCheckout.open({
+          ...options,
+        });
+        if (
+          paymentResponse?.razorpay_order_id &&
+          paymentResponse?.razorpay_payment_id &&
+          paymentResponse?.razorpay_signature
+        ) {
+          const params = {
+            userid: await decryptService("userId"),
+            razorpay_order_id: paymentResponse?.razorpay_order_id,
+            success: {
+              razorpay_signature: paymentResponse?.razorpay_signature,
+              razorpay_payment_id: paymentResponse?.razorpay_payment_id,
+            },
+          };
+          const acknowledgeResponse = await acknowledgeSubscription(params);
+          if (acknowledgeResponse?.status === 200) {
+            await fetchUserProfile();
+            setSubscription(true);
+          }
+        }
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {
+      contextValue?.setLoader(false);
+    }
+  };
 
   useEffect(() => {
     setAlreadySubscribed(
@@ -192,6 +303,11 @@ const PaymentsSubscription = (props) => {
           let selectedSub = {};
           setSubscriptionData(outputArray);
           setSubscriptionDetails(outputArray[0]);
+          let cardData = {
+            ...outputArray[0],
+            details: outputArray?.[0]?.details?.split(","),
+          };
+          setSelectedCard(cardData);
           if (
             profile?.[userKey]?.subscription?.subscriptioncode &&
             profile?.[userKey]?.subscription?.status === "active"
@@ -200,30 +316,7 @@ const PaymentsSubscription = (props) => {
               (sub) =>
                 sub?.code === profile?.[userKey]?.subscription?.subscriptioncode
             );
-          } else {
-            selectedSub = outputArray[0];
-            const obj1 = {
-              userId: await decryptService("userId"),
-              usertype: loggedInModule, // parent or provider
-              subscriptioncode: selectedSub?.code,
-              promocode: "",
-            };
-            const res1 = await getSubscription(obj1);
-            if (res1.status === 200) {
-              if (res1?.data?.data) {
-                setSubscriptionDetails({
-                  ...res1?.data?.data,
-                  amount: selectedSub?.amount,
-                });
-              }
-            }
           }
-
-          selectedSub = {
-            ...selectedSub,
-            details: selectedSub?.details?.split(","),
-          };
-          setSelectedCard(selectedSub);
         }
         contextValue?.setLoader(false);
       }
@@ -254,39 +347,8 @@ const PaymentsSubscription = (props) => {
   };
   const handlePayment = async () => {
     try {
-      const userData = await getUserData();
-      const options = {
-        image: "https://d2jswhakxkta9i.cloudfront.net/logos/logo.png", //roundIcon.png
-        currency: subscriptionDetails?.currency,
-        key: "rzp_test_PECnHmfOdkRLhw", // Replace with your Razorpay Key ID
-        amount: selectedCard?.amount,
-        name: "ADA",
-        order_id: subscriptionDetails?.id, //Replace this with an order_id created using Orders API.
-        theme: { color: "#53a20e" },
-        usertype: loggedInModule,
-      };
-      const paymentResponse = await RazorpayCheckout.open({
-        ...options,
-      });
-      if (
-        paymentResponse?.razorpay_order_id &&
-        paymentResponse?.razorpay_payment_id &&
-        paymentResponse?.razorpay_signature
-      ) {
-        const params = {
-          userid: await decryptService("userId"),
-          razorpay_order_id: paymentResponse?.razorpay_order_id,
-          success: {
-            razorpay_signature: paymentResponse?.razorpay_signature,
-            razorpay_payment_id: paymentResponse?.razorpay_payment_id,
-          },
-        };
-        const acknowledgeResponse = await acknowledgeSubscription(params);
-        if (acknowledgeResponse?.status === 200) {
-          await fetchUserProfile();
-          setSubscription(true);
-        }
-      }
+      contextValue?.setLoader(true);
+      await getSubscriptionApi();
     } catch (error) {
       console.log("🚀 ~ handlePayment ~ error:", error);
       const params = {
@@ -326,23 +388,12 @@ const PaymentsSubscription = (props) => {
             ? plan?.details?.split(",")
             : plan?.details,
       });
-      if (
-        !profile?.[userKey]?.subscription?.subscriptioncode ||
-        profile?.[userKey]?.subscription?.status === "inactive"
-      ) {
-        let obj = {
-          userId: await decryptService("userId"),
-          usertype: loggedInModule,
-          subscriptioncode: plan?.code,
-          promocode: "",
-        };
-        let res = await getSubscription(obj);
-        if (res.status == 200) {
-          if (res?.data?.data) {
-            setSubscriptionDetails(res?.data?.data);
-          }
-        }
-      }
+      // if (
+      //   !profile?.[userKey]?.subscription?.subscriptioncode ||
+      //   profile?.[userKey]?.subscription?.status === "inactive"
+      // ) {
+      //   getSubscriptionApi();
+      // }
     } catch (error) {
       console.log("🚀 ~ onCardClick ~ error:", error?.message);
     }
@@ -355,7 +406,6 @@ const PaymentsSubscription = (props) => {
       ? !validProfile.flag
       : !validProviderProfile.flag;
   };
-  console.log(checkStatus(), userKey, loggedInModule);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -531,51 +581,93 @@ const PaymentsSubscription = (props) => {
                 </View>
               )}
             </View>
-          </ScrollView>
-          <View
-            style={{
-              position: "absolute",
-              flex: 1,
-              bottom: 0,
-              alignSelf: "center",
-              width: "100%",
-              marginBottom: moderateScale(20),
-            }}
-          >
-            {subscriptionDetails?.amount && selectedCard?.flatdiscount ? (
-              <View style={styles.subscriptionView}>
-                <Text style={styles.subscriptionText}>
-                  {Strings.subscriptionCost}:{" "}
-                  <Text style={styles.subscriptionCost}>
-                    {"₹" +
+            <View>
+              {subscriptionDetails?.amount && selectedCard?.flatdiscount ? (
+                <View style={styles.subscriptionView}>
+                  <Text style={styles.subscriptionText}>
+                    {Strings.subscriptionCost}:{" "}
+                    <Text
+                      style={{
+                        fontFamily: "Inter-Medium",
+                        color: "#000",
+                        fontSize: moderateScale(14),
+                        textDecorationLine: "line-through",
+                      }}
+                    >
+                      ₹ {selectedCard?.amount}
+                    </Text>{" "}
+                    <Text
+                      style={[
+                        styles.subscriptionCost,
+                        { color: THEMES.colors.bottomBarGreen },
+                      ]}
+                    >
+                      ₹ {""}
+                      {promocodeDetails?.discount
+                        ? `${calcuateTotal(
+                            `${selectedCard?.amount}`,
+                            `${selectedCard?.flatdiscount}`,
+                            `${promocodeDetails?.discount}`
+                          )}`
+                        : `${calculateDiscount(
+                            `${selectedCard?.amount}`,
+                            `${selectedCard?.flatdiscount}`
+                          )}`}
+                      {/* { +
                       calculateDiscount(
                         `${selectedCard?.amount}`,
                         `${selectedCard?.flatdiscount}`
-                      )}
+                      )} */}
+                    </Text>
                   </Text>
+                </View>
+              ) : null}
+              {!userAlreadySubscribed ? (
+                <View
+                  style={{
+                    paddingTop: moderateScale(20),
+                    marginHorizontal: moderateScale(50),
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text
+                    onPress={togglePromoCodeModal}
+                    style={styles.viewBreakupText}
+                  >
+                    {promocodeDetails ? "View Promocode" : "Apply Promocode"}
+                  </Text>
+                  <Text onPress={toggleModal} style={styles.viewBreakupText}>
+                    {Strings.viewBreakup}
+                  </Text>
+                </View>
+              ) : (
+                <Text onPress={toggleModal} style={styles.viewBreakupText}>
+                  {Strings.viewBreakup}
                 </Text>
-              </View>
-            ) : null}
-            <View style={{ paddingTop: moderateScale(7) }}>
-              <Text onPress={toggleModal} style={styles.viewBreakupText}>
-                {Strings.viewBreakup}
-              </Text>
+              )}
+
+              {!userAlreadySubscribed && (
+                <View
+                  style={[styles.btnView, { paddingTop: moderateScale(30) }]}
+                >
+                  <TouchableButtonWithPermission
+                    customMsgForRegistration={
+                      "Get Registered and subscribe to enjoy all exciting features of ADA app."
+                    }
+                    useButton={true}
+                    onPress={handlePayment}
+                    title={Strings.payNow}
+                    checkPermission={checkStatus()}
+                  />
+                </View>
+              )}
             </View>
-            {!userAlreadySubscribed && (
-              <View style={[styles.btnView, { paddingTop: moderateScale(20) }]}>
-                <TouchableButtonWithPermission
-                  customMsgForRegistration={
-                    "Get Registered and subscribe to enjoy all exciting features of ADA app."
-                  }
-                  useButton={true}
-                  onPress={handlePayment}
-                  title={Strings.payNow}
-                  checkPermission={checkStatus()}
-                />
-              </View>
-            )}
-          </View>
+          </ScrollView>
+
           <Modal
+            onBackButtonPress={toggleModal}
             isVisible={isModalVisible}
             onBackdropPress={toggleModal}
             style={styles.modal}
@@ -588,15 +680,56 @@ const PaymentsSubscription = (props) => {
                   {Strings.subscriptionCost}:
                 </Text>
                 <Text numberOfLines={1} style={styles.subscriptionPrice}>
-                  ₹ {selectedCard?.amount}
+                  {"₹ " + selectedCard?.amount}
                 </Text>
               </View>
               <View style={styles.TaxView}>
-                <Text style={styles.TaxText}>Discount:</Text>
+                <Text style={styles.TaxText}>
+                  Discount ({selectedCard?.flatdiscount + "%"}):
+                </Text>
                 <Text numberOfLines={1} style={styles.TaxPrice}>
-                  {selectedCard?.flatdiscount} %
+                  -{" "}
+                  {"₹ " +
+                    calculatePercentage(
+                      selectedCard?.amount,
+                      selectedCard?.flatdiscount
+                    )}
                 </Text>
               </View>
+
+              <View style={styles.TaxView}>
+                <Text style={styles.TaxText}>
+                  Tax: ({selectedCard?.tax + "%"})
+                </Text>
+                <Text numberOfLines={1} style={styles.TaxPrice}>
+                  -{" "}
+                  {"₹ " +
+                    calculateTax(
+                      calculateDiscount(
+                        `${selectedCard?.amount}`,
+                        `${selectedCard?.flatdiscount}`
+                      ),
+                      selectedCard?.tax
+                    )}
+                </Text>
+              </View>
+
+              {promocode && (
+                <View style={styles.TaxView}>
+                  <Text style={styles.TaxText}>
+                    Promo code: ({promocodeDetails?.discount + "%"})
+                  </Text>
+                  <Text numberOfLines={1} style={styles.TaxPrice}>
+                    -{" "}
+                    {"₹ " +
+                      calculatePercentage(
+                        selectedCard?.amount,
+                        promocodeDetails?.discount
+                      )}
+                  </Text>
+                </View>
+              )}
+
               <View
                 style={[styles.dottedLine, { marginTop: moderateScale(21) }]}
               />
@@ -604,11 +737,16 @@ const PaymentsSubscription = (props) => {
               <View style={styles.totalRow}>
                 <Text style={styles.totalText}>{Strings.total}:</Text>
                 <Text numberOfLines={1} style={styles.totalPrice}>
-                  {"₹" +
-                    calculateDiscount(
-                      `${selectedCard?.amount}`,
-                      `${selectedCard?.flatdiscount}`
-                    )}
+                  {promocodeDetails?.discount
+                    ? `${calcuateTotal(
+                        `${selectedCard?.amount}`,
+                        `${selectedCard?.flatdiscount}`,
+                        `${promocodeDetails?.discount}`
+                      )}`
+                    : `${calculateDiscount(
+                        `${selectedCard?.amount}`,
+                        `${selectedCard?.flatdiscount}`
+                      )}`}
                 </Text>
               </View>
               <View
@@ -616,6 +754,92 @@ const PaymentsSubscription = (props) => {
               />
             </View>
           </Modal>
+
+          <Modal
+            isVisible={promocodeModal}
+            onBackdropPress={togglePromoCodeModal}
+            style={styles.modal}
+            onBackButtonPress={togglePromoCodeModal}
+            swipeDirection="down"
+          >
+            <View style={styles.modalContent}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Text style={styles.modalTitle}>Subscription cost</Text>
+                <Text style={styles.modalTitle}>
+                  {"₹ " +
+                    calculateDiscount(
+                      `${selectedCard?.amount}`,
+                      `${selectedCard?.flatdiscount}`
+                    )}
+                </Text>
+              </View>
+              <View style={{ paddingTop: moderateScale(20) }}>
+                <InputField
+                  label={"Promo code"}
+                  placeholderText={"Enter promo code"}
+                  value={promocode}
+                  maxLength={20}
+                  onChange={(text) => {
+                    setPromoCode(text);
+                    setValidation("");
+                  }}
+                  rightIcon={successPromocode && <CheckCircle />}
+                />
+                {validation && (
+                  <Text
+                    style={{
+                      color: "red",
+                      fontSize: moderateScale(12),
+                      paddingTop: 5,
+                      paddingHorizontal: 5,
+                    }}
+                  >
+                    {validation}
+                  </Text>
+                )}
+                {successPromocode && (
+                  <Text
+                    style={{
+                      color: THEMES.colors.green,
+                      fontSize: moderateScale(12),
+                      paddingTop: 5,
+                      paddingHorizontal: 5,
+                    }}
+                  >
+                    {successPromocode}
+                  </Text>
+                )}
+              </View>
+
+              <View
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  width: "100%",
+                  alignSelf: "center",
+                }}
+              >
+                {promocodeDetails ? (
+                  <Button
+                    title="Remove Promo code"
+                    onPress={handleRemovePromoCode}
+                  ></Button>
+                ) : (
+                  <Button
+                    title="Apply"
+                    onPress={handlePromoCodeSubmit}
+                  ></Button>
+                )}
+              </View>
+            </View>
+          </Modal>
+
           {subscriptionModal && (
             <SubscriptionSuccess
               isVisible={subscriptionModal}
@@ -827,6 +1051,7 @@ const styles = StyleSheet.create({
     color: THEMES.colors.cyan,
     fontFamily: THEMES.fontFamily.medium,
     textDecorationLine: "underline",
+    paddingTop:moderateScale(10)
   },
   btnView: {
     paddingVertical: moderateScale(10),

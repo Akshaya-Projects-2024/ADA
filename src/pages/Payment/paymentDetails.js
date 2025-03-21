@@ -78,11 +78,12 @@ const PaymentDetails = () => {
     }
   };
 
-  const downloadPDF = async (base64PDF) => {
+  const downloadPDF = async (base64PDF, id) => {
     try {
       const hasPermission = await requestStoragePermission();
+      console.log("has", hasPermission);
       if (hasPermission) {
-        const path = `${RNFS.DownloadDirectoryPath}/sample.pdf`;
+        const path = `${RNFS.DownloadDirectoryPath}/${id}.pdf`;
         await RNFS.writeFile(path, base64PDF, "base64");
         setSuccessDownload(true);
       } else {
@@ -107,7 +108,7 @@ const PaymentDetails = () => {
       };
       let res = await getInvoiceApi(obj);
       if (res?.status_code == 200) {
-        downloadPDF(res?.data);
+        downloadPDF(res?.data, id);
       } else {
         contextValue.setLoader(false);
       }
@@ -119,6 +120,7 @@ const PaymentDetails = () => {
   const renderItem = ({ item, index }) => {
     const paymentItem = item?.paymentdetails;
     const subscriptionItem = item?.subscription;
+    console.log("ss", paymentItem, subscriptionItem);
     return (
       <View style={styles.mainView}>
         <View style={styles.row}>
@@ -149,6 +151,26 @@ const PaymentDetails = () => {
           <View style={{ marginLeft: moderateScale(32) }}>
             <Text style={styles.upikey}>{paymentItem?.method}</Text>
             <Text style={styles.paymentMode}>{Strings.paymentMode}</Text>
+          </View>
+        </View>
+        <View style={styles.secondRow}>
+          <View>
+            <Text style={styles.amountValue}>
+              {subscriptionItem?.subscriptioncode}
+            </Text>
+            <Text style={styles.amountKey}>Subscription</Text>
+          </View>
+          <View style={{ marginLeft: moderateScale(32) }}>
+            <Text
+              style={{
+                color: THEMES.colors.black,
+                fontFamily: THEMES.fontFamily.bold,
+                fontSize: THEMES.fonts.font12,
+              }}
+            >
+              {subscriptionItem?.promocode}
+            </Text>
+            <Text style={styles.paymentMode}>Promo code</Text>
           </View>
         </View>
 

@@ -37,6 +37,7 @@ import { deleteDocument, uploadDocument } from "../../redux-store/actions/auth";
 import { contextValue } from "../../components/Loader";
 import Dialog from "../../components/Dialog";
 import { validateInput } from "../../utils/validation";
+import { getCurrentLocation } from "../../utils/geolocationUtils";
 
 const CreateEvent = () => {
   const [isStartTimeModalVisible, setStartTimeModalVisible] = useState(false);
@@ -203,6 +204,7 @@ const CreateEvent = () => {
       showToast("error", "Please enter valid mobile number");
     } else {
       try {
+        const currentPosition = await getCurrentLocation();
         contextValue?.setLoader(true);
         const userId = await decryptService("userId");
         let obj = {
@@ -218,6 +220,12 @@ const CreateEvent = () => {
           audience: audience,
           userId: userId,
           documents: posterImg.map((item) => item.id).join(","), //TODO
+          latitude: currentPosition?.coords?.latitude
+          ? currentPosition?.coords?.latitude?.toString()
+          : "0",
+        longitude: currentPosition?.coords?.longitude
+          ? currentPosition?.coords?.longitude?.toString()
+          : "0",
         };
         let res = await createEvent(obj);
         console.log("res", res);
