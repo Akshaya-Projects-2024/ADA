@@ -314,8 +314,8 @@ const SessionsForAppointment = ({
                       !slot?.isavailable && styles.disabledSlot,
                       slot?.isbooked && styles.bookedSlot,
                       selectedSlot?.start_time === slot?.start_time &&
-                        !slot?.isbooked &&
-                        styles.selectedSlotStyle,
+                      !slot?.isbooked &&
+                      styles.selectedSlotStyle,
                     ]}
                     onPress={() => selectTimeSlot(slot)}
                     disabled={slot?.isbooked} // Disable if the slot is marked as disabled
@@ -329,8 +329,8 @@ const SessionsForAppointment = ({
                             selectedSlot?.start_time === slot?.start_time
                               ? "#fff"
                               : slot?.isavailable || slot?.isbooked
-                              ? "#000"
-                              : "#fff",
+                                ? "#000"
+                                : "#fff",
                         },
                       ])}
                     >
@@ -370,8 +370,8 @@ const SessionsForAppointment = ({
                       !slot?.isavailable && styles.disabledSlot,
                       slot?.isbooked && styles.bookedSlot,
                       selectedSlot?.start_time === slot?.start_time &&
-                        !slot?.isbooked &&
-                        styles.selectedSlotStyle,
+                      !slot?.isbooked &&
+                      styles.selectedSlotStyle,
                     ]}
                     onPress={() => selectTimeSlot(slot)}
                     disabled={slot?.isbooked} // Disable if the slot is marked as disabled
@@ -385,8 +385,8 @@ const SessionsForAppointment = ({
                             selectedSlot?.start_time === slot?.start_time
                               ? "#fff"
                               : slot?.isavailable || slot?.isbooked
-                              ? "#000"
-                              : "#fff",
+                                ? "#000"
+                                : "#fff",
                         },
                       ])}
                     >
@@ -424,8 +424,8 @@ const SessionsForAppointment = ({
                       !slot?.isavailable && styles.disabledSlot,
                       slot?.isbooked && styles.bookedSlot,
                       selectedSlot?.start_time === slot?.start_time &&
-                        !slot?.isbooked &&
-                        styles.selectedSlotStyle,
+                      !slot?.isbooked &&
+                      styles.selectedSlotStyle,
                     ]}
                     onPress={() => selectTimeSlot(slot)}
                     disabled={slot?.isbooked} // Disable if the slot is marked as disabled
@@ -439,8 +439,8 @@ const SessionsForAppointment = ({
                             selectedSlot?.start_time === slot?.start_time
                               ? "#fff"
                               : slot?.isavailable || slot?.isbooked
-                              ? "#000"
-                              : "#fff",
+                                ? "#000"
+                                : "#fff",
                         },
                       ])}
                     >
@@ -459,6 +459,7 @@ const SessionsForAppointment = ({
         onConfirm={handleStartDateConfirm}
         onCancel={hideStartDatePicker}
         minimumDate={new Date()}
+        date={startDate ? new Date(startDate) : new Date()}
       />
       <DateTimePickerModal
         isVisible={endDateVisible}
@@ -466,6 +467,7 @@ const SessionsForAppointment = ({
         onConfirm={handleEndDateConfirm}
         onCancel={hideEndDatePicker}
         minimumDate={startDate || new Date()}
+        date={endDate ? new Date(endDate) : new Date()}
       />
       <View style={styles.button}>
         <Button title={buttonTitle} onPress={handleButtonPressed} />

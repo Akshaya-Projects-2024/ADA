@@ -85,6 +85,7 @@ const CreateEvent = () => {
     }
 
     setStartTime(formattedTime);
+    setEndTime("")
     hideStartDatePicker();
   };
 
@@ -107,8 +108,8 @@ const CreateEvent = () => {
       return;
     }
 
-    const startDateTime = moment(`${sDate} ${startTime}`, "DD/MM/YYYY HH:mm:ss");
-    const endDateTime = moment(`${eDate} ${moment(date).format("HH:mm:ss")}`, "DD/MM/YYYY HH:mm:ss");
+    const startDateTime = moment(`${sDate} ${startTime}`, "YYYY-MM-DD HH:mm:ss");
+    const endDateTime = moment(`${eDate} ${moment(date).format("HH:mm:ss")}`, "YYYY-MM-DD HH:mm:ss");
 
     if (endDateTime.isSameOrBefore(startDateTime, "minute")) {
       Alert.alert("Invalid End Time", "End time must be after start time.");
@@ -211,7 +212,7 @@ const CreateEvent = () => {
       showToast("error", "Please enter start date");
     } else if (!startTime) {
       showToast("error", "Please enter start time");
-    }  else if (!eDate) {
+    } else if (!eDate) {
       showToast("error", "Please enter end date");
     } else if (!endTime) {
       showToast("error", "Please enter end time");
@@ -239,14 +240,16 @@ const CreateEvent = () => {
           location: location,
           documents: posterImg.map((item) => item.id).join(","), //TODO
           latitude: currentPosition?.coords?.latitude
-          ? currentPosition?.coords?.latitude?.toString()
-          : "0",
-        longitude: currentPosition?.coords?.longitude
-          ? currentPosition?.coords?.longitude?.toString()
-          : "0",
+            ? currentPosition?.coords?.latitude?.toString()
+            : "0",
+          longitude: currentPosition?.coords?.longitude
+            ? currentPosition?.coords?.longitude?.toString()
+            : "0",
         };
+        console.log('====================================');
+        console.log(obj);
+        console.log('====================================');
         let res = await createEvent(obj);
-        console.log("res", res);
         if (res?.data?.status_code == 200) {
           contextValue?.setLoader(false);
           setModal(true);
@@ -260,6 +263,13 @@ const CreateEvent = () => {
       }
     }
   };
+
+  const selectStartTime = useMemo(() => {
+    return startTime ? new Date(`${sDate} ${startTime}`) : new Date()
+  }, [startTime])
+  const selectEndTime = useMemo(() => {
+    return endTime ? new Date(`${eDate} ${endTime}`) : new Date()
+  }, [endTime])
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -452,6 +462,7 @@ const CreateEvent = () => {
           display="spinner"
           onConfirm={handleStartConfirm}
           onCancel={hideStartDatePicker}
+          date={selectStartTime}
         />
         <DateTimePicker
           isVisible={isEndTimeModalVisible}
@@ -459,6 +470,7 @@ const CreateEvent = () => {
           display="spinner"
           onConfirm={handleEndConfirm}
           onCancel={hideEndDatePicker}
+          date={selectEndTime}
         />
         {calendarModal && (
           <Modal

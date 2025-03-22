@@ -29,6 +29,7 @@ import { showToast } from "../../utils/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
 import { useUser } from "../../api/UserContext";
+import { contextValue } from "../../components/Loader";
 
 export const DOCUMENT_TYPES = {
   image: "businessImg",
@@ -96,6 +97,7 @@ const UploadImagesDocs = (props) => {
       extention: extension,
       document: image?.fileData,
     };
+    contextValue?.setLoader(true);
     apiCall(payload, DOCUMENT_TYPES.image, image);
   };
 
@@ -108,6 +110,7 @@ const UploadImagesDocs = (props) => {
       extention: extension,
       document: image?.fileData,
     };
+    contextValue?.setLoader(true);
     apiCall(payload, DOCUMENT_TYPES.document, image);
   };
 
@@ -120,6 +123,7 @@ const UploadImagesDocs = (props) => {
       extention: extension,
       document: image?.fileData,
     };
+    contextValue?.setLoader(true);
     apiCall(payload, DOCUMENT_TYPES.logo, image);
   };
 
@@ -140,9 +144,11 @@ const UploadImagesDocs = (props) => {
           temp.push({ ...item, id: res?.data?.data?.reqId });
           setBusinessImg(temp);
         }
+        contextValue?.setLoader(false);
         showToast("success", "Successfully uploaded the image");
       }
     } catch (error) {
+      contextValue?.setLoader(false);
       showToast("error", error.message);
     }
   };
@@ -154,6 +160,7 @@ const UploadImagesDocs = (props) => {
         userid: userId,
         id: doc?.id,
       };
+      contextValue?.setLoader(true);
       const res = await deleteProviderDocument(postData);
       if (res?.status == 200) {
         if (type === DOCUMENT_TYPES.logo) {
@@ -171,9 +178,11 @@ const UploadImagesDocs = (props) => {
           );
           setBusinessImg(removeItemById);
         }
+        contextValue?.setLoader(false);
         showToast("success", "Successfully deleted the image");
       }
     } catch (error) {
+      contextValue?.setLoader(false);
       showToast("error", error.message);
     }
   };

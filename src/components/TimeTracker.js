@@ -43,12 +43,16 @@ const TimeTracker = ({
   const [pickerType, setPickerType] = useState(null);
   const [pickerDay, setPickerDay] = useState(null);
   const [minDate, setMinDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState("");
 
   const showDatePicker = (day, shift, type) => {
     setPickerDay(day);
     setPickerShift(shift);
     setPickerType(type);
     setDatePickerVisibility(true);
+    setSelectedTime(
+      day[shift][type] ? moment(day[shift][type], "HH:mm").toDate() : new Date()
+    );
   };
 
   const hideDatePicker = () => {
@@ -169,24 +173,24 @@ const TimeTracker = ({
         for (let index = 0; index < filteredItems.length; index++) {
           const element = filteredItems[index];
           const indx = temp.findIndex((ite) => ite?.label === element?.label);
-          if (!element?.shift1?.start) {
-            element.shift1 = {
-              ...element.shift1,
-              start: firstItem?.shift1.start,
-            };
-          }
-          if (!element?.shift1?.end) {
-            element.shift1 = { ...element.shift1, end: firstItem?.shift1.end };
-          }
-          if (!element?.shift2?.start) {
-            element.shift2 = {
-              ...element.shift2,
-              start: firstItem?.shift2.start,
-            };
-          }
-          if (!element?.shift2?.end) {
-            element.shift2 = { ...element.shift2, end: firstItem?.shift2.end };
-          }
+          // if (!element?.shift1?.start) {
+          element.shift1 = {
+            ...element.shift1,
+            start: firstItem?.shift1.start,
+          };
+          // }
+          // if (!element?.shift1?.end) {
+          element.shift1 = { ...element.shift1, end: firstItem?.shift1.end };
+          // }
+          // if (!element?.shift2?.start) {
+          element.shift2 = {
+            ...element.shift2,
+            start: firstItem?.shift2.start,
+          };
+          // }
+          // if (!element?.shift2?.end) {
+          element.shift2 = { ...element.shift2, end: firstItem?.shift2.end };
+          // }
           temp[indx] = element;
         }
       }
@@ -214,11 +218,25 @@ const TimeTracker = ({
       ...day,
       [shift]: { ...day[shift], [type]: value },
     };
+    if (type == "start") {
+      temp[selectedDay] = {
+        ...temp[selectedDay],
+        [shift]: { [type]: value, end: "" },
+      };
+    }
+    if (selectedShiftType == SHIFTS.shifts && shift == "shift1") {
+      temp[selectedDay] = {
+        ...temp[selectedDay],
+        shift2: { start: "", end: "" },
+      };
+    }
+
     if (
       (type === "end" && temp[selectedDay]?.[shift]?.start >= value) ||
       (shift === "shift2" &&
         type === "start" &&
-        temp[selectedDay]?.shift1?.start >= value)
+        (temp[selectedDay]?.shift1?.start >= value ||
+          temp[selectedDay]?.shift1?.end >= value))
     ) {
       hideDatePicker();
       showToast("error", Strings.timeError);
@@ -236,6 +254,12 @@ const TimeTracker = ({
         const element = filteredItems[index];
         const indx = temp.findIndex((ite) => ite?.label === element?.label);
         element[shift] = { ...element[shift], [type]: value };
+        if (type === "start") {
+          element[shift] = { ...element[shift], ["end"]: "" };
+        }
+        if (selectedShiftType == SHIFTS.shifts && shift == "shift1") {
+          element["shift2"] = { start: "", end: "" };
+        }
         temp[indx] = element;
       }
     }
@@ -496,7 +520,8 @@ const TimeTracker = ({
         display="spinner"
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
-        date={minDate ? minDate : new Date()}
+        date={selectedTime ? selectedTime : new Date()}
+        minimumDate={minDate}
       />
     </>
   );
