@@ -72,7 +72,6 @@ const calculateDiscount = (originalPrice, discountPercent) => {
 
 const calcuateTotal = (originalPrice, discountPercent, promocode) => {
   const add = Number(discountPercent)+ Number(promocode);
-  console.log(add, "ashish");
   if (!originalPrice || !add) return 0;
   const data = (originalPrice - (originalPrice * add) / 100).toFixed(0);
   return data;

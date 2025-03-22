@@ -97,7 +97,6 @@ export const feedbackApi = async (obj) => {
 export const getAppointmentHistoryApi = async (params) => {
   try {
     const res = await Api.POST(urlList.getAppointmentHistory, params);
-    console.log("res",res)
     if (!res || res?.data?.error || res?.data?.errorCode) {
       throw new Error(
         res?.data?.message || res?.data?.error || "Something went wrong!"

@@ -42,7 +42,7 @@ const UpcomingEvents = () => {
     };
     let res = await getAllEventsApi(obj);
     if (res?.data?.data?.length) {
-      setEventData(res?.data?.data);      
+      setEventData(res?.data?.data);
       setActiveIndex(new Array(res?.data?.data?.length).fill(0))
     }
   };
@@ -71,33 +71,31 @@ const UpcomingEvents = () => {
     return `${day} ${monthNames[parseInt(month, 10) - 1]} ${year}, ${hours}.${minutes} ${ampm}`;
   }
 
-  const paginationDots = (list) => {
+  const paginationDots = (list, itemIndex) => {
     return (
       <View style={{
         flexDirection: "row",
         marginTop: 10,
         alignSelf: "center",
       }}>
-        {list.map((_, index) => (
-          <View
-            key={index}
+        {list.map((_, i) => {
+          return <View
             style={[
               {
                 borderRadius: 5,
                 marginHorizontal: 3,
-                backgroundColor: "#E7C5B3", // Default color for inactive dots
-              },
-              {
-                backgroundColor: index === activeIndex[index] ? "#FC6532" : "#E7C5B3",
-                width: index === activeIndex[index] ? 20 : 12,
+                backgroundColor: i == activeIndex[itemIndex] ? "#FC6532" : "#E7C5B3",
+                width: i == activeIndex[itemIndex] ? 20 : 12,
                 height: 7,
               }, // Active dot color
             ]}
           />
-        ))}
+        })}
       </View>
     );
   };
+
+
 
   const renderItem = ({ item, index }) => {
     return (
@@ -142,14 +140,13 @@ const UpcomingEvents = () => {
             sliderWidth={screenWidth}
             itemWidth={screenWidth * 0.9}
             onSnapToItem={(x) => {
-              console.log(activeIndex);
               const temp = [...activeIndex];
               temp[index] = x;
               setActiveIndex(temp)
             }} // Track active slide index
           />
 
-          {paginationDots(item?.documentlist)}
+          {paginationDots(item?.documentlist, index)}
         </View>
 
 

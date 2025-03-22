@@ -73,9 +73,7 @@ const ParentReviews = (props) => {
         pageNum: 1,
         pageSize: 50,
       };
-      console.log("obj", obj);
       let res = await getAllReviews(obj);
-      console.log("res", res);
       if (res?.reviews?.length) {
         setReviewList(res?.reviews);
       }
