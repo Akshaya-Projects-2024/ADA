@@ -42,6 +42,8 @@ export const ActivityList = (props) => {
 
   const parentid = props?.route?.params?.parentid;
   const petId = props?.route?.params?.petId;
+  const add = props?.route?.params?.add;
+
   const [errors, setError] = useState({});
 
   useEffect(() => {
@@ -550,7 +552,7 @@ export const ActivityList = (props) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header title="Add Activity" showBack bgColor="transparent" />
+      <Header title={!add ? "Add Activity" : "Update Activity"} showBack bgColor="transparent" />
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {activityDataList.map((item, index) => (

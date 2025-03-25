@@ -133,8 +133,8 @@ export const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.medium,
   }),
   bondingContainer: {
-    marginTop: 30,
-    marginBottom: 100,
+    marginTop: 20,
+    marginBottom: 60,
   },
   bondingImagesContainer: {
     flexDirection: "row",

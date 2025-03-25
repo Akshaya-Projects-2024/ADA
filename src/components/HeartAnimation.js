@@ -71,7 +71,7 @@ const HeartAnimation = ({ size = 100, percentage = 20 }) => {
         </G>
 
         <Text
-          x="50%"
+          x="52%"
           y="50%"
           fontSize="16"
           textAnchor="middle"
