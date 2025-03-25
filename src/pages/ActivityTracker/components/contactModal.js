@@ -47,10 +47,9 @@ const ContactModal = ({ contactModalVisible, toggleContactModal, petInfo }) => {
         ...contactObj,
         [item.contact || item.id]: item.name || item.label,
       };
-      return item
+      return item;
     });
-    console.log(contactObj);
-    
+
     try {
       const contacts = await Contacts.getAllWithoutPhotos();
       const filteredContacts = contacts

@@ -164,7 +164,7 @@ export const styles = StyleSheet.create({
   },
   bondingText: {
     fontSize: THEMES.fonts.font12,
-    fontFamily: THEMES.fontFamily.medium,
+    fontFamily: THEMES.fontFamily.semiBold,
     color: THEMES.colors.black,
     marginRight: 10,
   },

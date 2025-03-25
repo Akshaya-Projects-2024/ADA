@@ -350,9 +350,17 @@ export const ActvityTrackerDashboard = (props) => {
           setWeekList={setWeekList}
           toggleContactModal={toggleContactModal}
         />
-        <View style={styles.activityListContainer}>
+        <View style={[styles.activityListContainer, { flex: 1 }]}>
           <View style={[styles.row, { paddingTop: 10, paddingBottom: 20 }]}>
-            <Text>Activity</Text>
+            <Text
+              style={{
+                fontSize: THEMES.fonts.font16,
+                fontFamily: THEMES.fontFamily.semiBold,
+                color: THEMES.colors.black,
+              }}
+            >
+              Activity
+            </Text>
             <TouchableOpacity
               style={styles.addButton}
               onPress={() =>
@@ -362,7 +370,12 @@ export const ActvityTrackerDashboard = (props) => {
                 })
               }
             >
-              <Plus stroke={THEMES.colors.cyan} strokeWidth={2} />
+              <Plus
+                stroke={THEMES.colors.cyan}
+                strokeWidth={2}
+                width={21}
+                height={21}
+              />
             </TouchableOpacity>
           </View>
           <SwipeListView
@@ -391,16 +404,19 @@ export const ActvityTrackerDashboard = (props) => {
             ListEmptyComponent={
               <View
                 style={[
-                  styles.emptyListContainer,
                   {
-                    height: 300,
                     alignItems: "center",
-                    top: 80,
+                    justifyContent: "center",
+                    paddingTop: 100,
                   },
                 ]}
               >
-                <Text style={styles.emptyListText}>
-                  No activity added for today
+                <Text style={{
+                  fontSize: THEMES.fonts.font14,
+                  fontFamily: THEMES.fontFamily.medium,
+                  color: THEMES.colors.darkGrey,
+                }}>
+                  No Activity added
                 </Text>
               </View>
             }
