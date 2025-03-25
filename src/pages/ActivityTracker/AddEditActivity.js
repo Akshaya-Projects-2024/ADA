@@ -45,6 +45,7 @@ export const ActivityList = (props) => {
   const add = props?.route?.params?.add;
 
   const [errors, setError] = useState({});
+  const [isSubmitPressed, setIsSubmitPressed] = useState();
 
   useEffect(() => {
     // getList();
@@ -56,6 +57,13 @@ export const ActivityList = (props) => {
     setActivityDataList(props?.route?.params?.activityListData);
     contextValue?.setLoader(false);
   };
+
+  useEffect(() => {
+    if (typeof isSubmitPressed === "boolean") {
+      const errors = getErrors(activityDataList);
+      setError(errors);
+    }
+  }, [activityDataList]);
 
   const getList = async () => {
     try {
@@ -352,6 +360,7 @@ export const ActivityList = (props) => {
       handleDataChange,
       handleModalVisibility,
       activityDataList,
+      errors,
     ]
   );
 
@@ -552,7 +561,11 @@ export const ActivityList = (props) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header title={!add ? "Add Activity" : "Update Activity"} showBack bgColor="transparent" />
+      <Header
+        title={!add ? "Add Activity" : "Update Activity"}
+        showBack
+        bgColor="transparent"
+      />
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {activityDataList.map((item, index) => (
@@ -560,17 +573,18 @@ export const ActivityList = (props) => {
             {renderActivity(item, index)}
           </React.Fragment>
         ))}
-        {Boolean(activityDataList.length) && (
-          <View style={{ marginTop: 10 }}>
-            <Button
-              title="Save"
-              onPress={() => {
-                handleSubmit();
-              }}
-            />
-          </View>
-        )}
       </ScrollView>
+      {Boolean(activityDataList.length) && (
+        <View style={{ marginTop: 10, bottom: 0, padding: 20 }}>
+          <Button
+            title="Save"
+            onPress={() => {
+              setIsSubmitPressed(!isSubmitPressed);
+              handleSubmit();
+            }}
+          />
+        </View>
+      )}
       {Boolean(modalState.time.isVisible) && (
         <DateTimePicker
           isVisible={modalState.time.isVisible}
