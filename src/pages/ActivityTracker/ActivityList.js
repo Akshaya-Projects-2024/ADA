@@ -156,7 +156,6 @@ export const ActivityList = (props) => {
       }
     } catch (error) {
       contextValue?.setLoader(false);
-      console.log("error", error);
     }
   };
 
@@ -490,8 +489,6 @@ export const ActivityList = (props) => {
   const handleSubmit = async () => {
     const errors = getErrors(activityDataList);
     setError(errors);
-    console.log(errors);
-
     if (Object.values(errors).some((x) => x)) {
       showToast(
         "error",
@@ -543,17 +540,20 @@ export const ActivityList = (props) => {
         parentid,
         activities: arr1,
       };
-      console.log(obj);
-      const res = await saveActivity(obj);
-
-      if (res.status == 200) {
+      try {
+        const res = await saveActivity(obj);
+        if (res.status == 200) {
+          contextValue.setLoader(false);
+          dispatch(updateActivityData());
+          showToast("success", "Activity added successfully");
+          props?.navigation?.goBack();
+        } else {
+          contextValue.setLoader(false);
+          showToast("error", res?.data?.message);
+        }
+      } catch (error) {
         contextValue.setLoader(false);
-        dispatch(updateActivityData());
-        showToast("success", "Activity added successfully");
-        props?.navigation?.goBack();
-      } else {
-        contextValue.setLoader(false);
-        showToast("error", res?.data?.message);
+        showToast("error", error?.message);
       }
     }
   };
