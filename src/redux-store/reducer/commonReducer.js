@@ -1,4 +1,8 @@
-import { PROFILE_DATA, REFRESH_USER_DATA } from "../types";
+import {
+  PROFILE_DATA,
+  REFRESH_ACTIVITY_DATA,
+  REFRESH_USER_DATA,
+} from "../types";
 
 const initialState = {
   logindetails: {},
@@ -6,6 +10,7 @@ const initialState = {
   providerProfile: {},
   profileData: {},
   refreshUserData: false,
+  refreshActivityData: false,
 };
 
 export const commonReducer = (state = initialState, action) => {
@@ -30,6 +35,11 @@ export const commonReducer = (state = initialState, action) => {
       return {
         ...state,
         refreshUserData: !state.refreshUserData,
+      };
+    case REFRESH_ACTIVITY_DATA:
+      return {
+        ...state,
+        refreshActivityData: !state.refreshActivityData,
       };
     default:
       return state;

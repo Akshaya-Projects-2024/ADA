@@ -39,6 +39,9 @@ import OtherRescueHelpAlert from "../pages/Alerts/OtherRescueHelpAlert";
 import Notification from "../pages/Notification/notification";
 import PaymentDetails from "../pages/Payment/paymentDetails";
 import ServiceListReviews from "../pages/ClientReviews/ServiceListReviews";
+import ActivityList from "../pages/ActivityTracker/ActivityList";
+import { ActvityTrackerDashboard } from "../pages/ActivityTracker/ActvityTrackerDashboard";
+import AddEditActivity from "../pages/ActivityTracker/AddEditActivity";
 
 const Stack = createStackNavigator();
 
@@ -276,6 +279,20 @@ const Routes = (props) => {
          <Stack.Screen
           name="serviceListReviews"
           component={ServiceListReviews}
+        />
+        <Stack.Screen
+          name="actvityTrackerDashboard"
+          component={ActvityTrackerDashboard}
+          options={navOptionHandler}
+        />
+        <Stack.Screen
+          name="activityTrackerList"
+          component={ActivityList}
+          options={navOptionHandler}
+        />
+        <Stack.Screen
+          name="addEditActivity"
+          component={AddEditActivity}
           options={navOptionHandler}
         />
       </Stack.Navigator>

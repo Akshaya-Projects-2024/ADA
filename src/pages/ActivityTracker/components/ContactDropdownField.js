@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,64 +7,65 @@ import {
   StyleSheet,
 } from "react-native";
 import Modal from "react-native-modal";
-import ArrowDown from "../assets/svg/arrowDown.svg";
-import Cross from "../assets/svg/cross.svg";
+import ArrowDown from "../../../assets/svg/arrowDown.svg";
+import Cross from "../../../assets/svg/cross.svg";
 import { moderateScale } from "react-native-size-matters";
-import { THEMES } from "../assets/theme/themes";
+import { THEMES } from "../../../assets/theme/themes";
 import Feather from "react-native-vector-icons/AntDesign";
-import Button from "./Button";
+import Button from "../../../components/Button";
+import InputField from "../../../components/InputField";
+import Contact from "../../../assets/svg/contact";
 
-const ModalDropdown = (props) => {
+const ContactDropdown = (props) => {
   const {
     data,
     setSelectedValue,
     selectedValue,
     title,
-    placeholder,
+    placeholderText,
     multiSelect = false,
     noPadding,
     showScroll = false,
-    customContainerStyle={}
+    customContainerStyle = {},
+    label,
+    onDone
   } = props;
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedId, setSelectedId] = useState(false);
+  const [selectedId, setSelectedId] = useState({});
 
-  const toggleRoleSelection = (role, id) => {
-    if (multiSelect) {
-      if (selectedValue?.findIndex((it) => it?.id === id) >= 0) {
-        setSelectedValue(selectedValue?.filter((item) => item?.id !== id)); // Remove if already selected
-      } else {
-        if (selectedValue) {
-          setSelectedValue([...selectedValue, { id: id, label: role }]); // Add if not selected  setSelectedValue([...selectedValue, { id: id, label: role }]);
-          setSelectedId(id);
-        } else {
-          setSelectedValue([{ id: id, label: role }]); // Add if not selected
-          setSelectedId(id);
-        }
-      }
+  const toggleRoleSelection = (item) => {
+    const newSelectedValue = { ...selectedId };
+    if (!selectedId[item.id]) {
+      newSelectedValue[item.id] = item;
     } else {
-      setSelectedValue([{ id: id, label: role }]);
-      setSelectedId(id);
-      setModalVisible(false);
+      delete newSelectedValue[item.id];
     }
+    setSelectedId(newSelectedValue);
   };
+
+  useEffect(() => {
+    setSelectedId({});
+  }, [modalVisible]);
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={[
         styles.option,
-        selectedValue?.some((selected) => selected.id === item.id)
-          ? styles.selectedOption
-          : null,
+        selectedId?.[item.id] ? styles.selectedOption : null,
       ]}
       onPress={() => {
-        toggleRoleSelection(item.label, item.id);
+        toggleRoleSelection(item);
       }}
     >
-      <Text numberOfLines={1} style={styles.optionText}>
-        {item.label}
-      </Text>
-      {selectedValue?.some((selected) => selected.id === item.id) && (
+      <View style={{ flexDirection: "column" }}>
+        <Text numberOfLines={1} style={styles.nameText}>
+          {item.label}
+        </Text>
+        <Text numberOfLines={1} style={styles.optionText}>
+          {item.id}
+        </Text>
+      </View>
+      {selectedId?.[item.id] && (
         <Feather size={20} name="checkcircle" color={THEMES.colors.green} />
       )}
     </TouchableOpacity>
@@ -85,29 +86,24 @@ const ModalDropdown = (props) => {
   };
 
   return (
-    <View style={[styles.container, { paddingHorizontal: noPadding ? 0 : 20 }]}>
+    <View style={[styles.container]}>
       {/* Button to open modal */}
       <TouchableOpacity
-        style={[styles.dropdownButton,customContainerStyle]}
+        style={[customContainerStyle]}
         onPress={() => setModalVisible(true)}
       >
-        <View style={{ width: "90%",flexDirection: "row" }}>
-          <Text
-            style={{
-              fontFamily: THEMES.fontFamily.semiBold,
-              fontSize: THEMES.fonts.font10,
-              color: THEMES.colors.darkGrey,
-            }}
-          >
-            {placeholder}
-          </Text>
-          <Text numberOfLines={1} style={styles.dropdownButtonText}>
-            {selectedValue?.length > 0
-              ? selectedValue.map((item) => item.label).join(", ")
-              : title}
-          </Text>
-        </View>
-        <ArrowDown width={25} height={25} />
+        <InputField
+          placeholderText={placeholderText}
+          label={label}
+          onChange={(text) => {}}
+          value=""
+          rightIcon={
+            <View style={{ flexDirection: "row" }}>
+              <Contact stroke="red" strokeWidth={1} />
+            </View>
+          }
+          editable={false}
+        />
       </TouchableOpacity>
 
       {/* Modal for dropdown */}
@@ -150,7 +146,14 @@ const ModalDropdown = (props) => {
             />
             {multiSelect && (
               <View style={{ paddingTop: moderateScale(20) }}>
-                <Button title="Done" onPress={() => setModalVisible(false)} />
+                <Button
+                  disabled={!Object.keys(selectedId)?.length}
+                  title="Done"
+                  onPress={() => {
+                    setModalVisible(false);
+                    onDone(Object.values(selectedId));
+                  }}
+                />
               </View>
             )}
           </View>
@@ -237,6 +240,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  nameText: {
+    fontSize: THEMES.fonts.font16,
+    color: THEMES.colors.black,
+    fontFamily: THEMES.fontFamily.medium,
+  },
 });
 
-export default ModalDropdown;
+export default ContactDropdown;

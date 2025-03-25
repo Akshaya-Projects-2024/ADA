@@ -143,7 +143,9 @@ const ParentAccount = (props) => {
       },
       {
         label: "Activity tracker",
-        onPress: () => {},
+        onPress: () => {
+          navigate("actvityTrackerDashboard", { route: "parentAccount" });
+        },
       },
       {
         label: Strings.myBookings,
@@ -393,6 +395,9 @@ const ParentAccount = (props) => {
                     title={"Activity tracker"}
                     showPending={false}
                     addBottom={"addBottom"}
+                    onPress={() => {
+                      navigate("actvityTrackerDashboard", { route: "parentAccount" });
+                    }}
                   />
                 </View>
               </View>

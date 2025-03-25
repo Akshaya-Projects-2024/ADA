@@ -7,6 +7,7 @@ import {
   Animated,
   StyleSheet,
 } from "react-native";
+import { THEMES } from "../assets/theme/themes";
 
 const PetCarousel = ({ pets, onSelectPet, selectedPet }) => {
   const fadeAnim = useRef(new Animated.Value(1)).current; // Animation ref
@@ -75,8 +76,19 @@ const styles = StyleSheet.create({
   },
   fixedPetContainer: { alignItems: "center", marginRight: 15 },
   petItem: { alignItems: "center", marginHorizontal: 10 },
-  petText: { fontSize: 18, color: "gray", fontWeight: "400" },
-  selectedText: { fontSize: 20, fontWeight: "bold", color: "black" },
+  petText: {
+    color: "#000000",
+    fontWeight: "400",
+    opacity: 0.2,
+    fontSize: THEMES.fonts.font16,
+    fontWeight: THEMES.fontFamily.semiBold,
+  },
+  selectedText: {
+    fontSize: THEMES.fonts.font16,
+    fontWeight: THEMES.fontFamily.semiBold,
+    color: "black",
+    opacity: 1,
+  },
   underline: {
     height: 2,
     backgroundColor: "blue",

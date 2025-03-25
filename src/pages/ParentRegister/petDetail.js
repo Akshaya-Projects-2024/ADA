@@ -38,7 +38,11 @@ import ProfileDummy from "../../assets/svg/user.svg";
 import { getAdoptionCategory } from "../../redux-store/actions/commonApis";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { contextValue } from "../../components/Loader";
-import { isValidName, isValidNumber, validatePetAge } from "../../utils/validation";
+import {
+  isValidName,
+  isValidNumber,
+  validatePetAge,
+} from "../../utils/validation";
 import PetCarousel from "../../components/PetCarousel";
 import Plus from "../../assets/svg/plus.svg";
 import Delete from "../../assets/svg/delete.svg";
@@ -80,7 +84,7 @@ const PetDetail = (props) => {
   const [deleteModal, setDeleteModal] = useState(false);
 
   const [submitDocumentData, setSubmitDocumentData] = useState([]);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const isURL = (str) => /^(https?:\/\/|file:\/\/)/.test(str);
 
   const isBase64 = (str) =>
@@ -407,8 +411,8 @@ const PetDetail = (props) => {
       setDeleteModal(false);
       if (res?.status_code == 200) {
         showToast("success", res?.data?.message);
-        dispatch(updateProfileData())
-        goBack()
+        dispatch(updateProfileData());
+        goBack();
       } else {
         showToast("error", res?.data?.message);
       }
@@ -503,11 +507,13 @@ const PetDetail = (props) => {
           </View>
         )}
         {Boolean(selectedPet) && (
-          <PetCarousel
-            pets={petDetails}
-            onSelectPet={(pet) => setSelectedPet(pet)}
-            selectedPet={selectedPet}
-          />
+          <View style={{ marginLeft: petDetails?.length === 1 ? "50%" : "30%" }}>
+            <PetCarousel
+              pets={petDetails}
+              onSelectPet={(pet) => setSelectedPet(pet)}
+              selectedPet={selectedPet}
+            />
+          </View>
         )}
 
         <View style={{ flex: 1 }}>

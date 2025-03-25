@@ -65,5 +65,14 @@ export const urlList = {
   paymentInvoice: "payment/invoice",
   deleteProviderDoc: "register/provider/deletedocument",
   getAppointmentHistory:"appointment/getall",
-  validatePromocode:'payment/promocode/validate'
+  validatePromocode:'payment/promocode/validate',
+  getactivitybydate: 'activity/getactivitybydate',
+  getActivityDashboard: 'activity/dashboard',
+  getMyActivity: 'activity/get',
+  saveActivity: 'activity/save',
+  updateActivitystatus: 'activity/updatestatus',
+  addContact: 'activity/contact/add',
+  getContact: 'activity/contact/get',
+  deleteContact: 'activity/contact/delete',
+  deleteActivity: 'activity/clear',
 };

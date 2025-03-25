@@ -764,3 +764,158 @@ export const deleteProviderDocument = async (params) => {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };
+
+export const getActivityDashboard = async (params) => {
+  try {
+    const res = await Api.POST(urlList.getActivityDashboard, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const getMyActivityByDate = async (params) => {
+  try {
+    const res = await Api.POST(urlList.getactivitybydate, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const getMyActivity = async (params) => {
+  try {
+    const res = await Api.POST(urlList.getMyActivity, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const saveActivity = async (params) => {
+  try {
+    const res = await Api.POST(urlList.saveActivity, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const updateActivitystatus = async (params) => {
+  try {
+    const res = await Api.POST(urlList.updateActivitystatus, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const addContacts = async (params) => {
+  try {
+    const res = await Api.POST(urlList.addContact, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const getContact = async (params) => {
+  try {
+    const res = await Api.POST(urlList.getContact, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const deleteContact = async (params) => {
+  try {
+    const res = await Api.POST(urlList.deleteContact, params);
+    
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    console.log(error);
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const deleteActivity = async (params) => {
+  try {
+    const res = await Api.POST(urlList.deleteActivity, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};

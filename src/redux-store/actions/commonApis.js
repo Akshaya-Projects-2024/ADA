@@ -1,5 +1,6 @@
 import Api from "../../api/Api";
 import { urlList } from "../../constants/urlList";
+import { REFRESH_ACTIVITY_DATA } from "../types";
 
 export const getAdoptionCategory = async (obj) => {
   try {
@@ -109,5 +110,14 @@ export const getAppointmentHistoryApi = async (params) => {
   } catch (error) {
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
+};
+
+export const updateActivityData = () => {
+  return async (dispatch) => {
+    dispatch({
+      type: REFRESH_ACTIVITY_DATA,
+      payload: [],
+    });
+  };
 };
 
