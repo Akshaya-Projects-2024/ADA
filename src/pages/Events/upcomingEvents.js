@@ -24,27 +24,30 @@ import { decryptService } from "../../utils/storageFunc";
 import { screenWidth, vh, vw } from "../../utils/dimensions";
 import { useIsFocused } from "@react-navigation/native";
 import Carousel from "react-native-snap-carousel";
-
-
+import { contextValue } from "../../components/Loader";
 
 const UpcomingEvents = () => {
-  const [eventData, setEventData] = useState([]);
+  const [eventData, setEventData] = useState();
   const isFocused = useIsFocused();
   const [activeIndex, setActiveIndex] = useState([]);
 
   useEffect(() => {
-    getEvents()
-  }, [isFocused])
+    getEvents();
+  }, [isFocused]);
 
   const getEvents = async () => {
-    let obj = {
-      userId: await decryptService("userId"),
-    };
-    let res = await getAllEventsApi(obj);
-    if (res?.data?.data?.length) {
-      setEventData(res?.data?.data);
-      setActiveIndex(new Array(res?.data?.data?.length).fill(0))
-    }
+    try {
+      contextValue?.setLoader(true);
+      let obj = {
+        userId: await decryptService("userId"),
+      };
+      let res = await getAllEventsApi(obj);
+      if (res?.data?.data?.length) {
+        setEventData(res?.data?.data);
+        setActiveIndex(new Array(res?.data?.data?.length).fill(0));
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {}
   };
 
   const formatDateTime = (startdate, starttime) => {
@@ -63,39 +66,54 @@ const UpcomingEvents = () => {
 
     // Array of month names
     const monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
 
     // Build and return the formatted string
-    return `${day} ${monthNames[parseInt(month, 10) - 1]} ${year}, ${hours}.${minutes} ${ampm}`;
-  }
+    return `${day} ${
+      monthNames[parseInt(month, 10) - 1]
+    } ${year}, ${hours}.${minutes} ${ampm}`;
+  };
 
   const paginationDots = (list, itemIndex) => {
     return (
-      <View style={{
-        flexDirection: "row",
-        marginTop: 10,
-        alignSelf: "center",
-      }}>
+      <View
+        style={{
+          flexDirection: "row",
+          marginTop: 10,
+          alignSelf: "center",
+        }}
+      >
         {list.map((_, i) => {
-          return <View
-            style={[
-              {
-                borderRadius: 5,
-                marginHorizontal: 3,
-                backgroundColor: i == activeIndex[itemIndex] ? "#FC6532" : "#E7C5B3",
-                width: i == activeIndex[itemIndex] ? 20 : 12,
-                height: 7,
-              }, // Active dot color
-            ]}
-          />
+          return (
+            <View
+              style={[
+                {
+                  borderRadius: 5,
+                  marginHorizontal: 3,
+                  backgroundColor:
+                    i == activeIndex[itemIndex] ? "#FC6532" : "#E7C5B3",
+                  width: i == activeIndex[itemIndex] ? 20 : 12,
+                  height: 7,
+                }, // Active dot color
+              ]}
+            />
+          );
         })}
       </View>
     );
   };
-
-
 
   const renderItem = ({ item, index }) => {
     return (
@@ -142,13 +160,12 @@ const UpcomingEvents = () => {
             onSnapToItem={(x) => {
               const temp = [...activeIndex];
               temp[index] = x;
-              setActiveIndex(temp)
+              setActiveIndex(temp);
             }} // Track active slide index
           />
 
           {paginationDots(item?.documentlist, index)}
         </View>
-
 
         <View
           style={{
@@ -242,11 +259,7 @@ const UpcomingEvents = () => {
             </View>
             <View style={{ width: "30%", alignItems: "flex-end" }}>
               <TouchableOpacity
-                onPress={() =>
-                  Linking.openURL(
-                    `tel:${item?.contact}`
-                  )
-                }
+                onPress={() => Linking.openURL(`tel:${item?.contact}`)}
                 style={{
                   width: 40,
                   height: 40,
@@ -287,7 +300,6 @@ const UpcomingEvents = () => {
     );
   };
 
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
@@ -305,16 +317,17 @@ const UpcomingEvents = () => {
             backgroundColor: THEMES.colors.bgColor,
           }}
         >
-          {
-            eventData?.length ? <FlatList
+          {eventData?.length ? (
+            <FlatList
               showsVerticalScrollIndicator={false}
               data={eventData}
               bounces={false}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
-            /> : EmptyContentView()
-          }
-
+            />
+          ) : eventData?.length == 0 ? (
+            EmptyContentView()
+          ) : null}
         </View>
       </View>
     </SafeAreaView>

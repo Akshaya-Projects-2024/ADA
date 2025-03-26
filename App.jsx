@@ -26,13 +26,22 @@ import {
   getNotificationToken,
 } from "./src/utils/pushNotificationUtils";
 import { UserProvider } from "./src/api/UserContext";
+import ServerError from "./src/pages/CommonPages/ServerError";
 
 const store = configureStore();
 
 function App() {
+  const [isServerError, setIsServerError] = useState(false);
+
   const initInterceptors = useCallback(() => {
     axios.interceptors?.response?.use(
       async (response) => {
+        
+        if (response?.status === 502) {
+          setIsServerError(true); // Show error screen
+          return Promise.reject(response);
+        }
+
         const originalRequest = response.config;
         if (response?.status === 403 && !originalRequest._retry) {
           const userId = await decryptService("userId");
@@ -91,6 +100,14 @@ function App() {
       const op = await createNotificationChannel();
     }
   };
+
+  const handleRetry = () => {
+    setIsServerError(false);
+  };
+
+  if (isServerError) {
+    return <ServerError onRetry={handleRetry} />;
+  }
 
   useEffect(() => {
     initHeaders();

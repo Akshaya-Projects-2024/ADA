@@ -6,11 +6,19 @@ import {THEMES} from '../assets/theme/themes';
 
 const ReviewComponent = props => {
   const {reviewData, totalReviews} = props;
-  
+  // Calculate Weighted Average
+  const totalWeighted = reviewData.reduce((sum, review) => sum + review.stars * review.count, 0);
+  const weightedAverage = totalReviews > 0 ? (totalWeighted / totalReviews).toFixed(2) : 0;
+
+  const starPercentages = reviewData.map((review) => ({
+    ...review,
+    percentage: totalReviews > 0 ? ((review.count / totalReviews) * 100).toFixed(1) : 0,
+  }));
+
   return (
     <View style={styles.container}>
       <View style={styles.reviewBreakdown}>
-        {reviewData.map((review, index) => (
+        {starPercentages.map((review, index) => (
           <View key={index} style={styles.reviewRow}>
             <Text style={styles.starCount}>{review.stars}</Text>
             <FontAwesome name="star" size={14} color={THEMES.colors.gallery} />
@@ -20,7 +28,7 @@ const ReviewComponent = props => {
                   styles.barFill,
                   {
                     backgroundColor: review?.bgColor ? review?.bgColor : 'orange',
-                    width: `${(review.count / totalReviews) * 100}%`,
+                    width: `${review.percentage}%`,
                   },
                 ]}
               />

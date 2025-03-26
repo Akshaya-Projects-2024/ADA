@@ -256,7 +256,7 @@ const TrendingTopics = (props) => {
             fontWeight: 500,
           }}
         >
-          Oops! No Payment details available.
+          Oops! No Trending Topics available.
         </Text>
       </View>
     );

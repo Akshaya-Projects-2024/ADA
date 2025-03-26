@@ -834,7 +834,43 @@ const Home = (props) => {
                         bgColor: "#ab47bc",
                       },
                     ]}
-                    totalReviews={5}
+                    totalReviews={[
+                      {
+                        stars: 5,
+                        count:
+                          profile?.providerProfile?.providerRating
+                            ?.providerRatingCount?.five || 0,
+                        bgColor: "#FDD835",
+                      },
+                      {
+                        stars: 4,
+                        count:
+                          profile?.providerProfile?.providerRating
+                            ?.providerRatingCount?.four || 0,
+                        bgColor: "#fcc7b7",
+                      },
+                      {
+                        stars: 3,
+                        count:
+                          profile?.providerProfile?.providerRating
+                            ?.providerRatingCount?.three || 0,
+                        bgColor: "#6dae43",
+                      },
+                      {
+                        stars: 2,
+                        count:
+                          profile?.providerProfile?.providerRating
+                            ?.providerRatingCount?.two || 0,
+                        bgColor: "#21c2ce",
+                      },
+                      {
+                        stars: 1,
+                        count:
+                          profile?.providerProfile?.providerRating
+                            ?.providerRatingCount?.one || 0,
+                        bgColor: "#ab47bc",
+                      },
+                    ].reduce((sum, review) => sum + review.count, 0)}
                   />
                 </View>
               </View>

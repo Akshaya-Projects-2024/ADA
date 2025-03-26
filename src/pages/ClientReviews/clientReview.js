@@ -7,6 +7,8 @@ import {
   Image,
   FlatList,
   ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
@@ -27,6 +29,7 @@ import { findDifferenceByDays, showToast } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
 import { useSelector } from "react-redux";
 import { contextValue } from "../../components/Loader";
+import { useIsFocused } from "@react-navigation/native";
 
 const ClientReview = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -34,9 +37,17 @@ const ClientReview = () => {
   const { providerProfile, profileData } = useSelector(
     ({ commonReducer }) => commonReducer
   );
+  const isFocused = useIsFocused();
+
+  const [reviewData, setReviewData] = useState();
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const [modalData, setModalData] = useState();
   const [comment, setComment] = useState();
+  const pageSize = 5; // Number of reviews per page
+  const [page, setPage] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -138,16 +149,16 @@ const ClientReview = () => {
                   <Text numberOfLines={2} style={styles.replyCommentText}>
                     {item?.item?.reply}
                   </Text>
-                  <Text
+                  <TouchableOpacity
+                    hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
                     onPress={() => {
                       setModalData(item);
                       setComment(item?.item?.reply);
                       setModalVisible(true);
                     }}
-                    style={styles.editText}
                   >
-                    {Strings.edit}{" "}
-                  </Text>
+                    <Text style={styles.editText}>{Strings.edit} </Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -158,38 +169,43 @@ const ClientReview = () => {
   };
 
   const listHeader = () => {
-    const data = globalReviews?.providerRatingCount;
+    const data = reviewData?.providerRatingCount;
+
+    const ratingData = [
+      { stars: 5, count: data?.five ? data?.five : 0 },
+      { stars: 4, count: data?.four ? data?.four : 0 },
+      { stars: 3, count: data?.three ? data?.three : 0 },
+      { stars: 2, count: data?.two ? data?.two : 0 },
+      { stars: 1, count: data?.one ? data?.one : 0 },
+    ];
     return (
       <>
         <View style={styles.headerView}>
           <View style={styles.headerRow}>
             <View style={styles.w25}>
               <Text style={styles.reviewCount}>
-                {globalReviews?.totalratingcount}
+                {reviewData?.totalratingcount}
               </Text>
               <Text style={styles.reviewsText}>
-                {globalReviews?.reviews?.length == 0
+                {reviewData?.reviews?.length == 0
                   ? "0"
-                  : globalReviews?.reviews?.length}{" "}
+                  : reviewData?.reviews?.length}{" "}
                 Reviews
               </Text>
             </View>
             <View style={styles.line} />
             <View style={styles.w70}>
               <ReviewComponent
-                reviewData={[
-                  { stars: 5, count: data?.five ? data?.five : 0 },
-                  { stars: 4, count: data?.four ? data?.four : 0 },
-                  { stars: 3, count: data?.three ? data?.three : 0 },
-                  { stars: 2, count: data?.two ? data?.two : 0 },
-                  { stars: 1, count: data?.one ? data?.one : 0 },
-                ]}
-                totalReviews={5}
+                reviewData={ratingData}
+                totalReviews={ratingData.reduce(
+                  (sum, review) => sum + review.count,
+                  0
+                )}
               />
             </View>
           </View>
         </View>
-        <View style={styles.dropdownMainView}>
+        {/* <View style={styles.dropdownMainView}>
           <View style={styles.dropDownRow}>
             <View style={styles.w35}>
               <Dropdown
@@ -207,21 +223,34 @@ const ClientReview = () => {
               <Dropdown
                 width={120}
                 dropdownData={[
-                  { label: "Most Recent", value: "1" },
-                  { label: "Most Relevant", value: "2" },
-                  { label: "Filter by Service", value: "3" },
+                  { label: "Newest", value: "newest" },
+                  { label: "Oldest", value: "oldest" },
+                  { label: "Toprated", value: "toprated" },
+                  { label: "Lowest", value: "lowest" },
                 ]}
               />
             </View>
           </View>
-        </View>
+        </View> */}
       </>
     );
   };
 
   useEffect(() => {
-    initData();
+    if (isFocused) {
+      contextValue?.setLoader(true);
+      initData(1, true);
+    }
   }, []);
+
+  useEffect(() => {
+    if (isFocused) {
+      setGlobalReviews([]);
+      setPage(1);
+      setHasMore(true);
+      initData(1, true);
+    }
+  }, [isFocused]);
 
   useEffect(() => {
     if (!isModalVisible) {
@@ -229,26 +258,43 @@ const ClientReview = () => {
     }
   }, [isModalVisible]);
 
-  initData = async () => {
+  initData = async (pageNum, reset = false) => {
     try {
-      contextValue.setLoader(true);
+      if (!hasMore && !reset) return;
+      if (reset) setLoading(true);
+      else setLoadingMore(true);
       const userId = await decryptService("userId");
       let obj = {
         userId: userId,
         vendor: userId,
-        sortBy: "newest",
-        pageNum: 1,
-        pageSize: 50,
+        sortBy: "rating",
+        pageNum: page,
+        pageSize: pageSize,
       };
       let res = await getAllReviews(obj);
-      if (Boolean(res)) {
-        contextValue.setLoader(false);
-        setGlobalReviews(res);
-      } else {
-        contextValue.setLoader(false);
+
+      if (res) {
+        const newReviews = res?.reviews;
+        if (newReviews.length === 0) {
+          setHasMore(false); // No more data to load
+        } else {
+          setGlobalReviews((prevReviews) => {
+            const combined = [...prevReviews, ...newReviews];
+            return Array.from(new Set(combined.map((review) => review.id))) // Remove duplicates
+              .map((id) => combined.find((review) => review.id === id));
+          });
+
+          setReviewData(res);
+          setHasMore(newReviews.length > 0);
+          setPage((prevPage) => prevPage + 1);
+        }
       }
+      contextValue?.setLoader(false);
     } catch (error) {
       contextValue.setLoader(false);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
     }
   };
 
@@ -264,6 +310,10 @@ const ClientReview = () => {
     if (res?.data?.status_code !== 200) {
       setModalVisible(false);
       showToast("success", res?.data?.message);
+      setGlobalReviews([]);
+      setPage(1);
+      setHasMore(true);
+      initData(1, true);
     } else {
       setModalVisible(false);
     }
@@ -279,7 +329,7 @@ const ClientReview = () => {
             fontWeight: 500,
           }}
         >
-          No Reviews found
+          Oop!! No Reviews found
         </Text>
       </View>
     );
@@ -295,23 +345,37 @@ const ClientReview = () => {
           bgColor="transparent"
           fontColor={THEMES.colors.black}
         />
-        {globalReviews?.reviews?.length ? (
+        {globalReviews?.length ? (
           <View style={styles.mainView}>
-            <FlatList
-              data={globalReviews?.reviews}
-              showsVerticalScrollIndicator={false}
-              bounces={false}
-              ListHeaderComponent={listHeader}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-            />
+            {loading ? (
+              <ActivityIndicator size="large" color="blue" />
+            ) : (
+              <FlatList
+                data={globalReviews}
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                ListHeaderComponent={listHeader}
+                renderItem={renderItem}
+                onEndReached={() => initData(page)}
+                onEndReachedThreshold={0.5}
+                keyExtractor={(item) => item.id}
+                ListFooterComponent={
+                  loadingMore ? (
+                    <ActivityIndicator size="small" color="gray" />
+                  ) : null
+                }
+              />
+            )}
           </View>
-        ) : EmptyContentView()}
+        ) : (
+          EmptyContentView()
+        )}
 
         <Modal
           animationType="none"
           onBackButtonPress={toggleModal}
           isVisible={isModalVisible}
+          onBackdropPress={toggleModal}
           style={styles.modal}
         >
           <ScrollView
@@ -398,7 +462,7 @@ const styles = StyleSheet.create({
   },
   mainView: {
     flex: 1,
-    paddingTop: moderateScale(30),
+    paddingTop: moderateScale(20),
     paddingHorizontal: moderateScale(20),
   },
   modal: {
@@ -508,6 +572,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     overflow: "hidden",
     borderRadius: 12,
+    marginBottom: moderateScale(20),
   },
   headerRow: {
     flexDirection: "row",
@@ -665,8 +730,8 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font13,
     color: "#323232",
     fontFamily: THEMES.fontFamily.regular,
-    paddingTop: moderateScale(5),
-    width: "80%",
+    paddingTop: moderateScale(1),
+    width: "50%",
   },
   replyComment: {
     flexDirection: "row",

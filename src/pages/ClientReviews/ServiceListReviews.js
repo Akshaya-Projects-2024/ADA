@@ -57,10 +57,19 @@ const ServiceListReviews = ({ navigation, route }) => {
       };
       const response = await getAppointmentHistoryApi(params);
       if (response?.status === 200) {
-        console.log("le", response?.data?.data?.length);
         const output = response?.data?.data;
-        setData(output);
-        setFilteredData(output);
+        const uniqueProviders = new Map();
+
+        const uniqueAppointments = output.filter((appointment) => {
+          if (!uniqueProviders.has(appointment.providername)) {
+            uniqueProviders.set(appointment.providername, true);
+            return true;
+          }
+          return false;
+        });
+
+        setData(uniqueAppointments);
+        setFilteredData(uniqueAppointments);
       }
       contextValue?.setLoader(false);
     } catch (error) {

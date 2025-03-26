@@ -278,6 +278,7 @@ const Routes = (props) => {
         />
          <Stack.Screen
           name="serviceListReviews"
+          options={navOptionHandler}
           component={ServiceListReviews}
         />
         <Stack.Screen

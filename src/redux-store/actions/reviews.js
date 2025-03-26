@@ -22,6 +22,7 @@ export const getAllReviews = async (params) => {
 export const replyReviewApi = async (params) => {
     try {
       const res = await Api.POST(urlList.replyReview, params);
+ 
       if (!res || res?.data?.error || res?.data?.errorCode) {
         throw new Error(
           res?.data?.message || res?.data?.error || "Something went wrong!"
@@ -32,6 +33,7 @@ export const replyReviewApi = async (params) => {
       }
       throw new Error("Something went wrong!");
     } catch (error) {
+      console.log("Err",error)
       throw new Error(error?.message || error || "Opps! Something went wrong!");
     }
   };

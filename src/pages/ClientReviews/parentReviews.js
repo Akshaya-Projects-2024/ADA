@@ -79,6 +79,7 @@ const ParentReviews = (props) => {
       }
       contextValue?.setLoader(false);
     } catch (error) {
+      console.log("Err", error);
       contextValue?.setLoader(false);
     }
   };
@@ -90,14 +91,15 @@ const ParentReviews = (props) => {
   );
 
   const replyReviewBtn = async () => {
-    let obj = {
-      provider: await decryptService("userId"),
-      id: modalData?.item?.id,
-      reply: comment,
+    let payload = {
+      provider: selectedItem?.provider_id,
+      rating: rating.toString(),
+      remark: comment,
+      createdby: await decryptService("userId"),
     };
 
-    let res = await replyReviewApi(obj);
-    if (res?.data?.status_code !== 200) {
+    let res = await addReview(payload);
+    if (res?.status_code == 200) {
       setModalVisible(false);
       showToast("success", res?.data?.message);
     } else {
@@ -109,100 +111,152 @@ const ParentReviews = (props) => {
     return (
       <>
         <View style={styles.flatlistView}>
-          <View style={styles.flatlistContent}>
-            <View style={styles.flatListRow}>
-              <View style={styles.flatListImgView}>
-                <Image
-                  style={styles.img}
-                  source={{ uri: item.item.parentprofile }}
-                />
-              </View>
-              <View style={{ marginLeft: moderateScale(8) }}>
-                <View style={styles.flatListNameRow}>
-                  <Text style={styles.name}>{item.item.parentname}</Text>
-                  <View>
-                    <StarRating
-                      starStyle={{ paddingHorizontal: moderateScale(1.5) }}
-                      disabled={true} // Disable interaction
-                      maxStars={5}
-                      rating={item?.item?.rating} // Set the rating value
-                      fullStarColor={THEMES.colors.orange} // Customize star color
-                      starSize={16} // Customize star size
-                    />
-                  </View>
-                </View>
-
-                <Text style={styles.profileTypeText}>{item.item.patname}</Text>
-              </View>
-            </View>
-          </View>
           <View>
-            <Text numberOfLines={2} style={styles.description}>
-              {item.item.remark}
-            </Text>
-          </View>
-          <View style={styles.dateRow}>
-            <Text style={styles.dateText}>
-              {`${findDifferenceByDays(item.item.createdon)}` > 50
-                ? "Few days ago"
-                : `${findDifferenceByDays(item.item.createdon)}d`}{" "}
-              {}
-            </Text>
-
-            {/* {!item?.item?.reply && (
-              <Text
-                onPress={() => {
-                  setModalData(item);
-                  setComment(item?.item?.reply);
-                  setModalVisible(true);
-                }}
-                style={styles.replyText}
-              >
-                {Strings.reply}{" "}
-              </Text>
-            )} */}
-          </View>
-          {item?.item?.reply && (
-            <View style={{ paddingTop: moderateScale(12) }}>
-              <View style={styles.replyMainView}>
-                <View style={styles.replyRow}>
-                  <View style={styles.profileImg}>
-                    <Image
-                      style={{ width: 52, height: 52, borderRadius: 52 / 2 }}
-                      source={{
-                        uri: profile?.logindetails?.parentphoto,
-                      }}
-                    />
-                  </View>
-                  <View style={{ marginLeft: moderateScale(8) }}>
-                    <Text style={styles.replyName}>
-                      {guestUser
-                        ? Strings.guest
-                        : profile?.parentProfie?.parentContact?.name}
-                    </Text>
-
-                    <Text numberOfLines={2} style={styles.replyProfile}>
-                      {profile?.parentProfie?.parentContact?.about}
-                    </Text>
-                  </View>
+            <View style={styles.replyMainView}>
+              <View style={styles.replyRow}>
+                <View style={styles.profileImg}>
+                  <Image
+                    style={{ width: 52, height: 52, borderRadius: 52 / 2 }}
+                    source={{
+                      uri: selectedItem?.providerPhoto,
+                    }}
+                  />
                 </View>
+                <View style={{ marginLeft: moderateScale(8) }}>
+                  <Text style={styles.replyName}>
+                    {guestUser ? Strings.guest : selectedItem?.providername}
+                  </Text>
+                </View>
+              </View>
+              {item?.item?.reply && (
                 <View style={styles.replyComment}>
                   <Text numberOfLines={2} style={styles.replyCommentText}>
                     {item?.item?.reply}
                   </Text>
-                  <Text
-                    onPress={() => {
-                      setModalData(item);
-                      setComment(item?.item?.reply);
-                      setModalVisible(true);
-                    }}
-                    style={styles.editText}
-                  >
-                    {Strings.edit}{" "}
-                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+
+          {item?.item?.reply && (
+            <>
+              <View style={styles.flatlistContent}>
+                <View style={styles.flatListRow}>
+                  <View style={styles.flatListImgView}>
+                    <Image
+                      style={styles.img}
+                      source={{ uri: item?.item?.parentprofile }}
+                    />
+                  </View>
+                  {console.log("item", modalData)}
+                  <View style={{ marginLeft: moderateScale(8) }}>
+                    <View style={styles.flatListNameRow}>
+                      <Text style={styles.name}>{item?.item?.parentname}</Text>
+                      <View>
+                        <StarRating
+                          starStyle={{
+                            paddingHorizontal: moderateScale(1.5),
+                          }}
+                          disabled={true} // Disable interaction
+                          maxStars={5}
+                          rating={item?.item?.rating} // Set the rating value
+                          fullStarColor={THEMES.colors.orange} // Customize star color
+                          starSize={16} // Customize star size
+                        />
+                      </View>
+                    </View>
+
+                    <Text style={styles.profileTypeText}>
+                      {item?.item?.patname}
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
+              <View>
+                <Text numberOfLines={2} style={styles.description}>
+                  {item?.item?.remark}
+                </Text>
+              </View>
+              <View style={styles.dateRow}>
+                <Text style={styles.dateText}>
+                  {`${findDifferenceByDays(item?.item?.createdon)}` > 50
+                    ? "Few days ago"
+                    : `${findDifferenceByDays(item?.item.createdon)}d`}{" "}
+                </Text>
+                <Text
+                  onPress={() => {
+                    setModalData(item);
+                    setComment(item?.item?.remark);
+                    setModalVisible(true);
+                    setRating(item?.item?.rating);
+                  }}
+                  style={styles.editText}
+                >
+                  {Strings.edit}{" "}
+                </Text>
+              </View>
+            </>
+          )}
+
+          {item?.item?.remark && item?.item?.reply == "" && (
+            <>
+              <View style={styles.flatlistContent}>
+                <View style={styles.flatListRow}>
+                  <View style={styles.flatListImgView}>
+                    <Image
+                      style={styles.img}
+                      source={{ uri: item?.item?.parentprofile }}
+                    />
+                  </View>
+                  <View style={{ marginLeft: moderateScale(8) }}>
+                    <View style={styles.flatListNameRow}>
+                      <Text style={styles.name}>{item?.item?.parentname}</Text>
+                      <View>
+                        <StarRating
+                          starStyle={{
+                            paddingHorizontal: moderateScale(1.5),
+                          }}
+                          disabled={true} // Disable interaction
+                          maxStars={5}
+                          rating={item?.item?.rating} // Set the rating value
+                          fullStarColor={THEMES.colors.orange} // Customize star color
+                          starSize={16} // Customize star size
+                        />
+                      </View>
+                    </View>
+
+                    <Text style={styles.profileTypeText}>
+                      {item?.item?.patname}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              <View>
+                <Text numberOfLines={2} style={styles.description}>
+                  {item?.item?.remark}
+                </Text>
+              </View>
+              <View style={styles.dateRow}>
+                <Text style={styles.dateText}>
+                  {`${findDifferenceByDays(item?.item?.createdon)}` > 50
+                    ? "Few days ago"
+                    : `${findDifferenceByDays(item?.item.createdon)}d`}{" "}
+                </Text>
+                <Text
+                  onPress={() => {
+                    console.log("asssst",item?.item?.rating)
+                    setRating(item?.item?.rating);
+                    setModalData(item);
+                    setComment(item?.item?.remark);
+                    setModalVisible(true);
+                   
+                  }}
+                  style={styles.editText}
+                >
+                  {Strings.edit}{" "}
+                </Text>
+              </View>
+            </>
           )}
         </View>
       </>
@@ -215,26 +269,37 @@ const ParentReviews = (props) => {
 
   const onSubmitReview = async () => {
     try {
-      contextValue?.setLoader(true);
+      if (!review) {
+        showToast("error", "Please enter review");
+      } else if (!rating) {
+        showToast("error", "Please enter review");
+      } else {
+        contextValue?.setLoader(true);
+        api();
+      }
+
+      contextValue?.setLoader(false);
+    } catch (error) {
+      contextValue?.setLoader(false);
+    }
+  };
+
+  const api = async () => {
+    try {
       let payload = {
-        provider: selectedItem?.profile?.providerContact?.userid,
+        provider: selectedItem?.provider_id,
         rating: rating.toString(),
         remark: review,
         createdby: await decryptService("userId"),
       };
 
       let res = await addReview(payload);
-      console.log("res?.data", res);
+
       if (res?.status_code == 200) {
-        setReview("");
-        setRating(0);
         showToast("success", res?.data?.message);
         initData();
       }
-      contextValue?.setLoader(false);
-    } catch (error) {
-      contextValue?.setLoader(false);
-    }
+    } catch (error) {}
   };
 
   return (
@@ -254,7 +319,7 @@ const ParentReviews = (props) => {
             paddingHorizontal: moderateScale(20),
           }}
         >
-          {reviewList?.length ? (
+          {Boolean(reviewList?.length) ? (
             <View style={styles.mainView}>
               <FlatList
                 data={reviewList}
@@ -336,37 +401,22 @@ const ParentReviews = (props) => {
                       <View style={styles.imgView}>
                         <Image
                           style={styles.img}
-                          source={{ uri: modalData?.item?.parentprofile }}
+                          source={{ uri: selectedItem?.providerPhoto }}
                         />
                       </View>
                       <View style={{ marginLeft: moderateScale(8) }}>
                         <View style={styles.nameRow}>
-                          <Text style={styles.nameText}>
-                            {modalData?.item?.parentname}
+                          <Text numberOfLines={1} style={styles.nameText}>
+                            {selectedItem?.providername}
                           </Text>
-                          <View>
-                            <StarRating
-                              starStyle={{
-                                paddingHorizontal: moderateScale(1.5),
-                              }}
-                              disabled={true} // Disable interaction
-                              maxStars={5}
-                              rating={modalData?.item?.rating} // Set the rating value
-                              fullStarColor={THEMES.colors.orange} // Customize star color
-                              starSize={16} // Customize star size
-                            />
-                          </View>
+                          <View></View>
                         </View>
-
-                        <Text style={styles.profileTypeText}>
-                          {modalData?.item?.patname}
-                        </Text>
                       </View>
                     </View>
                   </View>
                   <View>
                     <Text style={styles.commentText}>
-                      {modalData?.item?.remark}
+                      {modalData?.item?.reply}
                     </Text>
                   </View>
                   <View style={styles.commentDaysView}>
@@ -379,6 +429,33 @@ const ParentReviews = (props) => {
                           )}d`}{" "}
                       {}
                     </Text>
+                  </View>
+                </View>
+                <View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      paddingTop: moderateScale(20),
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: normalize(14),
+                        fontFamily: "Inter-SemiBold",
+                        color: "#000",
+                      }}
+                    >
+                      Rate Your Experience
+                    </Text>
+                    <AirbnbRating
+                      count={5} // Number of stars
+                      defaultRating={rating}
+                      size={20}
+                      showRating={false} // Hide numeric value below stars
+                      onFinishRating={handleRating}
+                    />
                   </View>
                 </View>
                 <View style={styles.commentView}>
@@ -473,6 +550,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.semiBold,
+    width: "80%",
   },
   profileTypeText: {
     fontSize: THEMES.fonts.font14,
@@ -587,6 +665,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: moderateScale(20),
+    marginTop: moderateScale(20),
   },
   flatListRow: {
     flexDirection: "row",
