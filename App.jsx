@@ -1,11 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Toast from "react-native-toast-message";
 import { SafeAreaView } from "react-native";
@@ -27,24 +20,24 @@ import {
 } from "./src/utils/pushNotificationUtils";
 import { UserProvider } from "./src/api/UserContext";
 import ServerError from "./src/pages/CommonPages/ServerError";
+import NetInfo from "@react-native-community/netinfo";
+import NoInternetScreen from "./src/pages/CommonPages/NoInternetScreen";
+
 
 const store = configureStore();
 
 function App() {
   const [isServerError, setIsServerError] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
 
   const initInterceptors = useCallback(() => {
     axios.interceptors?.response?.use(
       async (response) => {
-        
-   
         const originalRequest = response.config;
-
         if (response?.status === 502) {
-          setIsServerError(true); // Show error screen
-          return Promise.reject(response);
+          setIsServerError(true);
+          return response;
         }
-
         if (response?.status === 403 && !originalRequest._retry) {
           const userId = await decryptService("userId");
           const token = await decryptService("tokenId");
@@ -67,17 +60,17 @@ function App() {
               ? currentPosition?.coords?.longitude?.toString()
               : "0",
           };
-            const res = await refreshToken(params);
-            if (res?.status === 200) {
-              originalRequest._retry = true;
-              await encryptService("accessToken", res?.data?.data?.token);
-              await encryptService("tokenId", res?.data?.data?.tokenId);
-              const header = {
-                AccessToken: `${res?.data?.data?.token}`,
-              };
-              Api.defaultHeader(header);
-            }
-            return response;
+          const res = await refreshToken(params);
+          if (res?.status === 200) {
+            originalRequest._retry = true;
+            await encryptService("accessToken", res?.data?.data?.token);
+            await encryptService("tokenId", res?.data?.data?.tokenId);
+            const header = {
+              AccessToken: `${res?.data?.data?.token}`,
+            };
+            Api.defaultHeader(header);
+          }
+          return response;
         } else {
           return response;
         }
@@ -103,19 +96,38 @@ function App() {
     }
   };
 
-  const handleRetry = () => {
-    setIsServerError(false);
-  };
-
-  if (isServerError) {
-    return <ServerError onRetry={handleRetry} />;
-  }
-
   useEffect(() => {
     initHeaders();
     initInterceptors();
     initPermissions();
   }, [initInterceptors, initHeaders]);
+
+  const handleRetry = () => {
+    setIsServerError(false);
+  };
+
+  
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => unsubscribe(); // Cleanup on unmount
+  }, []);
+
+  if (isServerError) {
+    return <ServerError onRetry={handleRetry} />;
+  }
+
+  if (!isConnected) {
+    return <NoInternetScreen onRetry={handleNetworkRetry} />;
+  }
+
+  const handleNetworkRetry = () => {
+    NetInfo.fetch().then((state) => {
+      setIsConnected(state.isConnected);
+    });
+  };
 
   return (
     <SafeAreaProvider>

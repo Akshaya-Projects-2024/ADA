@@ -345,7 +345,7 @@ const ClientReview = () => {
           bgColor="transparent"
           fontColor={THEMES.colors.black}
         />
-        {globalReviews?.length ? (
+        {globalReviews?.length  ? (
           <View style={styles.mainView}>
             {loading ? (
               <ActivityIndicator size="large" color="blue" />
