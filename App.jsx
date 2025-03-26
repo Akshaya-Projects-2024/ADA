@@ -37,12 +37,14 @@ function App() {
     axios.interceptors?.response?.use(
       async (response) => {
         
+   
+        const originalRequest = response.config;
+
         if (response?.status === 502) {
           setIsServerError(true); // Show error screen
           return Promise.reject(response);
         }
 
-        const originalRequest = response.config;
         if (response?.status === 403 && !originalRequest._retry) {
           const userId = await decryptService("userId");
           const token = await decryptService("tokenId");
