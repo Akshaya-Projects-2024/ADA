@@ -9,11 +9,12 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
 import Header from "../../components/Header";
-import { moderateScale, s } from "react-native-size-matters";
+import { moderateScale, ms, s } from "react-native-size-matters";
 import ReviewComponent from "../../components/ReviewComponent";
 import Dropdown from "../../components/DropDown";
 import StarRating from "react-native-star-rating";
@@ -21,6 +22,7 @@ import Modal from "react-native-modal";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Lottie from "lottie-react-native";
 import {
   getAllReviews,
   replyReviewApi,
@@ -238,7 +240,6 @@ const ClientReview = () => {
 
   useEffect(() => {
     if (isFocused) {
-      contextValue?.setLoader(true);
       initData(1, true);
     }
   }, []);
@@ -267,7 +268,7 @@ const ClientReview = () => {
       let obj = {
         userId: userId,
         vendor: userId,
-        sortBy: "rating",
+        sortBy: "newest",
         pageNum: page,
         pageSize: pageSize,
       };
@@ -289,9 +290,7 @@ const ClientReview = () => {
           setPage((prevPage) => prevPage + 1);
         }
       }
-      contextValue?.setLoader(false);
     } catch (error) {
-      contextValue.setLoader(false);
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -305,9 +304,9 @@ const ClientReview = () => {
       id: modalData?.item?.id,
       reply: comment,
     };
-
     let res = await replyReviewApi(obj);
-    if (res?.data?.status_code !== 200) {
+    console.log("res?.data?.status_code", res);
+    if (res?.status_code == 200) {
       setModalVisible(false);
       showToast("success", res?.data?.message);
       setGlobalReviews([]);
@@ -345,7 +344,54 @@ const ClientReview = () => {
           bgColor="transparent"
           fontColor={THEMES.colors.black}
         />
-        {globalReviews?.length  ? (
+        {loading ? (
+          <Pressable
+            onPress={() => {
+              setLoader(false);
+            }}
+            style={{position: "absolute",
+              top: 0,
+              left: 0,
+              height: "100%",
+              width: "100%",
+              backgroundColor: THEMES.colors.backdropColor,
+              justifyContent: "center",
+              alignItems: "center",
+              zIndex: 1,}}
+          >
+            <Lottie
+              autoPlay
+              loop={true}
+              source={require("../../assets/gif/loader.json")}
+              style={{ width: ms(100), height: ms(100) }}
+            />
+            <Image
+              style={{ width: ms(75), height: ms(75), position: "absolute" }}
+              source={require("../../assets/images/roundIcon.png")}
+            />
+          </Pressable>
+        ) : globalReviews?.length > 0 ? (
+          <View style={styles.mainView}>
+            <FlatList
+              data={globalReviews}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              ListHeaderComponent={listHeader}
+              renderItem={renderItem}
+              onEndReached={() => initData(page)}
+              onEndReachedThreshold={0.5}
+              keyExtractor={(item) => item.id}
+              ListFooterComponent={
+                loadingMore ? (
+                  <ActivityIndicator size="small" color="gray" />
+                ) : null
+              }
+            />
+          </View>
+        ) : (
+          <EmptyContentView />
+        )}
+        {/* {globalReviews?.length && !loading ? (
           <View style={styles.mainView}>
             {loading ? (
               <ActivityIndicator size="large" color="blue" />
@@ -369,7 +415,7 @@ const ClientReview = () => {
           </View>
         ) : (
           EmptyContentView()
-        )}
+        )} */}
 
         <Modal
           animationType="none"
