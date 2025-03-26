@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   View,
   Text,
+  Alert,
+  PermissionsAndroid,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import moment from "moment";
@@ -75,6 +77,42 @@ export const ActvityTrackerDashboard = (props) => {
   }, [selectedPet, petDetails]);
 
   useEffect(() => {
+    checkPermission();
+  }, []);
+
+  const checkPermission = async () => {
+    const permission = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
+      {
+        title: "Contacts",
+        message: "This app would like to view your contacts.",
+        buttonNegative: "Cancel",
+        buttonPositive: "OK",
+      }
+    );
+    if (permission !== "granted") {
+      Alert.alert(
+        "Permission Denied",
+        "This app requires permission to access your contacts.",
+        [
+          {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          },
+          {
+            text: "OK",
+            onPress: () =>
+              PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.READ_CONTACTS
+              ),
+          },
+        ]
+      );
+    }
+  };
+
+  useEffect(() => {
     fetchActivityDashboardData();
   }, [isFocused]);
 
@@ -126,8 +164,9 @@ export const ActvityTrackerDashboard = (props) => {
       petId: selectedPet?.id,
       parentid: logindetails?.userid,
       activityListData: filterActvity,
+      add: true,
     });
-  }
+  };
 
   const getFilterAcivity = (item) => {
     const userActivity =
@@ -135,7 +174,6 @@ export const ActvityTrackerDashboard = (props) => {
 
     let arr1 = [];
 
-    
     const staticActivityList = Object.values(DefaultActivityList);
     staticActivityList.map((item) => {
       if (item.type !== "Medication" && item.type !== "Vaccination") {
@@ -296,13 +334,11 @@ export const ActvityTrackerDashboard = (props) => {
         contentContainerStyle={styles.scrollContent}
       >
         {Boolean(selectedPet) && (
-          <View style={[styles.carouselContainer,{ marginLeft: petDetails?.length === 1 ? "50%" : "30%" }]}>
-            <PetCarousel
-              pets={petDetails}
-              onSelectPet={setSelectedPet}
-              selectedPet={selectedPet}
-            />
-          </View>
+          <PetCarousel
+            pets={petDetails}
+            onSelectPet={setSelectedPet}
+            selectedPet={selectedPet}
+          />
         )}
         <BondingSection
           bound={dashboardData?.bound}
@@ -314,9 +350,17 @@ export const ActvityTrackerDashboard = (props) => {
           setWeekList={setWeekList}
           toggleContactModal={toggleContactModal}
         />
-        <View style={styles.activityListContainer}>
+        <View style={[styles.activityListContainer, { flex: 1 }]}>
           <View style={[styles.row, { paddingTop: 10, paddingBottom: 20 }]}>
-            <Text>Activity</Text>
+            <Text
+              style={{
+                fontSize: THEMES.fonts.font16,
+                fontFamily: THEMES.fontFamily.semiBold,
+                color: THEMES.colors.black,
+              }}
+            >
+              Activity
+            </Text>
             <TouchableOpacity
               style={styles.addButton}
               onPress={() =>
@@ -326,7 +370,12 @@ export const ActvityTrackerDashboard = (props) => {
                 })
               }
             >
-              <Plus stroke={THEMES.colors.cyan} strokeWidth={2} />
+              <Plus
+                stroke={THEMES.colors.cyan}
+                strokeWidth={2}
+                width={21}
+                height={21}
+              />
             </TouchableOpacity>
           </View>
           <SwipeListView
@@ -355,16 +404,19 @@ export const ActvityTrackerDashboard = (props) => {
             ListEmptyComponent={
               <View
                 style={[
-                  styles.emptyListContainer,
                   {
-                    height: 300,
                     alignItems: "center",
-                    top: 80,
+                    justifyContent: "center",
+                    paddingTop: 100,
                   },
                 ]}
               >
-                <Text style={styles.emptyListText}>
-                  No activity added for today
+                <Text style={{
+                  fontSize: THEMES.fonts.font14,
+                  fontFamily: THEMES.fontFamily.medium,
+                  color: THEMES.colors.darkGrey,
+                }}>
+                  No Activity added
                 </Text>
               </View>
             }

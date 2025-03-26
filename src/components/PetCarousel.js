@@ -32,15 +32,7 @@ const PetCarousel = ({ pets, onSelectPet, selectedPet }) => {
   return (
     <View style={styles.container}>
       {/* Fixed Selected Pet */}
-      <View
-        style={[
-          styles.fixedPetContainer,
-          {
-            justifyContent: !pets?.length <= 1 ? "center" : "flex-start",
-            width: pets?.length <= 1 ? "100%" : "auto",
-          },
-        ]}
-      >
+      <View style={[styles.fixedPetContainer]}>
         <Text style={[styles.petText, styles.selectedText]}>
           {selectedPet.name}
         </Text>
@@ -72,9 +64,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 3,
-    paddingHorizontal: 20,
   },
-  fixedPetContainer: { alignItems: "center", marginRight: 15 },
+  fixedPetContainer: {
+    width: "50%",
+    alignItems: "flex-end",
+    paddingRight: 20
+  },
   petItem: { alignItems: "center", marginHorizontal: 10 },
   petText: {
     color: "#000000",

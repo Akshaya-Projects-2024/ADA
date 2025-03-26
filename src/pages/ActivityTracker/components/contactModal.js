@@ -41,24 +41,15 @@ const ContactModal = ({ contactModalVisible, toggleContactModal, petInfo }) => {
   }, [contactList]);
 
   const getPhoneContacts = async () => {
-    if (Platform.OS === "android") {
-      const permission = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_CONTACTS
-      );
-      if (permission !== PermissionsAndroid.RESULTS.GRANTED) {
-        Linking.openSettings();
-      }
-    }
     let contactObj = {};
     contactList?.map((item) => {
       contactObj = {
         ...contactObj,
         [item.contact || item.id]: item.name || item.label,
       };
-      return item
+      return item;
     });
-    console.log(contactObj);
-    
+
     try {
       const contacts = await Contacts.getAllWithoutPhotos();
       const filteredContacts = contacts
@@ -87,8 +78,8 @@ const ContactModal = ({ contactModalVisible, toggleContactModal, petInfo }) => {
     };
     const res = await getContact(obj);
     if (res.status === 200) {
-      setContactList(res.data.data);
       setLoader(false);
+      setContactList(res.data.data);
     }
   };
 

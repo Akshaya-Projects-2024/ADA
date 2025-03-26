@@ -507,13 +507,11 @@ const PetDetail = (props) => {
           </View>
         )}
         {Boolean(selectedPet) && (
-          <View style={{ marginLeft: petDetails?.length === 1 ? "50%" : "30%" }}>
-            <PetCarousel
-              pets={petDetails}
-              onSelectPet={(pet) => setSelectedPet(pet)}
-              selectedPet={selectedPet}
-            />
-          </View>
+          <PetCarousel
+            pets={petDetails}
+            onSelectPet={(pet) => setSelectedPet(pet)}
+            selectedPet={selectedPet}
+          />
         )}
 
         <View style={{ flex: 1 }}>
