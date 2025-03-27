@@ -180,7 +180,6 @@ const OtpScreen = (props) => {
             }
           } else if (userData?.isparent && userData?.isprovider) {
             props?.navigation.replace("auth");
-            props.navigation.reset({
           } else if (userData?.isparent) {
             navigateToParent(props?.navigation);
           } else if (userData?.isprovider) {
