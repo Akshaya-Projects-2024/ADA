@@ -24,7 +24,7 @@ const ModalDropdown = (props) => {
     multiSelect = false,
     noPadding,
     showScroll = false,
-    customStyle={}
+    customStyle = {},
   } = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedId, setSelectedId] = useState(false);
@@ -79,7 +79,15 @@ const ModalDropdown = (props) => {
           justifyContent: "center",
         }}
       >
-        <Text>No Data Available</Text>
+        <Text
+          style={{
+            fontFamily: THEMES.fontFamily.medium,
+            fontSize: THEMES.fonts.font14,
+            color: THEMES.colors.black,
+          }}
+        >
+          No Data Available
+        </Text>
       </View>
     );
   };
@@ -88,10 +96,10 @@ const ModalDropdown = (props) => {
     <View style={[styles.container, { paddingHorizontal: noPadding ? 0 : 20 }]}>
       {/* Button to open modal */}
       <TouchableOpacity
-        style={[styles.dropdownButton,customStyle?.container]}
+        style={[styles.dropdownButton, customStyle?.container]}
         onPress={() => setModalVisible(true)}
       >
-        <View style={[{ width: "90%" },customStyle.innerContainer]}>
+        <View style={[{ width: "90%" }, customStyle.innerContainer]}>
           <Text
             style={{
               fontFamily: THEMES.fontFamily.semiBold,

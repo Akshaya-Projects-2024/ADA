@@ -25,7 +25,7 @@ export const ActivityHeader = ({
       </View>
       <View style={{ flexDirection: "row" }}>
         {getCurrentRoute() !== "addEditActivity" && 
-          (type === "Medication" || type == "Vaccination") && !item?.copied && (
+          (type === "Medication" || type == "Vaccination") && (
             <TouchableOpacity
               style={{
                 width: 24,

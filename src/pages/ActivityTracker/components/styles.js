@@ -49,13 +49,6 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 6,
   },
-  dayButton: {
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 40,
-    width: 40,
-  },
   dayText: {
     fontSize: THEMES.fonts.font12,
   },
@@ -222,7 +215,6 @@ export const styles = StyleSheet.create({
   activityGradient: {
     padding: 15,
     borderRadius: 12,
-    marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -294,7 +286,7 @@ export const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingLeft: 15,
     borderRadius: 15,
-    height: 96,
+    height: "100%",
   },
   backRightBtn: {
     alignItems: "center",
@@ -351,8 +343,8 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    height: 40,
-    width: 40,
+    height: 36,
+    width: 36,
   },
   dayText: {
     fontSize: THEMES.fonts.font12,

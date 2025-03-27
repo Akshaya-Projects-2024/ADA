@@ -20,7 +20,7 @@ const HeartAnimation = ({ size = 78, percentage = 0 }) => {
     const targetHeight = 71 - (percentage / 100) * 71;
     Animated.timing(fillHeight, {
       toValue: targetHeight,
-      duration: 3000,
+      duration: 1500,
       easing: Easing.inOut(Easing.ease),
       useNativeDriver: true,
     }).start();

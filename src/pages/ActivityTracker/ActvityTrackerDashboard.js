@@ -60,7 +60,7 @@ export const ActvityTrackerDashboard = (props) => {
   const toggleContactModal = () => {
     setContactModalVisible(!contactModalVisible);
   };
-  const [dashboardData, setDashboardData] = useState({}); // []
+  const [dashboardData, setDashboardData] = useState(null); // []
   const [activityListData, setActivityDataList] = useState([]);
   const refreshActivityData = useSelector(
     (state) => state?.commonReducer?.refreshActivityData
@@ -141,9 +141,13 @@ export const ActvityTrackerDashboard = (props) => {
     const res = await getActivityDashboard({ userId, petId });
     if (res?.status === 200) {
       setDashboardData(res?.data?.data);
-      setTimeout(() => {
-        setBound(res?.data?.data?.bound);
-      },500);
+      // if (dashboardData) {
+      //   setBound(res?.data?.data?.bound);
+      // } else {
+        setTimeout(() => {
+          setBound(res?.data?.data?.bound);
+        }, 500);
+      // }
     }
   };
 
@@ -249,7 +253,7 @@ export const ActvityTrackerDashboard = (props) => {
 
   const renderHiddenItem = useCallback(
     ({ item, index }, rowMap) => (
-      <View style={styles.rowBack}>
+      <View style={[styles.rowBack]}>
         <TouchableOpacity
           activeOpacity={1}
           style={[styles.backRightBtn, styles.backRightBtnLeft]}
@@ -394,14 +398,18 @@ export const ActvityTrackerDashboard = (props) => {
             leftOpenValue={75}
             rightOpenValue={-150}
             previewOpenValue={-100}
-            previewOpenDelay={1000}
+            previewOpenDelay={0}
             disableRightSwipe
             previewDuration={500}
             previewRowKey="0"
             closeOnRowBeginSwipe
             closeOnScroll
             keyboardShouldPersistTaps="always"
+            contentContainerStyle={{
+              paddingBottom: 30,
+            }}
             keyExtractor={(item, index) => index.toString()}
+            ItemSeparatorComponent={<View style={{ marginBottom: 10 }} />}
             ListEmptyComponent={
               <View
                 style={[

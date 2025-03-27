@@ -83,7 +83,15 @@ const ContactDropdown = (props) => {
           justifyContent: "center",
         }}
       >
-        <Text>No Data Available</Text>
+        <Text
+          style={{
+            fontFamily: THEMES.fontFamily.medium,
+            fontSize: THEMES.fonts.font14,
+            color: THEMES.colors.black,
+          }}
+        >
+          No Data Available
+        </Text>
       </View>
     );
   };
@@ -96,7 +104,7 @@ const ContactDropdown = (props) => {
         onPress={() => {
           setSearchText("");
           setFilterData(data);
-          setModalVisible(true)
+          setModalVisible(true);
         }}
       >
         <InputField

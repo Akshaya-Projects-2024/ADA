@@ -521,11 +521,11 @@ export const ActivityList = (props) => {
                 ...ActivityType[item.type]?.defaultValue[key],
                 name: ActivityType[item.type].activityLabel[key],
               };
-              if (item.type == "Medication") {
-                if (key === "startdate" && item[key]) {
-                  obj["date"] = item[key];
-                }
-              }
+              // if (item.type == "Medication") {
+              //   if (key === "startdate" && item[key]) {
+              //     obj["date"] = item[key];
+              //   }
+              // }
               delete obj["id"];
               if (id) {
                 obj["id"] = id;

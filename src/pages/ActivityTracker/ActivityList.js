@@ -255,7 +255,9 @@ export const ActivityList = (props) => {
   const handleDayChange = useCallback(
     (day, index, isSelected) => {
       // Logic to update days
-      const currentDays = activityDataList[index].days ? activityDataList[index].days : "" ;
+      const currentDays = activityDataList[index].days
+        ? activityDataList[index].days
+        : "";
       const newDays = isSelected
         ? currentDays.replace(`${day},`, "")
         : `${currentDays}${day},`;
@@ -274,10 +276,6 @@ export const ActivityList = (props) => {
       const formattedTimeFormat = moment(date).format("A");
 
       handleDataChange(index, {
-        // [key]:
-        //   key === "time"
-        //     ? formattedTime
-        //     : `${formattedTime} ${formattedTimeFormat}`,
         [key]: formattedTime,
         timeFormat: formattedTimeFormat,
       });
@@ -513,11 +511,6 @@ export const ActivityList = (props) => {
                 ...ActivityType[item.type]?.defaultValue[key],
                 name: ActivityType[item.type].activityLabel[key],
               };
-              if (item.type == "Medication") {
-                if (key === "startdate" && item[key]) {
-                  obj["date"] = item[key];
-                }
-              }
               delete obj["id"];
               if (id) {
                 obj["id"] = id;

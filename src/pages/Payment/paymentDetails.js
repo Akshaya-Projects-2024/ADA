@@ -26,6 +26,7 @@ import moment from "moment";
 import RNFS from "react-native-fs";
 import Dialog from "../../components/Dialog";
 import { check, PERMISSIONS, request, RESULTS } from "react-native-permissions";
+import { downloadFile } from "../../utils/documentUtils";
 
 const PaymentDetails = () => {
   const [paymentDetailsData, setPaymentDetailsData] = useState([]);
@@ -78,23 +79,26 @@ const PaymentDetails = () => {
     }
   };
 
-  const downloadPDF = async (base64PDF, id) => {
-    try {
-      const hasPermission = await requestStoragePermission();
-      if (hasPermission) {
-        const path = `${RNFS.DownloadDirectoryPath}/${id}.pdf`;
-        await RNFS.writeFile(path, base64PDF, "base64");
-        setSuccessDownload(true);
-      } else {
-        Linking.openSettings();
-      }
-      contextValue.setLoader(false);
-    } catch (error) {
-      setSuccessDownload(false);
-      contextValue.setLoader(false);
-      console.log("Download Error:", error);
-    }
-  };
+  // const downloadPDF = async (path, id) => {
+  //   try {
+  //       console.log(path,"dwwddw");
+  //     const hasPermission = await requestStoragePermission();
+  //     if (hasPermission) {
+  //       // const path = `${RNFS.DownloadDirectoryPath}/${id}.pdf`;
+  //       // await RNFS.writeFile(path, base64PDF, "base64");
+
+  //       downloadFile("dwdd",path,"pdf");
+  //       setSuccessDownload(true);
+  //     } else {
+  //       Linking.openSettings();
+  //     }
+  //     contextValue.setLoader(false);
+  //   } catch (error) {
+  //     setSuccessDownload(false);
+  //     contextValue.setLoader(false);
+  //     console.log("Download Error:", error);
+  //   }
+  // };
 
   const getInvoice = async (id) => {
     try {
@@ -107,10 +111,9 @@ const PaymentDetails = () => {
       };
       let res = await getInvoiceApi(obj);
       if (res?.status_code == 200) {
-        downloadPDF(res?.data, id);
-      } else {
-        contextValue.setLoader(false);
+        downloadFile("Invoice", res.data, "pdf", () => setSuccessDownload(true));
       }
+      contextValue.setLoader(false);
     } catch (error) {
       contextValue.setLoader(false);
     }

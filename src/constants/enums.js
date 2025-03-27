@@ -75,8 +75,8 @@ export const MealActivity = {
   iscustomise: 0,
   quantity: "",
   duration: "",
-  frequency: "",
-  days: "",
+  frequency: "Daily",
+  days: "Mon,Tue,Wed,Thu,Fri,Sat,Sun,",
   morning: "",
   afternoon: "",
   night: "",
@@ -90,8 +90,8 @@ export const PottyActivity = {
   iscustomise: 0,
   quantity: "",
   duration: "",
-  frequency: "",
-  days: "",
+  frequency: "Daily",
+  days: "Mon,Tue,Wed,Thu,Fri,Sat,Sun,",
   morning: "",
   afternoon: "",
   night: "",
@@ -221,7 +221,7 @@ export const ActivityType = {
     },
     defaultValue: {},
     label: {
-      time: "It`s time Training",
+      time: "It's time Training",
     },
   },
   Meal: {
@@ -313,7 +313,7 @@ export const ActivityType = {
       morning: "Morning Medication",
       afternoon: "Afternnon Medication",
       night: "Evening Medication",
-      startdate: "Startdate",
+      startdate: "Medication",
     },
     defaultValue: {
       morning: {
@@ -342,6 +342,7 @@ export const ActivityType = {
         afternoon: null,
         night: null,
         time: null,
+        date: null,
       },
     },
   },
@@ -354,9 +355,15 @@ export const ActivityType = {
     activityLabel: {
       date: "Date",
     },
-    defaultValue: {},
+    defaultValue: {
+      date: {
+        morning: null,
+        afternoon: null,
+        night: null,
+      },
+    },
     label: {
-      date: "Vaccination Date",
+      date: "Vaccination",
     },
   },
   Custom: {

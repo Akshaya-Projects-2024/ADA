@@ -19,7 +19,11 @@ export const ActivityListItem = memo(({ item, updateActivity }) => {
       } else if (item.type == "Vaccination") {
         return item.time;
       } else {
-        return item?.[ActivityType[item.type].activityLabel[item.name?.toLowerCase()]?.toLowerCase()];
+        return item?.[
+          ActivityType[item.type].activityLabel[
+            item.name?.toLowerCase()
+          ]?.toLowerCase()
+        ];
       }
     }
   };
@@ -46,14 +50,16 @@ export const ActivityListItem = memo(({ item, updateActivity }) => {
         colors={ActivityType[item.type].colors}
         style={styles.activityGradient}
       >
-        <View>
+        <View style={{width: "60%"}}>
           <View>{ActivityType[item.type].icon()}</View>
           <Text style={styles.activityTime}>{renderValue(item)}</Text>
-          <Text style={styles.activityName}>
+          <Text style={[styles.activityName]}>
             {item?.iscustomise
               ? item.name
               : item.type == "Medication" || item.type == "Vaccination"
-              ? item.subname + " " + item.type
+              ? item.subname +
+                " " +
+                ActivityType[item.type].label[[item.name.toLowerCase()]]
               : ActivityType[item.type].label[[item.name.toLowerCase()]]}
           </Text>
         </View>
