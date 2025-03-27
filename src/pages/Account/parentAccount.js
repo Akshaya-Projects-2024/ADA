@@ -44,6 +44,7 @@ import Badge from "../../assets/svg/badgeCheck.svg";
 import HeaderWithSearch from "./featureSearch";
 import { useIsFocused } from "@react-navigation/native";
 import { fetchUserProfileData } from "../../redux-store/actions/registerAction";
+import { LoginModules } from "../../constants/enums";
 
 const MenuItem = ({
   bgColor,
@@ -264,9 +265,10 @@ const ParentAccount = (props) => {
     }
   };
 
-  const switchProfile = () => {
+  const switchProfile = async () => {
     const validProviderProfile = validateServiceProfile(profile);
     modal && setModal(false);
+    await encryptService("loggedInModule", LoginModules.provider);
     if (validProviderProfile?.flag) {
       props.navigation.reset({
         index: 0,
@@ -293,7 +295,7 @@ const ParentAccount = (props) => {
 
   const profileStatus = useMemo(() => {
     const validParentProfile = validateParentProfile(profile);
-    return validParentProfile?.flag;
+    return validParentProfile?.partiallyCompleted;
   }, [profile]);
 
   const handleSwitch = () => {

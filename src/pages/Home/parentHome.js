@@ -29,7 +29,7 @@ import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import Strings from "../../constants/strings";
 import { showToast, validArray } from "../../utils/utils";
-import { decryptService } from "../../utils/storageFunc";
+import { decryptService, encryptService } from "../../utils/storageFunc";
 import {
   getServices,
   getUpcomingAppointments,
@@ -418,7 +418,7 @@ const ParentHome = (props) => {
   };
 
   const paginationDots = () => {
-    let paginationData = [...appointmentData, ...eventData]
+    let paginationData = [...appointmentData, ...eventData];
     return (
       <View style={styles.paginationContainer}>
         {paginationData?.map((_, index) => (
@@ -453,8 +453,9 @@ const ParentHome = (props) => {
     }
   };
 
-  const handleSwitch = () => {
+  const handleSwitch = async () => {
     if (profile?.providerProfile?.providerBusiness?.id) {
+      await encryptService("loggedInModule", LoginModules.provider);
       switchProfile();
     } else {
       setModal(true);

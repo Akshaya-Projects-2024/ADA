@@ -38,7 +38,7 @@ import {
 } from "../../constants/enums";
 import { useDispatch, useSelector } from "react-redux";
 import AppointmentCard from "../../components/AppointmentCard";
-import { decryptService } from "../../utils/storageFunc";
+import { decryptService, encryptService } from "../../utils/storageFunc";
 import {
   completeAppointment,
   confirmAppointment,
@@ -337,6 +337,7 @@ const Home = (props) => {
   const switchProfile = () => {
     const validParentProfile = validateParentProfile(profile);
     modal && setModal(false);
+    encryptService("loggedInModule", LoginModules.parent);
     if (validParentProfile?.flag) {
       navigateToParent(props.navigation);
     } else {
@@ -445,6 +446,7 @@ const Home = (props) => {
 
   const handleSwitch = () => {
     if (profile?.parentProfie?.parentContact?.id) {
+      encryptService("loggedInModule", LoginModules.parent);
       switchProfile();
     } else {
       setModal(true);

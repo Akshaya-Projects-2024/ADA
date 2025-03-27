@@ -15,7 +15,7 @@ import ModalDropdown from "../../components/ModalDropdown";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import Stepper from "../../components/Stepper";
-import { decryptService } from "../../utils/storageFunc";
+import { decryptService, encryptService } from "../../utils/storageFunc";
 import { saveBusinessDetails } from "../../redux-store/actions/auth";
 import { getServiceProviderRole } from "../../redux-store/actions/registerAction";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,6 +29,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
 import { useUser } from "../../api/UserContext";
 import { isValidName } from "../../utils/validation";
+import { LoginModules } from "../../constants/enums";
 
 const experienceData = [
   { id: "1", label: "1 Years" },
@@ -141,6 +142,7 @@ const BusinessDetail = (props) => {
         };
         const res = await saveBusinessDetails(postData);
         if (res?.data?.status_code == 200) {
+          await encryptService("loggedInModule", LoginModules.provider);
           if (route === "myprofile") {
             props.navigation.dispatch(StackActions.pop(1));
           } else {

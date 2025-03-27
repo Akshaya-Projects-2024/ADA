@@ -37,6 +37,11 @@ import { contextValue } from "../../components/Loader";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getNotificationToken } from "../../utils/pushNotificationUtils";
 import { validateInput } from "../../utils/validation";
+import { LoginModules } from "../../constants/enums";
+import {
+  navigateToParent,
+  navigateToServiceProvider,
+} from "../../navigations/rootNavigationRef";
 
 const OtpScreen = (props) => {
   const { top } = useSafeAreaInsets();
@@ -165,66 +170,21 @@ const OtpScreen = (props) => {
           setOtp(["", "", "", "", "", ""]);
           // dispatch(saveRegisterData(response?.data?.data)); No need
           dispatch(dispatchUserData(response?.data?.data));
-          const validProfile = validateParentProfile(response?.data?.data);
-          const validProviderProfile = validateServiceProfile(
-            response?.data?.data
-          );
-          if (validProfile?.flag && validProviderProfile?.flag) {
-            props.navigation.reset({
-              index: 0,
-              routes: [
-                {
-                  name: "auth",
-                  state: {
-                    routes: [
-                      {
-                        name: "home",
-                      },
-                    ],
-                  },
-                },
-              ],
-            });
-          } else if (
-            !validProfile?.flag &&
-            !validProfile?.partiallyCompleted &&
-            !validProviderProfile?.flag &&
-            !validProviderProfile?.partiallyCompleted
-          ) {
+          const loggedInModule = await decryptService("loggedInModule");
+          const userData = response?.data?.data?.logindetails;
+          if (loggedInModule) {
+            if (loggedInModule === LoginModules.parent) {
+              navigateToParent(props?.navigation);
+            } else {
+              navigateToServiceProvider(props?.navigation);
+            }
+          } else if (userData?.isparent && userData?.isprovider) {
             props?.navigation.replace("auth");
-          } else if (validProviderProfile?.flag) {
             props.navigation.reset({
-              index: 0,
-              routes: [
-                {
-                  name: "auth",
-                  state: {
-                    routes: [
-                      {
-                        name: "home",
-                      },
-                    ],
-                  },
-                },
-              ],
-            });
-          } else if (validProfile?.flag) {
-            props.navigation.reset({
-              index: 0,
-              routes: [{ name: "petParentAppStack" }],
-            });
-          } else if (
-            !validProviderProfile?.flag &&
-            validProviderProfile?.partiallyCompleted
-          ) {
-            showToast("error", "Please complete your registration");
-            props.navigation.navigate("auth", {
-              screen: validProviderProfile?.navigateTo,
-            });
-          } else if (!validProfile?.flag && validProfile?.partiallyCompleted) {
-            props.navigation.navigate(validProfile?.navigateTo, {
-              route: "parentAccount",
-            });
+          } else if (userData?.isparent) {
+            navigateToParent(props?.navigation);
+          } else if (userData?.isprovider) {
+            navigateToServiceProvider(props?.navigation);
           } else {
             props?.navigation.replace("auth");
           }
