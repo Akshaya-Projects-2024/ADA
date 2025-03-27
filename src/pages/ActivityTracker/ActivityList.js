@@ -113,22 +113,26 @@ export const ActivityList = (props) => {
               (x) => x.type == item.type && !x.iscustomise
             );
             if (arr.length) {
-              let obj = {
-                acitivityId: [],
-              };
-              arr.forEach((activity) => {
-                const activityName = activity.name
-                  ?.split(" ")[0]
-                  ?.toLowerCase();
-                activity.name = activity.type;
-                obj.acitivityId[ActivityType[item.type].idIndex[activityName]] =
-                  activity.id;
+              let list = {};
+              arr.map((x) => {
+                if (list[x.subname]) {
+                  list[x.subname].push(x);
+                } else {
+                  list[x.subname] = [x];
+                }
+              });
+              Object.keys(list).forEach((subname) => {
+                let obj = {
+                  acitivityId: [],
+                };
+                list[subname].map((activity) => {
+                  const activityName = activity.name
+                    ?.split(" ")[0]
+                    ?.toLowerCase();
+                  obj.acitivityId[
+                    ActivityType[activity.type].idIndex[activityName]
+                  ] = activity.id;
 
-                if (
-                  !obj.subname ||
-                  (obj.subname === activity.subname &&
-                    obj.duration === activity.duration)
-                ) {
                   Object.keys(activity).forEach((key) => {
                     const existingValue = obj[key];
                     const newValue = activity[key];
@@ -138,13 +142,10 @@ export const ActivityList = (props) => {
                       obj[key] = newValue;
                     }
                   });
-                } else {
-                  arr1.push(obj);
-                  obj = { ...activity };
-                }
+                });
+                obj["name"] = item.type;
+                arr1.push(obj);
               });
-              obj["name"] = item.type;
-              arr1.push(obj);
             } else {
               arr1.push(item);
             }
@@ -197,10 +198,10 @@ export const ActivityList = (props) => {
         }
       });
     }
-    if (item.iscustomise || item.copied) {
-      arr.splice(index, 1);
-    } else {
-      arr[index] = { ...DefaultActivityList[item.type] };
+    arr.splice(index, 1);
+    const activityExists = arr.filter((x) => x.type === item.type)?.length;
+    if (!activityExists && !item.iscustomise) {
+      arr.splice(index, 0, DefaultActivityList[item.type]);
     }
 
     contextValue.setLoader(false);
@@ -254,7 +255,7 @@ export const ActivityList = (props) => {
   const handleDayChange = useCallback(
     (day, index, isSelected) => {
       // Logic to update days
-      const currentDays = activityDataList[index].days;
+      const currentDays = activityDataList[index].days ? activityDataList[index].days : "" ;
       const newDays = isSelected
         ? currentDays.replace(`${day},`, "")
         : `${currentDays}${day},`;
@@ -506,17 +507,16 @@ export const ActivityList = (props) => {
             let id =
               item?.acitivityId?.[ActivityType?.[item.type]?.idIndex?.[key]];
 
-            if (item[key]) {
+            if (Boolean(item[key])) {
               let obj = {
                 ...item,
                 ...ActivityType[item.type]?.defaultValue[key],
                 name: ActivityType[item.type].activityLabel[key],
               };
               if (item.type == "Medication") {
-                if (["morning", "afternoon", "evening"].includes(key)) {
-                  obj["startdate"] = moment().format("YYYY-MM-DD");
+                if (key === "startdate" && item[key]) {
+                  obj["date"] = item[key];
                 }
-                obj["date"] = moment().format("YYYY-MM-DD");
               }
               delete obj["id"];
               if (id) {

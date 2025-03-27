@@ -142,9 +142,9 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   profileImage: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    width: moderateScale(56),
+    height: moderateScale(56),
+    borderRadius: moderateScale(28),
     backgroundColor: "#ddd",
     alignItems: "center",
     justifyContent: "center",
@@ -231,6 +231,11 @@ export const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.medium,
     color: "#757575",
     marginVertical: 5,
+  },
+  activityName: {
+    fontSize: THEMES.fonts.font14,
+    fontFamily: THEMES.fontFamily.medium,
+    color: THEMES.colors.black,
   },
   activityButton: {
     paddingVertical: 6,

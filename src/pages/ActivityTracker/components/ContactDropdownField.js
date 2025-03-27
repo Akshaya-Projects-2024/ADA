@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  TextInput,
 } from "react-native";
 import Modal from "react-native-modal";
 import ArrowDown from "../../../assets/svg/arrowDown.svg";
@@ -28,10 +29,12 @@ const ContactDropdown = (props) => {
     showScroll = false,
     customContainerStyle = {},
     label,
-    onDone
+    onDone,
   } = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedId, setSelectedId] = useState({});
+  const [filterData, setFilterData] = useState(data);
+  const [searchText, setSearchText] = useState("");
 
   const toggleRoleSelection = (item) => {
     const newSelectedValue = { ...selectedId };
@@ -90,7 +93,11 @@ const ContactDropdown = (props) => {
       {/* Button to open modal */}
       <TouchableOpacity
         style={[customContainerStyle]}
-        onPress={() => setModalVisible(true)}
+        onPress={() => {
+          setSearchText("");
+          setFilterData(data);
+          setModalVisible(true)
+        }}
       >
         <InputField
           placeholderText={placeholderText}
@@ -116,6 +123,7 @@ const ContactDropdown = (props) => {
         }}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
+        avoidKeyboard={true}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -136,13 +144,39 @@ const ContactDropdown = (props) => {
               </TouchableOpacity>
             </View>
 
+            <TextInput
+              style={{
+                borderWidth: 1,
+                borderColor: "#CFD3D4",
+                borderRadius: 8,
+                paddingHorizontal: 16,
+                backgroundColor: "#fff",
+                paddingVertical: 8,
+                fontSize: 16,
+                fontFamily: THEMES.fontFamily.regular,
+                marginBottom: 10,
+              }}
+              placeholder="Search"
+              onChangeText={(text) => {
+                setSearchText(text);
+                const filteredData = data.filter(
+                  (item) =>
+                    item.label.toLowerCase().includes(text.toLowerCase()) ||
+                    item.id.toLowerCase().includes(text.toLowerCase())
+                );
+                setFilterData(filteredData);
+              }}
+              value={searchText}
+            />
+
             <FlatList
-              data={data}
+              data={filterData}
               ListEmptyComponent={renderEmptyView}
               renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-              showsVerticalScrollIndicator={showScroll}
+              keyExtractor={(item) => item.id + item.label}
+              showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
+              keyboardShouldPersistTaps="always"
             />
             {multiSelect && (
               <View style={{ paddingTop: moderateScale(20) }}>

@@ -66,6 +66,7 @@ export const ActvityTrackerDashboard = (props) => {
     (state) => state?.commonReducer?.refreshActivityData
   );
   const isFocused = useIsFocused();
+  const [bound, setBound] = useState(0);
 
   useEffect(() => {
     if (petDetails?.length && selectedPet?.documents) {
@@ -140,6 +141,9 @@ export const ActvityTrackerDashboard = (props) => {
     const res = await getActivityDashboard({ userId, petId });
     if (res?.status === 200) {
       setDashboardData(res?.data?.data);
+      setTimeout(() => {
+        setBound(res?.data?.data?.bound);
+      },500);
     }
   };
 
@@ -164,14 +168,14 @@ export const ActvityTrackerDashboard = (props) => {
       petId: selectedPet?.id,
       parentid: logindetails?.userid,
       activityListData: filterActvity,
-      add: true,
+      isEdit: true,
     });
   };
 
   const getFilterAcivity = (item) => {
     const userActivity =
       activityListData.filter((x) => x.type == item.type) ?? [];
-
+    const activitySubname = item.subname;
     let arr1 = [];
 
     const staticActivityList = Object.values(DefaultActivityList);
@@ -206,7 +210,10 @@ export const ActvityTrackerDashboard = (props) => {
         arr1.push(obj);
       } else if (item.type === "Medication" || item.type === "Vaccination") {
         const arr = userActivity?.filter(
-          (x) => x.type == item.type && !x.iscustomise
+          (x) =>
+            x.type == item.type &&
+            !x.iscustomise &&
+            activitySubname == x.subname
         );
 
         if (arr.length) {
@@ -218,24 +225,15 @@ export const ActvityTrackerDashboard = (props) => {
             activity.name = activity.type;
             obj.acitivityId[ActivityType[item.type].idIndex[activityName]] =
               activity.id;
-            if (
-              !obj.subname ||
-              (obj.subname === activity.subname &&
-                obj.duration === activity.duration)
-            ) {
-              Object.keys(activity).forEach((key) => {
-                const existingValue = obj[key];
-                const newValue = activity[key];
-                if (newValue) {
-                  obj[key] = newValue ? newValue : existingValue;
-                } else if (!existingValue) {
-                  obj[key] = newValue;
-                }
-              });
-            } else {
-              arr1.push(obj);
-              obj = { ...activity };
-            }
+            Object.keys(activity).forEach((key) => {
+              const existingValue = obj[key];
+              const newValue = activity[key];
+              if (newValue) {
+                obj[key] = newValue ? newValue : existingValue;
+              } else if (!existingValue) {
+                obj[key] = newValue;
+              }
+            });
           });
           obj["name"] = item.type;
           arr1.push(obj);
@@ -256,7 +254,7 @@ export const ActvityTrackerDashboard = (props) => {
           activeOpacity={1}
           style={[styles.backRightBtn, styles.backRightBtnLeft]}
           onPress={() => {
-            closeRow(rowMap, item.id);
+            closeRow(rowMap, index);
             onCardPress(item);
           }}
         >
@@ -267,7 +265,7 @@ export const ActvityTrackerDashboard = (props) => {
           activeOpacity={1}
           style={[styles.backRightBtn, styles.backRightBtnRight]}
           onPress={() => {
-            closeRow(rowMap, item.id);
+            closeRow(rowMap, index);
             deleteRow(item);
           }}
         >
@@ -279,12 +277,15 @@ export const ActvityTrackerDashboard = (props) => {
     [closeRow, deleteRow, onCardPress]
   );
 
-  const updateActivity = async (item, status) => {
+  const updateActivity = async (item, status, value) => {
     if (
       weekList.todayDate !== weekList.selectedDate ||
-      moment().isBefore(moment(item[item.name.toLowerCase()], "HH:mm:ss"))
+      moment().isBefore(value)
     ) {
       showToast("error", "This activity is not started yet.");
+      return;
+    }
+    if (status == item?.activitystatus?.status) {
       return;
     }
     const userid = logindetails?.userid;
@@ -341,7 +342,7 @@ export const ActvityTrackerDashboard = (props) => {
           />
         )}
         <BondingSection
-          bound={dashboardData?.bound}
+          bound={bound}
           logindetails={logindetails}
           petImage={petImage}
         />
@@ -396,11 +397,11 @@ export const ActvityTrackerDashboard = (props) => {
             previewOpenDelay={1000}
             disableRightSwipe
             previewDuration={500}
-            previewRowKey="Walking"
+            previewRowKey="0"
             closeOnRowBeginSwipe
             closeOnScroll
             keyboardShouldPersistTaps="always"
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) => index.toString()}
             ListEmptyComponent={
               <View
                 style={[
@@ -411,11 +412,13 @@ export const ActvityTrackerDashboard = (props) => {
                   },
                 ]}
               >
-                <Text style={{
-                  fontSize: THEMES.fonts.font14,
-                  fontFamily: THEMES.fontFamily.medium,
-                  color: THEMES.colors.darkGrey,
-                }}>
+                <Text
+                  style={{
+                    fontSize: THEMES.fonts.font14,
+                    fontFamily: THEMES.fontFamily.medium,
+                    color: THEMES.colors.darkGrey,
+                  }}
+                >
                   No Activity added
                 </Text>
               </View>

@@ -32,29 +32,41 @@ const PetCarousel = ({ pets, onSelectPet, selectedPet }) => {
   return (
     <View style={styles.container}>
       {/* Fixed Selected Pet */}
-      <View style={[styles.fixedPetContainer]}>
-        <Text style={[styles.petText, styles.selectedText]}>
+      <View
+        style={[
+          pets?.length > 1 ? styles.fixedPetContainer : styles.singleView,
+        ]}
+      >
+        <Text
+          style={[
+            styles.petText,
+            styles.selectedText,
+            { textTransform: "capitalize" },
+          ]}
+        >
           {selectedPet.name}
         </Text>
       </View>
 
       {/* Scrollable Pet List (Excluding Selected Pet) */}
-      <FlatList
-        data={pets.filter((pet) => pet.id !== selectedPet.id)} // Exclude selected pet
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => handleSelectPet(item)}
-            activeOpacity={0.7}
-          >
-            <View style={styles.petItem}>
-              <Text style={styles.petText}>{item.name}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
-      />
+      {pets?.length > 1 && (
+        <FlatList
+          data={pets.filter((pet) => pet.id !== selectedPet.id)} // Exclude selected pet
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => handleSelectPet(item)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.petItem}>
+                <Text style={styles.petText}>{item.name}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      )}
     </View>
   );
 };
@@ -68,18 +80,18 @@ const styles = StyleSheet.create({
   fixedPetContainer: {
     width: "50%",
     alignItems: "flex-end",
-    paddingRight: 20
+    paddingRight: 20,
   },
   petItem: { alignItems: "center", marginHorizontal: 10 },
   petText: {
     color: "#000000",
     fontWeight: "400",
     opacity: 0.2,
-    fontSize: THEMES.fonts.font16,
+    fontSize: THEMES.fonts.font14,
     fontWeight: THEMES.fontFamily.semiBold,
   },
   selectedText: {
-    fontSize: THEMES.fonts.font16,
+    fontSize: THEMES.fonts.font18,
     fontWeight: THEMES.fontFamily.semiBold,
     color: "black",
     opacity: 1,
@@ -89,6 +101,10 @@ const styles = StyleSheet.create({
     backgroundColor: "blue",
     width: "100%",
     marginTop: 2,
+  },
+  singleView: {
+    alignItems: "center",
+    width: "100%",
   },
 });
 

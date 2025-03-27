@@ -5,16 +5,17 @@ import ProfileDummy from "../../../assets/svg/user.svg";
 import { THEMES } from "../../../assets/theme/themes";
 import { styles } from "./styles";
 import HeartAnimation from "../../../components/HeartAnimation";
+import { moderateScale } from "react-native-size-matters";
 
-export const BondingSection = memo(({ logindetails, petImage,bound }) => (
+export const BondingSection = ({ logindetails, petImage,bound }) => (
   <View style={styles.bondingContainer}>
     <View style={styles.bondingImagesContainer}>
       <View
         style={{
-          width: 50,
-          height: 50,
+          width: moderateScale(60),
+          height: moderateScale(60),
           borderWidth: 1,
-          borderRadius: 25,
+          borderRadius: moderateScale(30),
           backgroundColor: THEMES.colors.lightGrey,
           justifyContent: "center",
           alignItems: "center",
@@ -32,14 +33,14 @@ export const BondingSection = memo(({ logindetails, petImage,bound }) => (
         )}
       </View>
       <View style={styles.bondingDivider}>
-        <HeartAnimation size={78} percentage={bound ?? 0} />
+        <HeartAnimation percentage={bound} />
       </View>
       <View
         style={{
-          width: 50,
-          height: 50,
+          width: moderateScale(60),
+          height: moderateScale(60),
           borderWidth: 1,
-          borderRadius: 25,
+          borderRadius: moderateScale(30),
           backgroundColor: THEMES.colors.lightGrey,
           justifyContent: "center",
           alignItems: "center",
@@ -66,4 +67,4 @@ export const BondingSection = memo(({ logindetails, petImage,bound }) => (
       />
     </View>
   </View>
-));
+);

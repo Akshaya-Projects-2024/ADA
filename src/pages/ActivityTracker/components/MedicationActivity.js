@@ -82,15 +82,21 @@ export const MedicationActivity = memo(
               }
               data={MedicineQuantityList}
               noPadding
-              customContainerStyle={styles.dropdownContainer}
               title="Select Quantity"
+              customStyle={{
+                container: styles.dropdownContainer,
+                innerContainer: { flexDirection: "row" },
+              }}
             />
           </View>
           <View style={{ width: "47%" }}>
             <ModalDropdown
               data={DurationList}
               noPadding
-              customContainerStyle={styles.dropdownContainer}
+              customStyle={{
+                container: styles.dropdownContainer,
+                innerContainer: { flexDirection: "row" },
+              }}
               title="Select Duration"
               selectedValue={
                 item?.duration

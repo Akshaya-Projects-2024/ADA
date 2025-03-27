@@ -42,7 +42,7 @@ export const ActivityList = (props) => {
 
   const parentid = props?.route?.params?.parentid;
   const petId = props?.route?.params?.petId;
-  const add = props?.route?.params?.add;
+  const isEdit = props?.route?.params?.isEdit;
 
   const [errors, setError] = useState({});
   const [isSubmitPressed, setIsSubmitPressed] = useState();
@@ -118,22 +118,26 @@ export const ActivityList = (props) => {
               (x) => x.type == item.type && !x.iscustomise
             );
             if (arr.length) {
-              let obj = {
-                acitivityId: [],
-              };
-              arr.forEach((activity) => {
-                const activityName = activity.name
-                  ?.split(" ")[0]
-                  ?.toLowerCase();
-                activity.name = activity.type;
-                obj.acitivityId[ActivityType[item.type].idIndex[activityName]] =
-                  activity.id;
+              let list = {};
+              arr.map((x) => {
+                if (list[x.subname]) {
+                  list[x.subname].push(x);
+                } else {
+                  list[x.subname] = [x];
+                }
+              });
+              Object.keys(list).forEach((subname) => {
+                let obj = {
+                  acitivityId: [],
+                };
+                list[subname].map((activity) => {
+                  const activityName = activity.name
+                    ?.split(" ")[0]
+                    ?.toLowerCase();
+                  obj.acitivityId[
+                    ActivityType[activity.type].idIndex[activityName]
+                  ] = activity.id;
 
-                if (
-                  !obj.subname ||
-                  (obj.subname === activity.subname &&
-                    obj.duration === activity.duration)
-                ) {
                   Object.keys(activity).forEach((key) => {
                     const existingValue = obj[key];
                     const newValue = activity[key];
@@ -143,13 +147,10 @@ export const ActivityList = (props) => {
                       obj[key] = newValue;
                     }
                   });
-                } else {
-                  arr1.push(obj);
-                  obj = { ...activity };
-                }
+                });
+                obj["name"] = item.type;
+                arr1.push(obj);
               });
-              obj["name"] = item.type;
-              arr1.push(obj);
             } else {
               arr1.push(item);
             }
@@ -161,7 +162,6 @@ export const ActivityList = (props) => {
       }
     } catch (error) {
       contextValue?.setLoader(false);
-      console.log("error", error);
     }
   };
 
@@ -260,7 +260,9 @@ export const ActivityList = (props) => {
   const handleDayChange = useCallback(
     (day, index, isSelected) => {
       // Logic to update days
-      const currentDays = activityDataList[index].days;
+      const currentDays = activityDataList[index].days
+        ? activityDataList[index].days
+        : "";
       const newDays = isSelected
         ? currentDays.replace(`${day},`, "")
         : `${currentDays}${day},`;
@@ -279,6 +281,10 @@ export const ActivityList = (props) => {
       const formattedTimeFormat = moment(date).format("A");
 
       handleDataChange(index, {
+        // [key]:
+        //   key === "time"
+        //     ? formattedTime
+        //     : `${formattedTime} ${formattedTimeFormat}`,
         [key]: formattedTime,
         timeFormat: formattedTimeFormat,
       });
@@ -509,17 +515,16 @@ export const ActivityList = (props) => {
             let id =
               item?.acitivityId?.[ActivityType?.[item.type]?.idIndex?.[key]];
 
-            if (item[key]) {
+            if (Boolean(item[key])) {
               let obj = {
                 ...item,
                 ...ActivityType[item.type]?.defaultValue[key],
                 name: ActivityType[item.type].activityLabel[key],
               };
               if (item.type == "Medication") {
-                if (["morning", "afternoon", "evening"].includes(key)) {
-                  obj["startdate"] = moment().format("YYYY-MM-DD");
+                if (key === "startdate" && item[key]) {
+                  obj["date"] = item[key];
                 }
-                obj["date"] = moment().format("YYYY-MM-DD");
               }
               delete obj["id"];
               if (id) {
@@ -543,17 +548,20 @@ export const ActivityList = (props) => {
         parentid,
         activities: arr1,
       };
-      console.log(obj);
-      const res = await saveActivity(obj);
-
-      if (res.status == 200) {
+      try {
+        const res = await saveActivity(obj);
+        if (res.status == 200) {
+          contextValue.setLoader(false);
+          dispatch(updateActivityData());
+          showToast("success", "Activity added successfully");
+          isEdit ? props?.navigation?.goBack() : props?.navigation?.pop(2);
+        } else {
+          contextValue.setLoader(false);
+          showToast("error", res?.data?.message);
+        }
+      } catch (error) {
         contextValue.setLoader(false);
-        dispatch(updateActivityData());
-        showToast("success", "Activity added successfully");
-        props?.navigation?.goBack();
-      } else {
-        contextValue.setLoader(false);
-        showToast("error", res?.data?.message);
+        showToast("error", error?.message);
       }
     }
   };
@@ -562,7 +570,7 @@ export const ActivityList = (props) => {
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor={THEMES.colors.bgColor} />
       <Header
-        title={!add ? "Add Activity" : "Update Activity"}
+        title={isEdit ? "Update Activity" : "Add Activity"}
         showBack
         bgColor="transparent"
       />

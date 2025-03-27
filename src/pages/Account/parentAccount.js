@@ -25,7 +25,7 @@ import AboutUs from "../../assets/svg/aboutUs.svg";
 import Strings from "../../constants/strings";
 import { moderateScale } from "react-native-size-matters";
 import Activity from "../../assets/svg/activity.svg";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   validateParentProfile,
   validateServiceProfile,
@@ -33,7 +33,7 @@ import {
 import ProfileDummy from "../../assets/svg/user.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
-import { deleteAccountApi } from "../../redux-store/actions/auth";
+import { deleteAccountApi, getProfile } from "../../redux-store/actions/auth";
 import { navigate, resetNavigation } from "../../navigations/rootNavigationRef";
 import { showToast, validArray } from "../../utils/utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -42,6 +42,8 @@ import TouchableButtonWithPermission from "../../components/TouchableButtonWithP
 import { decryptService, encryptService } from "../../utils/storageFunc";
 import Badge from "../../assets/svg/badgeCheck.svg";
 import HeaderWithSearch from "./featureSearch";
+import { useIsFocused } from "@react-navigation/native";
+import { fetchUserProfileData } from "../../redux-store/actions/registerAction";
 
 const MenuItem = ({
   bgColor,
@@ -85,6 +87,8 @@ const ParentAccount = (props) => {
   const [deleteAccountModal, setDeleteAccountModal] = useState(false);
   const [loogutModal, setLogoutModal] = useState(false);
   const [featureList, setFeatureList] = useState([]);
+  const isFocused = useIsFocused();
+  const dispatch = useDispatch();
 
   const handleDeleteAccount = async () => {
     try {
@@ -192,6 +196,10 @@ const ParentAccount = (props) => {
       },
     ]);
   }, [profile]);
+
+  useEffect(() => {
+    dispatch(fetchUserProfileData())
+  },[isFocused])
 
   const renderItem = (
     bgColor,

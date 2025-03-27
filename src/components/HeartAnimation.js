@@ -12,7 +12,7 @@ import Svg, {
 } from "react-native-svg";
 import { Easing } from "react-native";
 
-const HeartAnimation = ({ size = 100, percentage = 20 }) => {
+const HeartAnimation = ({ size = 78, percentage = 0 }) => {
   const fillHeight = useRef(new Animated.Value(71)).current;
   const AnimatedRect = Animated.createAnimatedComponent(Rect);
 
@@ -20,10 +20,13 @@ const HeartAnimation = ({ size = 100, percentage = 20 }) => {
     const targetHeight = 71 - (percentage / 100) * 71;
     Animated.timing(fillHeight, {
       toValue: targetHeight,
-      duration: 1500,
+      duration: 3000,
       easing: Easing.inOut(Easing.ease),
       useNativeDriver: true,
     }).start();
+    // return () => {
+    //   fillHeight.setValue(71);
+    // }
   }, [percentage]);
 
   return (
