@@ -158,7 +158,8 @@ const ParentAccount = (props) => {
       },
       {
         label: "Reviews",
-        onPress: () => navigate("serviceListReviews", { route: "parentAccount" }),
+        onPress: () =>
+          navigate("serviceListReviews", { route: "parentAccount" }),
       },
       {
         label: Strings.paymentSubScription,
@@ -199,8 +200,8 @@ const ParentAccount = (props) => {
   }, [profile]);
 
   useEffect(() => {
-    dispatch(fetchUserProfileData())
-  },[isFocused])
+    dispatch(fetchUserProfileData());
+  }, [isFocused]);
 
   const renderItem = (
     bgColor,
@@ -406,7 +407,13 @@ const ParentAccount = (props) => {
                     showPending={false}
                     addBottom={"addBottom"}
                     onPress={() => {
-                      navigate("actvityTrackerDashboard", { route: "parentAccount" });
+                      if(validArray(profile?.parentProfie?.petDetails)) {
+                        navigate("actvityTrackerDashboard", {
+                          route: "parentAccount",
+                        });
+                      } else {
+                        showToast("error", "Please add pet profile first.");
+                      }
                     }}
                   />
                 </View>
@@ -629,7 +636,7 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font16,
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.bold,
-    textAlign:'center'
+    textAlign: "center",
   },
   nameView: {
     alignItems: "center",
