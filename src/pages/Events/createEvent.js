@@ -142,7 +142,6 @@ const CreateEvent = () => {
         data.push({ ...item, id: res?.data?.data?.reqId });
         setPosterImg(data);
         contextValue?.setLoader(false);
-        showToast("success", "Successfully uploaded the image");
       }
     } catch (error) {
       showToast("error", error.message);
@@ -170,7 +169,6 @@ const CreateEvent = () => {
         const removeItemById = posterImg?.filter((it) => it?.id !== doc?.id);
         setPosterImg(removeItemById);
         contextValue?.setLoader(false);
-        showToast("success", "Successfully deleted the image");
       }
     } catch (error) {
       contextValue?.setLoader(false);

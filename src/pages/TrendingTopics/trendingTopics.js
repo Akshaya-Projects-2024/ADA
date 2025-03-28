@@ -66,7 +66,7 @@ const TrendingTopics = (props) => {
     return (
       <TouchableButtonWithPermission
         customMsgForRegistration={
-          "Get Registered and subscribe to enjoy all exciting features of ADA app."
+          "Registered and Subscribed to enjoy all the exciting features of ADA app."
         }
         onPress={() =>
           props.navigation.navigate("trendDetail", { selectedData: item })
@@ -133,7 +133,7 @@ const TrendingTopics = (props) => {
     return (
       <TouchableButtonWithPermission
         customMsgForRegistration={
-          "Get Registered and subscribe to enjoy all exciting features of ADA app."
+          "Registered and Subscribed to enjoy all the exciting features of ADA app."
         }
         onPress={() =>
           props.navigation.navigate("trendDetail", { selectedData: item })
@@ -282,7 +282,12 @@ const TrendingTopics = (props) => {
               paddingTop: moderateScale(13),
             }}
           >
-            <View style={{ width: loggedInModule === LoginModules.provider ?  "87%" : '100%' }}>
+            <View
+              style={{
+                width:
+                  loggedInModule === LoginModules.provider ? "87%" : "100%",
+              }}
+            >
               <TouchableOpacity
                 onPress={() =>
                   props.navigation.navigate("auth", {

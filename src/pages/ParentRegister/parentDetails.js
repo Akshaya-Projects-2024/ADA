@@ -137,7 +137,6 @@ const ParentDetails = (props) => {
     try {
       const res = await uploadParentDocument(postData);
       if (res?.status == 200) {
-        showToast("success", "Successfully uploaded the image");
       }
     } catch (error) {
       showToast("error", error.message);

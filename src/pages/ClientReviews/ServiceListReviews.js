@@ -94,7 +94,7 @@ const ServiceListReviews = ({ navigation, route }) => {
     );
     return (
       <TouchableButtonWithPermission
-        customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+        customMsgForRegistration="Please complete parent profile and subscribe to get best services for your lovely pets."
         customMsgForPayment="Please  subscribe to get best services for your lovely pets."
         onPress={() =>
           navigation.navigate("parentReviews", { selectedItem: item })

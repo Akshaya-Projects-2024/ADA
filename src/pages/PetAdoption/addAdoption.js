@@ -139,7 +139,6 @@ const AddAdoption = (props) => {
         const data = [...petImage];
         data.push({ ...item, id: res?.data?.data?.reqId });
         setPetImage(data);
-        showToast("success", "Successfully uploaded the image");
       }
     } catch (error) {
       showToast("error", error.message);
@@ -263,7 +262,6 @@ const AddAdoption = (props) => {
       if (res?.status === 200) {
         const removeItemById = petImage?.filter((it) => it?.id !== doc?.id);
         setPetImage(removeItemById);
-        showToast("success", "Successfully deleted the image");
       }
     } catch (error) {
       showToast("error", error.message);
@@ -362,6 +360,7 @@ const AddAdoption = (props) => {
                 setSelectedValue={setSelectedBreed}
                 selectedValue={selectedBreed}
                 multiSelect={false}
+                customMsg="Please select category first"
               />
             </View>
 

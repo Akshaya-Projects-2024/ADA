@@ -426,7 +426,7 @@ const PaymentsSubscription = (props) => {
             <View style={styles.paymentDetailsView}>
               <TouchableButtonWithPermission
                 customMsgForRegistration={
-                  "Get Registered and subscribe to enjoy all exciting features of ADA app."
+                  "Registered and Subscribed to enjoy all the exciting features of ADA app."
                 }
                 onPress={() => props.navigation.navigate("paymentDetails")}
                 style={styles.paymentDetailsBtn}
@@ -654,7 +654,7 @@ const PaymentsSubscription = (props) => {
                 >
                   <TouchableButtonWithPermission
                     customMsgForRegistration={
-                      "Get Registered and subscribe to enjoy all exciting features of ADA app."
+                      "Registered and Subscribed to enjoy all the exciting features of ADA app."
                     }
                     useButton={true}
                     onPress={handlePayment}

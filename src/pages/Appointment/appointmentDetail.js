@@ -130,10 +130,12 @@ const AppointmentDetail = (props) => {
                   <Text style={styles.petDescription}>
                     {appointmentData?.petdetails?.about}
                   </Text>
-                  <View style={styles.medicalDocView}>
-                    <Text style={styles.medicalText}>Medical documents</Text>
-                    <RightArrow stroke="#000" />
-                  </View>
+                  {Boolean(document?.length) && (
+                    <View style={styles.medicalDocView}>
+                      <Text style={styles.medicalText}>Medical documents</Text>
+                      <RightArrow stroke="#000" />
+                    </View>
+                  )}
 
                   <View style={styles.documentView}>
                     <ScrollView
@@ -164,9 +166,11 @@ const AppointmentDetail = (props) => {
                         })}
                     </ScrollView>
                   </View>
-                  <View style={styles.moreView}>
-                    <More />
-                  </View>
+                  {Boolean(document?.length) && (
+                    <View style={styles.moreView}>
+                      <More />
+                    </View>
+                  )}
 
                   <View style={styles.cardView}>
                     <View style={styles.imgView}>

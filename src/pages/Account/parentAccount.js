@@ -558,7 +558,7 @@ const ParentAccount = (props) => {
         />
         <Dialog
           flag={modal}
-          title={"Info"}
+          title={"Switch Profile"}
           description={"Do you want to register as Service Provider?"}
           rightButtonText="Yes"
           leftButtonText="Close"
