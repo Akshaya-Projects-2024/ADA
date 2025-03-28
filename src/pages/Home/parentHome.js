@@ -438,9 +438,10 @@ const ParentHome = (props) => {
     );
   };
 
-  const switchProfile = () => {
+  const switchProfile = async () => {
     const validProviderProfile = validateServiceProfile(profile);
     modal && setModal(false);
+    await encryptService("loggedInModule", LoginModules.provider);
     if (validProviderProfile?.flag) {
       navigateToServiceProvider(props.navigation);
     } else {

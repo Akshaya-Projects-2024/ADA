@@ -446,7 +446,6 @@ const Home = (props) => {
 
   const handleSwitch = () => {
     if (profile?.parentProfie?.parentContact?.id) {
-      encryptService("loggedInModule", LoginModules.parent);
       switchProfile();
     } else {
       setModal(true);
