@@ -120,9 +120,6 @@ const Splash = (props) => {
       })
     );
 
-  const navigateToAuth = (screen) =>
-    delay(() => props.navigation.replace("auth", { screen }));
-
   const checkIfUserExits = useCallback(async () => {
     const data = await decryptService("accessToken");
     const loggedInModule = await getLoggedInMoodule();
@@ -130,49 +127,21 @@ const Splash = (props) => {
     if (Boolean(data)) {
       const userData = await initData();
       if (userData) {
-        const validProfile = validateParentProfile(userData);
-        const validProviderProfile = validateServiceProfile(userData); //pass true as an argument for testing purpose till payment part is done
-        const isProviderRegisterLater = await decryptService(
-          "isPetProviderRegisterLater"
-        );
-        const isPetParentRegisterLater = await decryptService(
-          "isPetParentRegisterLater"
-        );
-        if (validProfile?.flag && validProviderProfile?.flag) {
-          if (loggedInModule && loggedInModule === LoginModules.parent) {
+        if (loggedInModule) {
+          if (loggedInModule === LoginModules.parent) {
             navigateToParentApp();
           } else {
             navigateToHome();
           }
-        } else if (validProviderProfile?.flag && loggedInModule === "provider") {
-          navigateToHome();
-        } else if (validProfile?.flag && loggedInModule === "parent") {
+        } else if (
+          userData?.logindetails?.isparent &&
+          userData?.logindetails?.isprovider
+        ) {
+          delay(() => props?.navigation.replace("auth"));
+        } else if (userData?.logindetails?.isparent) {
           navigateToParentApp();
-        } else if (
-          (!validProviderProfile?.flag &&
-            validProviderProfile?.partiallyCompleted) ||
-          loggedInModule === "provider"
-        ) {
-          if (isProviderRegisterLater == false) {
-            showToast("error", "Please complete your registration");
-            delay(() =>
-              props.navigation.replace("auth", {
-                screen: validProviderProfile?.navigateTo,
-              })
-            );
-          } else {
-            navigateToHome();
-          }
-        } else if (
-          (!validProfile?.flag && validProfile?.partiallyCompleted) ||
-          loggedInModule === "parent"
-        ) {
-          if (isPetParentRegisterLater == false) {
-            showToast("error", "Please complete your registration");
-            navigateToAuth(validProfile?.navigateTo);
-          } else {
-            navigateToParentApp();
-          }
+        } else if (userData?.logindetails?.isprovider) {
+          navigateToHome();
         } else {
           delay(() => props?.navigation.replace("auth"));
         }

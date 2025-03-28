@@ -44,6 +44,7 @@ import Badge from "../../assets/svg/badgeCheck.svg";
 import HeaderWithSearch from "./featureSearch";
 import { useIsFocused } from "@react-navigation/native";
 import { fetchUserProfileData } from "../../redux-store/actions/registerAction";
+import { LoginModules } from "../../constants/enums";
 
 const MenuItem = ({
   bgColor,
@@ -157,7 +158,8 @@ const ParentAccount = (props) => {
       },
       {
         label: "Reviews",
-        onPress: () => navigate("serviceListReviews", { route: "parentAccount" }),
+        onPress: () =>
+          navigate("serviceListReviews", { route: "parentAccount" }),
       },
       {
         label: Strings.paymentSubScription,
@@ -198,8 +200,8 @@ const ParentAccount = (props) => {
   }, [profile]);
 
   useEffect(() => {
-    dispatch(fetchUserProfileData())
-  },[isFocused])
+    dispatch(fetchUserProfileData());
+  }, [isFocused]);
 
   const renderItem = (
     bgColor,
@@ -264,9 +266,10 @@ const ParentAccount = (props) => {
     }
   };
 
-  const switchProfile = () => {
+  const switchProfile = async () => {
     const validProviderProfile = validateServiceProfile(profile);
     modal && setModal(false);
+    await encryptService("loggedInModule", LoginModules.provider);
     if (validProviderProfile?.flag) {
       props.navigation.reset({
         index: 0,
@@ -293,7 +296,7 @@ const ParentAccount = (props) => {
 
   const profileStatus = useMemo(() => {
     const validParentProfile = validateParentProfile(profile);
-    return validParentProfile?.flag;
+    return validParentProfile?.partiallyCompleted;
   }, [profile]);
 
   const handleSwitch = () => {
@@ -404,7 +407,13 @@ const ParentAccount = (props) => {
                     showPending={false}
                     addBottom={"addBottom"}
                     onPress={() => {
-                      navigate("actvityTrackerDashboard", { route: "parentAccount" });
+                      if(validArray(profile?.parentProfie?.petDetails)) {
+                        navigate("actvityTrackerDashboard", {
+                          route: "parentAccount",
+                        });
+                      } else {
+                        showToast("error", "Please add pet profile first.");
+                      }
                     }}
                   />
                 </View>
@@ -627,7 +636,7 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font16,
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.bold,
-    textAlign:'center'
+    textAlign: "center",
   },
   nameView: {
     alignItems: "center",

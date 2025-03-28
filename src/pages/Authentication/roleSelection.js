@@ -14,7 +14,7 @@ import Tick from "../../assets/svg/check-circle.svg";
 import Button from "../../components/Button";
 import Modal from "react-native-modal";
 import Cross from "../../assets/svg/cross.svg";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { dispathGuestUser } from "../../redux-store/actions/userActions";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { decryptService, encryptService } from "../../utils/storageFunc";
@@ -24,6 +24,7 @@ const RoleSelection = (props) => {
   const dispatch = useDispatch();
   const [selected, setSelected] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
+  const { logindetails } = useSelector((state) => state?.commonReducer);
 
   const onLaterPressed = (type) => {
     dispatch(dispathGuestUser(true));
@@ -121,7 +122,7 @@ const RoleSelection = (props) => {
               onPress={async () => {
                 setSelected("parent");
                 const val = await decryptService("isPetParentRegisterLater");
-                if (!val) {
+                if (!val && !Boolean(logindetails?.isparent)) {
                   setModalVisible(true);
                 } else {
                   onLaterPressed("parent");
@@ -183,7 +184,7 @@ const RoleSelection = (props) => {
               onPress={async () => {
                 setSelected("service");
                 const val = await decryptService("isPetProviderRegisterLater");
-                if (!val) {
+                if (!val && !Boolean(logindetails?.isprovider)) {
                   setModalVisible(true);
                 } else {
                   onLaterPressed("service");
@@ -310,7 +311,11 @@ const RoleSelection = (props) => {
                     textColor="#000"
                     onlyBorder
                     title="Later"
-                    onPress={() => {
+                    onPress={async () => {
+                      await encryptService(
+                        "loggedInModule",
+                        selected == "service" ? "provider" : "parent"
+                      );
                       encryptService(
                         selected == "service"
                           ? "isPetProviderRegisterLater"

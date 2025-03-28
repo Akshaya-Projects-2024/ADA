@@ -146,7 +146,7 @@ export const ActvityTrackerDashboard = (props) => {
       // } else {
         setTimeout(() => {
           setBound(res?.data?.data?.bound);
-        }, 500);
+        }, 700);
       // }
     }
   };

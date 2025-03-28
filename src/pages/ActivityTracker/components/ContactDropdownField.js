@@ -163,6 +163,7 @@ const ContactDropdown = (props) => {
                 fontSize: 16,
                 fontFamily: THEMES.fontFamily.regular,
                 marginBottom: 10,
+                color: THEMES.colors.black,
               }}
               placeholder="Search"
               onChangeText={(text) => {

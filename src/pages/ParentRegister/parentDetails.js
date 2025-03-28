@@ -19,7 +19,7 @@ import User from "../../assets/svg/user.svg";
 import Pencil from "../../assets/svg/pencil.svg";
 import Location from "../../assets/svg/location.svg";
 import UploadImageModal from "../../components/UploadImageModal";
-import { decryptService } from "../../utils/storageFunc";
+import { decryptService, encryptService } from "../../utils/storageFunc";
 import {
   getProfile,
   saveParentDetails,
@@ -38,6 +38,7 @@ import {
   validateIndianPostalCode,
   validateInput,
 } from "../../utils/validation";
+import { LoginModules } from "../../constants/enums";
 
 const ParentDetails = (props) => {
   const route = props?.route?.params?.route;
@@ -85,7 +86,7 @@ const ParentDetails = (props) => {
     };
   }, []);
 
-  const initData = async() => {
+  const initData = async () => {
     let userId = await decryptService("userId");
     let input = validateInput(userId);
 
@@ -198,6 +199,7 @@ const ParentDetails = (props) => {
         const res = await saveParentDetails(postData);
         if (res?.data?.status_code == 200) {
           if (route === "parentAccount") {
+            await encryptService("loggedInModule", LoginModules.parent);
             props.navigation.dispatch(StackActions.pop(1));
           } else {
             props.navigation.navigate(
