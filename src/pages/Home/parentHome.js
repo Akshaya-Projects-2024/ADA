@@ -158,7 +158,7 @@ const ParentHome = (props) => {
   const renderTrendingItem = ({ item, index }) => {
     return (
       <TouchableButtonWithPermission
-        customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+        customMsgForRegistration="Please complete parent profile and subscribe to get best services for your lovely pets."
         customMsgForPayment="Please subscribe to get best services for your lovely pets."
         onPress={() =>
           props.navigation.navigate("trendDetail", { selectedData: item })
@@ -226,7 +226,7 @@ const ParentHome = (props) => {
       <View key={`${item?.id}_${index}`}>
         {item.type == "banner" ? (
           <TouchableButtonWithPermission
-            customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+            customMsgForRegistration="Please complete parent profile and subscribe to get best services for your lovely pets."
             customMsgForPayment="Please subscribe to get best services for your lovely pets."
             onPress={() => props.navigation.navigate("upComingEvents")}
             style={{
@@ -641,7 +641,7 @@ const ParentHome = (props) => {
             ? serviceListData?.map((item, index) => {
                 return (
                   <TouchableButtonWithPermission
-                    customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
+                    customMsgForRegistration="Please complete parent profile and subscribe to get best services for your lovely pets."
                     customMsgForPayment="Please subscribe to get best services for your lovely pets."
                     style={styles.itemContainer}
                     onPress={() =>
@@ -693,7 +693,7 @@ const ParentHome = (props) => {
         ) : null}
         <Dialog
           flag={Boolean(modal)}
-          title={"Info"}
+          title={"Switch Profile"}
           description={"Do you want to register as Service Provider?"}
           rightButtonText="Yes"
           leftButtonText="Close"

@@ -93,7 +93,6 @@ const OtherLostPetAlert = (props) => {
         dataId.push({ id: res?.data?.data?.reqId });
         setPetId(dataId);
         contextValue?.setLoader(false);
-        showToast("success", "Successfully uploaded the image");
       }
     } catch (error) {
       contextValue?.setLoader(false);
@@ -231,7 +230,6 @@ const OtherLostPetAlert = (props) => {
         const removeId = petImage.filter((it) => it?.id !== doc?.id);
         setPetId(removeId);
         setPetImage(removeItemById);
-        showToast("success", "Successfully deleted the image");
       }
     } catch (error) {
       showToast("error", error.message);

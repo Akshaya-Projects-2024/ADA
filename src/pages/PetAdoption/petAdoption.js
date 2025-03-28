@@ -137,7 +137,7 @@ const PetAdoption = (props) => {
     return (
       <TouchableButtonWithPermission
         customMsgForRegistration={
-          "Get Registered and subscribe to enjoy all exciting features of ADA app."
+          "Registered and Subscribed to enjoy all the exciting features of ADA app."
         }
         onPress={() => handlePremiumActionPressed(item)}
         style={{
@@ -272,7 +272,7 @@ const PetAdoption = (props) => {
 
                 <TextInput
                   style={styles.searchBar}
-                  placeholder="Search..."
+                  placeholder="Search (Type 3 letters to search)..."
                   placeholderTextColor={"#000"}
                   value={searchText}
                   onChangeText={handleSearchChange}
@@ -306,8 +306,7 @@ const PetAdoption = (props) => {
                   </Text>
                 </TouchableOpacity> */}
             </View>
-
-            {loggedInModule === LoginModules.parent && !guestUser ? (
+            {loggedInModule === LoginModules.parent ? (
               <TouchableButtonWithPermission
                 onPress={() =>
                   props.navigation.navigate("auth", {
@@ -430,7 +429,7 @@ const PetAdoption = (props) => {
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
               ListEmptyComponent={EmptyContentView}
-              contentContainerStyle={{flexGrow:1}}
+              contentContainerStyle={{ flexGrow: 1 }}
             />
           </View>
         </View>

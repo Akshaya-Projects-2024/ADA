@@ -207,10 +207,10 @@ const ClientReview = () => {
             </View>
           </View>
         </View>
-        {/* <View style={styles.dropdownMainView}>
+     <View style={styles.dropdownMainView}>
           <View style={styles.dropDownRow}>
             <View style={styles.w35}>
-              <Dropdown
+              {/* <Dropdown
                 dropdownData={[
                   { label: "All Rating", value: "1" },
                   { label: "1 Star", value: "2" },
@@ -219,7 +219,7 @@ const ClientReview = () => {
                   { label: "4 Star", value: "5" },
                   { label: "5 Star", value: "6" },
                 ]}
-              />
+              /> */}
             </View>
             <View style={styles.w40}>
               <Dropdown
@@ -233,7 +233,7 @@ const ClientReview = () => {
               />
             </View>
           </View>
-        </View> */}
+        </View> 
       </>
     );
   };
@@ -259,7 +259,7 @@ const ClientReview = () => {
     }
   }, [isModalVisible]);
 
-  initData = async (pageNum, reset = false) => {
+ const initData = async (pageNum, reset = false) => {
     try {
       if (!hasMore && !reset) return;
       if (reset) setLoading(true);
@@ -391,31 +391,7 @@ const ClientReview = () => {
         ) : (
           <EmptyContentView />
         )}
-        {/* {globalReviews?.length && !loading ? (
-          <View style={styles.mainView}>
-            {loading ? (
-              <ActivityIndicator size="large" color="blue" />
-            ) : (
-              <FlatList
-                data={globalReviews}
-                showsVerticalScrollIndicator={false}
-                bounces={false}
-                ListHeaderComponent={listHeader}
-                renderItem={renderItem}
-                onEndReached={() => initData(page)}
-                onEndReachedThreshold={0.5}
-                keyExtractor={(item) => item.id}
-                ListFooterComponent={
-                  loadingMore ? (
-                    <ActivityIndicator size="small" color="gray" />
-                  ) : null
-                }
-              />
-            )}
-          </View>
-        ) : (
-          EmptyContentView()
-        )} */}
+       
 
         <Modal
           animationType="none"
@@ -618,7 +594,6 @@ const styles = StyleSheet.create({
     elevation: 5,
     overflow: "hidden",
     borderRadius: 12,
-    marginBottom: moderateScale(20),
   },
   headerRow: {
     flexDirection: "row",

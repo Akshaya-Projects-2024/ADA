@@ -265,7 +265,7 @@ const MyAccount = (props) => {
     return (
       <TouchableButtonWithPermission
         customMsgForRegistration={
-          "Get Registered and subscribe to enjoy all exciting features of ADA app."
+          "Registered and Subscribed to enjoy all the exciting features of ADA app."
         }
         checkPermission={checkPermission}
         onPress={() => {
@@ -556,7 +556,7 @@ const MyAccount = (props) => {
         />
         <Dialog
           flag={modal}
-          title={"Info"}
+          title={"Switch Profile"}
           description={"Do you want to register as Pet Parent?"}
           rightButtonText="Yes"
           leftButtonText="Close"

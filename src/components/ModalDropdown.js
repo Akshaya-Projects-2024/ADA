@@ -25,6 +25,7 @@ const ModalDropdown = (props) => {
     noPadding,
     showScroll = false,
     customStyle = {},
+    customMsg =""
   } = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedId, setSelectedId] = useState(false);
@@ -86,7 +87,10 @@ const ModalDropdown = (props) => {
             color: THEMES.colors.black,
           }}
         >
-          No Data Available
+          {
+            customMsg ? customMsg : " No Data Available"
+          }
+         
         </Text>
       </View>
     );

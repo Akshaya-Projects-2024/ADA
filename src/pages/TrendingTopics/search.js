@@ -126,10 +126,11 @@ const Search = ({ navigation }) => {
   };
 
   useEffect(() => {
-    contextValue?.setLoader(true);
     if (searchQuery?.length >= 3) {
+      contextValue?.setLoader(true);
       initData();
     } else if (searchQuery?.length === 0) {
+      contextValue?.setLoader(true);
       initData();
       setSelectedChip();
       // Restore initial data when search is cleared
@@ -227,7 +228,7 @@ const Search = ({ navigation }) => {
 
             <TextInput
               style={styles.searchBar}
-              placeholder="Search"
+              placeholder="Search (Type 3 letters to search)"
               placeholderTextColor={THEMES.colors.darkGrey}
               value={searchText}
               onChangeText={handleSearchChange}

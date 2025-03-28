@@ -780,7 +780,7 @@ const Home = (props) => {
           <View>
             <TouchableButtonWithPermission
               customMsgForRegistration={
-                "Get Registered and subscribe to enjoy all exciting features of ADA app."
+                "Registered and Subscribed to enjoy all the exciting features of ADA app."
               }
               activeOpacity={1}
               onPress={() => props.navigation.navigate("clientReview")}
@@ -1119,7 +1119,7 @@ const Home = (props) => {
       />
       <Dialog
         flag={modal}
-        title={"Info"}
+        title={"Switch Profile"}
         description={"Do you want to register as Pet Parent?"}
         rightButtonText="Yes"
         leftButtonText="Close"

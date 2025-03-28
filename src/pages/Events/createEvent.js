@@ -78,7 +78,7 @@ const CreateEvent = () => {
       return;
     }
 
-    if (formattedDateTime.isBefore(now, "minute")) {
+    if (formattedDateTime?.isBefore(now, "minute")) {
       Alert.alert("Invalid Time", "You cannot select a past time.");
       hideStartDatePicker();
       return;
@@ -142,7 +142,6 @@ const CreateEvent = () => {
         data.push({ ...item, id: res?.data?.data?.reqId });
         setPosterImg(data);
         contextValue?.setLoader(false);
-        showToast("success", "Successfully uploaded the image");
       }
     } catch (error) {
       showToast("error", error.message);
@@ -170,7 +169,6 @@ const CreateEvent = () => {
         const removeItemById = posterImg?.filter((it) => it?.id !== doc?.id);
         setPosterImg(removeItemById);
         contextValue?.setLoader(false);
-        showToast("success", "Successfully deleted the image");
       }
     } catch (error) {
       contextValue?.setLoader(false);
@@ -246,9 +244,6 @@ const CreateEvent = () => {
             ? currentPosition?.coords?.longitude?.toString()
             : "0",
         };
-        console.log('====================================');
-        console.log(obj);
-        console.log('====================================');
         let res = await createEvent(obj);
         if (res?.data?.status_code == 200) {
           contextValue?.setLoader(false);

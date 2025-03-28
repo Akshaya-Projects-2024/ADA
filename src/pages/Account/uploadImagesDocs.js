@@ -145,7 +145,6 @@ const UploadImagesDocs = (props) => {
           setBusinessImg(temp);
         }
         contextValue?.setLoader(false);
-        showToast("success", "Successfully uploaded the image");
       }
     } catch (error) {
       contextValue?.setLoader(false);
@@ -179,7 +178,6 @@ const UploadImagesDocs = (props) => {
           setBusinessImg(removeItemById);
         }
         contextValue?.setLoader(false);
-        showToast("success", "Successfully deleted the image");
       }
     } catch (error) {
       contextValue?.setLoader(false);
