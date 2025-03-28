@@ -174,7 +174,6 @@ const MedicalHelp = (props) => {
       } else {
         contextValue?.setLoader(true);
         const currentPosition = await getCurrentLocation();
-        console.log("curre",currentPosition)
         let obj = {
           userid: await decryptService("userId"),
           isownpet: 1,

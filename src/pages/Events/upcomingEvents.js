@@ -27,7 +27,7 @@ import Carousel from "react-native-snap-carousel";
 import { contextValue } from "../../components/Loader";
 
 const UpcomingEvents = () => {
-  const [eventData, setEventData] = useState();
+  const [eventData, setEventData] = useState([]);
   const isFocused = useIsFocused();
   const [activeIndex, setActiveIndex] = useState([]);
 

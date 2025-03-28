@@ -78,7 +78,7 @@ const CreateEvent = () => {
       return;
     }
 
-    if (formattedDateTime.isBefore(now, "minute")) {
+    if (formattedDateTime?.isBefore(now, "minute")) {
       Alert.alert("Invalid Time", "You cannot select a past time.");
       hideStartDatePicker();
       return;
@@ -246,9 +246,6 @@ const CreateEvent = () => {
             ? currentPosition?.coords?.longitude?.toString()
             : "0",
         };
-        console.log('====================================');
-        console.log(obj);
-        console.log('====================================');
         let res = await createEvent(obj);
         if (res?.data?.status_code == 200) {
           contextValue?.setLoader(false);

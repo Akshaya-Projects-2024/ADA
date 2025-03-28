@@ -192,7 +192,7 @@ const ServiceListReviews = ({ navigation, route }) => {
           {searchText && searchText.length < 3
             ? ""
             : `Oops! No ${
-                selectedService?.service ?? "Services"
+                selectedService?.service ?? "Reviews"
               } available currently`}
         </Text>
       </View>
