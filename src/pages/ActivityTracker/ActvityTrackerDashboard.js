@@ -141,13 +141,9 @@ export const ActvityTrackerDashboard = (props) => {
     const res = await getActivityDashboard({ userId, petId });
     if (res?.status === 200) {
       setDashboardData(res?.data?.data);
-      // if (dashboardData) {
-      //   setBound(res?.data?.data?.bound);
-      // } else {
-        setTimeout(() => {
-          setBound(res?.data?.data?.bound);
-        }, 700);
-      // }
+      setTimeout(() => {
+        setBound(res?.data?.data?.bound);
+      }, 700);
     }
   };
 
@@ -303,9 +299,9 @@ export const ActvityTrackerDashboard = (props) => {
     if (item.activitystatus.id) {
       postObj.id = item?.activitystatus?.id;
     }
-
     const res = await updateActivitystatus(postObj);
     if (res?.status === 200) {
+      showToast("success", res.data?.message);
       fetchActivityDashboardData();
       fetchActivity();
     }
