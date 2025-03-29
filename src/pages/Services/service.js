@@ -187,10 +187,17 @@ const Service = ({ navigation, route }) => {
                   fontSize: THEMES.fonts.font10,
                   paddingTop: moderateScale(3),
                   maxWidth: moderateScale(260),
-                  width: "80%",
+                  width: "70%",
                 }}
               >
-                {`${item?.profile?.providerBusiness?.services?.map(item => item.service).join(", ")} | ${item?.profile?.providerBusiness?.experience} Years exp`}
+                {console.log(item?.profile?.providerBusiness?.experience)}
+                {`${item?.profile?.providerBusiness?.services
+                  ?.map((item) => item.service)
+                  .join(", ")} | ${
+                  item?.profile?.providerBusiness?.experience == "null"
+                    ? 0
+                    : item?.profile?.providerBusiness?.experience
+                } Years exp`}
               </Text>
               <View
                 style={{

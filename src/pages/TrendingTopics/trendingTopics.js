@@ -482,9 +482,9 @@ const styles = StyleSheet.create({
     borderRadius: ms(12),
     borderWidth: ms(1),
     borderColor: THEMES.colors.searchBorderColor,
-    marginVertical: ms(5),
     flexDirection: "row",
     padding: ms(10),
+    marginVertical: ms(5),
   },
   coverImage: { borderRadius: ms(24) },
   contentContainer: { flex: 1, marginLeft: ms(15) },
@@ -494,15 +494,14 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   authorContainer: {
-    marginTop: ms(5),
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingTop:ms(5)
   },
   authorStyle: {
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.topicAuthorText,
-    fontWeight: "500",
   },
   dateStyle: {
     fontSize: THEMES.fonts.font12,
