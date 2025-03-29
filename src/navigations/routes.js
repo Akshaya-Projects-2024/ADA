@@ -42,6 +42,7 @@ import ServiceListReviews from "../pages/ClientReviews/ServiceListReviews";
 import ActivityList from "../pages/ActivityTracker/ActivityList";
 import { ActvityTrackerDashboard } from "../pages/ActivityTracker/ActvityTrackerDashboard";
 import AddEditActivity from "../pages/ActivityTracker/AddEditActivity";
+import ReviewAll from "../pages/ClientReviews/ReviewAll";
 
 const Stack = createStackNavigator();
 
@@ -215,6 +216,11 @@ const Routes = (props) => {
           options={navOptionHandler}
         />
         <Stack.Screen
+          name="ViewAllReviews"
+          component={ReviewAll}
+          options={navOptionHandler}
+        />
+        <Stack.Screen
           name="commonScreen"
           component={CommonScreen}
           options={navOptionHandler}
@@ -276,7 +282,7 @@ const Routes = (props) => {
           component={PaymentDetails}
           options={navOptionHandler}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="serviceListReviews"
           options={navOptionHandler}
           component={ServiceListReviews}

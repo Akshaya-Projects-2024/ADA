@@ -1,43 +1,58 @@
-import React, {useState} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {Dropdown} from 'react-native-element-dropdown';
-import {THEMES} from '../assets/theme/themes';
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
+import { THEMES } from "../assets/theme/themes";
 
-const DropDown = props => {
-  const {dropdownData, width} = props;
-  const [value, setValue] = useState(dropdownData[0]);
+const DropDownField = (props) => {
+  const {
+    dropdownData,
+    width,
+    selectedValue,
+    onChange,
+    customStyle = {},
+  } = props;
+  const [value, setValue] = useState(
+    selectedValue ? selectedValue : dropdownData[0]
+  );
   const [isFocus, setIsFocus] = useState(false);
+
+  useEffect(() => {
+    setValue(selectedValue);
+  }, [selectedValue]);
 
   return (
     <View style={styles.container}>
       <Dropdown
         style={[
           styles.dropdown,
-          {width: width ? width : 100},
-          isFocus && {borderColor: '#007bff'},
+          { width: width ? width : 110 },
+          // isFocus && {borderColor: '#007bff'},
         ]}
         placeholderStyle={styles.placeholderStyle}
         itemTextStyle={{
           fontSize: THEMES.fonts.font12,
           padding: 0,
           fontFamily: THEMES.fontFamily.medium,
-          color: THEMES.colors.black
+          color: THEMES.colors.black,
         }}
-        itemContainerStyle={{padding: 0}}
-        containerStyle={{borderRadius: 16, padding: 0}}
+        itemContainerStyle={{ padding: 0 }}
+        // containerStyle={{ borderRadius: 16, padding: 0 }}
         selectedTextStyle={styles.selectedTextStyle}
         iconStyle={styles.iconStyle}
         data={dropdownData}
         maxHeight={200}
         labelField="label"
         valueField="value"
-        placeholder={!isFocus ? 'Select item' : '...'}
+        placeholder={!selectedValue ? "Select item" : "..."}
         value={value}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
-        onChange={item => {
-          setValue(item.value);
+        onChange={(item) => {
+          onChange(item.value);
           setIsFocus(false);
+        }}
+        containerStyle={{
+          ...customStyle.containerStyle,
         }}
       />
     </View>
@@ -47,11 +62,11 @@ const DropDown = props => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   filterButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
   },
@@ -63,7 +78,7 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     fontSize: THEMES.fonts.font12,
-    color: '#aaa',
+    color: "#aaa",
     fontFamily: THEMES.fontFamily.medium,
   },
   selectedTextStyle: {
@@ -80,4 +95,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DropDown;
+export default DropDownField;

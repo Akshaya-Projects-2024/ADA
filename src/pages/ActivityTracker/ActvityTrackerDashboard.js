@@ -67,6 +67,7 @@ export const ActvityTrackerDashboard = (props) => {
   );
   const isFocused = useIsFocused();
   const [bound, setBound] = useState(0);
+  const dataFetched = useRef(false);
 
   useEffect(() => {
     if (petDetails?.length && selectedPet?.documents) {
@@ -130,6 +131,7 @@ export const ActvityTrackerDashboard = (props) => {
     };
     const res = await getMyActivityByDate(obj);
     if (res.status == 200) {
+      dataFetched.current = true;
       setActivityDataList(res.data.data);
       contextValue.setLoader(false);
     }
@@ -406,7 +408,7 @@ export const ActvityTrackerDashboard = (props) => {
             }}
             keyExtractor={(item, index) => index.toString()}
             ItemSeparatorComponent={<View style={{ marginBottom: 10 }} />}
-            ListEmptyComponent={
+            ListEmptyComponent={!dataFetched.current ? null :
               <View
                 style={[
                   {

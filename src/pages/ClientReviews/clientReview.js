@@ -14,7 +14,7 @@ import {
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
 import Header from "../../components/Header";
-import { moderateScale, ms, s } from "react-native-size-matters";
+import { moderateScale, ms } from "react-native-size-matters";
 import ReviewComponent from "../../components/ReviewComponent";
 import Dropdown from "../../components/DropDown";
 import StarRating from "react-native-star-rating";
@@ -27,11 +27,12 @@ import {
   getAllReviews,
   replyReviewApi,
 } from "../../redux-store/actions/reviews";
-import { findDifferenceByDays, showToast } from "../../utils/utils";
+import { findDifferenceByDaysAndTime, showToast } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
 import { useSelector } from "react-redux";
-import { contextValue } from "../../components/Loader";
 import { useIsFocused } from "@react-navigation/native";
+import CrossIcon from "../../assets/svg/CrossIcon";
+import ProfileDummy from "../../assets/svg/user.svg";
 
 const ClientReview = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -45,11 +46,15 @@ const ClientReview = () => {
   const { guestUser, loggedInModule } = useSelector(({ register }) => register);
   const [modalData, setModalData] = useState();
   const [comment, setComment] = useState();
-  const pageSize = 5; // Number of reviews per page
+  const pageSize = 10; // Number of reviews per page
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [filterData, setFilterData] = useState({
+    rating: "5",
+    sortBy: "newest",
+  });
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -65,6 +70,14 @@ const ClientReview = () => {
     [profileData?.providerBusiness?.services]
   );
 
+  const profilePhoto = useMemo(
+    () =>
+      profileData?.providerDocument?.find(
+        (x) => x.documenttype === "companylogo" && x.isactive == 1
+      )?.url,
+    [profileData]
+  );
+
   const renderItem = (item) => {
     return (
       <>
@@ -72,10 +85,26 @@ const ClientReview = () => {
           <View style={styles.flatlistContent}>
             <View style={styles.flatListRow}>
               <View style={styles.flatListImgView}>
-                <Image
-                  style={styles.img}
-                  source={{ uri: item.item.parentprofile }}
-                />
+                {item?.item?.parentprofile ? (
+                  <Image
+                    style={styles.img}
+                    source={{ uri: item?.item?.parentprofile }}
+                  />
+                ) : (
+                  <View
+                    style={[
+                      styles.img,
+                      {
+                        borderWidth: 1,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderColor: THEMES.colors.lightGrey,
+                      },
+                    ]}
+                  >
+                    <ProfileDummy width={26} />
+                  </View>
+                )}
               </View>
               <View style={{ marginLeft: moderateScale(8) }}>
                 <View style={styles.flatListNameRow}>
@@ -103,10 +132,7 @@ const ClientReview = () => {
           </View>
           <View style={styles.dateRow}>
             <Text style={styles.dateText}>
-              {`${findDifferenceByDays(item.item.createdon)}` > 50
-                ? "Few days ago"
-                : `${findDifferenceByDays(item.item.createdon)}d`}{" "}
-              {}
+              {findDifferenceByDaysAndTime(item.item.createdon)}
             </Text>
 
             {!item?.item?.reply && (
@@ -130,15 +156,15 @@ const ClientReview = () => {
                     <Image
                       style={{ width: 52, height: 52, borderRadius: 52 / 2 }}
                       source={{
-                        uri: profileData?.providerDocument?.[0]?.url,
+                        uri: profilePhoto,
                       }}
                     />
                   </View>
                   <View style={{ marginLeft: moderateScale(8) }}>
                     <Text style={styles.replyName}>
-                      {guestUser
-                        ? Strings.guest
-                        : profileData?.providerBusiness?.name}
+                      {profileData?.providerBusiness?.name
+                        ? profileData?.providerBusiness?.name
+                        : Strings.guest}
                     </Text>
                     {profileServices && (
                       <Text numberOfLines={2} style={styles.replyProfile}>
@@ -207,33 +233,57 @@ const ClientReview = () => {
             </View>
           </View>
         </View>
-     <View style={styles.dropdownMainView}>
+        <View style={styles.dropdownMainView}>
           <View style={styles.dropDownRow}>
-            <View style={styles.w35}>
-              {/* <Dropdown
-                dropdownData={[
-                  { label: "All Rating", value: "1" },
-                  { label: "1 Star", value: "2" },
-                  { label: "2 Star", value: "3" },
-                  { label: "3 Star", value: "4" },
-                  { label: "4 Star", value: "5" },
-                  { label: "5 Star", value: "6" },
-                ]}
-              /> */}
-            </View>
-            <View style={styles.w40}>
+            {filterData?.sortBy == "rating" && (
+              <View style={{ width: 100 }}>
+                <Dropdown
+                  onChange={(value) => {
+                    setFilterData({
+                      ...filterData,
+                      rating: value,
+                      sortBy: "rating",
+                    });
+                  }}
+                  selectedValue={filterData?.rating}
+                  dropdownData={[
+                    { label: "1 Star", value: "1" },
+                    { label: "2 Star", value: "2" },
+                    { label: "3 Star", value: "3" },
+                    { label: "4 Star", value: "4" },
+                    { label: "5 Star", value: "5" },
+                  ]}
+                  width={90}
+                />
+              </View>
+            )}
+            <View style={{width: 140}}>
               <Dropdown
+                onChange={(value) => {
+                  setFilterData({
+                    ...filterData,
+                    sortBy: value,
+                    rating: "5",
+                  });
+                }}
+                selectedValue={filterData?.sortBy}
                 width={120}
                 dropdownData={[
                   { label: "Newest", value: "newest" },
                   { label: "Oldest", value: "oldest" },
-                  { label: "Toprated", value: "toprated" },
+                  { label: "Top Rated", value: "toprated" },
                   { label: "Lowest", value: "lowest" },
+                  { label: "Rating", value: "rating" },
                 ]}
+                customStyle={{
+                  containerStyle: {
+                    width: 120,
+                  },
+                }}
               />
             </View>
           </View>
-        </View> 
+        </View>
       </>
     );
   };
@@ -242,7 +292,7 @@ const ClientReview = () => {
     if (isFocused) {
       initData(1, true);
     }
-  }, []);
+  }, [filterData]);
 
   useEffect(() => {
     if (isFocused) {
@@ -255,11 +305,11 @@ const ClientReview = () => {
 
   useEffect(() => {
     if (!isModalVisible) {
-      initData();
+      initData(1,true);
     }
   }, [isModalVisible]);
 
- const initData = async (pageNum, reset = false) => {
+  const initData = async (pageNum, reset = false) => {
     try {
       if (!hasMore && !reset) return;
       if (reset) setLoading(true);
@@ -268,23 +318,22 @@ const ClientReview = () => {
       let obj = {
         userId: userId,
         vendor: userId,
-        sortBy: "newest",
-        pageNum: page,
+        sortBy: filterData?.sortBy,
+        pageNum: pageNum,
         pageSize: pageSize,
+        filterdata: filterData?.sortBy === "rating" ? filterData?.rating : "",
       };
       let res = await getAllReviews(obj);
-
       if (res) {
         const newReviews = res?.reviews;
         if (newReviews.length === 0) {
           setHasMore(false); // No more data to load
         } else {
           setGlobalReviews((prevReviews) => {
-            const combined = [...prevReviews, ...newReviews];
+            const combined = pageNum == 1 ? [...newReviews] : [...prevReviews, ...newReviews];
             return Array.from(new Set(combined.map((review) => review.id))) // Remove duplicates
               .map((id) => combined.find((review) => review.id === id));
           });
-
           setReviewData(res);
           setHasMore(newReviews.length > 0);
           setPage((prevPage) => prevPage + 1);
@@ -305,7 +354,6 @@ const ClientReview = () => {
       reply: comment,
     };
     let res = await replyReviewApi(obj);
-    console.log("res?.data?.status_code", res);
     if (res?.status_code == 200) {
       setModalVisible(false);
       showToast("success", res?.data?.message);
@@ -349,7 +397,8 @@ const ClientReview = () => {
             onPress={() => {
               setLoader(false);
             }}
-            style={{position: "absolute",
+            style={{
+              position: "absolute",
               top: 0,
               left: 0,
               height: "100%",
@@ -357,7 +406,8 @@ const ClientReview = () => {
               backgroundColor: THEMES.colors.backdropColor,
               justifyContent: "center",
               alignItems: "center",
-              zIndex: 1,}}
+              zIndex: 1,
+            }}
           >
             <Lottie
               autoPlay
@@ -391,7 +441,6 @@ const ClientReview = () => {
         ) : (
           <EmptyContentView />
         )}
-       
 
         <Modal
           animationType="none"
@@ -404,14 +453,38 @@ const ClientReview = () => {
             contentContainerStyle={{ justifyContent: "flex-end", flexGrow: 1 }}
           >
             <View style={styles.modalContent}>
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(false);
+                }}
+                style={{ marginBottom: 20, alignItems: "flex-end" }}
+              >
+                <CrossIcon width={24} height={24} />
+              </TouchableOpacity>
               <View style={styles.modalView}>
                 <View style={styles.modalRow}>
                   <View style={styles.row}>
                     <View style={styles.imgView}>
-                      <Image
-                        style={styles.img}
-                        source={{ uri: modalData?.item?.parentprofile }}
-                      />
+                      {modalData?.item?.parentprofile ? (
+                        <Image
+                          style={styles.img}
+                          source={{ uri: modalData?.item?.parentprofile }}
+                        />
+                      ) : (
+                        <View
+                          style={[
+                            styles.img,
+                            {
+                              borderWidth: 1,
+                              alignItems: "center",
+                              justifyContent: "center",
+                              borderColor: THEMES.colors.lightGrey,
+                            },
+                          ]}
+                        >
+                          <ProfileDummy width={26} />
+                        </View>
+                      )}
                     </View>
                     <View style={{ marginLeft: moderateScale(8) }}>
                       <View style={styles.nameRow}>
@@ -445,12 +518,7 @@ const ClientReview = () => {
                 </View>
                 <View style={styles.commentDaysView}>
                   <Text style={styles.commentDayText}>
-                    {`${findDifferenceByDays(modalData?.item?.createdon)}` > 50
-                      ? "Few days ago"
-                      : `${findDifferenceByDays(
-                          modalData?.item?.createdon
-                        )}d`}{" "}
-                    {}
+                    {findDifferenceByDaysAndTime(modalData?.item?.createdon)}
                   </Text>
                 </View>
               </View>
@@ -467,6 +535,7 @@ const ClientReview = () => {
                 <Button
                   title={Strings.reply}
                   onPress={() => replyReviewBtn()}
+                  disabled={comment?.length == 0}
                 />
               </View>
             </View>
@@ -493,7 +562,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: THEMES.colors.bgColor,
-    paddingTop: moderateScale(40),
+    paddingTop: moderateScale(20),
     paddingHorizontal: moderateScale(24),
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,

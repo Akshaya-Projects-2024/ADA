@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -38,7 +38,9 @@ const ServiceListReviews = ({ navigation, route }) => {
   const [searchText, setSearchText] = useState("");
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // Data after filtering
+  const listRef = useRef(null);
   const isFocused = useIsFocused();
+  const dataFetched = useRef(false);
   const { loggedInModule, guestUser, logindetails } = useSelector(
     (state) => state?.register
   );
@@ -69,6 +71,8 @@ const ServiceListReviews = ({ navigation, route }) => {
         });
 
         setData(uniqueAppointments);
+        listRef.current = uniqueAppointments;
+        dataFetched.current = true;
         setFilteredData(uniqueAppointments);
       }
       contextValue?.setLoader(false);
@@ -81,11 +85,10 @@ const ServiceListReviews = ({ navigation, route }) => {
 
   const handleSearch = (text) => {
     setSearchText(text);
-    if (text.length > 2) {
-      initData(text);
-    } else {
-      setFilteredData([]);
-    }
+    const filtered = listRef.current.filter((item) =>
+      item?.providername?.toLowerCase()?.includes(text.toLowerCase())
+    );
+    setFilteredData(text ? filtered : listRef.current);
   };
 
   const renderItem = ({ item }) => {
@@ -189,11 +192,9 @@ const ServiceListReviews = ({ navigation, route }) => {
             textAlign: "center",
           }}
         >
-          {searchText && searchText.length < 3
-            ? ""
-            : `Oops! No ${
-                selectedService?.service ?? "Reviews"
-              } available currently`}
+          {`Oops! No ${
+            selectedService?.service ?? "Service Provider"
+          } available currently`}
         </Text>
       </View>
     );
@@ -235,6 +236,7 @@ const ServiceListReviews = ({ navigation, route }) => {
                 value={searchText}
                 onChangeText={handleSearch}
                 placeholder="Search"
+                placeholderTextColor={THEMES.colors.lightGrey}
                 style={{
                   flex: 1, // Allow input to take full width except for icons
                   fontSize: THEMES.fonts.font12, // Adjust font size to match the design
@@ -243,7 +245,7 @@ const ServiceListReviews = ({ navigation, route }) => {
                 }}
               />
               {searchText.length > 0 && (
-                <TouchableOpacity onPress={() => setSearchText("")}>
+                <TouchableOpacity onPress={() => handleSearch("")}>
                   <Cross style={{ width: 20, height: 20 }} />
                 </TouchableOpacity>
               )}
@@ -256,7 +258,7 @@ const ServiceListReviews = ({ navigation, route }) => {
             bounces={false}
             renderItem={renderItem}
             contentContainerStyle={{ flexGrow: 1 }}
-            ListEmptyComponent={EmptyContentView}
+            ListEmptyComponent={!dataFetched ?  null : EmptyContentView}
           />
         </>
       </View>

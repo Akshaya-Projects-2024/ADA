@@ -192,7 +192,7 @@ const ServiceDetail = ({ navigation, route }) => {
             </View>
             <View style={{ paddingLeft: moderateScale(19), width: "80%" }}>
               <Text
-                numberOfLines={1}
+                numberOfLines={3}
                 style={{
                   fontFamily: THEMES.fontFamily.bold,
                   fontSize: THEMES.fonts.font16,
@@ -208,6 +208,7 @@ const ServiceDetail = ({ navigation, route }) => {
                   paddingTop: moderateScale(3),
                   fontSize: THEMES.fonts.font14,
                   width: "90%",
+                  color: THEMES.colors.black
                 }}
               >
                 {selectedProvider?.profile?.providerBusiness?.services
@@ -404,11 +405,12 @@ const ServiceDetail = ({ navigation, route }) => {
                   {selectedProvider?.profile?.providerRating
                     ?.totalratingcount !== 0 && (
                     <Text
-                      onPress={() =>
-                        navigation.navigate("parentReviews", {
+                      onPress={() => {
+                        navigation.navigate("ViewAllReviews", {
                           selectedService: selectedProvider,
-                        })
-                      }
+                          viewAll: true
+                        });
+                      }}
                       style={{
                         fontFamily: THEMES.fontFamily.semiBold,
                         color: THEMES.colors.cyan,

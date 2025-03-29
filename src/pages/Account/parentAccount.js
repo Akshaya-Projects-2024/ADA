@@ -54,6 +54,7 @@ const MenuItem = ({
   showPending = false,
   onPress,
   checkPermission = false,
+  checkPetExist = false,
 }) => {
   const Icon = icon;
   return (
@@ -66,6 +67,7 @@ const MenuItem = ({
           paddingBottom: addBottom && moderateScale(16),
         },
       ]}
+      checkPetExist={checkPetExist}
     >
       <View style={styles.rowCenter}>
         <View style={[styles.iconStyle, { backgroundColor: bgColor }]}>
@@ -412,14 +414,11 @@ const ParentAccount = (props) => {
                     showPending={false}
                     addBottom={"addBottom"}
                     onPress={() => {
-                      if (validArray(profile?.parentProfie?.petDetails)) {
-                        navigate("actvityTrackerDashboard", {
-                          route: "parentAccount",
-                        });
-                      } else {
-                        showToast("error", "Please add pet profile first.");
-                      }
+                      navigate("actvityTrackerDashboard", {
+                        route: "parentAccount",
+                      });
                     }}
+                    checkPetExist={true}
                   />
                 </View>
               </View>
@@ -442,7 +441,7 @@ const ParentAccount = (props) => {
                     "addBottom",
                     "serviceListReviews",
                     false,
-                    true
+                    false
                   )}
                   {/* {renderItem(
                     THEMES.colors.peach,

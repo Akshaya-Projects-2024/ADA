@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -42,6 +42,7 @@ const PetAdoption = (props) => {
   const [paymentModal, setPaymentModal] = useState(false);
   const searchQuery = useDebounce(searchText);
   const profile = useSelector((state) => state?.commonReducer);
+  const dataFetched = useRef(false);
 
   const paymentCompleted = useMemo(() => {
     if (
@@ -98,6 +99,7 @@ const PetAdoption = (props) => {
       const response = await getAdoption(params);
       if (response?.status === 200) {
         const output = response?.data?.data;
+        dataFetched.current = true;
         if (validArray(output)) {
           setData(output);
           const result = new Set(
@@ -428,7 +430,7 @@ const PetAdoption = (props) => {
               bounces={false}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
-              ListEmptyComponent={EmptyContentView}
+              ListEmptyComponent={!dataFetched.current ? null :EmptyContentView}
               contentContainerStyle={{ flexGrow: 1 }}
             />
           </View>

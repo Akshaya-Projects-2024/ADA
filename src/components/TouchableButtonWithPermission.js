@@ -15,6 +15,7 @@ const TouchableButtonWithPermission = ({
   customMsgForRegistration = "",
   customMsgForApproval = "",
   customMsgForPayment = "",
+  checkPetExist = false,
   ...rest
 }) => {
   const { loggedInModule } = useSelector((state) => state?.register);
@@ -32,12 +33,17 @@ const TouchableButtonWithPermission = ({
         profile?.[isServiceProvider ? "providerProfile" : "parentProfie"]
           ?.subscription?.status;
 
-      if (registrationStatus === "PENDING") {
+      if (
+        registrationStatus === "PENDING" ||
+        (isServiceProvider == "provider" && registrationStatus == "INPROGRESS")
+      ) {
         setTitle(
           customMsgForRegistration
             ? customMsgForRegistration
             : Strings.approvalAlertForRegistration
         );
+      } else if (checkPetExist) {
+        setTitle("Please add pet profile to continue");
       } else if (registrationStatus === "AAPPROVALPENDING") {
         setTitle(
           customMsgForApproval ? customMsgForApproval : Strings.approvaltError

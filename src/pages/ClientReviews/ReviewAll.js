@@ -41,7 +41,7 @@ import CrossIcon from "../../assets/svg/CrossIcon";
 import DropDown from "../../components/DropDown";
 import DropDownField from "../../components/DropDown";
 
-const ParentReviews = (props) => {
+const ReviewAll = (props) => {
   const vendorId =
     props?.route?.params?.selectedService?.profile?.providerBusiness?.userid;
   const selectedItem = props?.route?.params?.selectedItem;
@@ -64,10 +64,12 @@ const ParentReviews = (props) => {
     rating: "5",
     pageNum: 1,
     pageSize: 10,
+    filterdata: "",
   });
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const dataFetched = useRef(false);
+  const viewAll = props?.route?.params?.viewAll;
 
   useEffect(() => {
     initData();
@@ -92,19 +94,33 @@ const ParentReviews = (props) => {
   }, [isModalVisible]);
 
   const initData = async () => {
-    const res = await reviewGiven({
-      createdby: await decryptService("userId"),
-    });
-    if (res.status_code == 200) {
-      const filteredReviews = res?.data?.filter(
-        (review) => review?.provider === selectedItem?.provider_id
-      );
-      setReviewList(filteredReviews);
+    try {
+      let obj = {
+        userId: await decryptService("userId"), //login in id
+        vendor: vendorId ? vendorId : selectedItem?.provider_id, // pass id
+        ...filterParams,
+      };
+      delete obj.rating;
+      let res = await getAllReviews(obj);
+      console.log(obj);
+
+      if (res?.reviews?.length) {
+        let filteredReviews = [...res?.reviews];
+        setReviewList(
+          filterParams.pageNum === 1
+            ? filteredReviews
+            : [...reviewList, ...filteredReviews]
+        );
+        setHasMore(true);
+      } else {
+        setHasMore(false);
+      }
       dataFetched.current = true;
+      contextValue?.setLoader(false);
       setLoading(false);
-      setTimeout(() => {
-        contextValue?.setLoader(false);
-      }, 200);
+    } catch (error) {
+      setLoading(false);
+      contextValue?.setLoader(false);
     }
   };
 
@@ -135,7 +151,7 @@ const ParentReviews = (props) => {
     return (
       <>
         <View style={styles.flatlistView}>
-          <View>
+          {/* <View>
             <View style={styles.replyMainView}>
               <View style={styles.replyRow}>
                 <View style={styles.profileImg}>
@@ -148,7 +164,7 @@ const ParentReviews = (props) => {
                     />
                   ) : (
                     <ProviderFallback
-                      width={moderateScale(52)}
+                      width={moderateScale(55)}
                       height={moderateScale(55)}
                     />
                   )}
@@ -157,20 +173,9 @@ const ParentReviews = (props) => {
                   <Text style={styles.replyName}>
                     {selectedItem?.providername
                       ? selectedItem?.providername
+                      : item?.item?.providername
+                      ? selectedItem?.providername
                       : guestUser}
-                  </Text>
-                  <Text
-                    style={[
-                      styles.replyName,
-                      {
-                        fontFamily: THEMES.fontFamily.medium,
-                        fontSize: THEMES.fonts.font12,
-                      },
-                    ]}
-                  >
-                    {selectedItem?.servicedetails?.service
-                      ? selectedItem?.servicedetails?.service
-                      : ""}
                   </Text>
                 </View>
               </View>
@@ -182,7 +187,7 @@ const ParentReviews = (props) => {
                 </View>
               )}
             </View>
-          </View>
+          </View> */}
 
           {item?.item?.reply && (
             <>
@@ -191,12 +196,12 @@ const ParentReviews = (props) => {
                   <View style={styles.flatListImgView}>
                     <Image
                       style={styles.img}
-                      source={{ uri: logindetails?.parentphoto }}
+                      source={{ uri: item?.item?.parentprofile }}
                     />
                   </View>
                   <View style={{ marginLeft: moderateScale(8) }}>
                     <View style={styles.flatListNameRow}>
-                      <Text style={styles.name}>{profileData?.name}</Text>
+                      <Text style={styles.name}>{item?.item?.parentname}</Text>
                       <View>
                         <StarRating
                           starStyle={{
@@ -250,14 +255,12 @@ const ParentReviews = (props) => {
                   <View style={styles.flatListImgView}>
                     <Image
                       style={styles.img}
-                      source={{ uri: logindetails?.parentphoto }}
+                      source={{ uri: item?.item?.parentprofile }}
                     />
                   </View>
                   <View style={{ marginLeft: moderateScale(8) }}>
                     <View style={styles.flatListNameRow}>
-                      <Text style={styles.name}>
-                        {selectedItem?.parentdetails?.name}
-                      </Text>
+                      <Text style={styles.name}>{item?.item?.parentname}</Text>
                       <View>
                         <StarRating
                           starStyle={{
@@ -271,6 +274,7 @@ const ParentReviews = (props) => {
                         />
                       </View>
                     </View>
+
                     <Text style={styles.profileTypeText}>
                       {item?.item?.patname}
                     </Text>
@@ -286,17 +290,19 @@ const ParentReviews = (props) => {
                 <Text style={styles.dateText}>
                   {findDifferenceByDaysAndTime(item?.item?.createdon)}
                 </Text>
-                <Text
-                  onPress={() => {
-                    setRating(item?.item?.rating);
-                    setModalData(item);
-                    setComment(item?.item?.remark);
-                    setModalVisible(true);
-                  }}
-                  style={styles.editText}
-                >
-                  {Strings.edit}{" "}
-                </Text>
+                {item?.item?.parentname === profileData?.name && (
+                  <Text
+                    onPress={() => {
+                      setRating(item?.item?.rating);
+                      setModalData(item);
+                      setComment(item?.item?.remark);
+                      setModalVisible(true);
+                    }}
+                    style={styles.editText}
+                  >
+                    {Strings.edit}{" "}
+                  </Text>
+                )}
               </View>
             </>
           )}
@@ -361,129 +367,6 @@ const ParentReviews = (props) => {
     }
   };
 
-  const renderModal = () => (
-    <Modal
-      animationType="none"
-      onBackButtonPress={toggleModal}
-      isVisible={isModalVisible}
-      style={styles.modal}
-    >
-      <ScrollView
-        contentContainerStyle={{
-          justifyContent: "flex-end",
-          flexGrow: 1,
-        }}
-      >
-        <View style={styles.modalContent}>
-          <TouchableOpacity
-            onPress={() => {
-              setModalVisible(false);
-            }}
-            style={{ marginBottom: 20, alignItems: "flex-end" }}
-          >
-            <CrossIcon width={24} height={24} />
-          </TouchableOpacity>
-          <View style={styles.modalView}>
-            <View style={styles.modalRow}>
-              <View style={styles.row}>
-                <View style={styles.imgView}>
-                  {selectedItem?.providerPhoto ? (
-                    <Image
-                      style={{
-                        width: 52,
-                        height: 52,
-                        borderRadius: 52 / 2,
-                      }}
-                      source={getBase64Obj(
-                        "https://d2jswhakxkta9i.cloudfront.net/logos/petlogo/avatar.png"
-                      )}
-                    />
-                  ) : (
-                    <ProviderFallback
-                      width={moderateScale(52)}
-                      height={moderateScale(52)}
-                    />
-                  )}
-                </View>
-                <View style={{ marginLeft: moderateScale(8) }}>
-                  <View>
-                    <Text numberOfLines={1} style={styles.nameText}>
-                      {selectedItem?.providername}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.replyName,
-                        {
-                          fontFamily: THEMES.fontFamily.medium,
-                          fontSize: THEMES.fonts.font12,
-                        },
-                      ]}
-                    >
-                      {selectedItem?.servicedetails?.service
-                        ? selectedItem?.servicedetails?.service
-                        : ""}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-            <View>
-              <Text style={styles.commentText}>{modalData?.item?.reply}</Text>
-            </View>
-            <View style={styles.commentDaysView}>
-              <Text style={styles.commentDayText}>
-                {findDifferenceByDaysAndTime(modalData?.item?.createdon)}
-              </Text>
-            </View>
-          </View>
-          <View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingTop: moderateScale(20),
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: normalize(14),
-                  fontFamily: "Inter-SemiBold",
-                  color: "#000",
-                }}
-              >
-                Rate Your Experience
-              </Text>
-              <AirbnbRating
-                count={5} // Number of stars
-                defaultRating={rating}
-                size={20}
-                showRating={false} // Hide numeric value below stars
-                onFinishRating={handleRating}
-              />
-            </View>
-          </View>
-          <View style={styles.commentView}>
-            <InputField
-              label={Strings.comments}
-              placeholderText={Strings.enterYourCommentHere}
-              multiline={true}
-              value={comment}
-              onChange={setComment}
-            />
-          </View>
-          <View style={styles.btnView}>
-            <Button
-              disabled={!comment}
-              title={Strings.reply}
-              onPress={() => replyReviewBtn()}
-            />
-          </View>
-        </View>
-      </ScrollView>
-    </Modal>
-  );
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: THEMES.colors.bgColor }}>
@@ -504,6 +387,65 @@ const ParentReviews = (props) => {
             <>
               {Boolean(reviewList?.length) ? (
                 <View style={styles.mainView}>
+                  {reviewList?.length > 1 && (
+                    <View style={styles.dropdownMainView}>
+                      <View style={styles.dropDownRow}>
+                        {filterParams?.sortBy === "rating" && (
+                          <View style={{ width: 100 }}>
+                            <DropDownField
+                              onChange={(value) => {
+                                setFilterParams({
+                                  ...filterParams,
+                                  sortBy: "rating",
+                                  rating: value,
+                                  filterdata: value,
+                                  pageNum: 1
+                                });
+                                showLoader();
+                              }}
+                              selectedValue={filterParams?.rating}
+                              dropdownData={[
+                                { label: "1 Star", value: "1" },
+                                { label: "2 Star", value: "2" },
+                                { label: "3 Star", value: "3" },
+                                { label: "4 Star", value: "4" },
+                                { label: "5 Star", value: "5" },
+                              ]}
+                              width={90}
+                            />
+                          </View>
+                        )}
+                        <View style={{ width: 140 }}>
+                          <DropDownField
+                            onChange={(value) => {
+                              setFilterParams({
+                                ...filterParams,
+                                sortBy: value,
+                                filterdata: value == "rating" ? "5" : "",
+                                rating: value == "rating" ? "5" : "",
+                                pageNum: 1
+                              });
+                              showLoader();
+                            }}
+                            selectedValue={filterParams.sortBy}
+                            width={120}
+                            dropdownData={[
+                              { label: "Newest", value: "newest" },
+                              { label: "Oldest", value: "oldest" },
+                              { label: "Top Rated", value: "toprated" },
+                              { label: "Lowest", value: "lowest" },
+                              { label: "Rating", value: "rating" },
+                            ]}
+                            customStyle={{
+                              containerStyle: {
+                                width: 120,
+                              },
+                            }}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                  )}
                   <FlatList
                     data={reviewList}
                     showsVerticalScrollIndicator={false}
@@ -517,6 +459,8 @@ const ParentReviews = (props) => {
                       reviewList?.length === 0 ? styles.flatListContainer : null
                     }
                     onEndReached={loadMoreData}
+                    onEndReachedThreshold={0.7}
+                    ListFooterComponent={renderFooter}
                   />
                 </View>
               ) : (
@@ -574,7 +518,115 @@ const ParentReviews = (props) => {
             </>
           )}
 
-          {renderModal()}
+          <Modal
+            animationType="none"
+            onBackButtonPress={toggleModal}
+            isVisible={isModalVisible}
+            style={styles.modal}
+          >
+            <ScrollView
+              contentContainerStyle={{
+                justifyContent: "flex-end",
+                flexGrow: 1,
+              }}
+            >
+              <View style={styles.modalContent}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setModalVisible(false);
+                  }}
+                  style={{ marginBottom: 20, alignItems: "flex-end" }}
+                >
+                  <CrossIcon width={24} height={24} />
+                </TouchableOpacity>
+                <View style={styles.modalView}>
+                  <View style={styles.modalRow}>
+                    <View style={styles.row}>
+                      <View style={styles.imgView}>
+                        {selectedItem?.providerPhoto ? (
+                          <Image
+                            style={{
+                              width: 52,
+                              height: 52,
+                              borderRadius: 52 / 2,
+                            }}
+                            source={getBase64Obj(
+                              "https://d2jswhakxkta9i.cloudfront.net/logos/petlogo/avatar.png"
+                            )}
+                          />
+                        ) : (
+                          <ProviderFallback
+                            width={moderateScale(52)}
+                            height={moderateScale(52)}
+                          />
+                        )}
+                      </View>
+                      <View style={{ marginLeft: moderateScale(8) }}>
+                        <View style={styles.nameRow}>
+                          <Text numberOfLines={1} style={styles.nameText}>
+                            {selectedItem?.providername}
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                  <View>
+                    <Text style={styles.commentText}>
+                      {modalData?.item?.reply}
+                    </Text>
+                  </View>
+                  <View style={styles.commentDaysView}>
+                    <Text style={styles.commentDayText}>
+                      {findDifferenceByDaysAndTime(modalData?.item?.createdon)}
+                    </Text>
+                  </View>
+                </View>
+                <View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      paddingTop: moderateScale(20),
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: normalize(14),
+                        fontFamily: "Inter-SemiBold",
+                        color: "#000",
+                      }}
+                    >
+                      Rate Your Experience
+                    </Text>
+                    <AirbnbRating
+                      count={5} // Number of stars
+                      defaultRating={rating}
+                      size={20}
+                      showRating={false} // Hide numeric value below stars
+                      onFinishRating={handleRating}
+                    />
+                  </View>
+                </View>
+                <View style={styles.commentView}>
+                  <InputField
+                    label={Strings.comments}
+                    placeholderText={Strings.enterYourCommentHere}
+                    multiline={true}
+                    value={comment}
+                    onChange={setComment}
+                  />
+                </View>
+                <View style={styles.btnView}>
+                  <Button
+                    disabled={!comment}
+                    title={Strings.reply}
+                    onPress={() => replyReviewBtn()}
+                  />
+                </View>
+              </View>
+            </ScrollView>
+          </Modal>
         </View>
       </View>
     </SafeAreaView>
@@ -898,4 +950,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ParentReviews;
+export default ReviewAll;

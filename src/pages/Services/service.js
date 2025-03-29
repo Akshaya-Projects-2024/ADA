@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -37,6 +37,7 @@ const Service = ({ navigation, route }) => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // Data after filtering
   const isFocused = useIsFocused();
+  const dataFetched = useRef(false);
 
   useEffect(() => {
     initData();
@@ -56,6 +57,7 @@ const Service = ({ navigation, route }) => {
       if (response?.status === 200) {
         const output = response?.data?.data;
         setData(output);
+        dataFetched.current = true;
         setFilteredData(output);
       }
       contextValue?.setLoader(false);
@@ -325,7 +327,7 @@ const Service = ({ navigation, route }) => {
             bounces={false}
             renderItem={renderItem}
             contentContainerStyle={{ flexGrow: 1 }}
-            ListEmptyComponent={EmptyContentView}
+            ListEmptyComponent={!dataFetched.current ? null :EmptyContentView}
           />
         </>
       </View>

@@ -110,6 +110,15 @@ const PetDetail = (props) => {
     initData();
   }, []);
 
+  useEffect(() => {
+    if (selectedPet) {
+      const petExist = petDetails?.find((item) => item.id == selectedPet?.id);
+      if (!petExist) {
+        setSelectedPet(petDetails[0]);
+      }
+    }
+  }, [parentProfie]);
+
   const getPetData = () => {
     if (validArray(petDetails)) {
       const firstPet = { ...selectedPet };
@@ -359,7 +368,7 @@ const PetDetail = (props) => {
             if (redirectFunc) {
               redirectFunc();
             } else {
-              props.navigation.dispatch(StackActions.pop(addNew ? 2 : 1));
+              props.navigation.dispatch(StackActions.pop(1));
             }
           } else {
             setRegisterModal(true);
@@ -480,7 +489,7 @@ const PetDetail = (props) => {
                     marginRight: 3,
                   }}
                   onPress={() => {
-                    props.navigation.replace("petDetail", {
+                    props.navigation.push("petDetail", {
                       addNew: true,
                       route: "parentAccount",
                     });

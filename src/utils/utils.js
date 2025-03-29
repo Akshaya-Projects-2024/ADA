@@ -1,6 +1,7 @@
 import { Alert } from "react-native";
 import Toast from "react-native-toast-message";
 import Strings from "../constants/strings";
+import moment from "moment";
 
 const DAY_MULTIPLIER = 1000 * 60 * 60 * 24;
 
@@ -97,6 +98,23 @@ function calculatePercentage(amount, percent) {
   return percentamt;
 }
 
+const findDifferenceByDaysAndTime = (date) => {
+  const now = moment();
+  const then = moment(date);
+  const diffDays = now.diff(then, 'days');
+  
+  if (diffDays < 1) {
+    const diffHours = now.diff(then, 'hours');
+    if (diffHours < 1) {
+      const diffMinutes = now.diff(then, 'minutes');
+      return `${diffMinutes} min ago`;
+    }
+    return `${diffHours} hours ago`;
+  }
+  
+  return `${diffDays} days ago`;
+};
+
 export {
   showToast,
   validObject,
@@ -110,4 +128,5 @@ export {
   calculateTax,
   calculatePercentage,
   calcuateTotal,
+  findDifferenceByDaysAndTime
 };

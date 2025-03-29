@@ -63,7 +63,7 @@ const MyBookings = ({ navigation, route }) => {
   const [otpInput, setOtpInput] = useState();
 
   const filterOptions = ["Daily", "Weekly", "Monthly", "Custom"];
-
+  const dataFetched = useRef(false);
   useEffect(() => {
     if (!focus) {
       setVisible(false);
@@ -121,6 +121,7 @@ const MyBookings = ({ navigation, route }) => {
       };
       const res = await getAllAppointment(params);
       if (res?.status === 200) {
+        dataFetched.current = true;
         const output = res?.data?.data;
         if (validArray(output)) {
           setData(output);
@@ -264,7 +265,7 @@ const MyBookings = ({ navigation, route }) => {
             bounces={false}
             renderItem={renderItem}
             keyExtractor={(item) => item?.appointment_id?.toString()}
-            ListEmptyComponent={EmptyContentView}
+            ListEmptyComponent={!dataFetched.current ? null :EmptyContentView}
             contentContainerStyle={{ flexGrow: 1 }}
           />
         </View>
@@ -290,7 +291,7 @@ const MyBookings = ({ navigation, route }) => {
               </Pressable>
             )}
             keyExtractor={(item, index) => index.toString()}
-            ListEmptyComponent={EmptyView}
+            ListEmptyComponent={!dataFetched.current ? null :EmptyView}
             contentContainerStyle={{ flexGrow: 1 }}
           />
         </FilterModal>
