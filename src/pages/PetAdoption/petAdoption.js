@@ -272,7 +272,7 @@ const PetAdoption = (props) => {
 
                 <TextInput
                   style={styles.searchBar}
-                  placeholder="Search (Type 3 letters to search)..."
+                  placeholder="Search"
                   placeholderTextColor={"#000"}
                   value={searchText}
                   onChangeText={handleSearchChange}
@@ -424,7 +424,7 @@ const PetAdoption = (props) => {
           <View style={{ flex: 1 }}>
             <FlatList
               showsVerticalScrollIndicator={false}
-              data={validArray(filteredData) ? filteredData : data}
+              data={validArray(filteredData) ? filteredData : []}
               bounces={false}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     height: 42,
     flex: 1,
     fontSize: THEMES.fonts.font12,
-    color: THEMES.colors.darkGrey,
+    color: THEMES.colors.black,
   },
 });
 
