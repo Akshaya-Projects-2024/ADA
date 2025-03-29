@@ -53,6 +53,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { navigateToParent } from "../../navigations/rootNavigationRef";
 import InputField from "../../components/InputField";
 import CheckCircle from "../../assets/svg/check.svg";
+import { useUser } from "../../api/UserContext";
 
 const PaymentsSubscription = (props) => {
   const dispatch = useDispatch();
@@ -75,6 +76,7 @@ const PaymentsSubscription = (props) => {
   const [validation, setValidation] = useState("");
   const [successPromocode, setSuccessPromocode] = useState("");
   const [promocodeDetails, setPromoCodeDetails] = useState("");
+  const { userData, apiInitCall } = useUser();
 
   useEffect(() => {
     initData();
@@ -175,6 +177,7 @@ const PaymentsSubscription = (props) => {
           const acknowledgeResponse = await acknowledgeSubscription(params);
           if (acknowledgeResponse?.status === 200) {
             await fetchUserProfile();
+           await  apiInitCall();
             setSubscription(true);
           }
         }

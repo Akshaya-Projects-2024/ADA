@@ -49,6 +49,7 @@ import Delete from "../../assets/svg/delete.svg";
 import Dialog from "../../components/Dialog";
 import { goBack } from "../../navigations/rootNavigationRef";
 import { updateProfileData } from "../../redux-store/actions/registerAction";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 const GENDER = { male: "Male", female: "Female" };
 
@@ -86,6 +87,9 @@ const PetDetail = (props) => {
   const [submitDocumentData, setSubmitDocumentData] = useState([]);
   const dispatch = useDispatch();
   const isURL = (str) => /^(https?:\/\/|file:\/\/)/.test(str);
+  const [editEnable, setEditEnable] = useState(false);
+  const [isSubmit, setIsSubmit] = useState(false);
+  const [editModal, setEditModal] = useState(false);
 
   const isBase64 = (str) =>
     /^data:(image|application)\/[a-zA-Z]+;base64,/.test(str);
@@ -100,6 +104,9 @@ const PetDetail = (props) => {
   };
 
   useEffect(() => {
+    if (Boolean(petDetails?.length) == 0) {
+      setIsSubmit(true);
+    }
     initData();
   }, []);
 
@@ -176,6 +183,10 @@ const PetDetail = (props) => {
         setSubmitDocumentData([...petImages, ...certificates]);
       }
     }
+  };
+
+  const editPopup = () => {
+    setEditModal(true);
   };
 
   useEffect(() => {
@@ -460,7 +471,7 @@ const PetDetail = (props) => {
           right={
             !addNew && validArray(petDetails) ? (
               <View
-                style={{ flexDirection: "row", justifyContent: "flex-end" }}
+                style={{ flexDirection: "row", justifyContent: "flex-end", alignItems:'center' }}
               >
                 <TouchableOpacity
                   style={{
@@ -487,6 +498,19 @@ const PetDetail = (props) => {
                 >
                   <Delete />
                 </TouchableOpacity>
+                {Boolean(petDetails?.length) !== 0 && (
+                  <TouchableOpacity  style={{
+                    paddingVertical: 10,
+                    paddingHorizontal: 15,
+                    paddingRight: 0,
+                  }} onPress={() => editPopup()}>
+                    <FontAwesome
+                      size={20}
+                      name="edit"
+                      color={THEMES.colors.black}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
             ) : (
               <></>
@@ -816,7 +840,7 @@ const PetDetail = (props) => {
                 paddingHorizontal: moderateScale(16),
               }}
             >
-              <Button title="Submit" onPress={onSubmit} />
+              {(isSubmit || addNew) && <Button title="Submit" onPress={onSubmit} />}
             </View>
           </ScrollView>
         </View>
@@ -912,7 +936,7 @@ const PetDetail = (props) => {
         <Dialog
           flag={Boolean(deleteModal)}
           title={"Delete"}
-          description={`Are u sure you want to delete the pet?`}
+          description={`Are you sure you want to delete the pet?`}
           leftButtonText="No"
           rightButtonText="Yes"
           rightButtonPressed={deletePetData}
@@ -923,6 +947,22 @@ const PetDetail = (props) => {
             setDeleteModal(false);
           }}
         />
+        <Dialog
+            flag={editModal}
+            description={"Are you sure you want to edit this pet profile?"}
+            leftButtonText="No"
+            rightButtonText="Yes"
+            leftButtonPressed={() => {
+              setEditModal(false);
+              setIsSubmit(false);
+            }}
+            rightButtonPressed={() => {
+              setIsSubmit(true);
+              setEditModal(false);
+            }}
+            onClose={() => setEditModal(false)}
+            title="Edit Pet Profile"
+          />
       </View>
     </SafeAreaView>
   );

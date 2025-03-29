@@ -398,9 +398,9 @@ const MyAccount = (props) => {
               </View>
               <View style={styles.nameView}>
                 <Text style={[styles.nameText]}>
-                  {guestUser
-                    ? Strings.guest
-                    : profile?.providerProfile?.providerBusiness?.name}
+                  {profile?.providerProfile?.providerBusiness?.name
+                    ? profile?.providerProfile?.providerBusiness?.name
+                    : Strings.guest}
                 </Text>
                 <View style={{ alignItems: "center", width: "80%" }}>
                   {profileServices ? (

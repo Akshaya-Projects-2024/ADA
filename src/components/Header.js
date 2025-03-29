@@ -72,7 +72,7 @@ const Header = (props) => {
           {title}
         </Text>
       </View>
-      <View style={widthStyle}>
+      <View style={[widthStyle, {alignItems:'flex-end'}]}>
         {showFilter ? <Filter /> : showSearch ? <Search /> : null}
         {right}
       </View>

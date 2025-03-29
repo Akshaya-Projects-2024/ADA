@@ -39,6 +39,8 @@ import {
   validateInput,
 } from "../../utils/validation";
 import { LoginModules } from "../../constants/enums";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import Dialog from "../../components/Dialog";
 
 const ParentDetails = (props) => {
   const route = props?.route?.params?.route;
@@ -46,7 +48,6 @@ const ParentDetails = (props) => {
     (state) => state?.commonReducer
   );
   const dispatch = useDispatch();
-
   const { parentContact } = parentProfie;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -63,10 +64,18 @@ const ParentDetails = (props) => {
     providerProfile?.providerContact?.email || undefined
   );
   const [pinCode, setPincode] = useState();
-  const { apiInitCall } = useUser();
+  const [editEnable, setEditEnable] = useState(false);
+  const [isSubmit, setIsSubmit] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const { apiInitCall } = useUser(false);
+
+  console.log("parentProfie", parentProfie)
 
   useEffect(() => {
     initData();
+    if (parentContact?.id == 0) {
+      setIsSubmit(true);
+    }
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -167,7 +176,7 @@ const ParentDetails = (props) => {
     } else if (!emailId) {
       showToast("error", "Please enter email Id");
     } else if (validateInput(emailId) == "invalid") {
-      showToast("error", "Please enter valid email Id");
+      showToast("err or", "Please enter valid email Id");
     } else if (!address) {
       showToast("error", "Please enter address");
     } else if (!pinCode) {
@@ -219,11 +228,30 @@ const ParentDetails = (props) => {
     }
   };
 
+  const editPopup = () => {
+    setEditModal(true);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <StatusBar backgroundColor={THEMES.colors.bgColor} />
-        <Header title={"Parent details"} showBack bgColor="transparent" />
+        <Header
+          title={"Parent details"}
+          showBack
+          bgColor="transparent"
+          right={
+            parentContact?.id !== 0 && (
+              <TouchableOpacity onPress={() => editPopup()}>
+                <FontAwesome
+                  size={20}
+                  name="edit"
+                  color={THEMES.colors.black}
+                />
+              </TouchableOpacity>
+            )
+          }
+        />
         {route !== "parentAccount" && (
           <View
             style={{
@@ -364,7 +392,12 @@ const ParentDetails = (props) => {
                   paddingBottom: moderateScale(24),
                 }}
               >
-                <Button title="Next" onPress={() => onSubmit()} />
+                {isSubmit && (
+                  <Button
+                    title={parentContact?.id == 0 ? "Next" : "Submit"}
+                    onPress={() => onSubmit()}
+                  />
+                )}
               </View>
             </View>
           </ScrollView>
@@ -372,6 +405,22 @@ const ParentDetails = (props) => {
             isVisible={visible}
             onClose={() => setVisible(false)}
             handleSelectedImage={(image) => handleLogo(image)}
+          />
+          <Dialog
+            flag={editModal}
+            description={"Are you sure you want to edit this parent profile?"}
+            leftButtonText="No"
+            rightButtonText="Yes"
+            leftButtonPressed={() => {
+              setEditModal(false);
+              setIsSubmit(false);
+            }}
+            rightButtonPressed={() => {
+              setIsSubmit(true);
+              setEditModal(false);
+            }}
+            onClose={() => setEditModal(false)}
+            title="Edit Parent Profile"
           />
         </View>
       </View>

@@ -90,6 +90,7 @@ const ParentAccount = (props) => {
   const [featureList, setFeatureList] = useState([]);
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
+  const isServiceProvider = loggedInModule === LoginModules.provider;
 
   const handleDeleteAccount = async () => {
     try {
@@ -365,7 +366,11 @@ const ParentAccount = (props) => {
                     : Strings.guest}
                 </Text>
                 <Text style={styles.premiumMemberText}>
-                  {guestUser ? Strings.guestUser : Strings.premiumMemmber}
+                  {profile?.[
+                    isServiceProvider ? "providerProfile" : "parentProfie"
+                  ]?.subscription?.status == "inactive"
+                    ? Strings.guestUser
+                    : Strings.premiumMemmber}
                 </Text>
               </View>
               <View style={styles.padding14}>
@@ -407,7 +412,7 @@ const ParentAccount = (props) => {
                     showPending={false}
                     addBottom={"addBottom"}
                     onPress={() => {
-                      if(validArray(profile?.parentProfie?.petDetails)) {
+                      if (validArray(profile?.parentProfie?.petDetails)) {
                         navigate("actvityTrackerDashboard", {
                           route: "parentAccount",
                         });
