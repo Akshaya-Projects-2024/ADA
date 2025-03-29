@@ -305,10 +305,10 @@ const PaymentsSubscription = (props) => {
         if (validArray(outputArray)) {
           let selectedSub = {};
           setSubscriptionData(outputArray);
-          setSubscriptionDetails(outputArray[0]);
+          setSubscriptionDetails(outputArray[1]);
           let cardData = {
-            ...outputArray[0],
-            details: outputArray?.[0]?.details?.split(","),
+            ...outputArray[1],
+            details: outputArray?.[1]?.details?.split(","),
           };
           setSelectedCard(cardData);
           if (

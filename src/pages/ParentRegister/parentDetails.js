@@ -69,7 +69,7 @@ const ParentDetails = (props) => {
   const [editModal, setEditModal] = useState(false);
   const { apiInitCall } = useUser(false);
 
-  console.log("parentProfie", parentProfie)
+
 
   useEffect(() => {
     initData();
@@ -167,8 +167,6 @@ const ParentDetails = (props) => {
       showToast("error", "Please enter your parent name");
     } else if (!isValidName(parentName)) {
       showToast("error", "Please enter valid parent name");
-    } else if (!description) {
-      showToast("error", "Please enter description");
     } else if (!mobileNumber) {
       showToast("error", "Please enter mobile number");
     } else if (validateInput(mobileNumber) == "invalid") {

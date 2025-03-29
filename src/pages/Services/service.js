@@ -44,7 +44,6 @@ const Service = ({ navigation, route }) => {
   }, [isFocused]);
 
   const initData = async (text) => {
-    contextValue?.setLoader(true);
     try {
       const userId = await decryptService("userId");
       const params = {
@@ -70,10 +69,10 @@ const Service = ({ navigation, route }) => {
 
   const handleSearch = (text) => {
     setSearchText(text);
-    if (text.length > 2) {
+    if (text.length >= 3) {
       initData(text);
     } else {
-      setFilteredData([]);
+      initData();
     }
   };
 
@@ -192,7 +191,6 @@ const Service = ({ navigation, route }) => {
                   width: "70%",
                 }}
               >
-                {console.log(item?.profile?.providerBusiness?.experience)}
                 {`${item?.profile?.providerBusiness?.services
                   ?.map((item) => item.service)
                   .join(", ")} | ${
@@ -314,8 +312,13 @@ const Service = ({ navigation, route }) => {
                 }}
               />
               {searchText.length > 0 && (
-                <TouchableOpacity onPress={() => setSearchText("")}>
-                  <Cross style={{ width: 20, height: 20 }} />
+                <TouchableOpacity
+                  onPress={() => {
+                    setSearchText("");
+                    initData();
+                  }}
+                >
+                  <Cross style={{ width: 30, height: 30 }} />
                 </TouchableOpacity>
               )}
             </View>
@@ -327,7 +330,7 @@ const Service = ({ navigation, route }) => {
             bounces={false}
             renderItem={renderItem}
             contentContainerStyle={{ flexGrow: 1 }}
-            ListEmptyComponent={!dataFetched.current ? null :EmptyContentView}
+            ListEmptyComponent={!dataFetched.current ? null : EmptyContentView}
           />
         </>
       </View>

@@ -87,21 +87,18 @@ const ServiceDetail = ({ navigation, route }) => {
     }
   }, []);
 
-  const addBookmarkMethod = async () => {
+  const addBookmarkMethod = async (bookmark) => {
     try {
       contextValue?.setLoader(true);
       let obj = {
         userid: await decryptService("userId"),
         servicecode: selectedService?.code,
         provider: selectedProvider?.profile?.providerBusiness?.userid,
-        isactive: 1,
+        isactive: bookmark ? 1 : 0,
       };
-
       let res = await bookmarkApi(obj);
       if (res) {
-        setBookmark(true);
-      } else {
-        setBookmark(false);
+        setBookmark(bookmark);
       }
       contextValue?.setLoader(false);
     } catch (error) {
@@ -129,7 +126,11 @@ const ServiceDetail = ({ navigation, route }) => {
             <Back stroke={"#000"} />
           </TouchableOpacity>
           <View style={{ flexDirection: "row" }}>
-            <TouchableOpacity onPress={() => addBookmarkMethod()}>
+            <TouchableOpacity
+              onPress={() => {
+                addBookmarkMethod(!bookmark);
+              }}
+            >
               <Bookmark
                 fill={bookmark ? "#FFAE42" : "white"}
                 stroke={bookmark ? "#FFAE42" : "black"}
@@ -208,7 +209,7 @@ const ServiceDetail = ({ navigation, route }) => {
                   paddingTop: moderateScale(3),
                   fontSize: THEMES.fonts.font14,
                   width: "90%",
-                  color: THEMES.colors.black
+                  color: THEMES.colors.black,
                 }}
               >
                 {selectedProvider?.profile?.providerBusiness?.services
@@ -408,7 +409,7 @@ const ServiceDetail = ({ navigation, route }) => {
                       onPress={() => {
                         navigation.navigate("ViewAllReviews", {
                           selectedService: selectedProvider,
-                          viewAll: true
+                          viewAll: true,
                         });
                       }}
                       style={{
@@ -505,7 +506,7 @@ const ServiceDetail = ({ navigation, route }) => {
                           { marginLeft: index === 0 ? 0 : moderateScale(10) },
                         ]}
                       >
-                        <Text style={styles.docText}>{`Document ${
+                        <Text style={styles.docText}>{`Certificate ${
                           index + 1
                         }`}</Text>
                       </TouchableOpacity>

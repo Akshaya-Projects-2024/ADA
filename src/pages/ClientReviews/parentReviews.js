@@ -194,7 +194,7 @@ const ParentReviews = (props) => {
                       source={{ uri: logindetails?.parentphoto }}
                     />
                   </View>
-                  <View style={{ marginLeft: moderateScale(8) }}>
+                  <View style={{ marginLeft: moderateScale(8)}}>
                     <View style={styles.flatListNameRow}>
                       <Text style={styles.name}>{profileData?.name}</Text>
                       <View>
@@ -253,7 +253,7 @@ const ParentReviews = (props) => {
                       source={{ uri: logindetails?.parentphoto }}
                     />
                   </View>
-                  <View style={{ marginLeft: moderateScale(8) }}>
+                  <View style={{ marginLeft: moderateScale(8), backgroundColor:'red' }}>
                     <View style={styles.flatListNameRow}>
                       <Text style={styles.name}>
                         {selectedItem?.parentdetails?.name}
@@ -765,6 +765,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: moderateScale(20),
     marginTop: moderateScale(20),
+
   },
   flatListRow: {
     flexDirection: "row",

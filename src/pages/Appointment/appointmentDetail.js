@@ -166,7 +166,7 @@ const AppointmentDetail = (props) => {
                         })}
                     </ScrollView>
                   </View>
-                  {Boolean(document?.length) && (
+                  {Boolean(document?.length > 1) && (
                     <View style={styles.moreView}>
                       <More />
                     </View>

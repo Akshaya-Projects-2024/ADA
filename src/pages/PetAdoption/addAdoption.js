@@ -236,6 +236,7 @@ const AddAdoption = (props) => {
           description: description,
         };
         const response = await addAdoption(params);
+
         if (response?.status === 200) {
           if (selectedPlatforms) {
             await shareImageBase64(response?.data?.data, selectedPlatforms);
@@ -246,6 +247,7 @@ const AddAdoption = (props) => {
         contextValue?.setLoader(false);
       }
     } catch (error) {
+      console.log("er", error);
       contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
