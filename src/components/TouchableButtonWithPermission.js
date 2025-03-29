@@ -76,7 +76,7 @@ const TouchableButtonWithPermission = ({
 
       <Dialog
         flag={Boolean(title)}
-        title={"Warning!!!"}
+        title={"Get Registered !"}
         description={title}
         rightButtonText="Close"
         rightButtonPressed={() => {

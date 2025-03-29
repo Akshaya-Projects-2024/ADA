@@ -942,10 +942,11 @@ const PetDetail = (props) => {
             </View>
           </View>
         </Modal>
+        {console.log("Get Registered", selectedPet)}
         <Dialog
           flag={Boolean(deleteModal)}
-          title={"Delete"}
-          description={`Are you sure you want to delete the pet?`}
+          title={"Delete Profile"}
+          description={`Are you sure you want to delete ${selectedPet?.name} profile`}
           leftButtonText="No"
           rightButtonText="Yes"
           rightButtonPressed={deletePetData}
