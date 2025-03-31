@@ -166,7 +166,12 @@ const MyAccount = (props) => {
     () =>
       profile?.providerProfile?.providerBusiness?.services?.reduce(
         (accumulator, currentValue) =>
-          accumulator + `${currentValue?.service} `,
+          accumulator +
+          `${
+            currentValue?.service.includes("Other")
+              ? profile?.providerProfile?.providerBusiness?.others
+              : currentValue?.service
+          } `,
         ""
       ),
     [profile?.providerProfile?.providerBusiness?.services]
@@ -260,7 +265,8 @@ const MyAccount = (props) => {
     addBottom,
     route,
     showPending = false,
-    checkPermission = false
+    checkPermission = false,
+    showExpired = false
   ) => {
     const Icon = icon;
     return (
@@ -304,7 +310,11 @@ const MyAccount = (props) => {
           <Text style={styles.titleText}>{title}</Text>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          {showPending && <Text style={styles.pendingText}>Pending</Text>}
+          {(showPending || showExpired) && (
+            <Text style={styles.pendingText}>
+              {showPending ? "Pending" : "Expired"}
+            </Text>
+          )}
           <RightArrow stroke={THEMES.colors.boulder} />
         </View>
       </TouchableButtonWithPermission>
@@ -324,7 +334,7 @@ const MyAccount = (props) => {
   const switchProfile = () => {
     const validParentProfile = validateParentProfileUsingStatus(profile);
     modal && setModal(false);
-    
+
     if (validParentProfile?.flag) {
       navigateToParent(props.navigation);
     } else {
@@ -431,7 +441,9 @@ const MyAccount = (props) => {
                     Strings.paymentSubScription,
                     "",
                     "paymentsSubscription",
-                    profile?.providerProfile?.subscription?.status !== "active"
+                    profile?.providerProfile?.subscription?.status == "inactive",
+                    false,
+                    profile?.providerProfile?.subscription?.status == "expired"
                   )}
                   {renderItem(
                     THEMES.colors.sandyBeach,

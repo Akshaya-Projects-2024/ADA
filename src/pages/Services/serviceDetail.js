@@ -109,14 +109,15 @@ const ServiceDetail = ({ navigation, route }) => {
   const sessionChargesAmount = useMemo(() => {
     let amount = selectedProvider?.profile?.sessionRateDetails?.filter(
       (x) => x.servicecode === selectedService?.code
-    )?.[0].sessioncharges;
+    )?.[0]?.sessioncharges;
     let text = "/Per session"
     if (!Boolean(+amount)) {
+      
       amount =
         selectedProvider?.profile?.sessionRateDetails?.filter(
           (x) => x.servicecode === selectedService?.code
-        )?.[0].monthcharges;
-        text = "/Per Month"
+        )?.[0]?.monthcharges;
+        text = "/Per Month";
     }
     return amount + text
   });

@@ -14,6 +14,15 @@ export const validateParentProfileUsingStatus = (userData) => {
   };
 };
 
+// export const validateProviderProfileUsingStatus = (userData) => {
+//   const status = userData?.logindetails?.isparent;
+//   return {
+//     flag: Boolean(status == 4),
+//     navigateTo: !status ? "parentDetails" : status == 1 ? "petDetail" : "",
+//     partiallyCompleted: !status,
+//   };
+// };
+
 export const validateParentProfile = (userData) => {
   if (
     !userData?.parentProfie?.parentContact?.name ||
@@ -260,7 +269,7 @@ const validPerSession = (ProviderSession, sessionRateDetails) => {
       rateDetail.sessioncharges && rateDetail.sessioncharges !== "0"
   );
   if (
-    ProviderSession?.ispermonth &&
+    ProviderSession?.ispersession &&
     (!ProviderSession?.sessiontime || !isChargesAvailable)
   ) {
     return false;
