@@ -27,7 +27,11 @@ import { useSelector } from "react-redux";
 import ModalDropdown from "../../components/ModalDropdown";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "../../api/UserContext";
-import { isValidNumber, isValidPrice, validateMinutes } from "../../utils/validation";
+import {
+  isValidNumber,
+  isValidPrice,
+  validateMinutes,
+} from "../../utils/validation";
 const SESSION_AVAILABILITY = {
   home: "Home Visit",
   center: "At Center Service",
@@ -70,12 +74,22 @@ const SessionDetail = (props) => {
     };
   }, []);
 
+  const getServices = () => {
+    const services = userData?.providerProfile?.providerBusiness?.services;
+    const index = services.findIndex((item) => item.service.includes("Other"));
+    if (index > -1) {
+      services[index].service =
+        userData?.providerProfile?.providerBusiness?.others;
+    }
+    return services;
+  };
+
   const initData = () => {
     //TODO remove this once api is working properly
     // if (ProviderSession?.availableat) {
     //   setHomeVisit(true);
     // }
-    
+
     //TODO Uncomment this once api is working properly
     // Check session availability efficiently
     if (validArray(ProviderSession?.availableat)) {
@@ -89,14 +103,15 @@ const SessionDetail = (props) => {
     const isPerMonth = !!ProviderSession?.ispermonth;
     setPerSession(isPerSession);
     setPerMonth(isPerMonth);
-    const services = userData?.providerProfile?.providerBusiness?.services;
+    let services = getServices()
+
     if (services?.length) {
       const { perSession, perMonth } = services.reduce(
         (acc, { code: serviceCode, service: serviceName }) => {
           const matchingRates =
             sessionRateDetails?.filter((x) => x.servicecode === serviceCode) ||
             [];
-          
+
           if (matchingRates.length) {
             matchingRates.forEach(
               ({ sessioncharges, sessiontime, monthcharges, monthtime }) => {
@@ -362,7 +377,7 @@ const SessionDetail = (props) => {
                   setSessionData({
                     ...sessionData,
                     perSession: !perSession
-                      ? userData?.providerProfile?.providerBusiness?.services?.map(
+                      ? getServices()?.map(
                           (item) => ({
                             serviceName: item.service,
                             serviceCode: item.code,
@@ -398,7 +413,7 @@ const SessionDetail = (props) => {
                   setSessionData({
                     ...sessionData,
                     perMonth: !perMonth
-                      ? userData?.providerProfile?.providerBusiness?.services?.map(
+                      ? getServices()?.map(
                           (item) => ({
                             serviceName: item.service,
                             serviceCode: item.code,

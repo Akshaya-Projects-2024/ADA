@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -105,6 +105,22 @@ const ServiceDetail = ({ navigation, route }) => {
       contextValue?.setLoader(false);
     }
   };
+
+  const sessionChargesAmount = useMemo(() => {
+    let amount = selectedProvider?.profile?.sessionRateDetails?.filter(
+      (x) => x.servicecode === selectedService?.code
+    )?.[0].sessioncharges;
+    let text = "/Per session"
+    if (!Boolean(+amount)) {
+      amount =
+        selectedProvider?.profile?.sessionRateDetails?.filter(
+          (x) => x.servicecode === selectedService?.code
+        )?.[0].monthcharges;
+        text = "/Per Month"
+    }
+    return amount + text
+  });
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
@@ -225,12 +241,7 @@ const ServiceDetail = ({ navigation, route }) => {
                   color: THEMES.colors.black,
                 }}
               >
-                {`₹ ${
-                  selectedProvider?.profile?.sessionRateDetails[0]
-                    ?.sessioncharges ||
-                  selectedProvider?.profile?.monthcharges[0]?.sessioncharges ||
-                  "0"
-                }/Per session`}
+                {`₹ ${sessionChargesAmount}`}
               </Text>
             </View>
           </View>
