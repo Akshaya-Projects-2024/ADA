@@ -63,8 +63,8 @@ const ServiceListReviews = ({ navigation, route }) => {
         const uniqueProviders = new Map();
 
         const uniqueAppointments = output.filter((appointment) => {
-          if (!uniqueProviders.has(appointment.providername)) {
-            uniqueProviders.set(appointment.providername, true);
+          if (!uniqueProviders.has(appointment.providername?.trim())) {
+            uniqueProviders.set(appointment.providername?.trim(), true);
             return true;
           }
           return false;
@@ -86,7 +86,7 @@ const ServiceListReviews = ({ navigation, route }) => {
   const handleSearch = (text) => {
     setSearchText(text);
     const filtered = listRef.current.filter((item) =>
-      item?.providername?.toLowerCase()?.includes(text.toLowerCase())
+      item?.providername?.trim()?.toLowerCase()?.includes(text.toLowerCase())
     );
     setFilteredData(text ? filtered : listRef.current);
   };
@@ -171,7 +171,7 @@ const ServiceListReviews = ({ navigation, route }) => {
                   fontSize: THEMES.fonts.font14,
                 }}
               >
-                {item?.providername}
+                {item?.providername?.trim()}
               </Text>
             </View>
           </View>

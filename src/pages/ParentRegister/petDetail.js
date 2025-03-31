@@ -942,7 +942,6 @@ const PetDetail = (props) => {
             </View>
           </View>
         </Modal>
-        {console.log("Get Registered", selectedPet)}
         <Dialog
           flag={Boolean(deleteModal)}
           title={"Delete Profile"}

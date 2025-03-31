@@ -21,6 +21,7 @@ import { decryptService } from "../../utils/storageFunc";
 import { getAppointmentById } from "../../redux-store/actions/auth";
 import { contextValue } from "../../components/Loader";
 import { useSelector } from "react-redux";
+import BackArrowComponent from "../../components/BackArrowComponent";
 
 const AppointmentProviderDetail = (props) => {
   const selectedData = props?.route?.params?.selectedItem;
@@ -65,7 +66,6 @@ const AppointmentProviderDetail = (props) => {
       ),
     [appointmentData?.petdetails?.documents]
   );
-  console.log(appointmentData);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -75,13 +75,7 @@ const AppointmentProviderDetail = (props) => {
           resizeMode="cover"
           style={styles.imgBackground}
         >
-          <TouchableOpacity
-            style={styles.goBackBtn}
-            hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-            onPress={() => props.navigation.goBack()}
-          >
-            <Back stroke="#000" />
-          </TouchableOpacity>
+          <BackArrowComponent />
           <View style={styles.contentView}>
             <ScrollView
               style={{ flex: 1 }}
@@ -163,19 +157,19 @@ const AppointmentProviderDetail = (props) => {
                     </View>
                     <View style={styles.parentDetailsView}>
                       <Text style={styles.parentText}>Provider details</Text>
-                      <Text numberOfLines={2} style={styles.location}>
-                        {appointmentData?.providername}
+                      <Text style={styles.location}>
+                        {appointmentData?.providername?.trim()}
                       </Text>
                       <View style={styles.rowDetail}>
                         <Text style={styles.numberText}>
-                          {appointmentData?.provider_id}
+                          {appointmentData?.ProviderContact?.mobile}
                         </Text>
 
                         <TouchableOpacity
                           style={styles.ml20}
                           onPress={() =>
                             Linking.openURL(
-                              `tel:${appointmentData?.provider_id}`
+                              `tel:${appointmentData?.ProviderContact?.mobile}`
                             )
                           }
                         >

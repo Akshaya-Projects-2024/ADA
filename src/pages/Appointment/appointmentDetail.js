@@ -21,6 +21,8 @@ import { decryptService } from "../../utils/storageFunc";
 import { getAppointmentById } from "../../redux-store/actions/auth";
 import { contextValue } from "../../components/Loader";
 import { useSelector } from "react-redux";
+import ProfilePhoto from "../../components/ProfilePhoto";
+import BackArrowComponent from "../../components/BackArrowComponent";
 
 const AppointmentDetail = (props) => {
   const selectedData = props?.route?.params?.selectedItem;
@@ -74,13 +76,7 @@ const AppointmentDetail = (props) => {
           resizeMode="cover"
           style={styles.imgBackground}
         >
-          <TouchableOpacity
-            style={styles.goBackBtn}
-            hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-            onPress={() => props.navigation.goBack()}
-          >
-            <Back stroke="#000" />
-          </TouchableOpacity>
+          <BackArrowComponent />
           <View style={styles.contentView}>
             <ScrollView
               style={{ flex: 1 }}
@@ -174,8 +170,8 @@ const AppointmentDetail = (props) => {
 
                   <View style={styles.cardView}>
                     <View style={styles.imgView}>
-                      <Image
-                        source={{ uri: profile?.logindetails?.parentphoto }}
+                      <ProfilePhoto
+                        url={appointmentData?.providerphoto}
                         style={styles.img}
                       />
                     </View>
@@ -186,7 +182,6 @@ const AppointmentDetail = (props) => {
                       </Text>
                       <View style={styles.rowDetail}>
                         <Text style={styles.numberText}>
-                          {" "}
                           {appointmentData?.parentdetails?.mobile}
                         </Text>
 
@@ -450,6 +445,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingTop: moderateScale(5),
+    width: "100%"
   },
   numberText: {
     color: THEMES.colors.darkGrey,

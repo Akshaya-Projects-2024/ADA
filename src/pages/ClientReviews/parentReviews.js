@@ -155,8 +155,8 @@ const ParentReviews = (props) => {
                 </View>
                 <View style={{ marginLeft: moderateScale(8) }}>
                   <Text style={styles.replyName}>
-                    {selectedItem?.providername
-                      ? selectedItem?.providername
+                    {selectedItem?.providername?.trim()
+                      ? selectedItem?.providername?.trim()
                       : guestUser}
                   </Text>
                   <Text
@@ -210,7 +210,6 @@ const ParentReviews = (props) => {
                         />
                       </View>
                     </View>
-
                     <Text style={styles.profileTypeText}>
                       {item?.item?.patname}
                     </Text>
@@ -408,7 +407,7 @@ const ParentReviews = (props) => {
                 <View style={{ marginLeft: moderateScale(8) }}>
                   <View>
                     <Text numberOfLines={1} style={styles.nameText}>
-                      {selectedItem?.providername}
+                      {selectedItem?.providername?.trim()}
                     </Text>
                     <Text
                       style={[

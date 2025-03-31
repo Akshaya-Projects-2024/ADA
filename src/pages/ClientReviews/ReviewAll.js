@@ -171,10 +171,10 @@ const ReviewAll = (props) => {
                 </View>
                 <View style={{ marginLeft: moderateScale(8) }}>
                   <Text style={styles.replyName}>
-                    {selectedItem?.providername
-                      ? selectedItem?.providername
-                      : item?.item?.providername
-                      ? selectedItem?.providername
+                    {selectedItem?.providername?.trim()
+                      ? selectedItem?.providername?.trim()
+                      : item?.item?.providername?.trim()
+                      ? selectedItem?.providername?.trim()
                       : guestUser}
                   </Text>
                 </View>
@@ -593,7 +593,7 @@ const ReviewAll = (props) => {
                       <View style={{ marginLeft: moderateScale(8) }}>
                         <View style={styles.nameRow}>
                           <Text numberOfLines={1} style={styles.nameText}>
-                            {selectedItem?.providername}
+                            {selectedItem?.providername?.trim()}
                           </Text>
                         </View>
                       </View>

@@ -30,6 +30,7 @@ import { useIsFocused } from "@react-navigation/native";
 import {
   setLoggedInMoodule,
   validateParentProfile,
+  validateParentProfileUsingStatus,
 } from "../../utils/userUtils";
 import {
   AppointmentStatus,
@@ -335,9 +336,11 @@ const Home = (props) => {
   };
 
   const switchProfile = () => {
-    const validParentProfile = validateParentProfile(profile);
+    const validParentProfile = validateParentProfileUsingStatus(profile);
     modal && setModal(false);
     encryptService("loggedInModule", LoginModules.parent);
+    console.log(profile);
+    
     if (validParentProfile?.flag) {
       navigateToParent(props.navigation);
     } else {

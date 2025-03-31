@@ -30,10 +30,10 @@ import { useDebounce } from "../../hooks/useDebounce";
 import ProfileDummy from "../../assets/svg/user.svg";
 import Dialog from "../../components/Dialog";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
+import { getAdoptionCategory } from "../../redux-store/actions/commonApis";
 
 const PetAdoption = (props) => {
   const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
   const [petCategories, setPetCategories] = useState([]);
   const [filterCategory, setFilterCategory] = useState("");
   const isFocused = useIsFocused();
@@ -42,7 +42,6 @@ const PetAdoption = (props) => {
   const [paymentModal, setPaymentModal] = useState(false);
   const searchQuery = useDebounce(searchText);
   const profile = useSelector((state) => state?.commonReducer);
-  const [searchData, setSearchData] = useState([]);
   const dataFetched = useRef(false);
 
   const paymentCompleted = useMemo(() => {
@@ -64,93 +63,60 @@ const PetAdoption = (props) => {
   ]);
 
   useEffect(() => {
+    getCategory();
+  }, []);
+
+  useEffect(() => {
     if (isFocused) {
       initData();
     }
   }, [isFocused]);
 
-  useEffect(() => {
-    if (filterCategory && validArray(data)) {
-      const filteredPets = data?.filter((it) => {
-        return it.category === filterCategory;
-      });
-      setFilteredData(validArray(filteredPets) ? filteredPets : []);
-    }
-  }, [data, filterCategory]);
-
-  useEffect(() => {
-    if (validArray(data)) {
-      const filteredPets = data?.filter((it) => {
-        return it?.name
-          ?.toLowerCase()
-          ?.includes(searchQuery?.trim()?.toLowerCase());
-      });
-      setFilteredData(validArray(filteredPets) ? filteredPets : []);
-    }
-  }, [data, searchQuery]);
+  const getCategory = async () => {
+    let obj = {
+      category: "",
+    };
+    const data = await getAdoptionCategory(obj);
+    setPetCategories(
+      data.map((x) => x.category).filter((y) => !y.includes("Other"))
+    );
+  };
 
   useEffect(() => {
     if (searchQuery?.length >= 3) {
       contextValue?.setLoader(true);
-      searchApi();
+      initData();
     } else if (searchQuery?.length === 0) {
       contextValue?.setLoader(true);
-      searchApi();
-      // Restore initial data when search is cleared
+      initData();
     }
   }, [searchQuery]);
 
-  const searchApi = async () => {
+  useEffect(() => {
+    contextValue?.setLoader(true);
+    initData();
+  }, [filterCategory]);
+
+  const initData = async () => {
     try {
       const userId = await decryptService("userId");
       const params = {
         userId: userId,
         searchtype: "adoption",
-        keyword: searchQuery,
+        keyword: `category=${filterCategory};keyword=${searchQuery}`,
       };
       const res = await search(params);
-      if (validArray(res?.data?.data?.SearchResult)) {
-        setSearchData(res?.data?.data?.SearchResult);
-      } else {
-        setSearchData(filteredData);
-      }
+      dataFetched.current = true;
+      setData(res?.data?.data?.SearchResult);
       contextValue?.setLoader(false);
     } catch (error) {
-      setFilteredData(filteredData);
-      contextValue?.setLoader(false);
-      showToast("error", error?.message);
-    }
-  };
-
-  const initData = async () => {
-    contextValue?.setLoader(true);
-    try {
-      const userId = await decryptService("userId");
-      const params = {
-        process: "getAll",
-        createdby: userId,
-      };
-      const response = await getAdoption(params);
-      if (response?.status === 200) {
-        const output = response?.data?.data;
-        dataFetched.current = true;
-        if (validArray(output)) {
-          setData(output);
-          const result = new Set(
-            output.map((adoptionData) => adoptionData.category)
-          );
-          setPetCategories([...result]);
-        }
-      }
-      contextValue?.setLoader(false);
-    } catch (error) {
+      setData([]);
       contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
 
   const handleSearchChange = (text) => {
-    setFilterCategory();
     setSearchText(text);
   };
 
@@ -162,9 +128,6 @@ const PetAdoption = (props) => {
         selectedData: item,
       },
     });
-    // } else {
-    //   setPaymentModal(true);
-    // }
   };
 
   // first image in array to display as per requiremeny
@@ -383,8 +346,7 @@ const PetAdoption = (props) => {
                 <Pressable
                   onPress={() => {
                     setFilterCategory("");
-                    setSearchText("");
-                    setFilteredData(data); // Reset data to original
+                    // setSearchText("");
                   }}
                   style={{
                     paddingHorizontal: moderateScale(10),
@@ -418,7 +380,7 @@ const PetAdoption = (props) => {
                   <Pressable
                     key={`${item}_${index}`}
                     onPress={() => {
-                      setSearchText("");
+                      // setSearchText("");
                       setFilterCategory(item);
                     }}
                     style={{
@@ -427,9 +389,7 @@ const PetAdoption = (props) => {
                       paddingVertical: moderateScale(6),
                       borderWidth: 1,
                       borderColor:
-                        index === 0
-                          ? THEMES.colors.silver
-                          : filterCategory === item
+                        filterCategory === item
                           ? THEMES.colors.adoptionPink
                           : THEMES.colors.silver,
                       borderRadius: 20,
@@ -442,9 +402,7 @@ const PetAdoption = (props) => {
                       style={{
                         fontFamily: THEMES.fontFamily.semiBold,
                         color:
-                          index === 0
-                            ? THEMES.colors.black
-                            : filterCategory === item
+                          filterCategory === item
                             ? THEMES.colors.adoptionPink
                             : THEMES.colors.black,
                         fontSize: THEMES.fonts.font12,
@@ -460,13 +418,7 @@ const PetAdoption = (props) => {
           <View style={{ flex: 1 }}>
             <FlatList
               showsVerticalScrollIndicator={false}
-              data={
-                searchData?.length
-                  ? searchData
-                  : validArray(filteredData)
-                  ? filteredData
-                  : []
-              }
+              data={data}
               bounces={false}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}

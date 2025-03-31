@@ -34,6 +34,7 @@ import {
 } from "../../redux-store/actions/registerAction";
 import {
   validateParentProfile,
+  validateParentProfileUsingStatus,
   validateServiceProfile,
 } from "../../utils/userUtils";
 import {
@@ -206,7 +207,7 @@ const PaymentsSubscription = (props) => {
           userData = response?.data;
         } else {
           const validProviderProfile = validateServiceProfile(profile, true);
-          const validProfile = validateParentProfile(profile);
+          const validProfile = validateParentProfileUsingStatus(profile);
           if (loggedInModule === "provider") {
             if (validProviderProfile?.flag) {
               userData = validProviderProfile?.data;
@@ -404,7 +405,7 @@ const PaymentsSubscription = (props) => {
 
   const checkStatus = () => {
     const validProviderProfile = validateServiceProfile(profile, true);
-    const validProfile = validateParentProfile(profile);
+    const validProfile = validateParentProfileUsingStatus(profile);
     return loggedInModule === "parent"
       ? !validProfile.flag
       : !validProviderProfile.flag;

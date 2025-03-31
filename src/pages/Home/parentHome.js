@@ -323,7 +323,7 @@ const ParentHome = (props) => {
                       fontSize: THEMES.fonts.font16,
                     }}
                   >
-                    {item?.providername}
+                    {item?.providername?.trim()}
                   </Text>
                   <Text
                     numberOfLines={1}

@@ -20,7 +20,8 @@ import Share from "react-native-share";
 import { shareAdoption } from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
 import { contextValue } from "../../components/Loader";
-
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import BackArrowComponent from "../../components/BackArrowComponent";
 const AdoptionDetail = (props) => {
   const selectedAdotpionData = props.route.params.selectedData;
   const [image, setImage] = useState();
@@ -41,7 +42,6 @@ const AdoptionDetail = (props) => {
         setImage(response?.data?.data);
         contextValue?.setLoader(false);
       }
-     
     } catch (error) {
       contextValue?.setLoader(false);
     }
@@ -68,6 +68,7 @@ const AdoptionDetail = (props) => {
           resizeMode="cover"
           style={styles.imgBackground}
         >
+          <BackArrowComponent />
           <View style={styles.contentView}>
             <ScrollView
               style={{ flex: 1 }}
@@ -316,7 +317,7 @@ const AdoptionDetail = (props) => {
                             onPress={() => shareImageBase64()}
                             style={{ marginHorizontal: moderateScale(20) }}
                           >
-                            <ShareImg/>
+                            <ShareImg />
                           </TouchableOpacity>
                         </TouchableOpacity>
                       </View>
@@ -377,10 +378,11 @@ const styles = StyleSheet.create({
   },
   breedType: {
     fontFamily: THEMES.fontFamily.regular,
-    width: "50%",
+    width: "45%",
     fontSize: THEMES.fonts.font14,
     textAlign: "right",
     color: THEMES.colors.darkGrey,
+    marginRight: 5,
   },
   dogDetailView: {
     paddingVertical: moderateScale(32),
@@ -583,6 +585,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingTop: moderateScale(5),
+  },
+  goBackBtn: {
+    paddingTop: moderateScale(18),
+    paddingHorizontal: moderateScale(15),
   },
 });
 export default AdoptionDetail;

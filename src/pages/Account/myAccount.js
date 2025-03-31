@@ -28,6 +28,7 @@ import Strings from "../../constants/strings";
 import { moderateScale } from "react-native-size-matters";
 import {
   validateParentProfile,
+  validateParentProfileUsingStatus,
   validateServiceProfile,
 } from "../../utils/userUtils";
 import { useDispatch, useSelector } from "react-redux";
@@ -310,7 +311,7 @@ const MyAccount = (props) => {
     );
   };
   const onParentClick = () => {
-    const validParentProfile = validateParentProfile(profile);
+    const validParentProfile = validateParentProfileUsingStatus(profile);
     if (validParentProfile?.flag) {
       navigateToParent(props.navigation);
     } else {
@@ -321,8 +322,9 @@ const MyAccount = (props) => {
   };
 
   const switchProfile = () => {
-    const validParentProfile = validateParentProfile(profile);
+    const validParentProfile = validateParentProfileUsingStatus(profile);
     modal && setModal(false);
+    
     if (validParentProfile?.flag) {
       navigateToParent(props.navigation);
     } else {

@@ -75,6 +75,7 @@ const SessionDetail = (props) => {
     // if (ProviderSession?.availableat) {
     //   setHomeVisit(true);
     // }
+    
     //TODO Uncomment this once api is working properly
     // Check session availability efficiently
     if (validArray(ProviderSession?.availableat)) {
@@ -95,7 +96,7 @@ const SessionDetail = (props) => {
           const matchingRates =
             sessionRateDetails?.filter((x) => x.servicecode === serviceCode) ||
             [];
-
+          
           if (matchingRates.length) {
             matchingRates.forEach(
               ({ sessioncharges, sessiontime, monthcharges, monthtime }) => {

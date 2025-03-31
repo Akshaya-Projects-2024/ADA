@@ -28,6 +28,7 @@ import Activity from "../../assets/svg/activity.svg";
 import { useDispatch, useSelector } from "react-redux";
 import {
   validateParentProfile,
+  validateParentProfileUsingStatus,
   validateServiceProfile,
 } from "../../utils/userUtils";
 import ProfileDummy from "../../assets/svg/user.svg";
@@ -298,7 +299,7 @@ const ParentAccount = (props) => {
   };
 
   const profileStatus = useMemo(() => {
-    const validParentProfile = validateParentProfile(profile);
+    const validParentProfile = validateParentProfileUsingStatus(profile);
     return validParentProfile?.partiallyCompleted;
   }, [profile]);
 

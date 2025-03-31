@@ -5,6 +5,15 @@ import { dispatchLoggedInModule } from "../redux-store/actions/userActions";
 import { decryptService, encryptService } from "./storageFunc";
 import { validArray } from "./utils";
 
+export const validateParentProfileUsingStatus = (userData) => {
+  const status = userData?.logindetails?.isparent;
+  return {
+    flag: Boolean(status == 4),
+    navigateTo: !status ? "parentDetails" : status == 1 ? "petDetail" : "",
+    partiallyCompleted: !status,
+  };
+};
+
 export const validateParentProfile = (userData) => {
   if (
     !userData?.parentProfie?.parentContact?.name ||
@@ -27,10 +36,6 @@ export const validateParentProfile = (userData) => {
     !userData?.parentProfie?.petDetails[0]?.gender ||
     !userData?.parentProfie?.petDetails[0]?.name ||
     !userData?.parentProfie?.petDetails[0]?.type
-    // TODO
-    // || !userData?.parentProfie?.petDetails[0]?.breed ||
-    // || !validArray(userData?.parentProfie?.petDetails[0]?.documents) ||
-    // !validatePetDocuments(userData?.parentProfie?.petDetails[0]?.documents)
   ) {
     return { flag: false, navigateTo: "petDetail", partiallyCompleted: true };
   }
@@ -69,8 +74,9 @@ export const validateServiceProfile = (
   }
   if (
     (includeOptional &&
-    (!validArray(userData?.providerProfile?.providerDocument) ||
-      !validateDocuments(userData?.providerProfile?.providerDocument))) || !validArray(userData?.providerProfile?.ProviderSession?.availableat)
+      (!validArray(userData?.providerProfile?.providerDocument) ||
+        !validateDocuments(userData?.providerProfile?.providerDocument))) ||
+    !validArray(userData?.providerProfile?.ProviderSession?.availableat)
   ) {
     return {
       flag: false,
@@ -237,8 +243,7 @@ const validateTimeData = (times) => {
 
 const validMonthSession = (ProviderSession, sessionRateDetails) => {
   const isChargesAvailable = sessionRateDetails?.some(
-    (rateDetail) =>
-      rateDetail.monthcharges && rateDetail.monthcharges !== "0"
+    (rateDetail) => rateDetail.monthcharges && rateDetail.monthcharges !== "0"
   );
   if (
     ProviderSession?.ispermonth &&
