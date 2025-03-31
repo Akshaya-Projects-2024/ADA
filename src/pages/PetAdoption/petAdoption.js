@@ -16,7 +16,7 @@ import Header from "../../components/Header";
 import Strings from "../../constants/strings";
 import { moderateScale, ms } from "react-native-size-matters";
 import Plus from "../../assets/svg/plus.svg";
-import { getAdoption } from "../../redux-store/actions/auth";
+import { getAdoption, search } from "../../redux-store/actions/auth";
 import { showToast, validArray } from "../../utils/utils";
 import { decryptService } from "../../utils/storageFunc";
 import { useIsFocused } from "@react-navigation/native";
@@ -42,6 +42,7 @@ const PetAdoption = (props) => {
   const [paymentModal, setPaymentModal] = useState(false);
   const searchQuery = useDebounce(searchText);
   const profile = useSelector((state) => state?.commonReducer);
+  const [searchData, setSearchData] = useState([]);
   const dataFetched = useRef(false);
 
   const paymentCompleted = useMemo(() => {
@@ -87,6 +88,39 @@ const PetAdoption = (props) => {
       setFilteredData(validArray(filteredPets) ? filteredPets : []);
     }
   }, [data, searchQuery]);
+
+  useEffect(() => {
+    if (searchQuery?.length >= 3) {
+      contextValue?.setLoader(true);
+      searchApi();
+    } else if (searchQuery?.length === 0) {
+      contextValue?.setLoader(true);
+      searchApi();
+      // Restore initial data when search is cleared
+    }
+  }, [searchQuery]);
+
+  const searchApi = async () => {
+    try {
+      const userId = await decryptService("userId");
+      const params = {
+        userId: userId,
+        searchtype: "adoption",
+        keyword: searchQuery,
+      };
+      const res = await search(params);
+      if (validArray(res?.data?.data?.SearchResult)) {
+        setSearchData(res?.data?.data?.SearchResult);
+      } else {
+        setSearchData(filteredData);
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {
+      setFilteredData(filteredData);
+      contextValue?.setLoader(false);
+      showToast("error", error?.message);
+    }
+  };
 
   const initData = async () => {
     contextValue?.setLoader(true);
@@ -426,11 +460,19 @@ const PetAdoption = (props) => {
           <View style={{ flex: 1 }}>
             <FlatList
               showsVerticalScrollIndicator={false}
-              data={validArray(filteredData) ? filteredData : []}
+              data={
+                searchData?.length
+                  ? searchData
+                  : validArray(filteredData)
+                  ? filteredData
+                  : []
+              }
               bounces={false}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
-              ListEmptyComponent={!dataFetched.current ? null :EmptyContentView}
+              ListEmptyComponent={
+                !dataFetched.current ? null : EmptyContentView
+              }
               contentContainerStyle={{ flexGrow: 1 }}
             />
           </View>
