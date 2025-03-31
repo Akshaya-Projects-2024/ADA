@@ -45,6 +45,7 @@ const Service = ({ navigation, route }) => {
 
   const initData = async (text) => {
     try {
+      contextValue?.setLoader(true);
       const userId = await decryptService("userId");
       const params = {
         userid: userId,

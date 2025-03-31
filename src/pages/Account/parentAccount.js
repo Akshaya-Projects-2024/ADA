@@ -399,7 +399,7 @@ const ParentAccount = (props) => {
                     title={Strings.myPetProfile}
                     showPending={!validArray(profile?.parentProfie?.petDetails)}
                     onPress={() => {
-                      if (profileStatus) {
+                      if (profile?.logindetails?.isparent) {
                         props.navigation.navigate("petDetail", {
                           route: "parentAccount",
                         });
