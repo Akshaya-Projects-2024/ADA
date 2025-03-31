@@ -376,6 +376,35 @@ const ReviewAll = (props) => {
           fontColor="#EC559C"
           showBack
           bgColor="transparent"
+          right={
+            <View style={{ width: 100 }}>
+              <DropDownField
+                onChange={(value) => {
+                  setFilterParams({
+                    ...filterParams,
+                    sortBy: value,
+                    filterdata: value == "rating" ? "5" : "",
+                    rating: value == "rating" ? "5" : "",
+                    pageNum: 1,
+                  });
+                  showLoader();
+                }}
+                selectedValue={filterParams.sortBy}
+                width={100}
+                dropdownData={[
+                  { label: "Newest", value: "newest" },
+                  { label: "Oldest", value: "oldest" },
+                  { label: "Top Rated", value: "toprated" },
+                  { label: "Lowest", value: "lowest" },
+                ]}
+                customStyle={{
+                  containerStyle: {
+                    width: 140,
+                  },
+                }}
+              />
+            </View>
+          }
         />
         <View
           style={{
@@ -387,7 +416,7 @@ const ReviewAll = (props) => {
             <>
               {Boolean(reviewList?.length) ? (
                 <View style={styles.mainView}>
-                  {reviewList?.length > 1 && (
+                  {/* {reviewList?.length > 1 && (
                     <View style={styles.dropdownMainView}>
                       <View style={styles.dropDownRow}>
                         {filterParams?.sortBy === "rating" && (
@@ -445,7 +474,7 @@ const ReviewAll = (props) => {
                         </View>
                       </View>
                     </View>
-                  )}
+                  )} */}
                   <FlatList
                     data={reviewList}
                     showsVerticalScrollIndicator={false}
@@ -809,7 +838,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderRadius: 12,
     marginBottom: moderateScale(10),
-    paddingVertical: moderateScale(15),
+    paddingBottom: moderateScale(15),
   },
   flatlistContent: {
     flexDirection: "row",

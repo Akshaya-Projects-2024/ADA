@@ -43,6 +43,7 @@ import ActivityList from "../pages/ActivityTracker/ActivityList";
 import { ActvityTrackerDashboard } from "../pages/ActivityTracker/ActvityTrackerDashboard";
 import AddEditActivity from "../pages/ActivityTracker/AddEditActivity";
 import ReviewAll from "../pages/ClientReviews/ReviewAll";
+import AppointmentProviderDetail from "../pages/Appointment/appointmentProviderDetail";
 
 const Stack = createStackNavigator();
 
@@ -157,6 +158,11 @@ const Routes = (props) => {
         <Stack.Screen
           name="appointmentDetail"
           component={AppointmentDetail}
+          options={navOptionHandler}
+        />
+        <Stack.Screen
+          name="appointmentProviderDetail"
+          component={AppointmentProviderDetail}
           options={navOptionHandler}
         />
         <Stack.Screen

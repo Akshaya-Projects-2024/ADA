@@ -16,6 +16,7 @@ import Cross from "../assets/svg/redCross.svg";
 import Check from "../assets/svg/check.svg";
 import { AppointmentStatus } from "../constants/enums";
 import ProfileDummy from "../assets/svg/user.svg";
+import { decryptService } from "../utils/storageFunc";
 
 const AppointmentCard = ({
   item,
@@ -29,7 +30,9 @@ const AppointmentCard = ({
 
   const petImage = useMemo(
     () =>
-      item?.petdetails?.documents?.find((it) => it?.documenttype === "profilePhoto"),
+      item?.petdetails?.documents?.find(
+        (it) => it?.documenttype === "profilePhoto"
+      ),
     [item]
   );
 
@@ -60,11 +63,19 @@ const AppointmentCard = ({
   }, [item?.status]);
   return (
     <Pressable
-      onPress={() => {
+      onPress={async () => {
+        const loggedInModule = await decryptService("loggedInModule");
+        console.log(loggedInModule);
+        
         setSelectedItem(item);
         {
           item.requestedby !== "provider"
-            ? navigation.navigate("appointmentDetail", { selectedItem: item })
+            ? navigation.navigate(
+                loggedInModule === "parent"
+                  ? "appointmentProviderDetail"
+                  : "appointmentDetail",
+                { selectedItem: item }
+              )
             : null;
         }
       }}

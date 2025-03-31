@@ -110,9 +110,12 @@ const MyBookings = ({ navigation, route }) => {
     });
   };
 
+  useEffect(() => {
+    contextValue?.setLoader(true);
+  },[])
+
   const initData = useCallback(async () => {
     try {
-      contextValue?.setLoader(true);
       const userId = await decryptService("userId");
       const params = {
         userid: userId,

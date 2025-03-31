@@ -253,7 +253,7 @@ const ParentReviews = (props) => {
                       source={{ uri: logindetails?.parentphoto }}
                     />
                   </View>
-                  <View style={{ marginLeft: moderateScale(8), backgroundColor:'red' }}>
+                  <View style={{ marginLeft: moderateScale(8) }}>
                     <View style={styles.flatListNameRow}>
                       <Text style={styles.name}>
                         {selectedItem?.parentdetails?.name}
