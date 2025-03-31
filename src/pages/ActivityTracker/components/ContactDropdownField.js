@@ -180,7 +180,7 @@ const ContactDropdown = (props) => {
 
             <FlatList
               data={filterData}
-              ListEmptyComponent={!dataFetched.current ? null :renderEmptyView}
+              ListEmptyComponent={renderEmptyView}
               renderItem={renderItem}
               keyExtractor={(item) => item.id + item.label}
               showsVerticalScrollIndicator={false}
