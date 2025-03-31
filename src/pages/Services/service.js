@@ -188,7 +188,7 @@ const Service = ({ navigation, route }) => {
                   fontSize: THEMES.fonts.font10,
                   paddingTop: moderateScale(3),
                   maxWidth: moderateScale(260),
-                  width: "70%",
+                  width: "65%",
                 }}
               >
                 {`${item?.profile?.providerBusiness?.services
@@ -227,7 +227,7 @@ const Service = ({ navigation, route }) => {
               style={{
                 color: "#000",
                 fontFamily: THEMES.fontFamily.medium,
-                fontSize: THEMES.fonts.font14,
+                fontSize: THEMES.fonts.font13,
               }}
             >
               {`₹ ${
