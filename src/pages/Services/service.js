@@ -78,6 +78,7 @@ const Service = ({ navigation, route }) => {
   };
 
   const renderItem = ({ item }) => {
+ 
     return (
       <TouchableButtonWithPermission
         customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
@@ -86,10 +87,10 @@ const Service = ({ navigation, route }) => {
           const serviceData = !isSearch
             ? selectedService
             : {
-                code: item?.sessionservice?.servicecode,
+                code: item?.servicecode,
                 id: item?.sessionservice?.id,
                 logo: "",
-                service: item?.sessionservice?.service,
+                service: item?.service,
               };
           navigation.navigate("serviceDetail", {
             selectedProvider: item,
@@ -140,7 +141,12 @@ const Service = ({ navigation, route }) => {
             ) : null}
           </View>
           <View
-            style={{ flexDirection: "row", alignItems: "center", width: "70%" }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              width: "80%",
+              justifyContent: "space-between",
+            }}
           >
             {item?.photo ? (
               <View
@@ -175,13 +181,15 @@ const Service = ({ navigation, route }) => {
                 height={moderateScale(55)}
               />
             )}
-            <View style={{ paddingLeft: moderateScale(12) }}>
+
+            <View style={{ paddingLeft: moderateScale(12), width: "100%" }}>
               <Text
                 numberOfLines={1}
                 style={{
                   color: "#000",
-                  fontFamily: THEMES.fontFamily.semiBold,
+                  fontFamily: THEMES.fontFamily.bold,
                   fontSize: THEMES.fonts.font14,
+                  width:'70%',
                 }}
               >
                 {item?.profile?.providerBusiness?.name}
@@ -194,10 +202,9 @@ const Service = ({ navigation, route }) => {
                   fontSize: THEMES.fonts.font10,
                   paddingTop: moderateScale(3),
                   maxWidth: moderateScale(260),
-                  width: "65%",
                 }}
               >
-                {`${item?.sessionservice?.service} | ${
+                {`${item?.service} | ${
                   item?.profile?.providerBusiness?.experience == "null"
                     ? 0
                     : item?.profile?.providerBusiness?.experience
@@ -207,43 +214,59 @@ const Service = ({ navigation, route }) => {
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  paddingTop: moderateScale(5),
+                  justifyContent: "space-between",
                 }}
               >
-                <Star />
-                <Text
-                  numberOfLines={1}
+                <View style={{ width: "70%" }}>
+                  {item?.SessionCharges !== "0.00" && (
+                    <Text
+                      numberOfLines={2}
+                      style={{
+                        color: THEMES.colors.black,
+                        fontFamily: THEMES.fontFamily.medium,
+                        fontSize: THEMES.fonts.font10,
+                      }}
+                    >
+                      Rs. {item?.SessionCharges + " / " + "Per Session"}
+                    </Text>
+                  )}
+                  {item?.MonthCharges !== "0.00" && (
+                    <Text
+                      numberOfLines={2}
+                      style={{
+                        color: THEMES.colors.black,
+                        fontFamily: THEMES.fontFamily.medium,
+                        fontSize: THEMES.fonts.font10,
+                      }}
+                    >
+                      Rs. {item?.MonthCharges + " / " + "Per Month"}
+                    </Text>
+                  )}
+                </View>
+                <View
                   style={{
-                    color: "#000",
-                    fontFamily: THEMES.fontFamily.semiBold,
-                    fontSize: THEMES.fonts.font12,
-                    paddingHorizontal: moderateScale(5),
+                    alignItems: "flex-end",
+                    width: "20%",
                   }}
                 >
-                  {item?.profile?.providerRating?.rating}
-                </Text>
+                  <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-around'}}>
+                  <Star />
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      color: "#000",
+                      fontFamily: THEMES.fontFamily.semiBold,
+                      fontSize: THEMES.fonts.font12,
+                      paddingHorizontal: moderateScale(5),
+                    }}
+                  >
+                    {item?.profile?.providerRating?.rating}
+                  </Text>
+                  </View>
+                  
+                </View>
               </View>
             </View>
-          </View>
-          <View style={{ width: "25%", alignItems: "flex-end" }}>
-            <Text
-              numberOfLines={1}
-              style={{
-                color: "#000",
-                fontFamily: THEMES.fontFamily.medium,
-                fontSize: THEMES.fonts.font13,
-              }}
-            >
-              {`₹ ${
-                item?.sessionservice?.sessioncharges &&
-                item?.sessionservice?.sessioncharges !== "0"
-                  ? item?.sessionservice?.sessioncharges
-                  : item?.sessionservice?.monthcharges &&
-                    item?.sessionservice?.monthcharges !== "0"
-                  ? item?.sessionservice?.monthcharges
-                  : "0"
-              }`}
-            </Text>
           </View>
         </View>
       </TouchableButtonWithPermission>

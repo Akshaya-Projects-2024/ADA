@@ -54,11 +54,13 @@ const ServiceDetail = ({ navigation, route }) => {
 
   const share = async () => {
     try {
+      contextValue?.setLoader(true)
       let obj = {
         userid: await decryptService("userId"),
         vendor: selectedProvider?.profile?.providerBusiness?.userid,
       };
       let res = await shareProfileApi(obj);
+      contextValue?.setLoader(false)
       if (res) {
         const shareData = {
           title: "Share",
@@ -209,42 +211,48 @@ const ServiceDetail = ({ navigation, route }) => {
                   color: THEMES.colors.black,
                 }}
               >
+                
                 {selectedProvider?.profile?.providerBusiness?.name?.trim()}
               </Text>
               <Text
                 numberOfLines={2}
                 style={{
                   fontFamily: THEMES.fontFamily.medium,
-                  paddingTop: moderateScale(3),
                   fontSize: THEMES.fonts.font14,
                   width: "90%",
                   color: THEMES.colors.black,
+                  paddingBottom:moderateScale(5)
                 }}
               >
-                {selectedProvider?.sessionservice?.service}
+                {selectedProvider?.service}
               </Text>
-              <Text
-                style={{
-                  paddingTop: moderateScale(5),
-                  fontFamily: THEMES.fontFamily.regular,
-                  fontSize: THEMES.fonts.font16,
-                  color: THEMES.colors.black,
-                }}
-              >
-                {`₹ ${sessionChargesAmount}`}
-                <Text
-                  style={{
-                    paddingTop: moderateScale(5),
-                    fontFamily: THEMES.fontFamily.regular,
-                    fontSize: THEMES.fonts.font13,
-                    color: THEMES.colors.black,
-                  }}
-                >
-                  {+selectedProvider?.sessionservice?.sessioncharges
-                    ? " / Per Session"
-                    : " / Per Month"}
-                </Text>
-              </Text>
+              {selectedProvider?.SessionCharges !== "0.00" && (
+                    <Text
+                      numberOfLines={2}
+                      style={{
+                        color: "#000",
+                        fontFamily: THEMES.fontFamily.regular,
+                        fontSize: THEMES.fonts.font13,
+          
+                      }}
+                    >
+                      {selectedProvider?.SessionCharges + " / " + "Per Session"}
+                    </Text>
+                  )}
+                  {selectedProvider?.MonthCharges !== "0.00" && (
+                    <Text
+                      numberOfLines={2}
+                      style={{
+                        color: "#000",
+                        fontFamily: THEMES.fontFamily.regular,
+                        fontSize: THEMES.fonts.font13,
+                        paddingTop: moderateScale(2),
+                      }}
+                    >
+                      {selectedProvider?.MonthCharges + " / " + "Per Month"}
+                    </Text>
+                  )}
+            
             </View>
           </View>
           <View
@@ -297,7 +305,7 @@ const ServiceDetail = ({ navigation, route }) => {
                       fontSize: THEMES.fonts.font12,
                     }}
                   >
-                    {`${selectedProvider?.profile?.providerBusiness?.experience} Years`}
+                    {`${selectedProvider?.profile?.providerBusiness?.experience == "null" ? "0" :selectedProvider?.profile?.providerBusiness?.experience} Years`}
                   </Text>
                 </View>
                 <View
@@ -539,6 +547,7 @@ const ServiceDetail = ({ navigation, route }) => {
                         })
                   }
                 />
+                
               </View>
             </View>
           </View>
