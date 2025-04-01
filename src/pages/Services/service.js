@@ -40,19 +40,19 @@ const Service = ({ navigation, route }) => {
   const dataFetched = useRef(false);
 
   useEffect(() => {
-    initData();
+    initData(searchText);
   }, [isFocused]);
 
   const initData = async (text) => {
     try {
       contextValue?.setLoader(true);
       const userId = await decryptService("userId");
+
       const params = {
         userid: userId,
         searchby: isSearch ? "name" : "service",
         filter: isSearch ? text : selectedService?.code,
       };
-
       const response = await getProviderByService(params);
       if (response?.status === 200) {
         const output = response?.data?.data;
@@ -72,8 +72,8 @@ const Service = ({ navigation, route }) => {
     setSearchText(text);
     if (text.length >= 3) {
       initData(text);
-    } else {
-      initData();
+    } else if (!text.length) {
+      initData("");
     }
   };
 
@@ -91,8 +91,6 @@ const Service = ({ navigation, route }) => {
                 logo: "",
                 service: item?.sessionservice?.service,
               };
-             console.log(serviceData,"ddwd");
-              
           navigation.navigate("serviceDetail", {
             selectedProvider: item,
             selectedService: serviceData,
