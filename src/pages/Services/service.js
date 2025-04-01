@@ -56,9 +56,9 @@ const Service = ({ navigation, route }) => {
       const response = await getProviderByService(params);
       if (response?.status === 200) {
         const output = response?.data?.data;
-        setData(output);
         dataFetched.current = true;
         setFilteredData(output);
+        setData(output);
       }
       contextValue?.setLoader(false);
     } catch (error) {
@@ -78,19 +78,26 @@ const Service = ({ navigation, route }) => {
   };
 
   const renderItem = ({ item }) => {
-    const foundService = item?.profile?.sessionRateDetails?.find(
-      (it) => it?.servicecode === selectedService?.code
-    );
     return (
       <TouchableButtonWithPermission
         customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
         customMsgForPayment="Please  subscribe to get best services for your lovely pets."
-        onPress={() =>
+        onPress={() => {
+          const serviceData = !isSearch
+            ? selectedService
+            : {
+                code: item?.sessionservice?.servicecode,
+                id: item?.sessionservice?.id,
+                logo: "",
+                service: item?.sessionservice?.service,
+              };
+             console.log(serviceData,"ddwd");
+              
           navigation.navigate("serviceDetail", {
             selectedProvider: item,
-            selectedService: selectedService,
-          })
-        }
+            selectedService: serviceData,
+          });
+        }}
         style={{
           borderWidth: 1,
           borderColor: "#ddd",
@@ -192,9 +199,7 @@ const Service = ({ navigation, route }) => {
                   width: "65%",
                 }}
               >
-                {`${item?.profile?.providerBusiness?.services
-                  ?.map((item) => item.service)
-                  .join(", ")} | ${
+                {`${item?.sessionservice?.service} | ${
                   item?.profile?.providerBusiness?.experience == "null"
                     ? 0
                     : item?.profile?.providerBusiness?.experience
@@ -232,12 +237,12 @@ const Service = ({ navigation, route }) => {
               }}
             >
               {`₹ ${
-                foundService?.sessioncharges &&
-                foundService?.sessioncharges !== "0"
-                  ? foundService?.sessioncharges
-                  : foundService?.monthcharges &&
-                    foundService?.monthcharges !== "0"
-                  ? foundService?.monthcharges
+                item?.sessionservice?.sessioncharges &&
+                item?.sessionservice?.sessioncharges !== "0"
+                  ? item?.sessionservice?.sessioncharges
+                  : item?.sessionservice?.monthcharges &&
+                    item?.sessionservice?.monthcharges !== "0"
+                  ? item?.sessionservice?.monthcharges
                   : "0"
               }`}
             </Text>

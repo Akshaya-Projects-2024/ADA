@@ -107,19 +107,11 @@ const ServiceDetail = ({ navigation, route }) => {
   };
 
   const sessionChargesAmount = useMemo(() => {
-    let amount = selectedProvider?.profile?.sessionRateDetails?.filter(
-      (x) => x.servicecode === selectedService?.code
-    )?.[0]?.sessioncharges;
-    let text = "/Per session"
+    let amount = selectedProvider?.sessionservice?.sessioncharges;
     if (!Boolean(+amount)) {
-      
-      amount =
-        selectedProvider?.profile?.sessionRateDetails?.filter(
-          (x) => x.servicecode === selectedService?.code
-        )?.[0]?.monthcharges;
-        text = "/Per Month";
+      amount = selectedProvider?.sessionservice?.monthcharges;
     }
-    return amount + text
+    return amount;
   });
 
   return (
@@ -217,7 +209,7 @@ const ServiceDetail = ({ navigation, route }) => {
                   color: THEMES.colors.black,
                 }}
               >
-                {selectedProvider?.profile?.providerBusiness?.name}
+                {selectedProvider?.profile?.providerBusiness?.name?.trim()}
               </Text>
               <Text
                 numberOfLines={2}
@@ -229,20 +221,29 @@ const ServiceDetail = ({ navigation, route }) => {
                   color: THEMES.colors.black,
                 }}
               >
-                {selectedProvider?.profile?.providerBusiness?.services
-                  ?.map((item) => item.service)
-                  .join(", ")}
+                {selectedProvider?.sessionservice?.service}
               </Text>
               <Text
-                numberOfLines={1}
                 style={{
-                  paddingTop: moderateScale(21),
+                  paddingTop: moderateScale(5),
                   fontFamily: THEMES.fontFamily.regular,
                   fontSize: THEMES.fonts.font16,
                   color: THEMES.colors.black,
                 }}
               >
                 {`₹ ${sessionChargesAmount}`}
+                <Text
+                  style={{
+                    paddingTop: moderateScale(5),
+                    fontFamily: THEMES.fontFamily.regular,
+                    fontSize: THEMES.fonts.font13,
+                    color: THEMES.colors.black,
+                  }}
+                >
+                  {+selectedProvider?.sessionservice?.sessioncharges
+                    ? " / Per Session"
+                    : " / Per Month"}
+                </Text>
               </Text>
             </View>
           </View>
