@@ -119,18 +119,18 @@ class MainActivity : ReactActivity() {
             pottyChannel.lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
 
             // OTHERS
-            val othersChannel = NotificationChannel(
-                "others", "ADA", NotificationManager.IMPORTANCE_HIGH
+            val customChannel = NotificationChannel(
+                "custom", "ADA", NotificationManager.IMPORTANCE_HIGH
             )
-            othersChannel.setShowBadge(true)
-            othersChannel.description = ""
-            othersChannel.setSound(
-                (ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/others").toUri(),
+            customChannel.setShowBadge(true)
+            customChannel.description = ""
+            customChannel.setSound(
+                (ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + packageName + "/raw/custom").toUri(),
                 att
             )
-            othersChannel.enableVibration(true)
-            othersChannel.vibrationPattern = longArrayOf(400, 400)
-            othersChannel.lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+            customChannel.enableVibration(true)
+            customChannel.vibrationPattern = longArrayOf(400, 400)
+            customChannel.lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
 
             // MEDICATION
             val medicationChannel = NotificationChannel(
@@ -154,7 +154,7 @@ class MainActivity : ReactActivity() {
             manager.createNotificationChannel(trainingChannel)
             manager.createNotificationChannel(vaccinationChannel)
             manager.createNotificationChannel(pottyChannel)
-            manager.createNotificationChannel(othersChannel)
+            manager.createNotificationChannel(customChannel)
             manager.createNotificationChannel(medicationChannel)
         }
     }
