@@ -23,7 +23,6 @@ import ServerError from "./src/pages/CommonPages/ServerError";
 import NetInfo from "@react-native-community/netinfo";
 import NoInternetScreen from "./src/pages/CommonPages/NoInternetScreen";
 
-
 const store = configureStore();
 
 function App() {
@@ -91,9 +90,9 @@ function App() {
 
   const initPermissions = async () => {
     const permission = await requestNotificationPermission();
-    if (permission) {
-      const op = await createNotificationChannel();
-    }
+    // if (permission) {
+    //   const op = await createNotificationChannel();
+    // }
   };
 
   useEffect(() => {
@@ -106,7 +105,6 @@ function App() {
     setIsServerError(false);
   };
 
-  
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
       setIsConnected(state.isConnected);

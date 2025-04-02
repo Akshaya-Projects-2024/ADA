@@ -53,7 +53,7 @@ const createNotificationChannel = () => {
 
 const showNotification = ({ notification, data }) => {
   PushNotification.localNotification({
-    channelId: config.notificationChannelId,
+    channelId: notification?.android?.channelId,
     id: 100,
     autoCancel: true,
     largeIcon: "ic_launcher",
@@ -70,6 +70,7 @@ const showNotification = ({ notification, data }) => {
     bigPictureUrl:
       notification?.imageUrl || notification?.android?.imageUrl || "",
     userInfo: data ?? {},
+    soundName: notification?.android?.sound,
   });
 };
 
