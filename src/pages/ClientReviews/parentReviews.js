@@ -139,12 +139,10 @@ const ParentReviews = (props) => {
             <View style={styles.replyMainView}>
               <View style={styles.replyRow}>
                 <View style={styles.profileImg}>
-                  {item?.providerPhoto ? (
+                  {selectedItem?.providerPhoto ? (
                     <Image
                       style={{ width: 52, height: 52, borderRadius: 52 / 2 }}
-                      source={getBase64Obj(
-                        "https://d2jswhakxkta9i.cloudfront.net/logos/petlogo/avatar.png"
-                      )}
+                      source={getBase64Obj(selectedItem?.providerPhoto)}
                     />
                   ) : (
                     <ProviderFallback
@@ -194,7 +192,7 @@ const ParentReviews = (props) => {
                       source={{ uri: logindetails?.parentphoto }}
                     />
                   </View>
-                  <View style={{ marginLeft: moderateScale(8)}}>
+                  <View style={{ marginLeft: moderateScale(8) }}>
                     <View style={styles.flatListNameRow}>
                       <Text style={styles.name}>{profileData?.name}</Text>
                       <View>
@@ -310,9 +308,9 @@ const ParentReviews = (props) => {
 
   const onSubmitReview = async () => {
     try {
-      if (!review) {
-        showToast("error", "Please enter review");
-      } else if (!rating) {
+      if (!rating) {
+        showToast("error", "Please provide rating");
+      } else if (!review) {
         showToast("error", "Please enter review");
       } else {
         contextValue?.setLoader(true);
@@ -393,9 +391,7 @@ const ParentReviews = (props) => {
                         height: 52,
                         borderRadius: 52 / 2,
                       }}
-                      source={getBase64Obj(
-                        "https://d2jswhakxkta9i.cloudfront.net/logos/petlogo/avatar.png"
-                      )}
+                      source={getBase64Obj(selectedItem?.providerPhoto)}
                     />
                   ) : (
                     <ProviderFallback
@@ -764,7 +760,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: moderateScale(20),
     marginTop: moderateScale(20),
-
   },
   flatListRow: {
     flexDirection: "row",
