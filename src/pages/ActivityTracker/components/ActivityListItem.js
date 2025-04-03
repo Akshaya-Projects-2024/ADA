@@ -7,7 +7,7 @@ import CheckOutline from "../../../assets/svg/checkOutline";
 import { styles } from "./styles";
 import moment from "moment";
 
-export const ActivityListItem = memo(({ item, updateActivity }) => {
+export const ActivityListItem = memo(({ item, updateActivity,onCardPress }) => {
   const renderValue = () => {
     if (item.iscustomise) {
       return item.time;
@@ -50,7 +50,7 @@ export const ActivityListItem = memo(({ item, updateActivity }) => {
         colors={ActivityType[item.type].colors}
         style={styles.activityGradient}
       >
-        <View style={{width: "60%"}}>
+        <TouchableOpacity style={{width: "60%"}}onPress={() => onCardPress(item)} >
           <View>{ActivityType[item.type].icon()}</View>
           <Text style={styles.activityTime}>{renderValue(item)}</Text>
           <Text style={[styles.activityName]}>
@@ -62,7 +62,7 @@ export const ActivityListItem = memo(({ item, updateActivity }) => {
                 ActivityType[item.type].label[[item.name.toLowerCase()]]
               : ActivityType[item.type].label[[item.name.toLowerCase()]]}
           </Text>
-        </View>
+        </TouchableOpacity>
         <View>
           <TouchableOpacity
             style={[

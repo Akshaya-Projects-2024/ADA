@@ -88,17 +88,16 @@ function App() {
     Api.defaultHeader(header);
   }, []);
 
-  const initPermissions = async () => {
-    const permission = await requestNotificationPermission();
-    // if (permission) {
-    //   const op = await createNotificationChannel();
-    // }
-  };
+  // const initPermissions = async () => {
+  //   const permission = await requestNotificationPermission();
+  //   // if (permission) {
+  //   //   const op = await createNotificationChannel();
+  //   // }
+  // };
 
   useEffect(() => {
     initHeaders();
     initInterceptors();
-    initPermissions();
   }, [initInterceptors, initHeaders]);
 
   const handleRetry = () => {

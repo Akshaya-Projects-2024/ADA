@@ -260,7 +260,7 @@ export const ActvityTrackerDashboard = (props) => {
             onCardPress(item);
           }}
         >
-          <Feather name="edit-2" size={18} color={THEMES.colors.white} />
+          <Feather name="edit-2" size={18} color={THEMES.colors.black} />
           <Text style={styles.backTextWhite}>Edit</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -271,7 +271,7 @@ export const ActvityTrackerDashboard = (props) => {
             deleteRow(item);
           }}
         >
-          <CrossIcon color={THEMES.colors.white} />
+          <CrossIcon color={THEMES.colors.black} />
           <Text style={styles.backTextWhite}>Delete</Text>
         </TouchableOpacity>
       </View>
@@ -390,6 +390,7 @@ export const ActvityTrackerDashboard = (props) => {
                 updateActivity={updateActivity}
                 todayDate={weekList.todayDate}
                 selectedDate={weekList.selectedDate}
+                onCardPress={onCardPress}
               />
             )}
             renderHiddenItem={renderHiddenItem}

@@ -297,17 +297,17 @@ export const styles = StyleSheet.create({
     width: 75,
   },
   backRightBtnLeft: {
-    backgroundColor: "#289BFE",
+    backgroundColor: "#A7D3FF",
     right: 75,
   },
   backRightBtnRight: {
-    backgroundColor: "#BF0101",
+    backgroundColor: "#FFB3B3",
     right: 0,
     borderTopRightRadius: 15,
     borderBottomRightRadius: 15,
   },
   backTextWhite: {
-    color: "#FFF",
+    color: "#000",
     fontSize: THEMES.fonts.font12,
     fontFamily: THEMES.fontFamily.semiBold,
     paddingTop: 18,

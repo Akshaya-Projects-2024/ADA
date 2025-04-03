@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { dispathGuestUser } from "../../redux-store/actions/userActions";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { decryptService, encryptService } from "../../utils/storageFunc";
+import { requestNotificationPermission } from "../../utils/permissionUtils";
 
 const RoleSelection = (props) => {
   const { top } = useSafeAreaInsets();
@@ -53,6 +54,14 @@ const RoleSelection = (props) => {
         });
       }
     });
+  };
+
+  useEffect(() => {
+    init()
+  },[]);
+
+  const init = async () => {
+    await requestNotificationPermission();
   };
 
   return (
