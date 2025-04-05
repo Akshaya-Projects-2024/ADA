@@ -70,7 +70,9 @@ const showNotification = ({ notification, data }) => {
     bigPictureUrl:
       notification?.imageUrl || notification?.android?.imageUrl || "",
     userInfo: data ?? {},
-    soundName: notification?.android?.sound,
+    soundName: notification?.android?.sound, // Update this to match your sound file
+    priority: "max",
+    importance: "max",
   });
 };
 

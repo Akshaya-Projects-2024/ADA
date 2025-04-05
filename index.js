@@ -10,7 +10,7 @@ import { showNotification } from "./src/utils/pushNotificationUtils";
 
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
   if (remoteMessage && remoteMessage?.data) {
-    showNotification(remoteMessage);
+    // showNotification(remoteMessage);
   }
 });
 

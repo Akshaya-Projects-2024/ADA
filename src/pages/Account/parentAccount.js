@@ -133,22 +133,11 @@ const ParentAccount = (props) => {
     setFeatureList([
       {
         label: Strings.myProfile,
-        onPress: () => {
-          if (profileStatus) {
-            navigate("parentDetails", {
-              route: "parentAccount",
-            });
-          } else {
-            navigate("parentDetails");
-          }
-        },
+        onPress: () => handleOnClickParentDetails(),
       },
       {
         label: Strings.myPetProfile,
-        onPress: () =>
-          navigate("petDetail", {
-            route: "parentAccount",
-          }),
+        onPress: () => handleOnClickPetDetails(),
       },
       {
         label: "Activity tracker",
@@ -311,6 +300,26 @@ const ParentAccount = (props) => {
     }
   };
 
+  const handleOnClickParentDetails = () => {
+    if (profile?.logindetails?.isparent) {
+      props.navigation.navigate("parentDetails", {
+        route: "parentAccount",
+      });
+    } else {
+      props.navigation.navigate("parentDetails");
+    }
+  };
+
+  const handleOnClickPetDetails = () => {
+    if (profile?.logindetails?.isparent) {
+      props.navigation.navigate("petDetail", {
+        route: "parentAccount",
+      });
+    } else {
+      props.navigation.navigate("parentDetails");
+    }
+  };
+
   return (
     <LinearGradient
       locations={[0, 0.5, 0.6]}
@@ -383,30 +392,14 @@ const ParentAccount = (props) => {
                     icon={<ProfileImg />}
                     title={Strings.myProfile}
                     showPending={!profile?.parentProfie?.parentContact?.name}
-                    onPress={() => {
-                      if (profileStatus) {
-                        props.navigation.navigate("parentDetails", {
-                          route: "parentAccount",
-                        });
-                      } else {
-                        props.navigation.navigate("parentDetails");
-                      }
-                    }}
+                    onPress={handleOnClickParentDetails}
                   />
                   <MenuItem
                     bgColor={THEMES.colors.zanah}
                     icon={<PawPrint />}
                     title={Strings.myPetProfile}
                     showPending={!validArray(profile?.parentProfie?.petDetails)}
-                    onPress={() => {
-                      if (profile?.logindetails?.isparent) {
-                        props.navigation.navigate("petDetail", {
-                          route: "parentAccount",
-                        });
-                      } else {
-                        props.navigation.navigate("parentDetails");
-                      }
-                    }}
+                    onPress={handleOnClickPetDetails}
                   />
                   <MenuItem
                     bgColor={THEMES.colors.hawkesBlue}

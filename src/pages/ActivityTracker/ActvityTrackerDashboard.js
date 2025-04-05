@@ -116,7 +116,7 @@ export const ActvityTrackerDashboard = (props) => {
 
   useEffect(() => {
     fetchActivityDashboardData();
-  }, [isFocused]);
+  }, [isFocused,selectedPet]);
 
   useEffect(() => {
     fetchActivity();
