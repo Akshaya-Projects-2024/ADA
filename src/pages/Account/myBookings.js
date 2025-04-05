@@ -23,7 +23,7 @@ import Strings from "../../constants/strings";
 import Header from "../../components/Header";
 import FilterModal from "../../components/FilterModal";
 import Modal from "react-native-modal";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, ms } from "react-native-size-matters";
 import Button from "../../components/Button";
 import InputField from "../../components/InputField";
 import { showToast, validArray } from "../../utils/utils";
@@ -256,7 +256,7 @@ const MyBookings = ({ navigation, route }) => {
           right={
             <View ref={menuRef} onLayout={handleModalLayout}>
               <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
-                <Filter />
+                <Filter width={ms(24)} height={ms(24)}/>
               </TouchableOpacity>
             </View>
           }

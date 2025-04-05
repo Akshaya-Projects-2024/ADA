@@ -22,6 +22,7 @@ import { getAppointmentById } from "../../redux-store/actions/auth";
 import { contextValue } from "../../components/Loader";
 import { useSelector } from "react-redux";
 import BackArrowComponent from "../../components/BackArrowComponent";
+import ProfilePhoto from "../../components/ProfilePhoto";
 
 const AppointmentProviderDetail = (props) => {
   const selectedData = props?.route?.params?.selectedItem;
@@ -85,7 +86,7 @@ const AppointmentProviderDetail = (props) => {
             >
               <View style={styles.mainContent}>
                 <View style={styles.flexRow}>
-                  <Text numberOfLines={1} style={styles.petName}>
+                  <Text style={styles.petName}>
                     {appointmentData?.servicedetails?.service}
                   </Text>
                   {/* <Text numberOfLines={1} style={styles.breedType}>
@@ -126,14 +127,14 @@ const AppointmentProviderDetail = (props) => {
                     {appointmentData?.appointment_date}
                   </Text>
 
-                  <View style={{ marginTop: 20,flexDirection: "row" }}>
+                  <View style={{ marginTop: 20, flexDirection: "row" }}>
                     <View>
                       <Text style={styles.aboutPetText}>Start Time</Text>
                       <Text style={styles.petDescription}>
                         {appointmentData?.start_time}
                       </Text>
                     </View>
-                    <View style={{marginLeft: 20}}>
+                    <View style={{ marginLeft: 20 }}>
                       <Text style={styles.aboutPetText}>End Time</Text>
                       <Text style={styles.petDescription}>
                         {appointmentData?.end_time}
@@ -141,17 +142,17 @@ const AppointmentProviderDetail = (props) => {
                     </View>
                   </View>
 
-                    <View style={{marginTop: 20}}>
-                      <Text style={styles.aboutPetText}>Notes</Text>
-                      <Text style={styles.petDescription}>
-                        {appointmentData?.notes}
-                      </Text>
-                    </View>
+                  <View style={{ marginTop: 20 }}>
+                    <Text style={styles.aboutPetText}>Notes</Text>
+                    <Text style={styles.petDescription}>
+                      {appointmentData?.notes}
+                    </Text>
+                  </View>
 
                   <View style={styles.cardView}>
                     <View style={styles.imgView}>
-                      <Image
-                        source={{ uri: appointmentData?.providerPhoto }}
+                      <ProfilePhoto
+                        url={appointmentData?.providerPhoto}
                         style={styles.img}
                       />
                     </View>
@@ -223,7 +224,6 @@ const styles = StyleSheet.create({
   },
   petName: {
     fontFamily: THEMES.fontFamily.bold,
-    width: "50%",
     fontSize: THEMES.fonts.font16,
     color: THEMES.colors.black,
   },

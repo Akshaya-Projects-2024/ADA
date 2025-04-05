@@ -610,8 +610,9 @@ const styles = StyleSheet.create({
     borderColor: THEMES.colors.outrageousOrange,
   },
   pastSlot: {
-    backgroundColor: THEMES.colors.darkGrey,
+    backgroundColor: THEMES.colors.lightGrey,
     borderColor: THEMES.colors.lightGrey,
+    opacity: 0.2
   },
   selectedDate: {
     backgroundColor: THEMES.colors.cyan, // Highlight for selected date
