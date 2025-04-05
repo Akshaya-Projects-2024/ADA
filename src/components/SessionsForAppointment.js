@@ -49,18 +49,23 @@ const SessionsForAppointment = ({
       const morningSlots = [];
       const afternoonSlots = [];
       const eveningSlots = [];
+      const isToday = selectedDate.isSame(moment(), "day");
+      const currentHour = isToday ? parseInt(moment().format("HH")) : -1;
       for (let index = 0; index < slots?.length; index++) {
         const element = slots[index];
         const startArray = element?.start_time?.split(":");
         if (validArray(startArray)) {
-          const start = startArray[0];
-          if (start >= "00" && start <= "11") {
+          const start = parseInt(startArray[0]);
+          if (isToday && start <= currentHour) {
+            element.isslotpast = true;
+          }
+          if (start >= 0 && start <= 11) {
             morningSlots.push(element);
           }
-          if (start >= "12" && start <= "13") {
+          if (start >= 12 && start <= 13) {
             afternoonSlots.push(element);
           }
-          if (start >= "14") {
+          if (start >= 14) {
             eveningSlots.push(element);
           }
         }
@@ -313,12 +318,14 @@ const SessionsForAppointment = ({
                       styles.timeSlot,
                       !slot?.isavailable && styles.disabledSlot,
                       slot?.isbooked && styles.bookedSlot,
+                      slot?.isslotpast && styles.pastSlot,
                       selectedSlot?.start_time === slot?.start_time &&
-                      !slot?.isbooked &&
-                      styles.selectedSlotStyle,
+                        !slot?.isbooked &&
+                        !slot?.isslotpast &&
+                        styles.selectedSlotStyle,
                     ]}
                     onPress={() => selectTimeSlot(slot)}
-                    disabled={slot?.isbooked} // Disable if the slot is marked as disabled
+                    disabled={slot?.isbooked || slot?.isslotpast} // Disable if the slot is marked as disabled
                   >
                     <Text
                       style={StyleSheet.flatten([
@@ -329,8 +336,8 @@ const SessionsForAppointment = ({
                             selectedSlot?.start_time === slot?.start_time
                               ? "#fff"
                               : slot?.isavailable || slot?.isbooked
-                                ? "#000"
-                                : "#fff",
+                              ? "#000"
+                              : "#fff",
                         },
                       ])}
                     >
@@ -369,12 +376,14 @@ const SessionsForAppointment = ({
                       styles.timeSlot,
                       !slot?.isavailable && styles.disabledSlot,
                       slot?.isbooked && styles.bookedSlot,
+                      slot?.isslotpast && styles.pastSlot,
                       selectedSlot?.start_time === slot?.start_time &&
-                      !slot?.isbooked &&
-                      styles.selectedSlotStyle,
+                        !slot?.isbooked &&
+                        !slot?.isslotpast &&
+                        styles.selectedSlotStyle,
                     ]}
                     onPress={() => selectTimeSlot(slot)}
-                    disabled={slot?.isbooked} // Disable if the slot is marked as disabled
+                    disabled={slot?.isbooked || slot?.isslotpast} // Disable if the slot is marked as disabled
                   >
                     <Text
                       style={StyleSheet.flatten([
@@ -385,8 +394,8 @@ const SessionsForAppointment = ({
                             selectedSlot?.start_time === slot?.start_time
                               ? "#fff"
                               : slot?.isavailable || slot?.isbooked
-                                ? "#000"
-                                : "#fff",
+                              ? "#000"
+                              : "#fff",
                         },
                       ])}
                     >
@@ -423,12 +432,14 @@ const SessionsForAppointment = ({
                       styles.timeSlot,
                       !slot?.isavailable && styles.disabledSlot,
                       slot?.isbooked && styles.bookedSlot,
+                      slot?.isslotpast && styles.pastSlot,
                       selectedSlot?.start_time === slot?.start_time &&
-                      !slot?.isbooked &&
-                      styles.selectedSlotStyle,
+                        !slot?.isbooked &&
+                        !slot?.isslotpast &&
+                        styles.selectedSlotStyle,
                     ]}
                     onPress={() => selectTimeSlot(slot)}
-                    disabled={slot?.isbooked} // Disable if the slot is marked as disabled
+                    disabled={slot?.isbooked || slot?.isslotpast} // Disable if the slot is marked as disabled
                   >
                     <Text
                       style={StyleSheet.flatten([
@@ -439,8 +450,8 @@ const SessionsForAppointment = ({
                             selectedSlot?.start_time === slot?.start_time
                               ? "#fff"
                               : slot?.isavailable || slot?.isbooked
-                                ? "#000"
-                                : "#fff",
+                              ? "#000"
+                              : "#fff",
                         },
                       ])}
                     >
@@ -597,6 +608,10 @@ const styles = StyleSheet.create({
   bookedSlot: {
     backgroundColor: THEMES.colors.bookedSlot,
     borderColor: THEMES.colors.outrageousOrange,
+  },
+  pastSlot: {
+    backgroundColor: THEMES.colors.darkGrey,
+    borderColor: THEMES.colors.lightGrey,
   },
   selectedDate: {
     backgroundColor: THEMES.colors.cyan, // Highlight for selected date

@@ -1,4 +1,4 @@
-import React, { useState,useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ import { contextValue } from "../../components/Loader";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SessionsForAppointment from "../../components/SessionsForAppointment";
 import Dialog from "../../components/Dialog";
+import PetSelection from "../../components/PetSelection";
 
 export const SESSION_TYPE = { oneTime: "one_time", recursive: "recursive" };
 
@@ -28,6 +29,13 @@ const SelectAppointment = ({ navigation, route }) => {
   const [appointmentConfirm, setAppointmentConfirm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const profile = useSelector((state) => state?.commonReducer);
+  const [openPetSelectionDIalog, setOpenPetSelectionDialog] = useState({
+    flag: false,
+    data: {},
+  });
+  const [selectedPet, setSelectedPet] = useState(
+    profile?.parentProfie?.petDetails[0]?.id
+  );
 
   const handleSubmit = async (
     selectedDate,
@@ -37,7 +45,6 @@ const SelectAppointment = ({ navigation, route }) => {
     sessionSelection
   ) => {
     try {
-      contextValue?.setLoader(true);
       if (!selectedProvider?.profile?.providerBusiness?.userid) {
         throw new Error("Invalid Provider! Please select valid provider");
       } else if (!selectedService?.code) {
@@ -55,7 +62,6 @@ const SelectAppointment = ({ navigation, route }) => {
       } else if (!profile?.parentProfie?.petDetails[0]?.id) {
         throw new Error("No pet found in your profile");
       } else {
-
         const userId = await decryptService("userId");
         const params = {
           parent_id: userId,
@@ -73,20 +79,47 @@ const SelectAppointment = ({ navigation, route }) => {
           end_time: selectedSlot?.end_time,
           status: "scheduled", //HARDCODE
           notes: "First appointment of the day", //HARDCODE
-          petid: profile?.parentProfie?.petDetails[0]?.id,
+          petid: selectedPet,
           requestedby: "parent", //HARDCODE
         };
-       
-        const res = await createAppointment(params);
-        contextValue?.setLoader(false);
-        if (res?.status === 200) {
-          setAppointmentConfirm(true);
-          // showToast("success", res?.data?.data || String.appointmentConfirm);
-          // navigation.reset({
-          //   index: 0,
-          //   routes: [{ name: "petParentAppStack" }],
-          // });
+        if (profile?.parentProfie?.petDetails.length > 1) {
+          setOpenPetSelectionDialog({
+            flag: true,
+            data: params,
+          });
+        } else {
+          contextValue?.setLoader(true);
+          handlePetSelection("", params);
         }
+      }
+    } catch (error) {
+      contextValue?.setLoader(false);
+      showToast("error", error?.message);
+    }
+  };
+
+  const handlePetSelection = async (id, obj) => {
+    let params = {};
+    if (openPetSelectionDIalog?.flag && id) {
+      params = {
+        ...openPetSelectionDIalog?.data,
+        petid: id,
+      };
+      setOpenPetSelectionDialog({
+        flag: false,
+        data: {},
+      });
+      contextValue?.setLoader(true);
+    } else {
+      params = {
+        ...obj,
+      };
+    }
+    try {
+      const res = await createAppointment(params);
+      contextValue?.setLoader(false);
+      if (res?.status === 200) {
+        setAppointmentConfirm(true);
       }
     } catch (error) {
       contextValue?.setLoader(false);
@@ -154,6 +187,17 @@ const SelectAppointment = ({ navigation, route }) => {
           onClose={() => {
             setAppointmentConfirm(false);
           }}
+        />
+        <PetSelection
+          flag={Boolean(openPetSelectionDIalog?.flag)}
+          onClose={() => {
+            setOpenPetSelectionDialog({
+              flag: false,
+              data: {},
+            });
+          }}
+          onPetSelect={handlePetSelection}
+          title={"Select Your Pet for appointment"}
         />
       </View>
     </SafeAreaView>
