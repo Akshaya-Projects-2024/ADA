@@ -44,6 +44,10 @@ import { ActvityTrackerDashboard } from "../pages/ActivityTracker/ActvityTracker
 import AddEditActivity from "../pages/ActivityTracker/AddEditActivity";
 import ReviewAll from "../pages/ClientReviews/ReviewAll";
 import AppointmentProviderDetail from "../pages/Appointment/appointmentProviderDetail";
+import AlertList from "../pages/Alerts/AlertList";
+import LostAlertdetail from "../pages/Alerts/lostAlertDetail";
+import RescueAlertDetail from "../pages/Alerts/resuceAlertDetail";
+import MedicalAlertDetail from "../pages/Alerts/MedicalAlertDetail";
 
 const Stack = createStackNavigator();
 
@@ -272,8 +276,32 @@ const Routes = (props) => {
         />
 
         <Stack.Screen
+          name="lostAlertDetail"
+          component={LostAlertdetail}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="resuceAlertDetail"
+          component={RescueAlertDetail}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="medicalAlertDetail"
+          component={MedicalAlertDetail}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
           name="emergencyAlert"
           component={EmergencyAlert}
+          options={navOptionHandler}
+        />
+
+        <Stack.Screen
+          name="alertList"
+          component={AlertList}
           options={navOptionHandler}
         />
 

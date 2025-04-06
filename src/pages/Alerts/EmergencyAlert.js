@@ -29,11 +29,16 @@ const EmergencyAlert = (props) => {
   const [alertType, setAlertType] = useState();
   const [type, setType] = useState();
   const [provider, setProvider] = useState(false);
+  const [selectedData, setSelectedData] = useState();
 
   const { loggedInModule, guestUser, logindetails } = useSelector(
     (state) => state?.register
   );
-  const profile = useSelector((state) => state?.commonReducer);
+  const { profile, parentProfie } = useSelector(
+    (state) => state?.commonReducer
+  );
+
+  const { petDetails } = parentProfie;
 
   const alertOptions = [
     { type: "Rescue", image: require("../../assets/images/rescue.png") },
@@ -59,15 +64,15 @@ const EmergencyAlert = (props) => {
     } else {
       if (!provider) {
         if (alertType == "Lost Pet" && type == "Pet") {
-          props.navigation.navigate("lostPetAlert");
+          props.navigation.navigate("lostPetAlert", { selectedData });
         } else if (alertType == "Lost Pet" && type == "otherPet") {
           props.navigation.navigate("otherLostPetAlert");
         } else if (alertType == "Medical" && type == "Pet") {
-          props.navigation.navigate("medicalHelp");
+          props.navigation.navigate("medicalHelp", { selectedData });
         } else if (alertType == "Medical" && type == "otherPet") {
           props.navigation.navigate("otherMedicalAlert");
         } else if (alertType == "Rescue" && type == "Pet") {
-          props.navigation.navigate("rescueHelp");
+          props.navigation.navigate("rescueHelp", { selectedData });
         } else if (alertType == "Rescue" && type == "otherPet") {
           props.navigation.navigate("otherRescueHelpAlert");
         }
@@ -83,6 +88,7 @@ const EmergencyAlert = (props) => {
       setAgree(false);
       setAlertType();
       setType();
+      setSelectedData();
     }
   };
 
@@ -93,6 +99,117 @@ const EmergencyAlert = (props) => {
       ),
     [profile?.parentProfie?.petDetails]
   );
+
+  const renderItem = ({ item, index }) => {
+    if (item?.id === "otherPet") {
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            setType("otherPet");
+            setSelectedData(item);
+          }}
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            marginLeft: index !== 0 ? moderateScale(15) : 0,
+          }}
+        >
+          <Image
+            resizeMode="contain"
+            style={{
+              width: 90,
+              height: 90,
+              borderRadius: 10,
+              marginTop: 5,
+            }}
+            source={require("../../assets/images/rescue.png")}
+          />
+          {type === "otherPet" && (
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                width: 100,
+                height: 100,
+                borderRadius: 10,
+                backgroundColor: "#00BBC8",
+                opacity: 0.4,
+              }}
+            />
+          )}
+          <Text
+            style={{
+              fontFamily: THEMES.fontFamily.semiBold,
+              fontSize: THEMES.fonts.font12,
+              color: THEMES.colors.black,
+              paddingTop: moderateScale(5),
+              width: "80%",
+              textAlign: "center",
+            }}
+          >
+            Other pet
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+    const profilePhoto = item.documents.find(
+      (doc) => doc.documenttype == "profilePhoto"
+    );
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          setType("Pet");
+          setSelectedData(item);
+        }}
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 10,
+          marginLeft: index !== 0 && moderateScale(15),
+        }}
+      >
+        <Image
+          resizeMode="contain"
+          style={{
+            width: 90,
+            height: 90,
+            borderRadius: 10,
+            marginTop: 5,
+          }}
+          source={{
+            uri: profilePhoto?.url,
+          }}
+        />
+        {selectedData?.id === item?.id && (
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              width: 100,
+              height: 100,
+              borderRadius: 10,
+              backgroundColor: "#00BBC8", // Light blue transparent overlay
+              opacity: 0.4,
+            }}
+          ></View>
+        )}
+
+        <Text
+          style={{
+            fontFamily: THEMES.fontFamily.semiBold,
+            fontSize: THEMES.fonts.font12,
+            color: THEMES.colors.black,
+            paddingTop: moderateScale(5),
+            textAlign: "center",
+          }}
+        >
+          {item?.name}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -168,7 +285,7 @@ const EmergencyAlert = (props) => {
                 </>
               ))}
             </View>
-            {!provider && profile?.parentProfie?.petDetails?.length ? (
+            {!provider && petDetails?.length ? (
               <>
                 <View style={{ paddingTop: moderateScale(30) }}>
                   <Text
@@ -184,109 +301,19 @@ const EmergencyAlert = (props) => {
 
                 <View
                   style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    paddingTop: moderateScale(20),
+                    paddingTop: moderateScale(5),
                   }}
                 >
-                  <TouchableOpacity
-                    onPress={() => setType("Pet")}
-                    style={{
-                      alignItems: "center",
-                      width: "50%",
-                      justifyContent: "center",
-                      borderRadius: 10,
-                    }}
-                  >
-                    <Image
-                      resizeMode="contain"
-                      style={{
-                        width: 90,
-                        height: 90,
-                        borderRadius: 10,
-                        marginTop: 5,
-                      }}
-                      source={{
-                        uri: petImage?.url
-                      }}
-                    />
-
-                    {type === "Pet" && (
-                      <View
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          bottom: 0,
-                          width: 100,
-                          height: 100,
-                          borderRadius: 10,
-                          backgroundColor: "#00BBC8", // Light blue transparent overlay
-                          opacity: 0.4,
-                        }}
-                      ></View>
-                    )}
-
-                    <Text
-                      style={{
-                        fontFamily: THEMES.fontFamily.semiBold,
-                        fontSize: THEMES.fonts.font12,
-                        color: THEMES.colors.black,
-                        paddingTop: moderateScale(5),
-                        textAlign: "center",
-                      }}
-                    >
-                      Create Alert for{" "}
-                      {profile?.parentProfie?.petDetails?.[0]?.name}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => setType("otherPet")}
-                    style={{
-                      alignItems: "center",
-                      width: "50%",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Image
-                      resizeMode="contain"
-                      style={{
-                        width: 90,
-                        height: 90,
-                        borderRadius: 10,
-                        marginTop: 5,
-                      }}
-                      source={require("../../assets/images/rescue.png")}
-                    />
-
-                    {type === "otherPet" && (
-                      <View
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          bottom: 0,
-                          width: 100,
-                          height: 100,
-                          borderRadius: 10,
-                          backgroundColor: "#00BBC8", // Light blue transparent overlay
-                          opacity: 0.4,
-                        }}
-                      ></View>
-                    )}
-
-                    <Text
-                      style={{
-                        fontFamily: THEMES.fontFamily.semiBold,
-                        fontSize: THEMES.fonts.font12,
-                        color: THEMES.colors.black,
-                        paddingTop: moderateScale(5),
-                        width: "80%",
-                        textAlign: "center",
-                      }}
-                    >
-                      Other pet
-                    </Text>
-                  </TouchableOpacity>
+                  <FlatList
+                    showsHorizontalScrollIndicator={false}
+                    data={[...petDetails, { id: "otherPet" }]}
+                    horizontal={true}
+                    showsVerticalScrollIndicator={false}
+                    bounces={false}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id}
+                    style={{ paddingTop: moderateScale(15) }}
+                  />
                 </View>
               </>
             ) : null}

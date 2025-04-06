@@ -38,6 +38,8 @@ import { AddLostPetAlert } from "../../redux-store/actions/alerts";
 import { goBack } from "../../navigations/rootNavigationRef";
 import { contextValue } from "../../components/Loader";
 import { validateInput } from "../../utils/validation";
+import { useSelector } from "react-redux";
+import { LoginModules } from "../../constants/enums";
 
 const OtherLostPetAlert = (props) => {
   const [selectedGender, setSelectedGender] = useState(null);
@@ -57,6 +59,8 @@ const OtherLostPetAlert = (props) => {
   const [agree, setAgree] = useState();
   const [petId, setPetId] = useState([]);
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
+
+  const { loggedInModule } = useSelector((state) => state?.register);
 
   const hideDatePickerCancel = () => {
     setDateVisibility(false);
@@ -147,7 +151,9 @@ const OtherLostPetAlert = (props) => {
 
   const onSubmit = async () => {
     try {
-      if (!petImage) {
+      if (!petName) {
+        showToast("error", "Please enter pet name");
+      } else if (!petImage) {
         showToast("error", "Please add images of the pet");
       } else if (!date) {
         showToast("error", "Please select date");
@@ -158,7 +164,7 @@ const OtherLostPetAlert = (props) => {
       } else if (!message) {
         showToast("error", "Please enter message");
       } else if (!contactNo) {
-        showToast("error", "Please enter contact No");
+        showToast("error", "Please enter contact Number");
       } else if (validateInput(contactNo) == "invalid") {
         showToast("error", "Please enter valid mobile number");
       } else if (!agree) {
@@ -170,7 +176,7 @@ const OtherLostPetAlert = (props) => {
         let obj = {
           userid: await decryptService("userId"),
           isownpet: 0,
-          name: "",
+          name: petName,
           gender: "",
           lastseen: date,
           lastseenlocation: location,
@@ -181,12 +187,15 @@ const OtherLostPetAlert = (props) => {
           documents: petId.map((item) => item.id).join(","),
           requesttype: "lostpet",
           coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
+          usertype:
+            loggedInModule === LoginModules.provider ? "provider" : "parent",
         };
         let res = await AddLostPetAlert(obj);
         if (Boolean(res?.image)) {
           if (selectedPlatforms) {
             await shareImageBase64(res?.image, selectedPlatforms);
           }
+          contextValue?.setLoader(false);
           showToast("success", "Lost Pet Alert has successfully create");
           goBack();
         }
@@ -258,6 +267,19 @@ const OtherLostPetAlert = (props) => {
               marginBottom: moderateScale(24),
             }}
           >
+            <View
+              style={{
+                paddingHorizontal: moderateScale(20),
+                paddingTop: moderateScale(24),
+              }}
+            >
+              <InputField
+                label={"Pet name"}
+                placeholderText={"Enter pet name"}
+                value={petName}
+                onChange={setPetName}
+              />
+            </View>
             <View
               style={{
                 paddingHorizontal: moderateScale(20),

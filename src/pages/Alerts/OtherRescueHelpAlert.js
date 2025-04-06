@@ -38,6 +38,8 @@ import { AddLostPetAlert } from "../../redux-store/actions/alerts";
 import { goBack } from "../../navigations/rootNavigationRef";
 import { contextValue } from "../../components/Loader";
 import { validateInput } from "../../utils/validation";
+import { useSelector } from "react-redux";
+import { LoginModules } from "../../constants/enums";
 
 const OtherRescueHelpAlert = (props) => {
   const [petImage, setPetImage] = useState([]);
@@ -55,6 +57,7 @@ const OtherRescueHelpAlert = (props) => {
   const [agree, setAgree] = useState();
   const [petId, setPetId] = useState([]);
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
+  const { loggedInModule } = useSelector((state) => state?.register);
 
   const hideDatePickerCancel = () => {
     setDateVisibility(false);
@@ -146,7 +149,9 @@ const OtherRescueHelpAlert = (props) => {
 
   const onSubmit = async () => {
     try {
-      if (!petImage) {
+      if (!petName) {
+        showToast("error", "Please enter pet name");
+      } else if (!petImage) {
         showToast("error", "Please add images of the pet");
       } else if (!location) {
         showToast("error", "Please enter location");
@@ -155,7 +160,7 @@ const OtherRescueHelpAlert = (props) => {
       } else if (!feature) {
         showToast("error", "Please enter help description");
       } else if (!contactNo) {
-        showToast("error", "Please enter contact No");
+        showToast("error", "Please enter contact Number");
       } else if (validateInput(contactNo) == "invalid") {
         showToast("error", "Please enter valid mobile number");
       } else if (!agree) {
@@ -166,7 +171,7 @@ const OtherRescueHelpAlert = (props) => {
         let obj = {
           userid: await decryptService("userId"),
           isownpet: 0,
-          name: "",
+          name: petName,
           gender: "",
           lastseen: date,
           lastseenlocation: location,
@@ -176,12 +181,15 @@ const OtherRescueHelpAlert = (props) => {
           documents: petId?.map((item) => item?.id).join(","),
           requesttype: "rescue",
           coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
+          usertype:
+            loggedInModule === LoginModules.provider ? "provider" : "parent",
         };
         let res = await AddLostPetAlert(obj);
         if (Boolean(res?.image)) {
           if (selectedPlatforms) {
             await shareImageBase64(res?.image, selectedPlatforms);
           }
+          contextValue?.setLoader(false);
           showToast("success", "Rescue Pet Alert has successfully created");
           goBack();
         }
@@ -259,6 +267,20 @@ const OtherRescueHelpAlert = (props) => {
                 paddingTop: moderateScale(24),
               }}
             >
+              <InputField
+                label={"Pet name"}
+                placeholderText={"Enter pet name"}
+                value={petName}
+                onChange={setPetName}
+              />
+            </View>
+
+            <View
+              style={{
+                paddingHorizontal: moderateScale(20),
+                paddingTop: moderateScale(24),
+              }}
+            >
               <View style={styles.secondaryFlex}>
                 <Text style={styles.titleText}>Photo of the pet</Text>
                 <TouchableOpacity onPress={() => setPetImageVisible(true)}>
@@ -305,7 +327,7 @@ const OtherRescueHelpAlert = (props) => {
               }}
             >
               <InputField
-                label={"Location"}
+                label={"Location*"}
                 placeholderText={"Enter location name"}
                 value={location}
                 onChange={setLocation}

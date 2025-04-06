@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -40,9 +40,15 @@ import { goBack } from "../../navigations/rootNavigationRef";
 import { contextValue } from "../../components/Loader";
 import { validateInput } from "../../utils/validation";
 import { useSelector } from "react-redux";
+import { LoginModules } from "../../constants/enums";
 
 const LostPetAlert = (props) => {
-  const profile = useSelector((state) => state?.commonReducer);
+  const selectedData = props.route?.params?.selectedData;
+
+  const { profile, parentProfie } = useSelector(
+    (state) => state?.commonReducer
+  );
+  const { petDetails } = parentProfie;
   const [selectedGender, setSelectedGender] = useState(null);
   const [petImage, setPetImage] = useState([]);
   const [petImagesVisible, setPetImageVisible] = useState(false);
@@ -53,7 +59,7 @@ const LostPetAlert = (props) => {
   const [instagram, setInstagram] = useState();
   const [whatsup, setWhatsup] = useState();
   const [petName, setPetName] = useState(
-    profile?.parentProfie?.petDetails?.[0]?.name
+    selectedData?.name
   );
   const [location, setLocation] = useState();
   const [feature, setFeature] = useState();
@@ -62,11 +68,13 @@ const LostPetAlert = (props) => {
   const [agree, setAgree] = useState();
   const [petId, setPetId] = useState([]);
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
+  const { loggedInModule } = useSelector((state) => state?.register);
 
   const hideDatePickerCancel = () => {
     setDateVisibility(false);
   };
 
+ 
   const handleDateConfirm = (date) => {
     const formattedDate = moment(date).format("DD/MM/YYYY");
     selectedDate(formattedDate);
@@ -166,7 +174,7 @@ const LostPetAlert = (props) => {
       } else if (!message) {
         showToast("error", "Please enter message");
       } else if (!contactNo) {
-        showToast("error", "Please enter contact No");
+        showToast("error", "Please enter contact Number");
       } else if (validateInput(contactNo) == "invalid") {
         showToast("error", "Please enter valid mobile number");
       } else if (!agree) {
@@ -174,7 +182,6 @@ const LostPetAlert = (props) => {
       } else {
         contextValue?.setLoader(true);
         const currentPosition = await getCurrentLocation();
-
         let obj = {
           userid: await decryptService("userId"),
           isownpet: 1,
@@ -189,12 +196,16 @@ const LostPetAlert = (props) => {
           documents: petId.map((item) => item.id).join(","),
           requesttype: "lostpet",
           coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
+          usertype:
+            loggedInModule === LoginModules.provider ? "provider" : "parent",
+          petid: selectedData?.id,
         };
         let res = await AddLostPetAlert(obj);
         if (Boolean(res?.image)) {
           if (selectedPlatforms) {
             await shareImageBase64(res?.image, selectedPlatforms);
           }
+          contextValue?.setLoader(false);
           showToast("success", "Lost Pet Alert has successfully created");
           goBack();
         }
@@ -269,18 +280,16 @@ const LostPetAlert = (props) => {
           >
             <View
               style={{
+                paddingHorizontal:moderateScale(16),
                 paddingTop: moderateScale(24),
-                paddingHorizontal: moderateScale(20),
               }}
             >
               <InputField
-                editable={
-                  profile?.parentProfie?.petDetails?.[0]?.name ? false : true
-                }
                 label={"Pet Name*"}
                 placeholderText={"Enter Pet name"}
                 value={petName}
                 onChange={setPetName}
+                editable={false}
               />
             </View>
             <View style={styles.toggleContainer}>

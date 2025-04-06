@@ -561,8 +561,9 @@ const ParentHome = (props) => {
             onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
           />
         )} */}
+        {(appointmentData?.length > 1 ||
+          eventData?.length > 1) && paginationDots()}
 
-        {paginationDots()}
         <View>
           <View
             style={{

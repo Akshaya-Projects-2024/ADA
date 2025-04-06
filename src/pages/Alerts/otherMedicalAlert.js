@@ -38,6 +38,8 @@ import { AddLostPetAlert } from "../../redux-store/actions/alerts";
 import { goBack } from "../../navigations/rootNavigationRef";
 import { contextValue } from "../../components/Loader";
 import { validateInput } from "../../utils/validation";
+import { useSelector } from "react-redux";
+import { LoginModules } from "../../constants/enums";
 
 const OtherMedicalAlert = (props) => {
   const [selectedGender, setSelectedGender] = useState(null);
@@ -56,6 +58,7 @@ const OtherMedicalAlert = (props) => {
   const [agree, setAgree] = useState();
   const [petId, setPetId] = useState([]);
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
+  const { loggedInModule } = useSelector((state) => state?.register);
 
   const hideDatePickerCancel = () => {
     setDateVisibility(false);
@@ -145,7 +148,9 @@ const OtherMedicalAlert = (props) => {
 
   const onSubmit = async () => {
     try {
-      if (!petImage) {
+      if (!petName) {
+        showToast("error", "Please enter pet name");
+      } else if (!petImage) {
         showToast("error", "Please add images of the pet");
       } else if (!location) {
         showToast("error", "Please enter location");
@@ -154,7 +159,7 @@ const OtherMedicalAlert = (props) => {
       } else if (!feature) {
         showToast("error", "Please enter help description");
       } else if (!contactNo) {
-        showToast("error", "Please enter contact No");
+        showToast("error", "Please enter contact Number");
       } else if (validateInput(contactNo) == "invalid") {
         showToast("error", "Please enter valid mobile number");
       } else if (!agree) {
@@ -165,7 +170,7 @@ const OtherMedicalAlert = (props) => {
         let obj = {
           userid: await decryptService("userId"),
           isownpet: 0,
-          name: "",
+          name: petName,
           gender: "",
           lastseen: date,
           lastseenlocation: location,
@@ -175,12 +180,15 @@ const OtherMedicalAlert = (props) => {
           documents: petId.map((item) => item.id).join(","),
           requesttype: "medical",
           coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
+          usertype:
+            loggedInModule === LoginModules.provider ? "provider" : "parent",
         };
         let res = await AddLostPetAlert(obj);
         if (Boolean(res?.image)) {
           if (selectedPlatforms) {
             await shareImageBase64(res?.image, selectedPlatforms);
           }
+          contextValue?.setLoader(false);
           showToast("success", "Medical Pet Alert has successfully created");
           goBack();
         }
@@ -259,6 +267,19 @@ const OtherMedicalAlert = (props) => {
                 paddingTop: moderateScale(24),
               }}
             >
+              <InputField
+                label={"Pet name"}
+                placeholderText={"Enter pet name"}
+                value={petName}
+                onChange={setPetName}
+              />
+            </View>
+            <View
+              style={{
+                paddingHorizontal: moderateScale(20),
+                paddingTop: moderateScale(24),
+              }}
+            >
               <View style={styles.secondaryFlex}>
                 <Text style={styles.titleText}>Photo of the pet</Text>
                 <TouchableOpacity onPress={() => setPetImageVisible(true)}>
@@ -305,7 +326,7 @@ const OtherMedicalAlert = (props) => {
               }}
             >
               <InputField
-                label={"Location"}
+                label={"Location*"}
                 placeholderText={"Enter location name"}
                 value={location}
                 onChange={setLocation}
@@ -341,7 +362,7 @@ const OtherMedicalAlert = (props) => {
                           },
                         ]}
                       >
-                        Help needed date
+                        Help needed date*
                       </Text>
                       <Text style={styles.dateValue}>{date}</Text>
                     </>
@@ -356,7 +377,7 @@ const OtherMedicalAlert = (props) => {
                           },
                         ]}
                       >
-                        Help needed date
+                        Help needed date*
                       </Text>
                       <Text style={styles.datePlaceholderText}>
                         {Strings.ddMMYYYY}

@@ -6,6 +6,7 @@ import MyAccount from "../pages/Account/myAccount";
 import BottomTabBarItem from "./BottomTabBarItem";
 import Chat from "../pages/Chat/chat";
 import EmergencyAlert from "../pages/Alerts/EmergencyAlert";
+import AlertList from "../pages/Alerts/AlertList";
 
 const Tab = createBottomTabNavigator();
 
@@ -36,8 +37,8 @@ export default function BottomTabNavigation() {
         options={navOptionHandler}
       />
       <Tab.Screen
-        name="emergencyAlert"
-        component={EmergencyAlert}
+        name="alertList"
+        component={AlertList}
         options={navOptionHandler}
       />
       <Tab.Screen

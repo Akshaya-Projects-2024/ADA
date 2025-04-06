@@ -89,7 +89,7 @@ const PetParentBottoTabbarItem = ({ navigation, state }) => {
       />
       <Tab
         index={3}
-        route="emergencyAlert"
+        route="alertList"
         label="Alert"
         icon={"chat"}
         darkColor={"#0e96ea"}
