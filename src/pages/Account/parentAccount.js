@@ -94,6 +94,7 @@ const ParentAccount = (props) => {
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const isServiceProvider = loggedInModule === LoginModules.provider;
+  const [petAlert, setPetAlert] = useState(false);
 
   const handleDeleteAccount = async () => {
     try {
@@ -137,7 +138,7 @@ const ParentAccount = (props) => {
       },
       {
         label: Strings.myPetProfile,
-        onPress: () => handleOnClickPetDetails(),
+        onPress: () => checkIfParentExist(),
       },
       {
         label: "Activity tracker",
@@ -310,7 +311,16 @@ const ParentAccount = (props) => {
     }
   };
 
+  const checkIfParentExist = () => {
+    if (profile?.logindetails?.isparent) {
+      handleOnClickPetDetails();
+    } else {
+      setPetAlert(true);
+    }
+  };
+
   const handleOnClickPetDetails = () => {
+    petAlert && setPetAlert(false);
     if (profile?.logindetails?.isparent) {
       props.navigation.navigate("petDetail", {
         route: "parentAccount",
@@ -399,7 +409,7 @@ const ParentAccount = (props) => {
                     icon={<PawPrint />}
                     title={Strings.myPetProfile}
                     showPending={!validArray(profile?.parentProfie?.petDetails)}
-                    onPress={handleOnClickPetDetails}
+                    onPress={checkIfParentExist}
                   />
                   <MenuItem
                     bgColor={THEMES.colors.hawkesBlue}
@@ -564,6 +574,20 @@ const ParentAccount = (props) => {
           rightButtonPressed={switchProfile}
           onClose={() => {
             setModal(false);
+          }}
+        />
+        <Dialog
+          flag={petAlert}
+          title={"Info"}
+          description={
+            "Pet Parent details need to add first before adding Pet Details?"
+          }
+          rightButtonText="Ok"
+          leftButtonText="Close"
+          leftButtonPressed={() => setPetAlert(false)}
+          rightButtonPressed={handleOnClickPetDetails}
+          onClose={() => {
+            setPetAlert(false);
           }}
         />
       </SafeAreaView>

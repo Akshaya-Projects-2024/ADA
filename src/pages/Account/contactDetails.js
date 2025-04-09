@@ -25,6 +25,10 @@ import {
   validateIndianPostalCode,
   validateInput,
 } from "../../utils/validation";
+// Add these imports at the top
+import Dialog from "../../components/Dialog";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { TouchableOpacity } from "react-native";
 
 const ContactDetails = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -42,6 +46,9 @@ const ContactDetails = (props) => {
 
   useEffect(() => {
     initData();
+    if (!providerContact?.id) {
+      setIsSubmit(true);
+    }
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -137,11 +144,41 @@ const ContactDetails = (props) => {
     }
   };
 
+  // Add these state variables with existing states
+  const [isSubmit, setIsSubmit] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+
+  // Add this function after other function declarations
+  const editPopup = () => {
+    setEditModal(true);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <StatusBar backgroundColor={THEMES.colors.bgColor} />
-        <Header title={Strings.contactDetails} showBack bgColor="transparent" />
+        <Header
+          title={Strings.contactDetails}
+          showBack
+          bgColor="transparent"
+          right={
+            route === "myprofile" ? (
+              <TouchableOpacity
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 15,
+                }}
+                onPress={() => editPopup()}
+              >
+                <FontAwesome
+                  size={20}
+                  name="edit"
+                  color={THEMES.colors.black}
+                />
+              </TouchableOpacity>
+            ) : null
+          }
+        />
         {route !== "myprofile" && (
           <View
             style={{
@@ -162,60 +199,63 @@ const ContactDetails = (props) => {
             showsVerticalScrollIndicator={false}
             bounces={false}
           >
-            <View style={{ paddingHorizontal: moderateScale(20) }}>
-              <View
-                style={{
-                  paddingTop: moderateScale(route !== "myprofile" ? 18 : 30),
-                }}
-              >
-                <InputField
-                  maxLength={10}
-                  keyboardType="phone-pad"
-                  label={Strings.mobileNo}
-                  placeholderText={Strings.enterMobileNo}
-                  value={mobileNo}
-                  onChange={setMobileNo}
-                />
-              </View>
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  label={Strings.emailId}
-                  placeholderText={Strings.enterEmailId}
-                  value={emailId}
-                  onChange={setEmailId}
-                />
-              </View>
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  label={Strings.address}
-                  placeholderText={Strings.enterAddress}
-                  multiline={true}
-                  value={address}
-                  onChange={setAddress}
-                />
-              </View>
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  label={Strings.location}
-                  placeholderText={Strings.enterLocation}
-                  rightIcon={<Location stroke={THEMES.colors.darkGrey} />}
-                  value={location}
-                  onChange={setLocation}
-                />
-              </View>
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  maxLength={6}
-                  keyboardType="phone-pad"
-                  label={Strings.postalCode}
-                  placeholderText={Strings.enterPostalCode}
-                  value={postalCode}
-                  onChange={setPostalCode}
-                />
+            <View pointerEvents={isSubmit ? "auto" : "none"}>
+              {/* Wrap your existing form elements with this View */}
+              <View style={{ paddingHorizontal: moderateScale(20) }}>
+                <View
+                  style={{
+                    paddingTop: moderateScale(route !== "myprofile" ? 18 : 30),
+                  }}
+                >
+                  <InputField
+                    maxLength={10}
+                    keyboardType="phone-pad"
+                    label={Strings.mobileNo}
+                    placeholderText={Strings.enterMobileNo}
+                    value={mobileNo}
+                    onChange={setMobileNo}
+                  />
+                </View>
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <InputField
+                    label={Strings.emailId}
+                    placeholderText={Strings.enterEmailId}
+                    value={emailId}
+                    onChange={setEmailId}
+                  />
+                </View>
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <InputField
+                    label={Strings.address}
+                    placeholderText={Strings.enterAddress}
+                    multiline={true}
+                    value={address}
+                    onChange={setAddress}
+                  />
+                </View>
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <InputField
+                    label={Strings.location}
+                    placeholderText={Strings.enterLocation}
+                    rightIcon={<Location stroke={THEMES.colors.darkGrey} />}
+                    value={location}
+                    onChange={setLocation}
+                  />
+                </View>
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <InputField
+                    maxLength={6}
+                    keyboardType="phone-pad"
+                    label={Strings.postalCode}
+                    placeholderText={Strings.enterPostalCode}
+                    value={postalCode}
+                    onChange={setPostalCode}
+                  />
+                </View>
               </View>
             </View>
           </ScrollView>
-          {!isKeyboardVisible && (
+          {!isKeyboardVisible && isSubmit && (
             <View style={styles.submitButton}>
               <Button
                 title={route !== "myprofile" ? Strings.next : Strings.submit}
@@ -224,6 +264,24 @@ const ContactDetails = (props) => {
             </View>
           )}
         </View>
+
+        {/* Add Dialog component at the end of the container View */}
+        <Dialog
+          flag={editModal}
+          description={"Are you sure you want to edit this contact details?"}
+          leftButtonText="No"
+          rightButtonText="Yes"
+          leftButtonPressed={() => {
+            setEditModal(false);
+            setIsSubmit(false);
+          }}
+          rightButtonPressed={() => {
+            setIsSubmit(true);
+            setEditModal(false);
+          }}
+          onClose={() => setEditModal(false)}
+          title="Edit Contact Details"
+        />
       </View>
     </SafeAreaView>
   );

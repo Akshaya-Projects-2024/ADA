@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { moderateScale } from "react-native-size-matters";
@@ -16,6 +16,7 @@ import { DaySelector } from "./DaySelector";
 import { TimeButton } from "./TimeButton";
 import { styles } from "./styles";
 import { ActivityHeader } from "./ActivityHeader";
+import moment from "moment";
 
 export const MedicationActivity = memo(
   ({
@@ -44,6 +45,10 @@ export const MedicationActivity = memo(
       onChange("date", "");
       onChange("startdate", "");
     };
+
+    const startdate = useMemo(() => {
+      return item.startdate ? moment(item.date).format("DD-MM-YYYY") : "";
+    }, [item.startdate]);
 
     return (
       <LinearGradient
@@ -165,7 +170,7 @@ export const MedicationActivity = memo(
                     placeholder="Medicine Date"
                     placeholderTextColor={THEMES.colors.darkGrey}
                     editable={false}
-                    value={item.startdate}
+                    value={startdate}
                   />
                 </TouchableOpacity>
                 <TouchableOpacity

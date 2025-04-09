@@ -9,7 +9,7 @@ import {
   Linking,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, ms } from "react-native-size-matters";
 import { ScrollView } from "react-native-gesture-handler";
 import Back from "../../assets/svg/back.svg";
 import Msg from "../../assets/svg/msgSquareText.svg";
@@ -23,6 +23,8 @@ import { contextValue } from "../../components/Loader";
 import { useSelector } from "react-redux";
 import ProfilePhoto from "../../components/ProfilePhoto";
 import BackArrowComponent from "../../components/BackArrowComponent";
+import { AppointmentStatus } from "../../constants/enums";
+import moment from "moment";
 
 const AppointmentDetail = (props) => {
   const selectedData = props?.route?.params?.selectedItem;
@@ -68,6 +70,22 @@ const AppointmentDetail = (props) => {
     [appointmentData?.petdetails?.documents]
   );
 
+  const itemtextColor = () => {
+    if (appointmentData?.status === AppointmentStatus.cancelled) {
+      return "#F4511E";
+    } else if (appointmentData?.status === AppointmentStatus.scheduled) {
+      return "#6DAE43";
+    } else if (
+      appointmentData?.status === AppointmentStatus.rescheduled ||
+      appointmentData?.status === AppointmentStatus.pending
+    ) {
+      return "#FD9F00";
+    } else if (appointmentData?.status === AppointmentStatus.completed) {
+      return "#02bac7";
+    }
+    return THEMES.colors.black;
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -91,12 +109,12 @@ const AppointmentDetail = (props) => {
                   </Text>
                   <Text numberOfLines={1} style={styles.breedType}>
                     {appointmentData?.petdetails?.breed}
+                    {"  "}
                   </Text>
                 </View>
                 <View style={styles.content}>
                   <View style={styles.boxView}>
                     <Text style={styles.dogText}>
-                      {" "}
                       {appointmentData?.petdetails?.type}
                     </Text>
                     <Text style={styles.type}>Type</Text>
@@ -126,13 +144,65 @@ const AppointmentDetail = (props) => {
                   <Text style={styles.petDescription}>
                     {appointmentData?.petdetails?.about}
                   </Text>
-                  {Boolean(document?.length) && (
-                    <View style={styles.medicalDocView}>
-                      <Text style={styles.medicalText}>Medical documents</Text>
-                      <RightArrow stroke="#000" />
+                </View>
+                <View style={{ marginTop: ms(10) }}>
+                  <View>
+                    <Text style={styles.aboutPetText}>Status:</Text>
+                    <Text
+                      style={[styles.statusText, { color: itemtextColor() }]}
+                    >
+                      {appointmentData?.status === "completed"
+                        ? "Attended"
+                        : appointmentData?.status}
+                    </Text>
+                  </View>
+                  <View style={{ flexDirection: "row", marginTop: ms(15) }}>
+                    <View>
+                      <Text style={styles.chargesText}>Appointment Date</Text>
+                      <Text style={styles.chargesValue}>
+                        {moment(appointmentData?.appointment_date).format(
+                          "DD-MM-YYYY"
+                        )}
+                      </Text>
+                    </View>
+                    <View style={{ marginLeft: ms(20) }}>
+                      <Text style={styles.chargesText}>Start Time </Text>
+                      <Text style={styles.chargesValue}>
+                        {appointmentData?.start_time}
+                      </Text>
+                    </View>
+                    <View style={{ marginLeft: ms(20) }}>
+                      <Text style={styles.chargesText}>End Time </Text>
+                      <Text style={styles.chargesValue}>
+                        {appointmentData?.end_time}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{ flexDirection: "row", marginTop: ms(15) }}>
+                  <View>
+                    <Text style={styles.chargesText}>Session Charges</Text>
+                    <Text style={styles.chargesValue}>
+                      {appointmentData?.sessioncharges} / Per Session
+                    </Text>
+                  </View>
+                  {Boolean(+appointmentData?.monthcharges) && (
+                    <View style={{ marginLeft: ms(20) }}>
+                      <Text style={styles.chargesText}>Montly Charges </Text>
+                      <Text style={styles.chargesValue}>
+                        {appointmentData?.monthcharges} / Per Month
+                      </Text>
                     </View>
                   )}
-
+                </View>
+                {Boolean(document?.length) && (
+                  <View style={styles.medicalDocView}>
+                    <Text style={styles.medicalText}>Medical documents</Text>
+                    <RightArrow stroke="#000" />
+                  </View>
+                )}
+                {Boolean(document?.length) && (
                   <View style={styles.documentView}>
                     <ScrollView
                       horizontal={true}
@@ -141,61 +211,58 @@ const AppointmentDetail = (props) => {
                       showsHorizontalScrollIndicator={false}
                       showsVerticalScrollIndicator={false}
                     >
-                      {Boolean(document?.length) &&
-                        document?.map((item, index) => {
-                          return (
-                            <TouchableOpacity
-                              onPress={() => Linking.openURL(item.url)}
-                              style={[
-                                styles.documents,
-                                {
-                                  marginLeft:
-                                    index === 0 ? 0 : moderateScale(10),
-                                },
-                              ]}
-                            >
-                              <Text style={styles.docText}>
-                                {item?.documenttype} {index + 1}
-                              </Text>
-                            </TouchableOpacity>
-                          );
-                        })}
+                      {document?.map((item, index) => {
+                        return (
+                          <TouchableOpacity
+                            onPress={() => Linking.openURL(item.url)}
+                            style={[
+                              styles.documents,
+                              {
+                                marginLeft: index === 0 ? 0 : moderateScale(10),
+                              },
+                            ]}
+                          >
+                            <Text style={styles.docText}>
+                              {item?.documenttype} {index + 1}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
                     </ScrollView>
                   </View>
-                  {Boolean(document?.length > 1) && (
-                    <View style={styles.moreView}>
-                      <More />
-                    </View>
-                  )}
-
-                  <View style={styles.cardView}>
-                    <View style={styles.imgView}>
-                      <ProfilePhoto
-                        url={appointmentData?.providerphoto}
-                        style={styles.img}
-                      />
-                    </View>
-                    <View style={styles.parentDetailsView}>
-                      <Text style={styles.parentText}>Pet parent details</Text>
-                      <Text numberOfLines={2} style={styles.location}>
-                        {appointmentData?.parentdetails?.name}
+                )}
+                {Boolean(document?.length > 1) && (
+                  <View style={styles.moreView}>
+                    <More />
+                  </View>
+                )}
+                <View style={styles.cardView}>
+                  <View style={styles.imgView}>
+                    <ProfilePhoto
+                      url={appointmentData?.ParentPhoto}
+                      style={styles.img}
+                    />
+                  </View>
+                  <View style={styles.parentDetailsView}>
+                    <Text style={styles.parentText}>Pet parent details</Text>
+                    <Text numberOfLines={2} style={styles.location}>
+                      {appointmentData?.parentdetails?.name}
+                    </Text>
+                    <View style={styles.rowDetail}>
+                      <Text style={styles.numberText}>
+                        {appointmentData?.parentdetails?.mobile}
                       </Text>
-                      <View style={styles.rowDetail}>
-                        <Text style={styles.numberText}>
-                          {appointmentData?.parentdetails?.mobile}
-                        </Text>
 
-                        <TouchableOpacity
-                          style={styles.ml20}
-                          onPress={() =>
-                            Linking.openURL(
-                              `tel:${appointmentData?.parentdetails?.mobile}`
-                            )
-                          }
-                        >
-                          <Call />
-                        </TouchableOpacity>
-                      </View>
+                      <TouchableOpacity
+                        style={styles.ml20}
+                        onPress={() =>
+                          Linking.openURL(
+                            `tel:${appointmentData?.parentdetails?.mobile}`
+                          )
+                        }
+                      >
+                        <Call />
+                      </TouchableOpacity>
                     </View>
                   </View>
                 </View>
@@ -396,7 +463,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   cardView: {
-    marginTop: moderateScale(32),
+    marginTop: moderateScale(16),
     padding: moderateScale(14),
     backgroundColor: THEMES.colors.white,
     borderWidth: 1,
@@ -445,7 +512,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingTop: moderateScale(5),
-    width: "100%"
+    width: "100%",
   },
   numberText: {
     color: THEMES.colors.darkGrey,
@@ -458,6 +525,21 @@ const styles = StyleSheet.create({
   goBackBtn: {
     paddingTop: moderateScale(18),
     paddingHorizontal: moderateScale(15),
+  },
+  statusText: {
+    fontFamily: THEMES.fontFamily.medium,
+    fontSize: THEMES.fonts.font12,
+    textTransform: "capitalize",
+  },
+  chargesText: {
+    fontFamily: THEMES.fontFamily.medium,
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.darkGrey,
+  },
+  chargesValue: {
+    fontFamily: THEMES.fontFamily.semiBold,
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.black,
   },
 });
 

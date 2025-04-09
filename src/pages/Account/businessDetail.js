@@ -6,6 +6,7 @@ import {
   Text,
   StyleSheet,
   Keyboard,
+  TouchableOpacity,
 } from "react-native";
 import Strings from "../../constants/strings";
 import { THEMES } from "../../assets/theme/themes";
@@ -30,6 +31,8 @@ import { StackActions } from "@react-navigation/native";
 import { useUser } from "../../api/UserContext";
 import { isValidName } from "../../utils/validation";
 import { LoginModules } from "../../constants/enums";
+import Dialog from "../../components/Dialog";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 const experienceData = [
   { id: "1", label: "1 Years" },
@@ -60,6 +63,8 @@ const BusinessDetail = (props) => {
   const [serviceProviderRole, setServiceProviderRole] = useState();
   const [serviceProviderForOther, setServiceProviderForOther] = useState("");
   const { userData, apiInitCall } = useUser();
+  const [editModal, setEditModal] = useState(false);
+  const [isSubmit, setIsSubmit] = useState(false);
 
   useEffect(() => {
     if (serviceProviderRoleData.length) {
@@ -82,6 +87,9 @@ const BusinessDetail = (props) => {
         setKeyboardVisible(false); // Keyboard is hidden
       }
     );
+    if (!providerBusiness?.id) {
+      setIsSubmit(true);
+    }
 
     return () => {
       keyboardDidHideListener.remove();
@@ -114,9 +122,16 @@ const BusinessDetail = (props) => {
       showToast("error", "Please enter Business name or person name");
     } else if (!isValidName(businessValue)) {
       showToast("error", "Please enter valid business name");
-    } else if (!selectedServiceProvider || selectedServiceProvider?.length == 0) {
+    } else if (
+      !selectedServiceProvider ||
+      selectedServiceProvider?.length == 0
+    ) {
       showToast("error", "Please select service provider role");
-    } else if (selectedServiceProvider?.some(item => item.label == "Other" && !isValidName(serviceProviderForOther))) {
+    } else if (
+      selectedServiceProvider?.some(
+        (item) => item.label == "Other" && !isValidName(serviceProviderForOther)
+      )
+    ) {
       showToast("error", "Please enter valid service provider role");
     } else if (!selectedExperience) {
       showToast("error", "Please enter your experience");
@@ -137,7 +152,9 @@ const BusinessDetail = (props) => {
           name: businessValue,
           services: formattedServices,
           userid: userId,
-          others:selectedServiceProvider?.some(item => item.label == "Other") ? serviceProviderForOther : "",
+          others: selectedServiceProvider?.some((item) => item.label == "Other")
+            ? serviceProviderForOther
+            : "",
           ...(providerBusiness?.id ? { id: providerBusiness?.id } : {}),
         };
         const res = await saveBusinessDetails(postData);
@@ -160,12 +177,36 @@ const BusinessDetail = (props) => {
       }
     }
   };
+  const editPopup = () => {
+    setEditModal(true);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <StatusBar backgroundColor={THEMES.colors.bgColor} />
-        <Header title={Strings.businessDetail} showBack bgColor="transparent" />
+        <Header
+          title={Strings.businessDetail}
+          showBack
+          bgColor="transparent"
+          right={
+            route === "myprofile" ? (
+              <TouchableOpacity
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 15,
+                }}
+                onPress={() => editPopup()}
+              >
+                <FontAwesome
+                  size={20}
+                  name="edit"
+                  color={THEMES.colors.black}
+                />
+              </TouchableOpacity>
+            ) : null
+          }
+        />
         {route !== "myprofile" && (
           <View
             style={{
@@ -187,33 +228,60 @@ const BusinessDetail = (props) => {
             showsVerticalScrollIndicator={false}
             bounces={false}
           >
-            <View
-              style={{
-                paddingTop: route !== "myprofile" ? 18 : 30,
-                marginHorizontal: moderateScale(20),
-              }}
-            >
-              <InputField
-                label={"Business name/Person name*"}
-                placeholderText={"Enter name"}
-                value={businessValue}
-                onChange={setBusinessValue}
-              />
-            </View>
+            <View pointerEvents={isSubmit ? "auto" : "none"}>
+              <View
+                style={{
+                  paddingTop: route !== "myprofile" ? 18 : 30,
+                  marginHorizontal: moderateScale(20),
+                }}
+              >
+                <InputField
+                  label={"Business name/Person name*"}
+                  placeholderText={"Enter name"}
+                  value={businessValue}
+                  onChange={setBusinessValue}
+                />
+              </View>
 
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <ModalDropdown
-                placeholder="Service provider Role*"
-                data={serviceProviderRole}
-                title={"Select service role"}
-                setSelectedValue={setServiceProviderValue}
-                selectedValue={selectedServiceProvider}
-                multiSelect={true}
-                showScroll={true}
-              />
-            </View>
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <ModalDropdown
+                  placeholder="Service provider Role*"
+                  data={serviceProviderRole}
+                  title={"Select service role"}
+                  setSelectedValue={setServiceProviderValue}
+                  selectedValue={selectedServiceProvider}
+                  multiSelect={true}
+                  showScroll={true}
+                />
+              </View>
 
-            {selectedServiceProvider?.some(item => item.label == "Other") && (
+              {selectedServiceProvider?.some(
+                (item) => item.label == "Other"
+              ) && (
+                <View
+                  style={{
+                    paddingTop: moderateScale(16),
+                    marginHorizontal: moderateScale(20),
+                  }}
+                >
+                  <InputField
+                    label={"Other"}
+                    placeholderText={"Enter your role here"}
+                    value={serviceProviderForOther}
+                    onChange={setServiceProviderForOther}
+                  />
+                </View>
+              )}
+
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <ModalDropdown
+                  placeholder="Years of Experience"
+                  data={experienceData}
+                  title={"Select experience"}
+                  setSelectedValue={setSelectedExperience}
+                  selectedValue={selectedExperience}
+                />
+              </View>
               <View
                 style={{
                   paddingTop: moderateScale(16),
@@ -221,54 +289,16 @@ const BusinessDetail = (props) => {
                 }}
               >
                 <InputField
-                  label={"Other"}
-                  placeholderText={"Enter your role here"}
-                  value={serviceProviderForOther}
-                  onChange={setServiceProviderForOther}
+                  label={"About Info /Description*"}
+                  placeholderText={"Write the about info/description"}
+                  multiline
+                  value={description}
+                  onChange={setDescription}
                 />
               </View>
-            )}
-
-            {/* <View
-              style={{
-                paddingTop: moderateScale(16),
-                marginHorizontal: moderateScale(20),
-              }}
-            >
-              <InputField
-                label={"About Info /Description*"}
-                placeholderText={"Write the about info/description"}
-                multiline
-                value={description}
-                onChange={setDescription}
-              />
-            </View> */}
-
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <ModalDropdown
-                placeholder="Years of Experience"
-                data={experienceData}
-                title={"Select experience"}
-                setSelectedValue={setSelectedExperience}
-                selectedValue={selectedExperience}
-              />
-            </View>
-            <View
-              style={{
-                paddingTop: moderateScale(16),
-                marginHorizontal: moderateScale(20),
-              }}
-            >
-              <InputField
-                label={"About Info /Description*"}
-                placeholderText={"Write the about info/description"}
-                multiline
-                value={description}
-                onChange={setDescription}
-              />
             </View>
           </ScrollView>
-          {!isKeyboardVisible && (
+          {!isKeyboardVisible && isSubmit && (
             <View style={styles.submitButton}>
               <Button
                 title={route !== "myprofile" ? Strings.next : Strings.submit}
@@ -277,6 +307,23 @@ const BusinessDetail = (props) => {
             </View>
           )}
         </View>
+
+        <Dialog
+          flag={editModal}
+          description={"Are you sure you want to edit this business profile?"}
+          leftButtonText="No"
+          rightButtonText="Yes"
+          leftButtonPressed={() => {
+            setEditModal(false);
+            setIsSubmit(false);
+          }}
+          rightButtonPressed={() => {
+            setIsSubmit(true);
+            setEditModal(false);
+          }}
+          onClose={() => setEditModal(false)}
+          title="Edit Business Profile"
+        />
       </View>
     </SafeAreaView>
   );

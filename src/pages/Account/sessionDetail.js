@@ -6,6 +6,7 @@ import {
   StatusBar,
   StyleSheet,
   Keyboard,
+  TouchableOpacity,
 } from "react-native";
 import InputField from "../../components/InputField";
 import { THEMES } from "../../assets/theme/themes";
@@ -14,7 +15,7 @@ import Checked from "../../assets/svg/checked.svg";
 import UnChecked from "../../assets/svg/unchecked.svg";
 import Strings from "../../constants/strings";
 import Button from "../../components/Button";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, ms } from "react-native-size-matters";
 import CheckBox from "react-native-check-box";
 import Stepper from "../../components/Stepper";
 import {
@@ -32,6 +33,8 @@ import {
   isValidPrice,
   validateMinutes,
 } from "../../utils/validation";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import Dialog from "../../components/Dialog";
 const SESSION_AVAILABILITY = {
   home: "Home Visit",
   center: "At Center Service",
@@ -52,9 +55,14 @@ const SessionDetail = (props) => {
     perSession: [],
     perMonth: [],
   });
+  const [isSubmit, setIsSubmit] = useState(false);
+  const [editModal, setEditModal] = useState(false);
 
   useEffect(() => {
     initData();
+    if(!ProviderSession?.id) {
+      setIsSubmit(true);
+    }
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -73,6 +81,10 @@ const SessionDetail = (props) => {
       keyboardDidShowListener.remove();
     };
   }, []);
+
+  const editPopup = () => {
+    setEditModal(true);
+  };
 
   const getServices = () => {
     const services = userData?.providerProfile?.providerBusiness?.services;
@@ -103,7 +115,7 @@ const SessionDetail = (props) => {
     const isPerMonth = !!ProviderSession?.ispermonth;
     setPerSession(isPerSession);
     setPerMonth(isPerMonth);
-    let services = getServices()
+    let services = getServices();
 
     if (services?.length) {
       const { perSession, perMonth } = services.reduce(
@@ -289,7 +301,28 @@ const SessionDetail = (props) => {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <StatusBar backgroundColor={THEMES.colors.bgColor} />
-        <Header title={Strings.sessionDetails} showBack bgColor="transparent" />
+        <Header
+          title={Strings.sessionDetails}
+          showBack
+          bgColor="transparent"
+          right={
+            route === "myprofile" ? (
+              <TouchableOpacity
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 15,
+                }}
+                onPress={() => editPopup()}
+              >
+                <FontAwesome
+                  size={20}
+                  name="edit"
+                  color={THEMES.colors.black}
+                />
+              </TouchableOpacity>
+            ) : null
+          }
+        />
         {route !== "myprofile" && (
           <View
             style={{
@@ -310,235 +343,253 @@ const SessionDetail = (props) => {
             showsVerticalScrollIndicator={false}
             bounces={false}
           >
-            <View
-              style={[
-                styles.contentView,
-                { paddingTop: route !== "myprofile" ? 18 : 30 },
-              ]}
-            >
-              <Text style={styles.availableText}>
-                {Strings.howYouWillBeAvailable}{" "}
-              </Text>
-            </View>
-            <View style={styles.contentValueView}>
-              <CheckBox
-                checkedImage={<Checked />}
-                unCheckedImage={<UnChecked />}
-                onClick={() => setHomeVisit(!homeVisit)}
-                isChecked={homeVisit}
-                style={styles.flex}
-                rightTextStyle={{
-                  color: THEMES.colors.black,
-                  fontSize: THEMES.fonts.font12,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                }}
-                rightText={SESSION_AVAILABILITY.home}
-              />
-              <CheckBox
-                checkedImage={<Checked />}
-                unCheckedImage={<UnChecked />}
-                onClick={() => setCenterService(!centerService)}
-                isChecked={centerService}
-                style={styles.flex}
-                rightText={SESSION_AVAILABILITY.center}
-                rightTextStyle={{
-                  color: THEMES.colors.black,
-                  fontSize: THEMES.fonts.font12,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                }}
-              />
-            </View>
-            <View style={{ paddingTop: moderateScale(25) }}>
-              <CheckBox
-                checkedImage={<Checked />}
-                unCheckedImage={<UnChecked />}
-                onClick={() => setOnlineConsultation(!onlineConsultation)}
-                isChecked={onlineConsultation}
-                style={styles.flex}
-                rightTextStyle={{
-                  color: THEMES.colors.black,
-                  fontSize: THEMES.fonts.font12,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                }}
-                rightText={SESSION_AVAILABILITY.online}
-              />
-            </View>
-            <View style={styles.contentView}>
-              <Text style={styles.availableText}>
-                {Strings.howYouWillBeAvailable}{" "}
-              </Text>
-            </View>
-            <View style={styles.contentValueView}>
-              <CheckBox
-                checkedImage={<Checked />}
-                unCheckedImage={<UnChecked />}
-                onClick={() => {
-                  setPerSession(!perSession);
-                  setSessionData({
-                    ...sessionData,
-                    perSession: !perSession
-                      ? getServices()?.map(
-                          (item) => ({
+            <View pointerEvents={isSubmit ? "auto" : "none"}>
+              <View
+                style={[
+                  styles.contentView,
+                  { paddingTop: route !== "myprofile" ? 18 : 30 },
+                ]}
+              >
+                <Text style={styles.availableText}>
+                  {Strings.howYouWillBeAvailable}{" "}
+                </Text>
+              </View>
+              <View style={styles.contentValueView}>
+                <CheckBox
+                  checkedImage={<Checked />}
+                  unCheckedImage={<UnChecked />}
+                  onClick={() => setHomeVisit(!homeVisit)}
+                  isChecked={homeVisit}
+                  style={styles.flex}
+                  rightTextStyle={{
+                    color: THEMES.colors.black,
+                    fontSize: THEMES.fonts.font12,
+                    fontFamily: THEMES.fontFamily.semiBold,
+                  }}
+                  rightText={SESSION_AVAILABILITY.home}
+                />
+                <CheckBox
+                  checkedImage={<Checked />}
+                  unCheckedImage={<UnChecked />}
+                  onClick={() => setCenterService(!centerService)}
+                  isChecked={centerService}
+                  style={styles.flex}
+                  rightText={SESSION_AVAILABILITY.center}
+                  rightTextStyle={{
+                    color: THEMES.colors.black,
+                    fontSize: THEMES.fonts.font12,
+                    fontFamily: THEMES.fontFamily.semiBold,
+                  }}
+                />
+              </View>
+              <View style={{ paddingTop: moderateScale(25) }}>
+                <CheckBox
+                  checkedImage={<Checked />}
+                  unCheckedImage={<UnChecked />}
+                  onClick={() => setOnlineConsultation(!onlineConsultation)}
+                  isChecked={onlineConsultation}
+                  style={styles.flex}
+                  rightTextStyle={{
+                    color: THEMES.colors.black,
+                    fontSize: THEMES.fonts.font12,
+                    fontFamily: THEMES.fontFamily.semiBold,
+                  }}
+                  rightText={SESSION_AVAILABILITY.online}
+                />
+              </View>
+              <View style={styles.contentView}>
+                <Text style={styles.availableText}>
+                  {Strings.howYouWillBeAvailable}{" "}
+                </Text>
+              </View>
+              <View style={styles.contentValueView}>
+                <CheckBox
+                  checkedImage={<Checked />}
+                  unCheckedImage={<UnChecked />}
+                  onClick={() => {
+                    setPerSession(!perSession);
+                    setSessionData({
+                      ...sessionData,
+                      perSession: !perSession
+                        ? getServices()?.map((item) => ({
                             serviceName: item.service,
                             serviceCode: item.code,
                             sessioncharges: "",
                             sessiontime: "",
-                          })
-                        )
-                      : [],
-                  });
-                }}
-                isChecked={perSession}
-                style={styles.flex}
-                rightTextStyle={{
-                  color: THEMES.colors.black,
-                  fontSize: THEMES.fonts.font12,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                }}
-                rightText={"Per Session"}
-              />
-              <CheckBox
-                checkedImage={<Checked />}
-                unCheckedImage={<UnChecked />}
-                isChecked={perMonth}
-                style={styles.flex}
-                rightText={"Per Month"}
-                rightTextStyle={{
-                  color: THEMES.colors.black,
-                  fontSize: THEMES.fonts.font12,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                }}
-                onClick={() => {
-                  setPerMonth(!perMonth);
-                  setSessionData({
-                    ...sessionData,
-                    perMonth: !perMonth
-                      ? getServices()?.map(
-                          (item) => ({
+                          }))
+                        : [],
+                    });
+                  }}
+                  isChecked={perSession}
+                  style={styles.flex}
+                  rightTextStyle={{
+                    color: THEMES.colors.black,
+                    fontSize: THEMES.fonts.font12,
+                    fontFamily: THEMES.fontFamily.semiBold,
+                  }}
+                  rightText={"Per Session"}
+                />
+                <CheckBox
+                  checkedImage={<Checked />}
+                  unCheckedImage={<UnChecked />}
+                  isChecked={perMonth}
+                  style={styles.flex}
+                  rightText={"Per Month"}
+                  rightTextStyle={{
+                    color: THEMES.colors.black,
+                    fontSize: THEMES.fonts.font12,
+                    fontFamily: THEMES.fontFamily.semiBold,
+                  }}
+                  onClick={() => {
+                    setPerMonth(!perMonth);
+                    setSessionData({
+                      ...sessionData,
+                      perMonth: !perMonth
+                        ? getServices()?.map((item) => ({
                             serviceName: item.service,
                             serviceCode: item.code,
                             monthcharges: "",
                             monthtime: "",
-                          })
-                        )
-                      : [],
-                  });
-                }}
-              />
-            </View>
-            {perSession &&
-              sessionData?.perSession?.map((item, index) => (
-                <>
-                  <View style={styles.contentView}>
-                    <Text style={styles.availableText}>
-                      {Strings.perSessionCharges}{" "}
-                    </Text>
-                  </View>
-                  <View style={{ paddingTop: moderateScale(16) }}>
-                    <InputField
-                      label="Service provider Role*"
-                      value={item?.serviceName}
-                      editable={false}
-                    />
-                  </View>
-                  <View style={{ paddingTop: moderateScale(16) }}>
-                    <InputField
-                      keyboardType="phone-pad"
-                      label={Strings.chargesPerSession}
-                      placeholderText={Strings.enterPrice}
-                      value={item?.sessioncharges}
-                      onChange={(value) => {
-                        handleSessionChange(
-                          "perSession",
-                          "sessioncharges",
-                          index,
-                          value
-                        );
-                      }}
-                    />
-                  </View>
-                  <View style={{ paddingTop: moderateScale(16) }}>
-                    <InputField
-                      keyboardType="phone-pad"
-                      label={Strings.perDaySessionInMin}
-                      placeholderText={Strings.perDaySession}
-                      value={item?.sessiontime}
-                      onChange={(value) => {
-                        handleSessionChange(
-                          "perSession",
-                          "sessiontime",
-                          index,
-                          value
-                        );
-                      }}
-                    />
-                  </View>
-                </>
-              ))}
-            {perMonth &&
-              sessionData?.perMonth?.map((item, index) => (
-                <>
-                  <View style={styles.contentView}>
-                    <Text style={styles.availableText}>
-                      {Strings.perMonthSession}{" "}
-                    </Text>
-                  </View>
-                  <View style={{ paddingTop: moderateScale(16) }}>
-                    <InputField
-                      label="Service provider Role*"
-                      value={item?.serviceName}
-                      editable={false}
-                    />
-                  </View>
-                  <View style={{ paddingTop: moderateScale(16) }}>
-                    <InputField
-                      keyboardType="phone-pad"
-                      label={Strings.chargesPerSession}
-                      placeholderText={Strings.enterPrice}
-                      value={item?.monthcharges}
-                      onChange={(value) => {
-                        handleSessionChange(
-                          "perMonth",
-                          "monthcharges",
-                          index,
-                          value
-                        );
-                      }}
-                    />
-                  </View>
-                  <View style={{ paddingTop: moderateScale(16) }}>
-                    <InputField
-                      keyboardType="phone-pad"
-                      label={Strings.perDaySessionInMin}
-                      placeholderText={Strings.perDaySession}
-                      value={item?.monthtime}
-                      onChange={(value) => {
-                        handleSessionChange(
-                          "perMonth",
-                          "monthtime",
-                          index,
-                          value
-                        );
-                      }}
-                    />
-                  </View>
-                </>
-              ))}
-
-            <View
-              style={{
-                paddingBottom: moderateScale(25),
-                paddingTop: moderateScale(30),
-              }}
-            >
-              <Button
-                title={route !== "myprofile" ? Strings.next : Strings.submit}
-                onPress={onSubmit}
-              />
+                          }))
+                        : [],
+                    });
+                  }}
+                />
+              </View>
+              {perSession &&
+                sessionData?.perSession?.map((item, index) => (
+                  <>
+                    <View style={styles.contentView}>
+                      <Text style={styles.availableText}>
+                        {Strings.perSessionCharges}{" "}
+                      </Text>
+                    </View>
+                    <View style={{ paddingTop: moderateScale(16) }}>
+                      <InputField
+                        label="Service provider Role*"
+                        value={item?.serviceName}
+                        editable={false}
+                      />
+                    </View>
+                    <View style={{ paddingTop: moderateScale(16) }}>
+                      <InputField
+                        keyboardType="phone-pad"
+                        label={Strings.chargesPerSession}
+                        placeholderText={Strings.enterPrice}
+                        value={item?.sessioncharges}
+                        onChange={(value) => {
+                          handleSessionChange(
+                            "perSession",
+                            "sessioncharges",
+                            index,
+                            value
+                          );
+                        }}
+                      />
+                    </View>
+                    <View style={{ paddingTop: moderateScale(16) }}>
+                      <InputField
+                        keyboardType="phone-pad"
+                        label={Strings.perDaySessionInMin}
+                        placeholderText={Strings.perDaySession}
+                        value={item?.sessiontime}
+                        onChange={(value) => {
+                          handleSessionChange(
+                            "perSession",
+                            "sessiontime",
+                            index,
+                            value
+                          );
+                        }}
+                      />
+                    </View>
+                  </>
+                ))}
+              {perMonth &&
+                sessionData?.perMonth?.map((item, index) => (
+                  <>
+                    <View style={styles.contentView}>
+                      <Text style={styles.availableText}>
+                        {Strings.perMonthSession}{" "}
+                      </Text>
+                    </View>
+                    <View style={{ paddingTop: moderateScale(16) }}>
+                      <InputField
+                        label="Service provider Role*"
+                        value={item?.serviceName}
+                        editable={false}
+                      />
+                    </View>
+                    <View style={{ paddingTop: moderateScale(16) }}>
+                      <InputField
+                        keyboardType="phone-pad"
+                        label={Strings.chargesPerSession}
+                        placeholderText={Strings.enterPrice}
+                        value={item?.monthcharges}
+                        onChange={(value) => {
+                          handleSessionChange(
+                            "perMonth",
+                            "monthcharges",
+                            index,
+                            value
+                          );
+                        }}
+                      />
+                    </View>
+                    <View style={{ paddingTop: moderateScale(16) }}>
+                      <InputField
+                        keyboardType="phone-pad"
+                        label={Strings.perDaySessionInMin}
+                        placeholderText={Strings.perDaySession}
+                        value={item?.monthtime}
+                        onChange={(value) => {
+                          handleSessionChange(
+                            "perMonth",
+                            "monthtime",
+                            index,
+                            value
+                          );
+                        }}
+                      />
+                    </View>
+                  </>
+                ))}
+              {!isSubmit && <View style={{ marginBottom: ms(20) }} />}
+              {!isKeyboardVisible && isSubmit && (
+                <View
+                  style={{
+                    paddingBottom: moderateScale(25),
+                    paddingTop: moderateScale(30),
+                  }}
+                >
+                  <Button
+                    title={
+                      route !== "myprofile" ? Strings.next : Strings.submit
+                    }
+                    onPress={onSubmit}
+                  />
+                </View>
+              )}
             </View>
           </ScrollView>
         </View>
       </View>
+      <Dialog
+        flag={editModal}
+        description={"Are you sure you want to edit these session details?"}
+        leftButtonText="No"
+        rightButtonText="Yes"
+        leftButtonPressed={() => {
+          setEditModal(false);
+          setIsSubmit(false);
+        }}
+        rightButtonPressed={() => {
+          setIsSubmit(true);
+          setEditModal(false);
+        }}
+        onClose={() => setEditModal(false)}
+        title="Edit Session Details"
+      />
     </SafeAreaView>
   );
 };

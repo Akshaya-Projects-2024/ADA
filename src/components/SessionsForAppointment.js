@@ -477,7 +477,7 @@ const SessionsForAppointment = ({
         mode="date"
         onConfirm={handleEndDateConfirm}
         onCancel={hideEndDatePicker}
-        minimumDate={startDate || new Date()}
+        minimumDate={startDate ? moment(startDate).add(1, 'days').toDate() : new Date()}
         date={endDate ? new Date(endDate) : new Date()}
       />
       <View style={styles.button}>
