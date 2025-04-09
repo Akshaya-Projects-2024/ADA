@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { moderateScale } from "react-native-size-matters";
@@ -8,6 +8,7 @@ import Calendars from "../../../assets/svg/calendar.svg";
 import { styles } from "./styles";
 import { ActivityHeader } from "./ActivityHeader";
 import { TimeButton } from "./TimeButton";
+import moment from "moment";
 
 export const VaccineeActivity = memo(
   ({
@@ -28,6 +29,11 @@ export const VaccineeActivity = memo(
         value: "time",
       },
     ];
+
+    const dateTime = useMemo(() => {
+      return item.date ? moment(item.date).format("DD-MM-YYYY") : "";
+    }, [item.date]);
+
     return (
       <LinearGradient
         colors={ActivityType[type].colors}
@@ -64,7 +70,7 @@ export const VaccineeActivity = memo(
               placeholder="Vaccination Date"
               placeholderTextColor={THEMES.colors.darkGrey}
               editable={false}
-              value={item.date}
+              value={dateTime}
             />
           </TouchableOpacity>
           <TouchableOpacity

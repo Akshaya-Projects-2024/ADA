@@ -113,7 +113,7 @@ const UploadImageModal = (props) => {
       handleSelectedImage(obj);
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
-        Alert.alert("Canceled");
+        // Alert.alert("Canceled");
       }
       console.error(err);
     }

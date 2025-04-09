@@ -31,42 +31,36 @@ const PetCarousel = ({ pets, onSelectPet, selectedPet }) => {
 
   return (
     <View style={styles.container}>
-      {/* Fixed Selected Pet */}
-      <View
-        style={[
-          pets?.length > 1 ? styles.fixedPetContainer : styles.singleView,
-        ]}
-      >
-        <Text
-          style={[
-            styles.petText,
-            styles.selectedText,
-            { textTransform: "capitalize" },
-          ]}
-        >
-          {selectedPet.name}
-        </Text>
-      </View>
-
-      {/* Scrollable Pet List (Excluding Selected Pet) */}
-      {pets?.length > 1 && (
-        <FlatList
-          data={pets.filter((pet) => pet.id !== selectedPet.id)} // Exclude selected pet
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => handleSelectPet(item)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.petItem}>
-                <Text style={styles.petText}>{item.name}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
-      )}
+      <FlatList
+        data={pets} // Exclude selected pet
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => handleSelectPet(item)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.petItem}>
+              <Text
+                style={[
+                  item.id === selectedPet.id
+                    ? styles.selectedText
+                    : styles.petText,
+                ]}
+              >
+                {item.name}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+        contentContainerStyle={{
+          alignItems: "center",
+          flexGrow: 1,
+          flexDirection: "row",
+          justifyContent: "center",
+        }}
+      />
     </View>
   );
 };
@@ -77,22 +71,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 3,
   },
-  fixedPetContainer: {
-    width: "50%",
-    alignItems: "flex-end",
-    paddingRight: 20,
-  },
   petItem: { alignItems: "center", marginHorizontal: 10 },
   petText: {
     color: "#000000",
     fontWeight: "400",
     opacity: 0.2,
     fontSize: THEMES.fonts.font14,
-    fontWeight: THEMES.fontFamily.semiBold,
+    fontFamily: THEMES.fontFamily.semiBold,
   },
   selectedText: {
     fontSize: THEMES.fonts.font18,
-    fontWeight: THEMES.fontFamily.semiBold,
+    fontFamily: THEMES.fontFamily.semiBold,
     color: "black",
     opacity: 1,
   },

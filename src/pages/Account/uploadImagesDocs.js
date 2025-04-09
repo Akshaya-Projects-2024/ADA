@@ -38,6 +38,9 @@ export const DOCUMENT_TYPES = {
   lostpet: "lostpet",
 };
 
+// Add Dialog import
+import Dialog from "../../components/Dialog";
+
 const UploadImagesDocs = (props) => {
   const route = props?.route?.params?.route;
   const [visible, setVisible] = useState(false);
@@ -229,6 +232,15 @@ const UploadImagesDocs = (props) => {
     );
   };
 
+  // Add these state variables
+  const [isSubmit, setIsSubmit] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+
+  // Add edit popup function
+  const editPopup = () => {
+    setEditModal(true);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -237,6 +249,23 @@ const UploadImagesDocs = (props) => {
           title={Strings.uploadImagesDoc}
           showBack
           bgColor="transparent"
+          right={
+            route === "myprofile" ? (
+              <TouchableOpacity
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 15,
+                }}
+                onPress={() => editPopup()}
+              >
+                <FontAwesome
+                  size={20}
+                  name="edit"
+                  color={THEMES.colors.black}
+                />
+              </TouchableOpacity>
+            ) : null
+          }
         />
         {route !== "myprofile" && (
           <View
@@ -258,190 +287,216 @@ const UploadImagesDocs = (props) => {
             showsVerticalScrollIndicator={false}
             style={{ flex: 1 }}
           >
-            <View
-              style={[
-                styles.padding,
-                { paddingTop: moderateScale(route !== "myprofile" ? 18 : 30) },
-              ]}
-            >
-              <View style={styles.businessContainer}>
-                <Text style={styles.businessLogoText}>
-                  {Strings.businessLogo}
-                </Text>
-                <TouchableOpacity
-                  disabled={Boolean(photo)}
-                  onPress={() => setVisible(true)}
-                >
-                  <Text
-                    style={[
-                      styles.addBtnTextStyle,
-                      {
-                        color: photo
-                          ? THEMES.colors.doveGray
-                          : THEMES.colors.cyan,
-                        opacity: photo ? 0.5 : 1,
-                      },
-                    ]}
-                  >
-                    {Strings.add}
+            <View pointerEvents={isSubmit || route !== "myprofile" ? "auto" : "none"}>
+              <View
+                style={[
+                  styles.padding,
+                  {
+                    paddingTop: moderateScale(route !== "myprofile" ? 18 : 30),
+                  },
+                ]}
+              >
+                <View style={styles.businessContainer}>
+                  <Text style={styles.businessLogoText}>
+                    {Strings.businessLogo}
                   </Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.logoBoxView}>
-                {photo ? (
-                  <View style={styles.logoImgView}>
-                    <Image
-                      style={styles.logoImg}
-                      resizeMode="contain"
-                      source={getBase64Obj(photo?.filepath ?? photo?.fileData)}
-                    />
-                    <TouchableOpacity
-                      onPress={() => {
-                        onCancel(DOCUMENT_TYPES.logo, photo);
-                      }}
-                      style={styles.crossView}
+                  <TouchableOpacity
+                    disabled={Boolean(photo)}
+                    onPress={() => setVisible(true)}
+                  >
+                    <Text
+                      style={[
+                        styles.addBtnTextStyle,
+                        {
+                          color: photo
+                            ? THEMES.colors.doveGray
+                            : THEMES.colors.cyan,
+                          opacity: photo ? 0.5 : 1,
+                        },
+                      ]}
                     >
-                      <CrossCircle
-                        stroke={THEMES.colors.black}
-                        style={styles.crossImg}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <View style={styles.emptyView}>
-                    <Text style={styles.emptyText}>
-                      {Strings.pleaseAddLogo}
+                      {Strings.add}
                     </Text>
-                  </View>
-                )}
-              </View>
-            </View>
-
-            <View style={styles.secondaryView}>
-              <View style={styles.secondaryFlex}>
-                <Text style={styles.titleText}>
-                  {Strings.businessPlaceImages}
-                </Text>
-                <TouchableOpacity onPress={() => setBusinessVisible(true)}>
-                  <Text style={styles.addText}>{Strings.add}</Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={[
-                  styles.flatlistView,
-                  {
-                    alignItems:
-                      businessImg?.length == 0 ? "center" : "flex-start",
-                  },
-                ]}
-              >
-                <FlatList
-                  horizontal={true}
-                  contentContainerStyle={{
-                    justifyContent: businessImg?.length
-                      ? "flex-start"
-                      : "center",
-                    alignItems: "center",
-                    padding: businessImg?.length
-                      ? moderateScale(0)
-                      : moderateScale(16),
-                    borderColor: THEMES.colors.darkGrey,
-                    borderRadius: 10,
-                  }}
-                  showsHorizontalScrollIndicator={false}
-                  data={businessImg}
-                  renderItem={renderItem}
-                  ListHeaderComponent={() =>
-                    businessImg?.length == 0 ? (
-                      <Text style={styles.imgPlaceholder}>
-                        {Strings.pleaseAddImg}
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.logoBoxView}>
+                  {photo ? (
+                    <View style={styles.logoImgView}>
+                      <Image
+                        style={styles.logoImg}
+                        resizeMode="contain"
+                        source={getBase64Obj(
+                          photo?.filepath ?? photo?.fileData
+                        )}
+                      />
+                      <TouchableOpacity
+                        onPress={() => {
+                          onCancel(DOCUMENT_TYPES.logo, photo);
+                        }}
+                        style={styles.crossView}
+                      >
+                        <CrossCircle
+                          stroke={THEMES.colors.black}
+                          style={styles.crossImg}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View style={styles.emptyView}>
+                      <Text style={styles.emptyText}>
+                        {Strings.pleaseAddLogo}
                       </Text>
-                    ) : null
-                  }
-                />
+                    </View>
+                  )}
+                </View>
               </View>
+
+              <View style={styles.secondaryView}>
+                <View style={styles.secondaryFlex}>
+                  <Text style={styles.titleText}>
+                    {Strings.businessPlaceImages}
+                  </Text>
+                  <TouchableOpacity onPress={() => setBusinessVisible(true)}>
+                    <Text style={styles.addText}>{Strings.add}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={[
+                    styles.flatlistView,
+                    {
+                      alignItems:
+                        businessImg?.length == 0 ? "center" : "flex-start",
+                    },
+                  ]}
+                >
+                  <FlatList
+                    horizontal={true}
+                    contentContainerStyle={{
+                      justifyContent: businessImg?.length
+                        ? "flex-start"
+                        : "center",
+                      alignItems: "center",
+                      padding: businessImg?.length
+                        ? moderateScale(0)
+                        : moderateScale(16),
+                      borderColor: THEMES.colors.darkGrey,
+                      borderRadius: 10,
+                    }}
+                    showsHorizontalScrollIndicator={false}
+                    data={businessImg}
+                    renderItem={renderItem}
+                    ListHeaderComponent={() =>
+                      businessImg?.length == 0 ? (
+                        <Text style={styles.imgPlaceholder}>
+                          {Strings.pleaseAddImg}
+                        </Text>
+                      ) : null
+                    }
+                  />
+                </View>
+              </View>
+
+              <View style={styles.certificationView}>
+                <View style={styles.certificationFlex}>
+                  <Text style={styles.certificationText}>
+                    {Strings.certificationDocuments}
+                  </Text>
+                  <TouchableOpacity onPress={() => setDocumentVisible(true)}>
+                    <Text style={styles.addText}>{Strings.add}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={[
+                    styles.certificationList,
+                    {
+                      alignItems:
+                        documentImg?.length == 0 ? "center" : "flex-start",
+                    },
+                  ]}
+                >
+                  <FlatList
+                    horizontal={true}
+                    contentContainerStyle={{
+                      justifyContent: documentImg?.length
+                        ? "flex-start"
+                        : "center",
+                      alignItems: "center",
+                      padding: documentImg?.length
+                        ? moderateScale(0)
+                        : moderateScale(16),
+                      borderColor: THEMES.colors.darkGrey,
+                      borderRadius: 10,
+                    }}
+                    showsHorizontalScrollIndicator={false}
+                    data={documentImg}
+                    renderItem={renderDocumentItem}
+                    ListHeaderComponent={() =>
+                      documentImg?.length == 0 ? (
+                        <Text style={styles.imgPlaceholder}>
+                          {Strings.pleaseAddImg}
+                        </Text>
+                      ) : null
+                    }
+                  />
+                </View>
+              </View>
+
+              <UploadImageModal
+                isVisible={visible}
+                onClose={() => setVisible(false)}
+                handleSelectedImage={(image) => handleLogo(image)}
+              />
+
+              <UploadImageModal
+                isVisible={businessVisible}
+                onClose={() => setBusinessVisible(false)}
+                handleSelectedImage={(image) => handleBusinessImg(image)}
+              />
+              <UploadImageModal
+                hasDocument
+                isVisible={documentVisible}
+                onClose={() => setDocumentVisible(false)}
+                handleSelectedImage={(image) => handleDocumentImg(image)}
+              />
             </View>
-
-            <View style={styles.certificationView}>
-              <View style={styles.certificationFlex}>
-                <Text style={styles.certificationText}>
-                  {Strings.certificationDocuments}
-                </Text>
-                <TouchableOpacity onPress={() => setDocumentVisible(true)}>
-                  <Text style={styles.addText}>{Strings.add}</Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={[
-                  styles.certificationList,
-                  {
-                    alignItems:
-                      documentImg?.length == 0 ? "center" : "flex-start",
-                  },
-                ]}
-              >
-                <FlatList
-                  horizontal={true}
-                  contentContainerStyle={{
-                    justifyContent: documentImg?.length
-                      ? "flex-start"
-                      : "center",
-                    alignItems: "center",
-                    padding: documentImg?.length
-                      ? moderateScale(0)
-                      : moderateScale(16),
-                    borderColor: THEMES.colors.darkGrey,
-                    borderRadius: 10,
-                  }}
-                  showsHorizontalScrollIndicator={false}
-                  data={documentImg}
-                  renderItem={renderDocumentItem}
-                  ListHeaderComponent={() =>
-                    documentImg?.length == 0 ? (
-                      <Text style={styles.imgPlaceholder}>
-                        {Strings.pleaseAddImg}
-                      </Text>
-                    ) : null
-                  }
-                />
-              </View>
-            </View>
-
-            <UploadImageModal
-              isVisible={visible}
-              onClose={() => setVisible(false)}
-              handleSelectedImage={(image) => handleLogo(image)}
-            />
-
-            <UploadImageModal
-              isVisible={businessVisible}
-              onClose={() => setBusinessVisible(false)}
-              handleSelectedImage={(image) => handleBusinessImg(image)}
-            />
-            <UploadImageModal
-              hasDocument
-              isVisible={documentVisible}
-              onClose={() => setDocumentVisible(false)}
-              handleSelectedImage={(image) => handleDocumentImg(image)}
-            />
           </ScrollView>
         </View>
-        <View style={styles.submitButton}>
-          <Button
-            title={route !== "myprofile" ? Strings.next : Strings.submit}
-            onPress={() => {
-              if (route === "myprofile") {
-                props.navigation.dispatch(StackActions.pop(1));
-              } else {
-                props.navigation.navigate(
-                  "sessionDetail",
-                  route ? { route: route } : {}
-                );
-              }
-              apiInitCall();
-            }}
-          />
-        </View>
+
+        {(route !== "myprofile" || isSubmit) && (
+          <View style={styles.submitButton}>
+            <Button
+              title={route !== "myprofile" ? Strings.next : Strings.submit}
+              onPress={() => {
+                if (route === "myprofile") {
+                  props.navigation.dispatch(StackActions.pop(1));
+                } else {
+                  props.navigation.navigate(
+                    "sessionDetail",
+                    route ? { route: route } : {}
+                  );
+                }
+                apiInitCall();
+              }}
+            />
+          </View>
+        )}
+
+        <Dialog
+          flag={editModal}
+          description={"Are you sure you want to edit these documents?"}
+          leftButtonText="No"
+          rightButtonText="Yes"
+          leftButtonPressed={() => {
+            setEditModal(false);
+            setIsSubmit(false);
+          }}
+          rightButtonPressed={() => {
+            setIsSubmit(true);
+            setEditModal(false);
+          }}
+          onClose={() => setEditModal(false)}
+          title="Edit Documents"
+        />
       </View>
     </SafeAreaView>
   );

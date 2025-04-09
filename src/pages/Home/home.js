@@ -215,7 +215,8 @@ const Home = (props) => {
         output = output.filter((it) => {
           return (
             it?.status === AppointmentStatus.scheduled ||
-            it?.status === AppointmentStatus.rescheduled
+            it?.status === AppointmentStatus.rescheduled || 
+            it?.status === AppointmentStatus.pending
           );
         });
         setAppointmentData(validArray(output) ? output : []);
@@ -246,6 +247,7 @@ const Home = (props) => {
         let canceledAppointments = 0;
         let rescheduledAppointments = 0;
         const response = Object.values(res?.data?.data);
+        
         for (let index = 0; index < response.length; index++) {
           const element = response[index];
           for (let index2 = 0; index2 < element.length; index2++) {
@@ -757,6 +759,9 @@ const Home = (props) => {
                   sliderWidth={screenWidth}
                   itemWidth={screenWidth * 0.9}
                   onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
+                  loop={true}
+                  enableSnap={true}
+                  autoplay={true}
                 />
               )}
 

@@ -5,9 +5,6 @@ import {
   StatusBar,
   Image,
   TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-  Dimensions,
   FlatList,
   Linking,
 } from "react-native";
@@ -18,10 +15,10 @@ import Description from "../../assets/svg/codesandbox.svg";
 import Location from "../../assets/svg/location.svg";
 import Calendar from "../../assets/svg/calendar_event.svg";
 import Call from "../../assets/svg/call.svg";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { getAllEventsApi } from "../../redux-store/actions/events";
 import { decryptService } from "../../utils/storageFunc";
-import { screenWidth, vh, vw } from "../../utils/dimensions";
+import { screenWidth, vh } from "../../utils/dimensions";
 import { useIsFocused } from "@react-navigation/native";
 import Carousel from "react-native-snap-carousel";
 import { contextValue } from "../../components/Loader";
@@ -162,6 +159,9 @@ const UpcomingEvents = () => {
               temp[index] = x;
               setActiveIndex(temp);
             }} // Track active slide index
+            loop={true}
+            enableSnap={true}
+            autoplay={true}
           />
 
           {paginationDots(item?.documentlist, index)}
@@ -202,7 +202,30 @@ const UpcomingEvents = () => {
                 color: THEMES.colors.black,
               }}
             >
-              {formatDateTime(item.startdate, item.starttime)}
+             From : {formatDateTime(item.startdate, item.starttime)}
+            </Text>
+          </View>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            marginTop: moderateScale(10),
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <View style={{ width: "10%" }}>
+            <Calendar />
+          </View>
+          <View style={{ width: "85%" }}>
+            <Text
+              style={{
+                fontFamily: THEMES.fontFamily.bold,
+                fontSize: THEMES.fonts.font12,
+                color: THEMES.colors.black,
+              }}
+            >
+              To : {formatDateTime(item.enddate, item.endtime)}
             </Text>
           </View>
         </View>

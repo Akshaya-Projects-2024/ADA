@@ -212,7 +212,8 @@ const ClientReview = () => {
           <View style={styles.headerRow}>
             <View style={styles.w25}>
               <Text style={styles.reviewCount}>
-                {reviewData?.totalratingcount}
+                {console.log(reviewData)}
+                {reviewData?.rating}
               </Text>
               <Text style={styles.reviewsText}>
                 {reviewData?.reviews?.length == 0

@@ -30,7 +30,6 @@ const RescueAlertDetail = (props) => {
   const profilePhoto = selectedAdotpionData?.petdetails?.documents?.find(
     (doc) => doc.documenttype == "profilePhoto"
   );
-  console.log("resuce", selectedAdotpionData);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>

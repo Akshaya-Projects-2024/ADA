@@ -26,6 +26,10 @@ import Dialog from "../../components/Dialog";
 import { useUser } from "../../api/UserContext";
 import { contextValue } from "../../components/Loader";
 
+// Add these imports at the top
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { TouchableOpacity } from "react-native";
+
 const MediaLink = (props) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const route = props?.route?.params?.route;
@@ -37,6 +41,9 @@ const MediaLink = (props) => {
   const { providerProfile } = useSelector((state) => state?.commonReducer);
   const { MediaLinks } = providerProfile;
   const { userData, apiInitCall } = useUser();
+  // Add these state variables after other states
+  const [isSubmit, setIsSubmit] = useState(false);
+  const [editModal, setEditModal] = useState(false);
 
   useEffect(() => {
     initData();
@@ -126,11 +133,37 @@ const MediaLink = (props) => {
     }
   };
 
+  // Add edit popup function before return statement
+  const editPopup = () => {
+    setEditModal(true);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <StatusBar backgroundColor={THEMES.colors.bgColor} />
-        <Header title={Strings.mediaLinks} showBack bgColor="transparent" />
+        <Header
+          title={Strings.mediaLinks}
+          showBack
+          bgColor="transparent"
+          right={
+            route === "myprofile" ? (
+              <TouchableOpacity
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 15,
+                }}
+                onPress={() => editPopup()}
+              >
+                <FontAwesome
+                  size={20}
+                  name="edit"
+                  color={THEMES.colors.black}
+                />
+              </TouchableOpacity>
+            ) : null
+          }
+        />
         {route !== "myprofile" && (
           <View
             style={{
@@ -152,117 +185,130 @@ const MediaLink = (props) => {
             bounces={false}
           >
             <View
-              style={[
-                styles.headerView,
-                { paddingTop: route !== "myprofile" ? 18 : 30 },
-              ]}
+              pointerEvents={
+                isSubmit || route !== "myprofile" ? "auto" : "none"
+              }
             >
-              <Text style={styles.headerText}>
-                {Strings.onlineConsultation}
-              </Text>
-            </View>
+              <View
+                style={[
+                  styles.headerView,
+                  { paddingTop: route !== "myprofile" ? 18 : 30 },
+                ]}
+              >
+                <Text style={styles.headerText}>
+                  {Strings.onlineConsultation}
+                </Text>
+              </View>
 
-            <View style={styles.contentView}>
-              <View style={styles.w20}>
-                <Image
-                  resizeMode="contain"
-                  source={require("../../assets/images/addLink.png")}
-                />
+              <View style={styles.contentView}>
+                <View style={styles.w20}>
+                  <Image
+                    resizeMode="contain"
+                    source={require("../../assets/images/addLink.png")}
+                  />
+                </View>
+                <View style={styles.w80}>
+                  <InputField
+                    label={Strings.addLink}
+                    placeholderText={Strings.pasteLink}
+                    rightIcon={
+                      <ClipboardPaste stroke={THEMES.colors.darkGrey} />
+                    }
+                    value={link}
+                    onChange={setLink}
+                  />
+                </View>
               </View>
-              <View style={styles.w80}>
-                <InputField
-                  label={Strings.addLink}
-                  placeholderText={Strings.pasteLink}
-                  rightIcon={<ClipboardPaste stroke={THEMES.colors.darkGrey} />}
-                  value={link}
-                  onChange={setLink}
-                />
-              </View>
-            </View>
 
-            <View style={styles.secondContentHeading}>
-              <Text style={styles.secondContent}>
-                {Strings.socialMediaLink}
-              </Text>
-            </View>
+              <View style={styles.secondContentHeading}>
+                <Text style={styles.secondContent}>
+                  {Strings.socialMediaLink}
+                </Text>
+              </View>
 
-            <View style={styles.secondImgView}>
-              <View style={styles.w20}>
-                <Image
-                  resizeMode="contain"
-                  source={require("../../assets/images/instagram.png")}
-                />
+              <View style={styles.secondImgView}>
+                <View style={styles.w20}>
+                  <Image
+                    resizeMode="contain"
+                    source={require("../../assets/images/instagram.png")}
+                  />
+                </View>
+                <View style={styles.w80}>
+                  <InputField
+                    label={Strings.instaLink}
+                    placeholderText={Strings.pasteLink}
+                    rightIcon={<ClipboardPaste stroke={THEMES.colors.red} />}
+                    value={instaLink}
+                    onChange={setInstaLink}
+                  />
+                </View>
               </View>
-              <View style={styles.w80}>
-                <InputField
-                  label={Strings.instaLink}
-                  placeholderText={Strings.pasteLink}
-                  rightIcon={<ClipboardPaste stroke={THEMES.colors.red} />}
-                  value={instaLink}
-                  onChange={setInstaLink}
-                />
-              </View>
-            </View>
 
-            <View style={styles.secondaryContentView}>
-              <View style={styles.w20}>
-                <Image
-                  resizeMode="contain"
-                  source={require("../../assets/images/facebook.png")}
-                />
+              <View style={styles.secondaryContentView}>
+                <View style={styles.w20}>
+                  <Image
+                    resizeMode="contain"
+                    source={require("../../assets/images/facebook.png")}
+                  />
+                </View>
+                <View style={styles.w80}>
+                  <InputField
+                    label={Strings.fbLink}
+                    placeholderText={Strings.pasteLink}
+                    rightIcon={
+                      <ClipboardPaste stroke={THEMES.colors.darkGrey} />
+                    }
+                    value={fbLink}
+                    onChange={setFbLink}
+                  />
+                </View>
               </View>
-              <View style={styles.w80}>
-                <InputField
-                  label={Strings.fbLink}
-                  placeholderText={Strings.pasteLink}
-                  rightIcon={<ClipboardPaste stroke={THEMES.colors.darkGrey} />}
-                  value={fbLink}
-                  onChange={setFbLink}
-                />
-              </View>
-            </View>
 
-            <View style={styles.secondaryContentView}>
-              <View style={styles.w20}>
-                <Image
-                  resizeMode="contain"
-                  source={require("../../assets/images/websiteLink.png")}
-                />
-              </View>
-              <View style={styles.w80}>
-                <InputField
-                  label={Strings.websiteLink}
-                  placeholderText={Strings.pasteLink}
-                  rightIcon={<ClipboardPaste stroke={THEMES.colors.darkGrey} />}
-                  value={weblink}
-                  onChange={setWebLink}
-                />
+              <View style={styles.secondaryContentView}>
+                <View style={styles.w20}>
+                  <Image
+                    resizeMode="contain"
+                    source={require("../../assets/images/websiteLink.png")}
+                  />
+                </View>
+                <View style={styles.w80}>
+                  <InputField
+                    label={Strings.websiteLink}
+                    placeholderText={Strings.pasteLink}
+                    rightIcon={
+                      <ClipboardPaste stroke={THEMES.colors.darkGrey} />
+                    }
+                    value={weblink}
+                    onChange={setWebLink}
+                  />
+                </View>
               </View>
             </View>
           </ScrollView>
-          {!isKeyboardVisible && (
+          {!isKeyboardVisible && (route !== "myprofile" || isSubmit) && (
             <View style={styles.submitButton}>
               <Button title={Strings.submit} onPress={() => onSubmit()} />
             </View>
           )}
         </View>
+
+        <Dialog
+          flag={editModal}
+          description={"Are you sure you want to edit these media links?"}
+          leftButtonText="No"
+          rightButtonText="Yes"
+          leftButtonPressed={() => {
+            setEditModal(false);
+            setIsSubmit(false);
+          }}
+          rightButtonPressed={() => {
+            setIsSubmit(true);
+            setEditModal(false);
+          }}
+          onClose={() => setEditModal(false)}
+          title="Edit Media Links"
+        />
       </View>
-      <Dialog
-        flag={modal}
-        title={"Registration Complete! 🎉"}
-        description={
-          "Thank you for registering on ADA. Your profile will be validated and activated within 48 hours. Happy exploring!"
-        }
-        rightButtonText="Close"
-        rightButtonPressed={() => {
-          setModal(false);
-          handleNavigation();
-        }}
-        onClose={() => {
-          setModal(false);
-          handleNavigation();
-        }}
-      />
     </SafeAreaView>
   );
 };

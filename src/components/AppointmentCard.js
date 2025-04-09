@@ -65,8 +65,6 @@ const AppointmentCard = ({
     <Pressable
       onPress={async () => {
         const loggedInModule = await decryptService("loggedInModule");
-        console.log(loggedInModule);
-        
         setSelectedItem(item);
         {
           item.requestedby !== "provider"
@@ -154,6 +152,42 @@ const AppointmentCard = ({
                 </Text>
               </View>
             </View>
+            {Boolean(item.preappointment_date) && (
+              <View style={styles.row}>
+                <Text
+                  style={StyleSheet.flatten([
+                    styles.visitTypeText,
+                    {
+                      marginRight: moderateScale(5),
+                      textDecorationLine: "line-through",
+                    },
+                  ])}
+                >
+                  {moment(item?.preappointment_date)?.format("Do MMM")}
+                </Text>
+                <Text
+                  style={StyleSheet.flatten([
+                    styles.visitTypeText,
+                    {
+                      marginRight: moderateScale(5),
+                      textDecorationLine: "line-through",
+                    },
+                  ])}
+                >
+                  |
+                </Text>
+                <Text
+                  style={StyleSheet.flatten([
+                    styles.visitTypeText,
+                    {
+                      textDecorationLine: "line-through",
+                    },
+                  ])}
+                >
+                  {item?.prestart_time}
+                </Text>
+              </View>
+            )}
             <View style={styles.flatListNameRow}>
               <View style={styles.row}>
                 <Text
@@ -234,7 +268,7 @@ const AppointmentCard = ({
                 </Text>
               ) : null}
               {routeFrom &&
-              routeFrom === "parentAccount" ? null : item?.status ===
+              routeFrom == "parentAccount" ? null : item?.status ===
                 AppointmentStatus.scheduled ? (
                 <TouchableOpacity
                   onPress={() => {

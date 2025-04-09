@@ -45,19 +45,15 @@ const AlertList = (props) => {
         id: "",
       };
       let res = await getAlertListApi(obj);
-      console.log("res", res)
       if (res?.length) {
         if (validArray(res)) {
           dataFetched.current = true;
           setAlertData(res);
         } else {
-          console.log("res2222")
           setAlertData([]);
         }
       } else {
-        console.log("res333")
         setAlertData([]);
-      
       }
       contextValue?.setLoader(false);
     } catch (error) {
@@ -91,8 +87,6 @@ const AlertList = (props) => {
     const profilePhoto = item?.petdetails?.documents?.find(
       (doc) => doc.documenttype == "profilePhoto"
     );
-    console.log("item",item)
-
     return (
       <TouchableButtonWithPermission
         onPress={() => {

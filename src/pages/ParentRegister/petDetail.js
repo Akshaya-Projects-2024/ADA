@@ -286,7 +286,8 @@ const PetDetail = (props) => {
   };
 
   const handleCertificates = async (image) => {
-    const extension = image?.uri?.split(".").pop();
+    const extension = image?.fileName?.split(".").pop();
+    
     let payload = {
       documenttype: "certificate",
       extention: extension,
@@ -443,22 +444,33 @@ const PetDetail = (props) => {
 
   const renderDocumentItem = (item, index) => {
     const photo = item?.item.document;
+    let extension = item?.item.extention;
+    if (item?.item?.url && !photo) {
+      extension = item?.item?.url?.split(".").pop();
+    }
+    
     return (
       <View style={styles.imgContent}>
-        {photo ? (
+        {["jpg", "png", "jpeg"].includes(extension) ? (
           <Image
             style={styles.img}
             resizeMode="contain"
-            source={getBase64Obj(photo)}
+            source={photo ? getBase64Obj(photo) : { uri: item?.item?.url }}
           />
         ) : (
-          <Image
-            style={styles.img}
-            resizeMode="contain"
-            source={{ uri: item?.item?.url }}
-          />
+          <View
+            style={[
+              styles.img,
+              { alignItems: "center", justifyContent: "center" },
+            ]}
+          >
+            <FontAwesome
+              name="file-text"
+              size={30}
+              color={THEMES.colors.cyan}
+            />
+          </View>
         )}
-
         <TouchableOpacity
           style={styles.crossView}
           onPress={() => onCancelDocument(item)}
@@ -508,11 +520,14 @@ const PetDetail = (props) => {
                   <Delete />
                 </TouchableOpacity>
                 {Boolean(petDetails?.length) !== 0 && (
-                  <TouchableOpacity  style={{
-                    paddingVertical: 10,
-                    paddingHorizontal: 15,
-                    paddingRight: 0,
-                  }} onPress={() => editPopup()}>
+                  <TouchableOpacity
+                    style={{
+                      paddingVertical: 10,
+                      paddingHorizontal: 15,
+                      paddingRight: 0,
+                    }}
+                    onPress={() => editPopup()}
+                  >
                     <FontAwesome
                       size={20}
                       name="edit"
@@ -614,232 +629,234 @@ const PetDetail = (props) => {
                 <Pencil />
               </TouchableOpacity>
             </View>
-            <View
-              style={{
-                paddingTop: moderateScale(16),
-                paddingHorizontal: moderateScale(20),
-              }}
-            >
-              <InputField
-                label={"Pet Name*"}
-                placeholderText={"Enter pet name"}
-                value={petName}
-                onChange={setPetName}
-              />
-            </View>
-
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <ModalDropdown
-                placeholder="Pet Type*"
-                data={petTypeData}
-                title={"Select Pet Type"}
-                setSelectedValue={(value) => handleSelectedCategory(value)}
-                selectedValue={selectedPetType}
-              />
-            </View>
-            <View style={{ paddingTop: moderateScale(16) }}>
-              <ModalDropdown
-                placeholder="Breed*"
-                data={breedList}
-                title={"Select pet breed"}
-                setSelectedValue={setSelectedPetBreed}
-                selectedValue={selectPetBreed}
-              />
-            </View>
-            <View
-              style={{
-                paddingTop: moderateScale(16),
-                paddingHorizontal: moderateScale(20),
-              }}
-            >
-              <InputField
-                label={"Age*"}
-                placeholderText={"Enter age"}
-                value={petAge}
-                onChange={setPetAge}
-                keyboardType="phone-pad"
-                maxLength={2}
-              />
-            </View>
-            <View style={styles.toggleContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.toggleButton,
-                  {
-                    backgroundColor:
-                      selectedGender === GENDER.male
-                        ? THEMES.colors.cyan
-                        : THEMES.colors.white,
-                  },
-                ]}
-                onPress={() => setSelectedGender(GENDER.male)}
+            <View pointerEvents={isSubmit ? "auto" : "none"}>
+              <View
+                style={{
+                  paddingTop: moderateScale(16),
+                  paddingHorizontal: moderateScale(20),
+                }}
               >
-                <Text
+                <InputField
+                  label={"Pet Name*"}
+                  placeholderText={"Enter pet name"}
+                  value={petName}
+                  onChange={setPetName}
+                />
+              </View>
+
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <ModalDropdown
+                  placeholder="Pet Type*"
+                  data={petTypeData}
+                  title={"Select Pet Type"}
+                  setSelectedValue={(value) => handleSelectedCategory(value)}
+                  selectedValue={selectedPetType}
+                />
+              </View>
+              <View style={{ paddingTop: moderateScale(16) }}>
+                <ModalDropdown
+                  placeholder="Breed*"
+                  data={breedList}
+                  title={"Select pet breed"}
+                  setSelectedValue={setSelectedPetBreed}
+                  selectedValue={selectPetBreed}
+                />
+              </View>
+              <View
+                style={{
+                  paddingTop: moderateScale(16),
+                  paddingHorizontal: moderateScale(20),
+                }}
+              >
+                <InputField
+                  label={"Age*"}
+                  placeholderText={"Enter age"}
+                  value={petAge}
+                  onChange={setPetAge}
+                  keyboardType="phone-pad"
+                  maxLength={2}
+                />
+              </View>
+              <View style={styles.toggleContainer}>
+                <TouchableOpacity
                   style={[
-                    styles.toggleText,
+                    styles.toggleButton,
                     {
-                      color:
+                      backgroundColor:
                         selectedGender === GENDER.male
-                          ? THEMES.colors.white
-                          : THEMES.colors.cyan,
+                          ? THEMES.colors.cyan
+                          : THEMES.colors.white,
                     },
                   ]}
+                  onPress={() => setSelectedGender(GENDER.male)}
                 >
-                  {GENDER.male}
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.toggleText,
+                      {
+                        color:
+                          selectedGender === GENDER.male
+                            ? THEMES.colors.white
+                            : THEMES.colors.cyan,
+                      },
+                    ]}
+                  >
+                    {GENDER.male}
+                  </Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[
-                  styles.toggleButton,
-                  {
-                    backgroundColor:
-                      selectedGender === GENDER.female
-                        ? THEMES.colors.cyan
-                        : THEMES.colors.white,
-                  },
-                ]}
-                onPress={() => setSelectedGender(GENDER.female)}
-              >
-                <Text
+                <TouchableOpacity
                   style={[
-                    styles.toggleText,
+                    styles.toggleButton,
                     {
-                      color:
+                      backgroundColor:
                         selectedGender === GENDER.female
-                          ? THEMES.colors.white
-                          : THEMES.colors.cyan,
+                          ? THEMES.colors.cyan
+                          : THEMES.colors.white,
+                    },
+                  ]}
+                  onPress={() => setSelectedGender(GENDER.female)}
+                >
+                  <Text
+                    style={[
+                      styles.toggleText,
+                      {
+                        color:
+                          selectedGender === GENDER.female
+                            ? THEMES.colors.white
+                            : THEMES.colors.cyan,
+                      },
+                    ]}
+                  >
+                    {GENDER.female}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View
+                style={{
+                  paddingTop: moderateScale(16),
+                  paddingHorizontal: moderateScale(20),
+                }}
+              >
+                <InputField
+                  label={"Weight"}
+                  placeholderText={"Enter weight"}
+                  value={petWeight}
+                  onChange={setPetWeight}
+                  keyboardType="phone-pad"
+                  maxLength={2}
+                />
+              </View>
+              <View
+                style={{
+                  paddingTop: moderateScale(16),
+                  paddingHorizontal: moderateScale(20),
+                }}
+              >
+                <InputField
+                  label={"About Pet"}
+                  placeholderText={"Enter about Pet"}
+                  multiline
+                  value={petDescription}
+                  onChange={setPetDescription}
+                />
+              </View>
+              <View
+                style={{
+                  paddingTop: moderateScale(16),
+                  paddingHorizontal: moderateScale(20),
+                }}
+              ></View>
+              <View
+                style={{
+                  paddingHorizontal: moderateScale(20),
+                  marginBottom: moderateScale(30),
+                }}
+              >
+                <View style={styles.secondaryFlex}>
+                  <Text style={styles.titleText}>Pet Images</Text>
+                  <TouchableOpacity onPress={() => setPetImageVisible(true)}>
+                    <Text style={styles.addText}>{Strings.add}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={[
+                    styles.flatlistView,
+                    {
+                      alignItems:
+                        petAllImages?.length == 0 ? "center" : "flex-start",
                     },
                   ]}
                 >
-                  {GENDER.female}
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                paddingTop: moderateScale(16),
-                paddingHorizontal: moderateScale(20),
-              }}
-            >
-              <InputField
-                label={"Weight"}
-                placeholderText={"Enter weight"}
-                value={petWeight}
-                onChange={setPetWeight}
-                keyboardType="phone-pad"
-                maxLength={2}
-              />
-            </View>
-            <View
-              style={{
-                paddingTop: moderateScale(16),
-                paddingHorizontal: moderateScale(20),
-              }}
-            >
-              <InputField
-                label={"About Pet"}
-                placeholderText={"Enter about Pet"}
-                multiline
-                value={petDescription}
-                onChange={setPetDescription}
-              />
-            </View>
-            <View
-              style={{
-                paddingTop: moderateScale(16),
-                paddingHorizontal: moderateScale(20),
-              }}
-            ></View>
-            <View
-              style={{
-                paddingHorizontal: moderateScale(20),
-                marginBottom: moderateScale(30),
-              }}
-            >
-              <View style={styles.secondaryFlex}>
-                <Text style={styles.titleText}>Pet Images</Text>
-                <TouchableOpacity onPress={() => setPetImageVisible(true)}>
-                  <Text style={styles.addText}>{Strings.add}</Text>
-                </TouchableOpacity>
+                  <FlatList
+                    horizontal={true}
+                    contentContainerStyle={{
+                      justifyContent: petAllImages?.length
+                        ? "flex-start"
+                        : "center",
+                      alignItems: "center",
+                      padding: moderateScale(16),
+                      borderColor: THEMES.colors.darkGrey,
+                      borderRadius: 10,
+                    }}
+                    showsHorizontalScrollIndicator={false}
+                    data={petAllImages}
+                    renderItem={renderItem}
+                    ListHeaderComponent={() =>
+                      petAllImages?.length == 0 ? (
+                        <Text style={styles.imgPlaceholder}>
+                          {Strings.pleaseAddImg}
+                        </Text>
+                      ) : null
+                    }
+                  />
+                </View>
               </View>
-              <View
-                style={[
-                  styles.flatlistView,
-                  {
-                    alignItems:
-                      petAllImages?.length == 0 ? "center" : "flex-start",
-                  },
-                ]}
-              >
-                <FlatList
-                  horizontal={true}
-                  contentContainerStyle={{
-                    justifyContent: petAllImages?.length
-                      ? "flex-start"
-                      : "center",
-                    alignItems: "center",
-                    padding: moderateScale(16),
-                    borderColor: THEMES.colors.darkGrey,
-                    borderRadius: 10,
-                  }}
-                  showsHorizontalScrollIndicator={false}
-                  data={petAllImages}
-                  renderItem={renderItem}
-                  ListHeaderComponent={() =>
-                    petAllImages?.length == 0 ? (
-                      <Text style={styles.imgPlaceholder}>
-                        {Strings.pleaseAddImg}
-                      </Text>
-                    ) : null
-                  }
-                />
-              </View>
-            </View>
 
-            <View
-              style={{
-                paddingHorizontal: moderateScale(20),
-                marginBottom: moderateScale(30),
-              }}
-            >
-              <View style={styles.secondaryFlex}>
-                <Text style={styles.titleText}>Medical Documents</Text>
-                <TouchableOpacity onPress={() => setMedicalVisible(true)}>
-                  <Text style={styles.addText}>{Strings.add}</Text>
-                </TouchableOpacity>
-              </View>
               <View
-                style={[
-                  styles.flatlistView,
-                  {
-                    alignItems:
-                      petCertificates?.length == 0 ? "center" : "flex-start",
-                  },
-                ]}
+                style={{
+                  paddingHorizontal: moderateScale(20),
+                  marginBottom: moderateScale(30),
+                }}
               >
-                <FlatList
-                  horizontal={true}
-                  contentContainerStyle={{
-                    justifyContent: petCertificates?.length
-                      ? "flex-start"
-                      : "center",
-                    alignItems: "center",
-                    padding: moderateScale(16),
-                    borderColor: THEMES.colors.darkGrey,
-                    borderRadius: 10,
-                  }}
-                  showsHorizontalScrollIndicator={false}
-                  data={petCertificates}
-                  renderItem={renderDocumentItem}
-                  ListHeaderComponent={() =>
-                    petCertificates?.length == 0 ? (
-                      <Text style={styles.imgPlaceholder}>
-                        {Strings.pleaseAddImg}
-                      </Text>
-                    ) : null
-                  }
-                />
+                <View style={styles.secondaryFlex}>
+                  <Text style={styles.titleText}>Medical Documents</Text>
+                  <TouchableOpacity onPress={() => setMedicalVisible(true)}>
+                    <Text style={styles.addText}>{Strings.add}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={[
+                    styles.flatlistView,
+                    {
+                      alignItems:
+                        petCertificates?.length == 0 ? "center" : "flex-start",
+                    },
+                  ]}
+                >
+                  <FlatList
+                    horizontal={true}
+                    contentContainerStyle={{
+                      justifyContent: petCertificates?.length
+                        ? "flex-start"
+                        : "center",
+                      alignItems: "center",
+                      padding: moderateScale(16),
+                      borderColor: THEMES.colors.darkGrey,
+                      borderRadius: 10,
+                    }}
+                    showsHorizontalScrollIndicator={false}
+                    data={petCertificates}
+                    renderItem={renderDocumentItem}
+                    ListHeaderComponent={() =>
+                      petCertificates?.length == 0 ? (
+                        <Text style={styles.imgPlaceholder}>
+                          {Strings.pleaseAddImg}
+                        </Text>
+                      ) : null
+                    }
+                  />
+                </View>
               </View>
             </View>
             <View
@@ -849,7 +866,9 @@ const PetDetail = (props) => {
                 paddingHorizontal: moderateScale(16),
               }}
             >
-              {(isSubmit || addNew) && <Button title="Submit" onPress={onSubmit} />}
+              {(isSubmit || addNew) && (
+                <Button title="Submit" onPress={onSubmit} />
+              )}
             </View>
           </ScrollView>
         </View>
@@ -865,6 +884,7 @@ const PetDetail = (props) => {
           handleSelectedImage={(image) => handlePetDocuments(image)}
         />
         <UploadImageModal
+          hasDocument={true}
           isVisible={medicalVisible}
           onClose={() => setMedicalVisible(false)}
           handleSelectedImage={(image) => handleCertificates(image)}
@@ -957,21 +977,21 @@ const PetDetail = (props) => {
           }}
         />
         <Dialog
-            flag={editModal}
-            description={"Are you sure you want to edit this pet profile?"}
-            leftButtonText="No"
-            rightButtonText="Yes"
-            leftButtonPressed={() => {
-              setEditModal(false);
-              setIsSubmit(false);
-            }}
-            rightButtonPressed={() => {
-              setIsSubmit(true);
-              setEditModal(false);
-            }}
-            onClose={() => setEditModal(false)}
-            title="Edit Pet Profile"
-          />
+          flag={editModal}
+          description={"Are you sure you want to edit this pet profile?"}
+          leftButtonText="No"
+          rightButtonText="Yes"
+          leftButtonPressed={() => {
+            setEditModal(false);
+            setIsSubmit(false);
+          }}
+          rightButtonPressed={() => {
+            setIsSubmit(true);
+            setEditModal(false);
+          }}
+          onClose={() => setEditModal(false)}
+          title="Edit Pet Profile"
+        />
       </View>
     </SafeAreaView>
   );

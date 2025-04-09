@@ -11,7 +11,7 @@ import moment from "moment";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { moderateScale } from "react-native-size-matters";
 import { THEMES } from "../assets/theme/themes";
-import SwitchOn from "../assets/svg/switchOn.svg";
+import SwitchOn from "../assets/svg/selectAllSwitchOn.svg";
 import SwitchOff from "../assets/svg/switchOff.svg";
 import Strings from "../constants/strings";
 import RadioSelected from "../assets/svg/radioSelected.svg";

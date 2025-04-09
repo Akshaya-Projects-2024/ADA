@@ -102,8 +102,6 @@ const ReviewAll = (props) => {
       };
       delete obj.rating;
       let res = await getAllReviews(obj);
-      console.log(obj);
-
       if (res?.reviews?.length) {
         let filteredReviews = [...res?.reviews];
         setReviewList(

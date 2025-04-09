@@ -1,6 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { Image } from "react-native-svg";
 import ProfileDummy from "../assets/svg/user.svg";
 
 const ProfilePhoto = ({ url, style, dummyImageContainerStyle = {} }) => {

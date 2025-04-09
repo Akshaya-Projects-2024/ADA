@@ -543,24 +543,10 @@ const ParentHome = (props) => {
           sliderWidth={screenWidth}
           itemWidth={screenWidth * 0.9}
           onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
+          loop={true}
+          enableSnap={true}
+          autoplay={true}
         />
-        {/* {!appointmentData?.length ? (
-          <Carousel
-            data={appointmentData}
-            renderItem={renderItem}
-            sliderWidth={screenWidth}
-            itemWidth={screenWidth * 0.9}
-            onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
-          />
-        ) : (
-          <Carousel
-            data={eventData}
-            renderItem={renderBannerItem}
-            sliderWidth={screenWidth}
-            itemWidth={screenWidth * 0.9}
-            onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
-          />
-        )} */}
         {(appointmentData?.length > 1 ||
           eventData?.length > 1) && paginationDots()}
 

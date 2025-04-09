@@ -9,7 +9,7 @@ import {
   Linking,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, ms } from "react-native-size-matters";
 import { ScrollView } from "react-native-gesture-handler";
 import Back from "../../assets/svg/back.svg";
 import Msg from "../../assets/svg/msgSquareText.svg";
@@ -23,6 +23,8 @@ import { contextValue } from "../../components/Loader";
 import { useSelector } from "react-redux";
 import BackArrowComponent from "../../components/BackArrowComponent";
 import ProfilePhoto from "../../components/ProfilePhoto";
+import { AppointmentStatus } from "../../constants/enums";
+import moment from "moment";
 
 const AppointmentProviderDetail = (props) => {
   const selectedData = props?.route?.params?.selectedItem;
@@ -68,6 +70,22 @@ const AppointmentProviderDetail = (props) => {
     [appointmentData?.petdetails?.documents]
   );
 
+  const itemtextColor = () => {
+    if (appointmentData?.status === AppointmentStatus.cancelled) {
+      return "#F4511E";
+    } else if (appointmentData?.status === AppointmentStatus.scheduled) {
+      return "#6DAE43";
+    } else if (
+      appointmentData?.status === AppointmentStatus.rescheduled ||
+      appointmentData?.status === AppointmentStatus.pending
+    ) {
+      return "#FD9F00";
+    } else if (appointmentData?.status === AppointmentStatus.completed) {
+      return "#02bac7";
+    }
+    return THEMES.colors.black;
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -93,38 +111,10 @@ const AppointmentProviderDetail = (props) => {
                     {appointmentData?.petdetails?.breed}
                   </Text> */}
                 </View>
-                {/* <View style={styles.content}>
-                  <View style={styles.boxView}>
-                    <Text style={styles.dogText}>
-                      {" "}
-                      {appointmentData?.petdetails?.type}
-                    </Text>
-                    <Text style={styles.type}>Type</Text>
-                  </View>
-                  <View style={styles.ageContent}>
-                    <Text style={styles.ageText}>
-                      {appointmentData?.petdetails?.age}
-                    </Text>
-                    <Text style={styles.age}>Age</Text>
-                  </View>
-                  <View style={styles.genderContent}>
-                    <Text style={styles.genderText}>
-                      {appointmentData?.petdetails?.gender}
-                    </Text>
-                    <Text style={styles.gender}>Gender</Text>
-                  </View>
-                  <View style={styles.weightContent}>
-                    <Text style={styles.weightText}>
-                      {appointmentData?.petdetails?.weight} kg
-                    </Text>
-                    <Text style={styles.weight}>Weight</Text>
-                  </View>
-                </View> */}
-
                 <View style={{ marginTop: 20 }}>
                   <Text style={styles.aboutPetText}>Appointment Date</Text>
                   <Text style={styles.petDescription}>
-                    {appointmentData?.appointment_date}
+                    {moment(appointmentData?.appointment_date).format("DD-MM-YYYY")}
                   </Text>
 
                   <View style={{ marginTop: 20, flexDirection: "row" }}>
@@ -140,6 +130,34 @@ const AppointmentProviderDetail = (props) => {
                         {appointmentData?.end_time}
                       </Text>
                     </View>
+                  </View>
+
+                  <View style={{ marginTop: 20 }}>
+                    <Text style={styles.aboutPetText}>Status</Text>
+                    <Text
+                      style={[styles.statusText, { color: itemtextColor() }]}
+                    >
+                      {appointmentData?.status === "completed"
+                        ? "Attended"
+                        : appointmentData?.status}
+                    </Text>
+                  </View>
+
+                  <View style={{ flexDirection: "row", marginTop: ms(15) }}>
+                    <View>
+                      <Text style={styles.chargesText}>Session Charges</Text>
+                      <Text style={styles.chargesValue}>
+                        {appointmentData?.sessioncharges} / Per Session
+                      </Text>
+                    </View>
+                    {Boolean(+appointmentData?.monthcharges) && (
+                      <View style={{ marginLeft: ms(20) }}>
+                        <Text style={styles.chargesText}>Montly Charges </Text>
+                        <Text style={styles.chargesValue}>
+                          {appointmentData?.monthcharges} / Per Month
+                        </Text>
+                      </View>
+                    )}
                   </View>
 
                   <View style={{ marginTop: 20 }}>
@@ -376,7 +394,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   cardView: {
-    marginTop: moderateScale(32),
+    marginTop: moderateScale(16),
     padding: moderateScale(14),
     backgroundColor: THEMES.colors.white,
     borderWidth: 1,
@@ -437,6 +455,21 @@ const styles = StyleSheet.create({
   goBackBtn: {
     paddingTop: moderateScale(18),
     paddingHorizontal: moderateScale(15),
+  },
+  statusText: {
+    fontFamily: THEMES.fontFamily.semiBold,
+    fontSize: THEMES.fonts.font12,
+    textTransform: "capitalize",
+  },
+  chargesText: {
+    fontFamily: THEMES.fontFamily.medium,
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.darkGrey,
+  },
+  chargesValue: {
+    fontFamily: THEMES.fontFamily.semiBold,
+    fontSize: THEMES.fonts.font12,
+    color: THEMES.colors.black,
   },
 });
 

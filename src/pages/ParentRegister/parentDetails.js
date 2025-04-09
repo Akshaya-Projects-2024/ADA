@@ -174,7 +174,7 @@ const ParentDetails = (props) => {
     } else if (!emailId) {
       showToast("error", "Please enter email Id");
     } else if (validateInput(emailId) == "invalid") {
-      showToast("err or", "Please enter valid email Id");
+      showToast("error", "Please enter valid email Id");
     } else if (!address) {
       showToast("error", "Please enter address");
     } else if (!pinCode) {

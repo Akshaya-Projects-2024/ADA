@@ -22,6 +22,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StackActions } from "@react-navigation/native";
 import { useUser } from "../../api/UserContext";
 
+// Add these imports at the top
+import Dialog from "../../components/Dialog";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { TouchableOpacity } from "react-native";
+
 const WorkingHours = (props) => {
   const route = props?.route?.params?.route;
   // const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -41,7 +46,14 @@ const WorkingHours = (props) => {
   const { apiInitCall } = useUser();
   const { providerProfile } = useSelector((state) => state?.commonReducer);
   const { sessionDetails } = providerProfile;
+  // Add these state variables after other states
+  const [isSubmit, setIsSubmit] = useState(false);
+  const [editModal, setEditModal] = useState(false);
 
+  // Add edit popup function
+  const editPopup = () => {
+    setEditModal(true);
+  };
   useEffect(() => {
     initData();
     // const keyboardDidShowListener = Keyboard.addListener(
@@ -196,7 +208,29 @@ const WorkingHours = (props) => {
     <SafeAreaView style={styles.flex}>
       <View style={styles.container}>
         <StatusBar backgroundColor={THEMES.colors.bgColor} />
-        <Header title={"Working Days & TIme"} showBack bgColor="transparent" />
+        <Header
+          title={"Working Days & Time"}
+          showBack
+          bgColor="transparent"
+          right={
+            route === "myprofile" ? (
+              <TouchableOpacity
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 15,
+                }}
+                onPress={() => editPopup()}
+              >
+                <FontAwesome
+                  size={20}
+                  name="edit"
+                  color={THEMES.colors.black}
+                />
+              </TouchableOpacity>
+            ) : null
+          }
+        />
+
         {route !== "myprofile" && (
           <View style={styles.stepper}>
             <Stepper currentStep={5} totalSteps={6} />
@@ -209,27 +243,52 @@ const WorkingHours = (props) => {
             showsVerticalScrollIndicator={false}
             bounces={false}
           >
-            <TimeTracker
-              times={times}
-              setTimes={setTimes}
-              selectedForAll={selectedForAll}
-              setSelectedForAll={setSelectedForAll}
-              selectedShiftType={selectedShiftType}
-              setSelectedShiftType={setSelectedShiftType}
-            />
             <View
-              style={{
-                paddingBottom: moderateScale(25),
-                paddingTop: moderateScale(30),
-              }}
+              pointerEvents={
+                isSubmit || route !== "myprofile" ? "auto" : "none"
+              }
             >
-              <Button
-                title={route !== "myprofile" ? Strings.next : Strings.submit}
-                onPress={onSubmit}
+              <TimeTracker
+                times={times}
+                setTimes={setTimes}
+                selectedForAll={selectedForAll}
+                setSelectedForAll={setSelectedForAll}
+                selectedShiftType={selectedShiftType}
+                setSelectedShiftType={setSelectedShiftType}
               />
             </View>
+            {(route !== "myprofile" || isSubmit) && (
+              <View
+                style={{
+                  paddingBottom: moderateScale(25),
+                  paddingTop: moderateScale(30),
+                }}
+              >
+                <Button
+                  title={route !== "myprofile" ? Strings.next : Strings.submit}
+                  onPress={onSubmit}
+                />
+              </View>
+            )}
           </ScrollView>
         </View>
+
+        <Dialog
+          flag={editModal}
+          description={"Are you sure you want to edit these working hours?"}
+          leftButtonText="No"
+          rightButtonText="Yes"
+          leftButtonPressed={() => {
+            setEditModal(false);
+            setIsSubmit(false);
+          }}
+          rightButtonPressed={() => {
+            setIsSubmit(true);
+            setEditModal(false);
+          }}
+          onClose={() => setEditModal(false)}
+          title="Edit Working Hours"
+        />
       </View>
     </SafeAreaView>
   );

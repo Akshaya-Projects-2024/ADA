@@ -28,15 +28,15 @@ const HeaderWithSearch = ({ loggedInModule, handleSwitch, featureList }) => {
 
   const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
-const listOpacity = useRef(new Animated.Value(0)).current; // Start opacity at 0
+  const listOpacity = useRef(new Animated.Value(0)).current; // Start opacity at 0
 
-useEffect(() => {
-  Animated.timing(listOpacity, {
-    toValue: 1,
-    duration: 300, // Adjust animation duration
-    useNativeDriver: true,
-  }).start();
-}, [filteredData]);
+  useEffect(() => {
+    Animated.timing(listOpacity, {
+      toValue: 1,
+      duration: 300, // Adjust animation duration
+      useNativeDriver: true,
+    }).start();
+  }, [filteredData]);
 
   // Helper function to animate search bar
   const toggleSearchBar = useCallback(
@@ -81,13 +81,8 @@ useEffect(() => {
           <Header
             customIcon={
               <Toggle
-                state={
-                  loggedInModule ===
-                  LoginModules[
-                    loggedInModule == "parent" ? "provider" : "parent"
-                  ]
-                }
-                onPress={handleSwitch}
+              state={loggedInModule === LoginModules.provider}
+              onPress={handleSwitch}
               />
             }
             right={
