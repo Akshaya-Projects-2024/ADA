@@ -47,7 +47,7 @@ const WorkingHours = (props) => {
   const { providerProfile } = useSelector((state) => state?.commonReducer);
   const { sessionDetails } = providerProfile;
   // Add these state variables after other states
-  const [isSubmit, setIsSubmit] = useState(false);
+  const [isSubmit, setIsSubmit] = useState(true);
   const [editModal, setEditModal] = useState(false);
 
   // Add edit popup function
@@ -212,23 +212,6 @@ const WorkingHours = (props) => {
           title={"Working Days & Time"}
           showBack
           bgColor="transparent"
-          right={
-            route === "myprofile" ? (
-              <TouchableOpacity
-                style={{
-                  paddingVertical: 10,
-                  paddingHorizontal: 15,
-                }}
-                onPress={() => editPopup()}
-              >
-                <FontAwesome
-                  size={20}
-                  name="edit"
-                  color={THEMES.colors.black}
-                />
-              </TouchableOpacity>
-            ) : null
-          }
         />
 
         {route !== "myprofile" && (
@@ -243,11 +226,7 @@ const WorkingHours = (props) => {
             showsVerticalScrollIndicator={false}
             bounces={false}
           >
-            <View
-              pointerEvents={
-                isSubmit || route !== "myprofile" ? "auto" : "none"
-              }
-            >
+            <View pointerEvents={isSubmit ? "auto" : "none"}>
               <TimeTracker
                 times={times}
                 setTimes={setTimes}

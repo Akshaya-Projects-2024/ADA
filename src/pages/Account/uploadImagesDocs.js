@@ -78,6 +78,9 @@ const UploadImagesDocs = (props) => {
           break;
       }
     }
+    if (!providerDocument?.some((item) => item.id)) {
+      setIsSubmit(true);
+    }
     setPhoto(logo);
     setDocumentImg(documents);
     setBusinessImg(images);
@@ -287,7 +290,7 @@ const UploadImagesDocs = (props) => {
             showsVerticalScrollIndicator={false}
             style={{ flex: 1 }}
           >
-            <View pointerEvents={isSubmit || route !== "myprofile" ? "auto" : "none"}>
+            <View pointerEvents={isSubmit ? "auto" : "none"}>
               <View
                 style={[
                   styles.padding,
@@ -462,7 +465,7 @@ const UploadImagesDocs = (props) => {
           </ScrollView>
         </View>
 
-        {(route !== "myprofile" || isSubmit) && (
+        {isSubmit && (
           <View style={styles.submitButton}>
             <Button
               title={route !== "myprofile" ? Strings.next : Strings.submit}

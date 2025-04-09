@@ -87,6 +87,9 @@ const BusinessDetail = (props) => {
         setKeyboardVisible(false); // Keyboard is hidden
       }
     );
+    if (!providerBusiness?.id) {
+      setIsSubmit(true);
+    }
 
     return () => {
       keyboardDidHideListener.remove();
@@ -295,7 +298,7 @@ const BusinessDetail = (props) => {
               </View>
             </View>
           </ScrollView>
-          {!isKeyboardVisible && (route !== "myprofile" || isSubmit) && (
+          {!isKeyboardVisible && isSubmit && (
             <View style={styles.submitButton}>
               <Button
                 title={route !== "myprofile" ? Strings.next : Strings.submit}

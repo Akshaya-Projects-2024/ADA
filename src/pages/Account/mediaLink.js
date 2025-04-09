@@ -67,17 +67,25 @@ const MediaLink = (props) => {
   }, []);
 
   const initData = () => {
+    const isPresent = false;
     if (MediaLinks?.facebook) {
+      isPresent = true;
       setFbLink(MediaLinks?.facebook);
     }
     if (MediaLinks?.instagram) {
+      isPresent = true;
       setInstaLink(MediaLinks?.instagram);
     }
     if (MediaLinks?.onlinelink) {
+      isPresent = true;
       setWebLink(MediaLinks?.onlinelink);
     }
     if (MediaLinks?.website) {
+      isPresent = true;
       setLink(MediaLinks?.website);
+    }
+    if (!isPresent) {
+      setIsSubmit(true);
     }
   };
 
@@ -184,11 +192,7 @@ const MediaLink = (props) => {
             showsVerticalScrollIndicator={false}
             bounces={false}
           >
-            <View
-              pointerEvents={
-                isSubmit || route !== "myprofile" ? "auto" : "none"
-              }
-            >
+            <View pointerEvents={isSubmit ? "auto" : "none"}>
               <View
                 style={[
                   styles.headerView,
@@ -285,7 +289,7 @@ const MediaLink = (props) => {
               </View>
             </View>
           </ScrollView>
-          {!isKeyboardVisible && (route !== "myprofile" || isSubmit) && (
+          {!isKeyboardVisible && isSubmit && (
             <View style={styles.submitButton}>
               <Button title={Strings.submit} onPress={() => onSubmit()} />
             </View>

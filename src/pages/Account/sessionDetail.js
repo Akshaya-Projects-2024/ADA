@@ -60,6 +60,9 @@ const SessionDetail = (props) => {
 
   useEffect(() => {
     initData();
+    if(!ProviderSession?.id) {
+      setIsSubmit(true);
+    }
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -340,11 +343,7 @@ const SessionDetail = (props) => {
             showsVerticalScrollIndicator={false}
             bounces={false}
           >
-            <View
-              pointerEvents={
-                isSubmit || route !== "myprofile" ? "auto" : "none"
-              }
-            >
+            <View pointerEvents={isSubmit ? "auto" : "none"}>
               <View
                 style={[
                   styles.contentView,
@@ -555,8 +554,8 @@ const SessionDetail = (props) => {
                     </View>
                   </>
                 ))}
-              {!isSubmit && <View style={{marginBottom: ms(20)}}/>}
-              {!isKeyboardVisible && (route !== "myprofile" || isSubmit) && (
+              {!isSubmit && <View style={{ marginBottom: ms(20) }} />}
+              {!isKeyboardVisible && isSubmit && (
                 <View
                   style={{
                     paddingBottom: moderateScale(25),

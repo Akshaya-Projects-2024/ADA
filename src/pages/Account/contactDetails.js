@@ -46,6 +46,9 @@ const ContactDetails = (props) => {
 
   useEffect(() => {
     initData();
+    if (!providerContact?.id) {
+      setIsSubmit(true);
+    }
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
       () => {
@@ -154,9 +157,9 @@ const ContactDetails = (props) => {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <StatusBar backgroundColor={THEMES.colors.bgColor} />
-        <Header 
-          title={Strings.contactDetails} 
-          showBack 
+        <Header
+          title={Strings.contactDetails}
+          showBack
           bgColor="transparent"
           right={
             route === "myprofile" ? (
@@ -252,7 +255,7 @@ const ContactDetails = (props) => {
               </View>
             </View>
           </ScrollView>
-          {(!isKeyboardVisible && (route !== "myprofile" || isSubmit)) && (
+          {!isKeyboardVisible && isSubmit && (
             <View style={styles.submitButton}>
               <Button
                 title={route !== "myprofile" ? Strings.next : Strings.submit}

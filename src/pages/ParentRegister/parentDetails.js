@@ -69,11 +69,9 @@ const ParentDetails = (props) => {
   const [editModal, setEditModal] = useState(false);
   const { apiInitCall } = useUser(false);
 
-
-
   useEffect(() => {
     initData();
-    if (parentContact?.id == 0) {
+    if (!parentContact?.id) {
       setIsSubmit(true);
     }
     const keyboardDidShowListener = Keyboard.addListener(
@@ -270,102 +268,103 @@ const ParentDetails = (props) => {
             showsVerticalScrollIndicator={false}
             bounces={false}
           >
-            <View
-              style={{ alignSelf: "center", paddingTop: moderateScale(32) }}
-            >
+            <View pointerEvents={isSubmit ? "auto" : "none"}>
+              <View
+                style={{ alignSelf: "center", paddingTop: moderateScale(32) }}
+              >
+                <View
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: 50,
+                    backgroundColor: "#ddd",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {parentImg ? (
+                    <Image
+                      style={{
+                        width: 100,
+                        height: 100,
+                        borderRadius: 50,
+                        backgroundColor: "#ddd",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      resizeMode="contain"
+                      source={getBase64Obj(parentImg)}
+                    />
+                  ) : (
+                    <User />
+                  )}
+                </View>
+                {/* Edit Icon */}
+                <TouchableOpacity
+                  onPress={() => setVisible(true)}
+                  style={{
+                    position: "absolute",
+                    bottom: 5,
+                    right: 5,
+                    backgroundColor: "#00ACC1",
+                    borderRadius: 20,
+                    padding: 5,
+                  }}
+                >
+                  <Pencil />
+                </TouchableOpacity>
+              </View>
               <View
                 style={{
-                  width: 100,
-                  height: 100,
-                  borderRadius: 50,
-                  backgroundColor: "#ddd",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  alignSelf: "center",
+                  paddingTop: moderateScale(32),
+                  paddingHorizontal: moderateScale(20),
                 }}
               >
-                {parentImg ? (
-                  <Image
-                    style={{
-                      width: 100,
-                      height: 100,
-                      borderRadius: 50,
-                      backgroundColor: "#ddd",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                    resizeMode="contain"
-                    source={getBase64Obj(parentImg)}
+                <InputField
+                  label={"Parent Name*"}
+                  placeholderText={"Enter parent name"}
+                  value={parentName}
+                  onChange={setParentName}
+                />
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <InputField
+                    label={"About Parent*"}
+                    placeholderText={"Enter description"}
+                    multiline
+                    value={description}
+                    onChange={setDescription}
                   />
-                ) : (
-                  <User />
-                )}
-              </View>
-              {/* Edit Icon */}
-              <TouchableOpacity
-                onPress={() => setVisible(true)}
-                style={{
-                  position: "absolute",
-                  bottom: 5,
-                  right: 5,
-                  backgroundColor: "#00ACC1",
-                  borderRadius: 20,
-                  padding: 5,
-                }}
-              >
-                <Pencil />
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                alignSelf: "center",
-                paddingTop: moderateScale(32),
-                paddingHorizontal: moderateScale(20),
-              }}
-            >
-              <InputField
-                label={"Parent Name*"}
-                placeholderText={"Enter parent name"}
-                value={parentName}
-                onChange={setParentName}
-              />
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  label={"About Parent*"}
-                  placeholderText={"Enter description"}
-                  multiline
-                  value={description}
-                  onChange={setDescription}
-                />
-              </View>
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  maxLength={10}
-                  keyboardType="phone-pad"
-                  label={"Mobile number*"}
-                  placeholderText={"Enter mobile number"}
-                  value={mobileNumber}
-                  onChange={setMobileNumber}
-                />
-              </View>
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  label={"Email ID*"}
-                  placeholderText={"Enter email id"}
-                  value={emailId}
-                  onChange={setEmailId}
-                />
-              </View>
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  label={"Address*"}
-                  placeholderText={"Enter your address"}
-                  multiline
-                  value={address}
-                  onChange={setAddress}
-                />
-              </View>
+                </View>
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <InputField
+                    maxLength={10}
+                    keyboardType="phone-pad"
+                    label={"Mobile number*"}
+                    placeholderText={"Enter mobile number"}
+                    value={mobileNumber}
+                    onChange={setMobileNumber}
+                  />
+                </View>
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <InputField
+                    label={"Email ID*"}
+                    placeholderText={"Enter email id"}
+                    value={emailId}
+                    onChange={setEmailId}
+                  />
+                </View>
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <InputField
+                    label={"Address*"}
+                    placeholderText={"Enter your address"}
+                    multiline
+                    value={address}
+                    onChange={setAddress}
+                  />
+                </View>
 
-              {/* <View style={{ paddingTop: moderateScale(16) }}>
+                {/* <View style={{ paddingTop: moderateScale(16) }}>
                 <InputField
                   label={Strings.location}
                   placeholderText={Strings.enterLocation}
@@ -374,28 +373,29 @@ const ParentDetails = (props) => {
                   onChange={setAddress}
                 />
               </View> */}
-              <View style={{ paddingTop: moderateScale(16) }}>
-                <InputField
-                  maxLength={6}
-                  keyboardType="phone-pad"
-                  label={"ZIP/Postal code*"}
-                  placeholderText={"Enter zip or postal code"}
-                  value={pinCode}
-                  onChange={setPincode}
-                />
-              </View>
-              <View
-                style={{
-                  paddingTop: moderateScale(16),
-                  paddingBottom: moderateScale(24),
-                }}
-              >
-                {isSubmit && (
-                  <Button
-                    title={parentContact?.id == 0 ? "Next" : "Submit"}
-                    onPress={() => onSubmit()}
+                <View style={{ paddingTop: moderateScale(16) }}>
+                  <InputField
+                    maxLength={6}
+                    keyboardType="phone-pad"
+                    label={"ZIP/Postal code*"}
+                    placeholderText={"Enter zip or postal code"}
+                    value={pinCode}
+                    onChange={setPincode}
                   />
-                )}
+                </View>
+                <View
+                  style={{
+                    paddingTop: moderateScale(16),
+                    paddingBottom: moderateScale(24),
+                  }}
+                >
+                  {isSubmit && (
+                    <Button
+                      title={parentContact?.id == 0 ? "Next" : "Submit"}
+                      onPress={() => onSubmit()}
+                    />
+                  )}
+                </View>
               </View>
             </View>
           </ScrollView>
