@@ -703,10 +703,9 @@ const PaymentsSubscription = (props) => {
 
               <View style={styles.TaxView}>
                 <Text style={styles.TaxText}>
-                  Tax: ({selectedCard?.tax + "%"})
+                  Tax:
                 </Text>
                 <Text numberOfLines={1} style={styles.TaxPrice}>
-                  -{" "}
                   {"₹ " +
                     calculateTax(
                       calculateDiscount(

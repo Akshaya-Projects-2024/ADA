@@ -46,9 +46,13 @@ const MedicalHelp = (props) => {
   const { profile, parentProfie } = useSelector(
     (state) => state?.commonReducer
   );
+  const profilePhoto = selectedData?.documents.find(
+    (item) => item.documenttype === "profilePhoto"
+  );
+
   const selectedData = props.route?.params?.selectedData;
   const { petDetails } = parentProfie;
-  const [selectedGender, setSelectedGender] = useState(null);
+  const [selectedGender, setSelectedGender] = useState(selectedData?.gender);
   const [petImage, setPetImage] = useState([]);
   const [petImagesVisible, setPetImageVisible] = useState(false);
   const [isDateVisible, setDateVisibility] = useState(false);
@@ -57,7 +61,9 @@ const MedicalHelp = (props) => {
   const [facebook, setFacebook] = useState();
   const [instagram, setInstagram] = useState();
   const [whatsup, setWhatsup] = useState();
-  const [petName, setPetName] = useState(props.route?.params?.selectedData?.name);
+  const [petName, setPetName] = useState(
+    props.route?.params?.selectedData?.name
+  );
   const [location, setLocation] = useState();
   const [feature, setFeature] = useState();
   const [contactNo, setContactNo] = useState();
@@ -71,6 +77,12 @@ const MedicalHelp = (props) => {
     setDateVisibility(false);
   };
 
+  useEffect(() => {
+    const profilePhoto = selectedData?.documents?.filter(
+      (item) => item.documenttype === "profilePhoto"
+    );
+    setPetImage([profilePhoto?.[0]?.url]);
+  }, []);
 
   const handleDateConfirm = (date) => {
     const formattedDate = moment(date).format("DD/MM/YYYY");
@@ -93,6 +105,7 @@ const MedicalHelp = (props) => {
 
   const apiCall = async (postData, type, item) => {
     try {
+
       const res = await uploadDocument(postData);
       if (res?.status == 200) {
         const data = [...petImage];
@@ -102,6 +115,8 @@ const MedicalHelp = (props) => {
         const dataId = [...petId];
         dataId.push({ id: res?.data?.data?.reqId });
         setPetId(dataId);
+        contextValue?.setLoader(false);
+      }else{
         contextValue?.setLoader(false);
       }
     } catch (error) {
@@ -131,14 +146,14 @@ const MedicalHelp = (props) => {
           await Share.open(shareData);
         }
 
-        if (platform == "INSTAGRAM") {
-          const shareData = {
-            title: "Attention Required !!",
-            message: feature,
-            url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
-          };
-          await Share.open(shareData);
-        }
+        // if (platform == "INSTAGRAM") {
+        //   const shareData = {
+        //     title: "Attention Required !!",
+        //     message: feature,
+        //     url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
+        //   };
+        //   await Share.open(shareData);
+        // }
 
         if (platform == "WHATSUP") {
           const shareData = {
@@ -193,7 +208,7 @@ const MedicalHelp = (props) => {
           coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
           usertype:
             loggedInModule === LoginModules.provider ? "provider" : "parent",
-            petid: selectedData?.id,
+          petid: selectedData?.id,
         };
         let res = await AddLostPetAlert(obj);
         if (Boolean(res?.image)) {
@@ -212,14 +227,24 @@ const MedicalHelp = (props) => {
   };
 
   const renderItem = (item, index) => {
+    const type =
+      typeof item?.item === "string" && item?.item.startsWith("https://");
     const photo = item?.item.fileData;
     return (
       <View style={styles.imgContent}>
-        <Image
-          style={styles.img}
-          resizeMode="contain"
-          source={getBase64Obj(photo)}
-        />
+        {type ? (
+          <Image
+            style={styles.img}
+            resizeMode="contain"
+            source={{ uri: item?.item }}
+          />
+        ) : (
+          <Image
+            style={styles.img}
+            resizeMode="contain"
+            source={getBase64Obj(photo)}
+          />
+        )}
         <TouchableOpacity
           onPress={() => {
             onCancel(DOCUMENT_TYPES.image, item?.item);
@@ -276,10 +301,10 @@ const MedicalHelp = (props) => {
             <View
               style={{
                 paddingTop: moderateScale(24),
-                paddingHorizontal:moderateScale(16),
+                paddingHorizontal: moderateScale(16),
               }}
             >
-             <InputField
+              <InputField
                 label={"Pet Name*"}
                 placeholderText={"Enter Pet name"}
                 value={petName}

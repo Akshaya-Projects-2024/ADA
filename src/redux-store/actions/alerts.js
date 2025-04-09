@@ -1,5 +1,6 @@
 import Api from "../../api/Api";
 import { urlList } from "../../constants/urlList";
+import { showToast } from "../../utils/utils";
 
 export const AddLostPetAlert = async (obj) => {
   try {
@@ -19,7 +20,7 @@ export const AddLostPetAlert = async (obj) => {
     }
     throw new Error("Something went wrong!");
   } catch (error) {
-    console.log("AddLostPetAlert Error! ", error);
+    showToast("error", error.message || "An alert is already created for this pet")
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
 };

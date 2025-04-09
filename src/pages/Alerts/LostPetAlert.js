@@ -48,8 +48,13 @@ const LostPetAlert = (props) => {
   const { profile, parentProfie } = useSelector(
     (state) => state?.commonReducer
   );
+
+  const profilePhoto = selectedData?.documents.find(
+    (item) => item.documenttype === "profilePhoto"
+  );
+
   const { petDetails } = parentProfie;
-  const [selectedGender, setSelectedGender] = useState(null);
+  const [selectedGender, setSelectedGender] = useState(selectedData?.gender);
   const [petImage, setPetImage] = useState([]);
   const [petImagesVisible, setPetImageVisible] = useState(false);
   const [isDateVisible, setDateVisibility] = useState(false);
@@ -58,9 +63,7 @@ const LostPetAlert = (props) => {
   const [facebook, setFacebook] = useState();
   const [instagram, setInstagram] = useState();
   const [whatsup, setWhatsup] = useState();
-  const [petName, setPetName] = useState(
-    selectedData?.name
-  );
+  const [petName, setPetName] = useState(selectedData?.name);
   const [location, setLocation] = useState();
   const [feature, setFeature] = useState();
   const [message, setMessage] = useState();
@@ -74,7 +77,13 @@ const LostPetAlert = (props) => {
     setDateVisibility(false);
   };
 
- 
+  useEffect(() => {
+    const profilePhoto = selectedData?.documents?.filter(
+      (item) => item.documenttype === "profilePhoto"
+    );
+    setPetImage([profilePhoto?.[0]?.url]);
+  }, []);
+
   const handleDateConfirm = (date) => {
     const formattedDate = moment(date).format("DD/MM/YYYY");
     selectedDate(formattedDate);
@@ -100,11 +109,14 @@ const LostPetAlert = (props) => {
       if (res?.status == 200) {
         const data = [...petImage];
         data.push({ ...item, id: res?.data?.data?.reqId });
+
         setPetImage(data);
 
         const dataId = [...petId];
         dataId.push({ id: res?.data?.data?.reqId });
         setPetId(dataId);
+        contextValue?.setLoader(false);
+      }else{
         contextValue?.setLoader(false);
       }
     } catch (error) {
@@ -133,14 +145,14 @@ const LostPetAlert = (props) => {
           await Share.open(shareData);
         }
 
-        if (platform == "INSTAGRAM") {
-          const shareData = {
-            title: "Attention Required !!",
-            message: message,
-            url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
-          };
-          await Share.open(shareData);
-        }
+        // if (platform == "INSTAGRAM") {
+        //   const shareData = {
+        //     title: "Attention Required !!",
+        //     message: message,
+        //     url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
+        //   };
+        //   await Share.open(shareData);
+        // }
 
         if (platform == "WHATSUP") {
           const shareData = {
@@ -217,14 +229,26 @@ const LostPetAlert = (props) => {
   };
 
   const renderItem = (item, index) => {
-    const photo = item?.item.fileData;
+    const type =
+      typeof item?.item === "string" && item?.item.startsWith("https://");
+    const photo = item?.item?.fileData;
+    console.log(item?.item)
     return (
       <View style={styles.imgContent}>
-        <Image
-          style={styles.img}
-          resizeMode="contain"
-          source={getBase64Obj(photo)}
-        />
+        {type ? (
+          <Image
+            style={styles.img}
+            resizeMode="contain"
+            source={{ uri: item?.item }}
+          />
+        ) : (
+          <Image
+            style={styles.img}
+            resizeMode="contain"
+            source={getBase64Obj(photo)}
+          />
+        )}
+
         <TouchableOpacity
           onPress={() => {
             onCancel(DOCUMENT_TYPES.image, item?.item);
@@ -280,7 +304,7 @@ const LostPetAlert = (props) => {
           >
             <View
               style={{
-                paddingHorizontal:moderateScale(16),
+                paddingHorizontal: moderateScale(16),
                 paddingTop: moderateScale(24),
               }}
             >
