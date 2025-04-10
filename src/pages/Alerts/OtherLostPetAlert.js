@@ -40,6 +40,7 @@ import { contextValue } from "../../components/Loader";
 import { validateInput } from "../../utils/validation";
 import { useSelector } from "react-redux";
 import { LoginModules } from "../../constants/enums";
+import Dialog from "../../components/Dialog";
 
 const OtherLostPetAlert = (props) => {
   const [selectedGender, setSelectedGender] = useState(null);
@@ -59,7 +60,7 @@ const OtherLostPetAlert = (props) => {
   const [agree, setAgree] = useState();
   const [petId, setPetId] = useState([]);
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
-
+  const [modal, setModal] = useState(false);
   const { loggedInModule } = useSelector((state) => state?.register);
 
   const hideDatePickerCancel = () => {
@@ -196,8 +197,7 @@ const OtherLostPetAlert = (props) => {
             await shareImageBase64(res?.image, selectedPlatforms);
           }
           contextValue?.setLoader(false);
-          showToast("success", "Lost Pet Alert has successfully create");
-          goBack();
+          setModal(true);
         }
       }
     } catch (error) {
@@ -570,6 +570,19 @@ const OtherLostPetAlert = (props) => {
           mode="date"
           onConfirm={handleDateConfirm}
           onCancel={hideDatePickerCancel}
+        />
+        <Dialog
+          flag={modal}
+          title={"✨ Alert Created Successfully!✨"}
+          description={"Congratulations! Your alert has been created!"}
+          rightButtonText="Go back"
+          rightButtonPressed={() => {
+            setModal(false);
+            goBack();
+          }}
+          onClose={() => {
+            setModal(false);
+          }}
         />
       </View>
     </SafeAreaView>

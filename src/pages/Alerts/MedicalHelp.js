@@ -41,6 +41,7 @@ import { contextValue } from "../../components/Loader";
 import { validateInput } from "../../utils/validation";
 import { useSelector } from "react-redux";
 import { LoginModules } from "../../constants/enums";
+import Dialog from "../../components/Dialog";
 
 const MedicalHelp = (props) => {
   const { profile, parentProfie } = useSelector(
@@ -72,6 +73,7 @@ const MedicalHelp = (props) => {
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
   const [petDropdownData, setPetDropdownData] = useState([]);
   const { loggedInModule } = useSelector((state) => state?.register);
+  const [modal, setModal] = useState(false);
 
   const hideDatePickerCancel = () => {
     setDateVisibility(false);
@@ -216,8 +218,7 @@ const MedicalHelp = (props) => {
             await shareImageBase64(res?.image, selectedPlatforms);
           }
           contextValue?.setLoader(false);
-          showToast("success", "Medical Pet Alert has successfully created");
-          goBack();
+           setModal(true);
         }
       }
     } catch (error) {
@@ -638,6 +639,19 @@ const MedicalHelp = (props) => {
           mode="date"
           onConfirm={handleDateConfirm}
           onCancel={hideDatePickerCancel}
+        />
+        <Dialog
+          flag={modal}
+          title={"✨ Alert Created Successfully!✨"}
+          description={"Congratulations! Your alert has been created!"}
+          rightButtonText="Go back"
+          rightButtonPressed={() => {
+            setModal(false);
+            goBack();
+          }}
+          onClose={() => {
+            setModal(false);
+          }}
         />
       </View>
     </SafeAreaView>

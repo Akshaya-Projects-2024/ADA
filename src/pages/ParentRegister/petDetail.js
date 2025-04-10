@@ -614,9 +614,10 @@ const PetDetail = (props) => {
                   <ProfileDummy />
                 )}
               </View>
+              <View pointerEvents={isSubmit ? "auto" : "none"}>
               {/* Edit Icon */}
               <TouchableOpacity
-                onPress={() => setPetPhotoVisible(true)}
+                onPress={() =>setPetPhotoVisible(true) }
                 style={{
                   position: "absolute",
                   bottom: 5,
@@ -628,6 +629,7 @@ const PetDetail = (props) => {
               >
                 <Pencil />
               </TouchableOpacity>
+              </View>
             </View>
             <View pointerEvents={isSubmit ? "auto" : "none"}>
               <View
