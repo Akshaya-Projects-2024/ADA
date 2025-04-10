@@ -31,6 +31,7 @@ import { useIsFocused } from "@react-navigation/native";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 import { getAppointmentHistoryApi } from "../../redux-store/actions/commonApis";
 import { useSelector } from "react-redux";
+import ProfileInitial from "../../components/ProfileInitial";
 
 const ServiceListReviews = ({ navigation, route }) => {
   const selectedService = route?.params?.selectedService;
@@ -157,9 +158,13 @@ const ServiceListReviews = ({ navigation, route }) => {
                 </View>
               </View>
             ) : (
-              <ProviderFallback
-                width={moderateScale(55)}
-                height={moderateScale(55)}
+              <ProfileInitial
+                style={{
+                  width: moderateScale(55),
+                  height: moderateScale(55),
+                  borderRadius: moderateScale(55) / 2,
+                }}
+                name={item?.providername?.trim()}
               />
             )}
             <View style={{ paddingLeft: moderateScale(12) }}>
@@ -258,7 +263,7 @@ const ServiceListReviews = ({ navigation, route }) => {
             bounces={false}
             renderItem={renderItem}
             contentContainerStyle={{ flexGrow: 1 }}
-            ListEmptyComponent={!dataFetched ?  null : EmptyContentView}
+            ListEmptyComponent={!dataFetched ? null : EmptyContentView}
           />
         </>
       </View>

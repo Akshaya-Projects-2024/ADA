@@ -40,6 +40,7 @@ import { getBase64Obj } from "../../utils/documentUtils";
 import CrossIcon from "../../assets/svg/CrossIcon";
 import DropDown from "../../components/DropDown";
 import DropDownField from "../../components/DropDown";
+import ProfileInitial from "../../components/ProfileInitial";
 
 const ReviewAll = (props) => {
   const vendorId =
@@ -149,44 +150,6 @@ const ReviewAll = (props) => {
     return (
       <>
         <View style={styles.flatlistView}>
-          {/* <View>
-            <View style={styles.replyMainView}>
-              <View style={styles.replyRow}>
-                <View style={styles.profileImg}>
-                  {item?.providerPhoto ? (
-                    <Image
-                      style={{ width: 52, height: 52, borderRadius: 52 / 2 }}
-                      source={getBase64Obj(
-                        "https://d2jswhakxkta9i.cloudfront.net/logos/petlogo/avatar.png"
-                      )}
-                    />
-                  ) : (
-                    <ProviderFallback
-                      width={moderateScale(55)}
-                      height={moderateScale(55)}
-                    />
-                  )}
-                </View>
-                <View style={{ marginLeft: moderateScale(8) }}>
-                  <Text style={styles.replyName}>
-                    {selectedItem?.providername?.trim()
-                      ? selectedItem?.providername?.trim()
-                      : item?.item?.providername?.trim()
-                      ? selectedItem?.providername?.trim()
-                      : guestUser}
-                  </Text>
-                </View>
-              </View>
-              {item?.item?.reply && (
-                <View style={styles.replyComment}>
-                  <Text numberOfLines={2} style={styles.replyCommentText}>
-                    {item?.item?.reply}
-                  </Text>
-                </View>
-              )}
-            </View>
-          </View> */}
-
           {item?.item?.reply && (
             <>
               <View style={styles.flatlistContent}>
@@ -414,65 +377,6 @@ const ReviewAll = (props) => {
             <>
               {Boolean(reviewList?.length) ? (
                 <View style={styles.mainView}>
-                  {/* {reviewList?.length > 1 && (
-                    <View style={styles.dropdownMainView}>
-                      <View style={styles.dropDownRow}>
-                        {filterParams?.sortBy === "rating" && (
-                          <View style={{ width: 100 }}>
-                            <DropDownField
-                              onChange={(value) => {
-                                setFilterParams({
-                                  ...filterParams,
-                                  sortBy: "rating",
-                                  rating: value,
-                                  filterdata: value,
-                                  pageNum: 1
-                                });
-                                showLoader();
-                              }}
-                              selectedValue={filterParams?.rating}
-                              dropdownData={[
-                                { label: "1 Star", value: "1" },
-                                { label: "2 Star", value: "2" },
-                                { label: "3 Star", value: "3" },
-                                { label: "4 Star", value: "4" },
-                                { label: "5 Star", value: "5" },
-                              ]}
-                              width={90}
-                            />
-                          </View>
-                        )}
-                        <View style={{ width: 140 }}>
-                          <DropDownField
-                            onChange={(value) => {
-                              setFilterParams({
-                                ...filterParams,
-                                sortBy: value,
-                                filterdata: value == "rating" ? "5" : "",
-                                rating: value == "rating" ? "5" : "",
-                                pageNum: 1
-                              });
-                              showLoader();
-                            }}
-                            selectedValue={filterParams.sortBy}
-                            width={120}
-                            dropdownData={[
-                              { label: "Newest", value: "newest" },
-                              { label: "Oldest", value: "oldest" },
-                              { label: "Top Rated", value: "toprated" },
-                              { label: "Lowest", value: "lowest" },
-                              { label: "Rating", value: "rating" },
-                            ]}
-                            customStyle={{
-                              containerStyle: {
-                                width: 120,
-                              },
-                            }}
-                          />
-                        </View>
-                      </View>
-                    </View>
-                  )} */}
                   <FlatList
                     data={reviewList}
                     showsVerticalScrollIndicator={false}
@@ -573,18 +477,22 @@ const ReviewAll = (props) => {
                         {selectedItem?.providerPhoto ? (
                           <Image
                             style={{
-                              width: 52,
-                              height: 52,
-                              borderRadius: 52 / 2,
+                              width: moderateScale(52),
+                              height: moderateScale(52),
+                              borderRadius: moderateScale(52) / 2,
                             }}
                             source={getBase64Obj(
                               "https://d2jswhakxkta9i.cloudfront.net/logos/petlogo/avatar.png"
                             )}
                           />
                         ) : (
-                          <ProviderFallback
-                            width={moderateScale(52)}
-                            height={moderateScale(52)}
+                          <ProfileInitial
+                            style={{
+                              width: moderateScale(52),
+                              height: moderateScale(52),
+                              borderRadius: moderateScale(52) / 2,
+                            }}
+                            name={selectedItem?.providername?.trim()}
                           />
                         )}
                       </View>

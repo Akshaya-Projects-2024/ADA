@@ -20,6 +20,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 const CancelAppointment = ({ navigation, route }) => {
   const selectedItem = route?.params?.selectedItem;
+  const requestedby = route?.params?.requestedby ?? "provider";
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [reason, setReason] = useState("");
 
@@ -54,11 +55,11 @@ const CancelAppointment = ({ navigation, route }) => {
           parent_id: selectedItem?.parentdetails?.userid,
           provider_id: selectedItem?.provider_id,
           notes: reason,
-          requestedby: "provider",
+          requestedby,
         };
         const res = await cancelAppointment(params);
         if (res?.status === 200) {
-          navigation.goBack();
+            navigation.goBack();
         }
       }
       contextValue?.setLoader(false);
@@ -71,34 +72,34 @@ const CancelAppointment = ({ navigation, route }) => {
   return (
 
    <SafeAreaView style={{flex:1}}>
-    <View style={styles.container}>
-      <StatusBar backgroundColor={THEMES.colors.bgColor} />
-      <Header
-        title={Strings.cancelAppointment}
-        showBack
-        bgColor="transparent"
-        fontColor={THEMES.colors.black}
-      />
-
-      <View style={styles.mainView}>
-        <InputField
-          label={""}
-          placeholderText={Strings.writeAMessage}
-          multiline={true}
-          value={reason}
-          onChange={setReason}
+      <View style={styles.container}>
+        <StatusBar backgroundColor={THEMES.colors.bgColor} />
+        <Header
+          title={Strings.cancelAppointment}
+          showBack
+          bgColor="transparent"
+          fontColor={THEMES.colors.black}
         />
-        {!isKeyboardVisible && (
-          <View style={styles.submitButton}>
-            <Button
-              onPress={onCancel}
-              title={Strings.cancelAppointment}
-              bgColor={THEMES.colors.crimsonRed}
-            />
-          </View>
-        )}
+
+        <View style={styles.mainView}>
+          <InputField
+            label={""}
+            placeholderText={Strings.writeAMessage}
+            multiline={true}
+            value={reason}
+            onChange={setReason}
+          />
+          {!isKeyboardVisible && (
+            <View style={styles.submitButton}>
+              <Button
+                onPress={onCancel}
+                title={Strings.cancelAppointment}
+                bgColor={THEMES.colors.crimsonRed}
+              />
+            </View>
+          )}
+        </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 };

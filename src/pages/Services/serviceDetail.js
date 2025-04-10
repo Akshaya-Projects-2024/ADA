@@ -12,7 +12,7 @@ import {
   Linking,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, ms } from "react-native-size-matters";
 import { goBack } from "../../navigations/rootNavigationRef";
 import Back from "../../assets/svg/back.svg";
 import Share from "../../assets/svg/share.svg";
@@ -33,12 +33,13 @@ import ShareApp from "react-native-share";
 import { contextValue } from "../../components/Loader";
 import moment from "moment";
 import Dialog from "../../components/Dialog";
+import ProfileInitial from "../../components/ProfileInitial";
 
 const ServiceDetail = ({ navigation, route }) => {
   const selectedProvider = route?.params?.selectedProvider;
   const selectedService = route?.params?.selectedService;
   const filteredData = selectedProvider?.profile?.providerDocument?.filter(
-    (item) => item.documenttype !== "companylogo"
+    (item) => item.documenttype === "documentImg"
   );
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
@@ -47,6 +48,7 @@ const ServiceDetail = ({ navigation, route }) => {
   );
   const [bookAppointmentDisabled, setBookAppointmentBtnDisbaled] = useState();
   const [modal, setModal] = useState(false);
+  console.log(JSON.stringify(selectedProvider));
 
   useEffect(() => {
     getDates();
@@ -54,13 +56,13 @@ const ServiceDetail = ({ navigation, route }) => {
 
   const share = async () => {
     try {
-      contextValue?.setLoader(true)
+      contextValue?.setLoader(true);
       let obj = {
         userid: await decryptService("userId"),
         vendor: selectedProvider?.profile?.providerBusiness?.userid,
       };
       let res = await shareProfileApi(obj);
-      contextValue?.setLoader(false)
+      contextValue?.setLoader(false);
       if (res) {
         const shareData = {
           title: "Share",
@@ -170,38 +172,38 @@ const ServiceDetail = ({ navigation, route }) => {
               paddingHorizontal: moderateScale(30),
             }}
           >
-            <View
-              style={{
-                backgroundColor: "#fff",
-                height: 105,
-                width: 97,
-                borderRadius: 12,
-                elevation: 5,
-              }}
-            >
-              {selectedProvider?.photo ? (
+            {selectedProvider?.photo ? (
+              <View
+                style={{
+                  backgroundColor: "#fff",
+                  width: moderateScale(90),
+                  height: moderateScale(90),
+                  borderRadius: 12,
+                  elevation: 5,
+                }}
+              >
                 <Image
                   style={{
-                    height: 105,
-                    width: 97,
+                    width: moderateScale(90),
+                    height: moderateScale(90),
                     borderRadius: 12,
                   }}
                   source={getBase64Obj(selectedProvider?.photo)}
                 />
-              ) : (
-                <View
-                  style={{
-                    height: 105,
-                    width: 97,
-                    borderRadius: 12,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <ProviderFallback width={80} height={100} />
-                </View>
-              )}
-            </View>
+              </View>
+            ) : (
+              <ProfileInitial
+                name={selectedProvider?.profile?.providerBusiness?.name?.trim()}
+                style={{
+                  width: moderateScale(90),
+                  height: moderateScale(90),
+                  borderRadius: 12,
+                }}
+                textStyle={{
+                  fontSize: ms(20),
+                }}
+              />
+            )}
             <View style={{ paddingLeft: moderateScale(19), width: "80%" }}>
               <Text
                 numberOfLines={3}
@@ -211,7 +213,6 @@ const ServiceDetail = ({ navigation, route }) => {
                   color: THEMES.colors.black,
                 }}
               >
-                
                 {selectedProvider?.profile?.providerBusiness?.name?.trim()}
               </Text>
               <Text
@@ -221,38 +222,36 @@ const ServiceDetail = ({ navigation, route }) => {
                   fontSize: THEMES.fonts.font14,
                   width: "90%",
                   color: THEMES.colors.black,
-                  paddingBottom:moderateScale(5)
+                  paddingBottom: moderateScale(5),
                 }}
               >
                 {selectedProvider?.service}
               </Text>
               {selectedProvider?.SessionCharges !== "0.00" && (
-                    <Text
-                      numberOfLines={2}
-                      style={{
-                        color: "#000",
-                        fontFamily: THEMES.fontFamily.regular,
-                        fontSize: THEMES.fonts.font13,
-          
-                      }}
-                    >
-                      {selectedProvider?.SessionCharges + " / " + "Per Session"}
-                    </Text>
-                  )}
-                  {selectedProvider?.MonthCharges !== "0.00" && (
-                    <Text
-                      numberOfLines={2}
-                      style={{
-                        color: "#000",
-                        fontFamily: THEMES.fontFamily.regular,
-                        fontSize: THEMES.fonts.font13,
-                        paddingTop: moderateScale(2),
-                      }}
-                    >
-                      {selectedProvider?.MonthCharges + " / " + "Per Month"}
-                    </Text>
-                  )}
-            
+                <Text
+                  numberOfLines={2}
+                  style={{
+                    color: "#000",
+                    fontFamily: THEMES.fontFamily.regular,
+                    fontSize: THEMES.fonts.font13,
+                  }}
+                >
+                  {selectedProvider?.SessionCharges + " / " + "Per Session"}
+                </Text>
+              )}
+              {selectedProvider?.MonthCharges !== "0.00" && (
+                <Text
+                  numberOfLines={2}
+                  style={{
+                    color: "#000",
+                    fontFamily: THEMES.fontFamily.regular,
+                    fontSize: THEMES.fonts.font13,
+                    paddingTop: moderateScale(2),
+                  }}
+                >
+                  {selectedProvider?.MonthCharges + " / " + "Per Month"}
+                </Text>
+              )}
             </View>
           </View>
           <View
@@ -305,7 +304,13 @@ const ServiceDetail = ({ navigation, route }) => {
                       fontSize: THEMES.fonts.font12,
                     }}
                   >
-                    {`${selectedProvider?.profile?.providerBusiness?.experience == "null" ? "0" :selectedProvider?.profile?.providerBusiness?.experience} Years`}
+                    {`${
+                      selectedProvider?.profile?.providerBusiness?.experience ==
+                      "null"
+                        ? "0"
+                        : selectedProvider?.profile?.providerBusiness
+                            ?.experience
+                    } Years`}
                   </Text>
                 </View>
                 <View
@@ -547,7 +552,6 @@ const ServiceDetail = ({ navigation, route }) => {
                         })
                   }
                 />
-                
               </View>
             </View>
           </View>

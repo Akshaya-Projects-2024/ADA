@@ -1,40 +1,55 @@
-import React, { useEffect, useMemo, useState } from "react";
+import moment from "moment";
+import { React, useEffect, useMemo, useState } from "react";
 import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
   ImageBackground,
   Linking,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { THEMES } from "../../assets/theme/themes";
-import { moderateScale, ms } from "react-native-size-matters";
 import { ScrollView } from "react-native-gesture-handler";
-import Back from "../../assets/svg/back.svg";
-import Msg from "../../assets/svg/msgSquareText.svg";
-import Call from "../../assets/svg/phoneCall.svg";
-import RightArrow from "../../assets/svg/arrowRight.svg";
-import More from "../../assets/svg/more.svg";
+import Modal from "react-native-modal";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { decryptService } from "../../utils/storageFunc";
-import { getAppointmentById } from "../../redux-store/actions/auth";
-import { contextValue } from "../../components/Loader";
+import { moderateScale, ms } from "react-native-size-matters";
 import { useSelector } from "react-redux";
-import ProfilePhoto from "../../components/ProfilePhoto";
+import RightArrow from "../../assets/svg/arrowRight.svg";
+import BlackCross from "../../assets/svg/cross.svg";
+import More from "../../assets/svg/more.svg";
+import Call from "../../assets/svg/phoneCall.svg";
+import { THEMES } from "../../assets/theme/themes";
 import BackArrowComponent from "../../components/BackArrowComponent";
+import Button from "../../components/Button";
+import Dialog from "../../components/Dialog";
+import InputField from "../../components/InputField";
+import { contextValue } from "../../components/Loader";
+import ProfilePhoto from "../../components/ProfilePhoto";
 import { AppointmentStatus } from "../../constants/enums";
-import moment from "moment";
+import Strings from "../../constants/strings";
+import {
+  completeAppointment,
+  confirmAppointment,
+  getAppointmentById,
+} from "../../redux-store/actions/auth";
+import { decryptService } from "../../utils/storageFunc";
+import { showToast } from "../../utils/utils";
+import { navigate } from "../../navigations/rootNavigationRef";
+import { useIsFocused } from "@react-navigation/native";
 
 const AppointmentDetail = (props) => {
   const selectedData = props?.route?.params?.selectedItem;
   const [appointmentData, setAppointmentData] = useState();
   const [document, setDocument] = useState();
   const profile = useSelector((state) => state?.commonReducer);
+  const [isVisible, setVisible] = useState(false);
+  const [attendedModal, setAttendedModal] = useState(false);
+  const [appointmentConfirm, setAppointmentConfirm] = useState(false);
+  const [otpInput, setOtpInput] = useState();
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    initData();
-  }, []);
+    isFocused && initData();
+  }, [isFocused]);
 
   const initData = async () => {
     try {
@@ -84,6 +99,82 @@ const AppointmentDetail = (props) => {
       return "#02bac7";
     }
     return THEMES.colors.black;
+  };
+
+  const handleAttended = async () => {
+    try {
+      contextValue?.setLoader(true);
+      if (!appointmentData) {
+        throw new Error("Please select the appointment!");
+      } else if (!otpInput) {
+        throw new Error("Please enter OTP first!");
+      } else {
+        const params = {
+          appointment_id: appointmentData?.appointment_id,
+          parent_id: appointmentData?.parentdetails?.userid,
+          provider_id: appointmentData?.provider_id,
+          otp: otpInput,
+        };
+        const res = await completeAppointment(params);
+        if (res?.status === 200) {
+          setVisible(false);
+          setAttendedModal(false);
+          setAppointmentConfirm(false);
+          setOtpInput("");
+          initData();
+        }
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {
+      contextValue?.setLoader(false);
+      showToast("error", error?.message);
+    }
+  };
+
+  const confirm = async () => {
+    try {
+      contextValue?.setLoader(true);
+      if (!appointmentData) {
+        throw new Error("Please select the appointment!");
+      } else {
+        const params = {
+          appointment_id: appointmentData?.appointment_id,
+          parent_id: appointmentData?.parentdetails?.userid,
+          provider_id: appointmentData?.provider_id,
+        };
+        const res = await confirmAppointment(params);
+        if (res?.status === 200) {
+          setVisible(false);
+          setAttendedModal(false);
+          setAppointmentConfirm(false);
+          setOtpInput("");
+          initData();
+        }
+      }
+      contextValue?.setLoader(false);
+    } catch (error) {
+      contextValue?.setLoader(false);
+      showToast("error", error?.message);
+    }
+  };
+
+  const onAppointmentClose = () => {
+    setAppointmentConfirm(false);
+  };
+
+  const onCancel = () => {
+    setVisible(false);
+    navigate("cancelAppointment", {
+      selectedItem: selectedData,
+      requestedby: "provider",
+    });
+  };
+
+  const onReschedule = () => {
+    setVisible(false);
+    navigate("rescheduleAppointment", {
+      selectedItem: selectedData,
+    });
   };
 
   return (
@@ -189,7 +280,7 @@ const AppointmentDetail = (props) => {
                   </View>
                   {Boolean(+appointmentData?.monthcharges) && (
                     <View style={{ marginLeft: ms(20) }}>
-                      <Text style={styles.chargesText}>Montly Charges </Text>
+                      <Text style={styles.chargesText}>Monthly Charges </Text>
                       <Text style={styles.chargesValue}>
                         {appointmentData?.monthcharges} / Per Month
                       </Text>
@@ -268,8 +359,184 @@ const AppointmentDetail = (props) => {
                 </View>
               </View>
             </ScrollView>
+            {Boolean(
+              ["pending", "rescheduled", "scheduled"].includes(
+                appointmentData?.status
+              )
+            ) && (
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginVertical: ms(15),
+                }}
+              >
+                <View style={{ width: "48%" }}>
+                  <Button title="Edit" onPress={() => setVisible(true)} />
+                </View>
+                <View style={{ width: "48%" }}>
+                  <Button
+                    title={
+                      appointmentData?.status === "pending"
+                        ? "Accept"
+                        : "Confirm"
+                    }
+                    onPress={() => {
+                      if (
+                        appointmentData?.status === "pending" ||
+                        appointmentData?.status === "rescheduled"
+                      ) {
+                        setAppointmentConfirm(true);
+                      } else {
+                        setAttendedModal(true);
+                      }
+                    }}
+                  />
+                </View>
+              </View>
+            )}
           </View>
         </ImageBackground>
+        <Modal
+          onBackdropPress={() => {
+            setVisible(false);
+          }}
+          isVisible={isVisible}
+          backdropOpacity={0.5}
+          style={{
+            margin: 0,
+            borderRadius: 16,
+            flex: 1,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: THEMES.colors.bgColor,
+              paddingVertical: moderateScale(24),
+              paddingHorizontal: moderateScale(24),
+              borderRadius: 16,
+              marginHorizontal: moderateScale(30),
+            }}
+          >
+            <View
+              style={{
+                justifyContent: "space-between",
+                flexDirection: "row",
+              }}
+            >
+              <Text
+                numberOfLines={2}
+                style={{
+                  color: THEMES.colors.black,
+                  fontFamily: THEMES.fontFamily.bold,
+                  fontSize: THEMES.fonts.font16,
+                  width: "70%",
+                  lineHeight: moderateScale(24),
+                }}
+              >
+                Need to Change Your Plans?
+              </Text>
+              <TouchableOpacity
+                hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
+                onPress={() => {
+                  setVisible(false);
+                }}
+              >
+                <BlackCross />
+              </TouchableOpacity>
+            </View>
+            <Text
+              style={{
+                color: THEMES.colors.black,
+                fontFamily: THEMES.fontFamily.regular,
+                fontSize: THEMES.fonts.font14,
+                paddingTop: moderateScale(16),
+                lineHeight: moderateScale(20),
+              }}
+            >
+              Do you want to cancel the appointment, or would you like to
+              reschedule it instead?
+            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingTop: moderateScale(31),
+              }}
+            >
+              <View style={{ width: "45%" }}>
+                <Button onlyBorder title="Cancel" onPress={() => onCancel()} />
+              </View>
+              <View style={{ width: "45%" }}>
+                <Button title="Reschedule" onPress={() => onReschedule()} />
+              </View>
+            </View>
+          </View>
+        </Modal>
+        <Modal
+          onBackButtonPress={() => {
+            setAttendedModal(false);
+            setOtpInput("");
+          }}
+          onBackdropPress={() => {
+            setAttendedModal(false);
+            setOtpInput("");
+          }}
+          isVisible={attendedModal}
+          backdropOpacity={0.5}
+          style={{
+            margin: 0,
+            borderRadius: 16,
+            flex: 1,
+            justifyContent: "flex-end",
+          }}
+        >
+          <View
+            style={{
+              borderTopRightRadius: 49,
+              paddingVertical: moderateScale(20),
+              backgroundColor: THEMES.colors.white,
+            }}
+          >
+            <Text
+              style={{
+                color: THEMES.colors.black,
+                paddingHorizontal: moderateScale(31),
+                fontFamily: THEMES.fontFamily.semiBold,
+              }}
+            >
+              Enter OTP to confirm
+            </Text>
+            <View
+              style={{
+                paddingTop: moderateScale(36),
+                marginHorizontal: moderateScale(24),
+              }}
+            >
+              <InputField
+                label={"Enter otp"}
+                placeholderText={"Enter otp"}
+                value={otpInput}
+                onChange={setOtpInput}
+              />
+
+              <View style={{ paddingTop: moderateScale(20) }}>
+                <Button onPress={handleAttended} title="Attended" />
+              </View>
+            </View>
+          </View>
+        </Modal>
+        <Dialog
+          flag={appointmentConfirm}
+          description={Strings.confirmAppointmentMessage}
+          leftButtonText="No"
+          rightButtonText="Yes"
+          leftButtonPressed={onAppointmentClose}
+          rightButtonPressed={confirm}
+          onClose={onAppointmentClose}
+        />
       </View>
     </SafeAreaView>
   );

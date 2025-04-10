@@ -8,27 +8,23 @@ import {
   TextInput,
   Image,
   StatusBar,
-  ActivityIndicator,
-  useWindowDimensions,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Header from "../../components/Header";
-import Filter from "../../assets/svg/funnel.svg";
 import Search from "../../assets/svg/search.svg";
 import Cross from "../../assets/svg/closeSquare.svg";
 import Star from "../../assets/svg/yellowStar.svg";
 import { moderateScale } from "react-native-size-matters";
 import { decryptService } from "../../utils/storageFunc";
 import { getProviderByService } from "../../redux-store/actions/auth";
-import { showToast, validArray } from "../../utils/utils";
+import { showToast } from "../../utils/utils";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { contextValue } from "../../components/Loader";
-import EmptyView from "../../components/EmptyView";
-import ProviderFallback from "../../assets/svg/ProviderFallback";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Bookmark from "../../assets/svg/bookmark.svg";
 import { useIsFocused } from "@react-navigation/native";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
+import ProfileInitial from "../../components/ProfileInitial";
 
 const Service = ({ navigation, route }) => {
   const selectedService = route?.params?.selectedService;
@@ -47,7 +43,6 @@ const Service = ({ navigation, route }) => {
     try {
       contextValue?.setLoader(true);
       const userId = await decryptService("userId");
-
       const params = {
         userid: userId,
         searchby: isSearch ? "name" : "service",
@@ -55,7 +50,12 @@ const Service = ({ navigation, route }) => {
       };
       const response = await getProviderByService(params);
       if (response?.status === 200) {
-        const output = response?.data?.data;
+        const output = response?.data?.data?.sort(
+          (item1, item2) =>
+            item1?.profile?.providerBusiness?.name.localeCompare(
+              item2?.profile?.providerBusiness?.name
+            )
+        );
         dataFetched.current = true;
         setFilteredData(output);
         setData(output);
@@ -78,7 +78,6 @@ const Service = ({ navigation, route }) => {
   };
 
   const renderItem = ({ item }) => {
- 
     return (
       <TouchableButtonWithPermission
         customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
@@ -176,10 +175,7 @@ const Service = ({ navigation, route }) => {
                 </View>
               </View>
             ) : (
-              <ProviderFallback
-                width={moderateScale(55)}
-                height={moderateScale(55)}
-              />
+              <ProfileInitial name={item?.profile?.providerBusiness?.name} />
             )}
 
             <View style={{ paddingLeft: moderateScale(12), width: "100%" }}>
@@ -189,7 +185,7 @@ const Service = ({ navigation, route }) => {
                   color: "#000",
                   fontFamily: THEMES.fontFamily.bold,
                   fontSize: THEMES.fonts.font14,
-                  width:'70%',
+                  width: "70%",
                 }}
               >
                 {item?.profile?.providerBusiness?.name}
@@ -249,21 +245,26 @@ const Service = ({ navigation, route }) => {
                     width: "20%",
                   }}
                 >
-                  <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-around'}}>
-                  <Star />
-                  <Text
-                    numberOfLines={1}
+                  <View
                     style={{
-                      color: "#000",
-                      fontFamily: THEMES.fontFamily.semiBold,
-                      fontSize: THEMES.fonts.font12,
-                      paddingHorizontal: moderateScale(5),
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-around",
                     }}
                   >
-                    {item?.profile?.providerRating?.rating}
-                  </Text>
+                    <Star />
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        color: "#000",
+                        fontFamily: THEMES.fontFamily.semiBold,
+                        fontSize: THEMES.fonts.font12,
+                        paddingHorizontal: moderateScale(5),
+                      }}
+                    >
+                      {item?.profile?.providerRating?.rating}
+                    </Text>
                   </View>
-                  
                 </View>
               </View>
             </View>

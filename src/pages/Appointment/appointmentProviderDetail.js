@@ -1,40 +1,39 @@
+import moment from "moment";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
   ImageBackground,
   Linking,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { THEMES } from "../../assets/theme/themes";
-import { moderateScale, ms } from "react-native-size-matters";
 import { ScrollView } from "react-native-gesture-handler";
-import Back from "../../assets/svg/back.svg";
-import Msg from "../../assets/svg/msgSquareText.svg";
-import Call from "../../assets/svg/phoneCall.svg";
-import RightArrow from "../../assets/svg/arrowRight.svg";
-import More from "../../assets/svg/more.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { decryptService } from "../../utils/storageFunc";
-import { getAppointmentById } from "../../redux-store/actions/auth";
-import { contextValue } from "../../components/Loader";
+import { moderateScale, ms } from "react-native-size-matters";
 import { useSelector } from "react-redux";
+import Call from "../../assets/svg/phoneCall.svg";
+import { THEMES } from "../../assets/theme/themes";
 import BackArrowComponent from "../../components/BackArrowComponent";
+import { contextValue } from "../../components/Loader";
+import ProfileInitial from "../../components/ProfileInitial";
 import ProfilePhoto from "../../components/ProfilePhoto";
 import { AppointmentStatus } from "../../constants/enums";
-import moment from "moment";
+import { getAppointmentById } from "../../redux-store/actions/auth";
+import { decryptService } from "../../utils/storageFunc";
+import Button from "../../components/Button";
+import { useIsFocused } from "@react-navigation/native";
 
 const AppointmentProviderDetail = (props) => {
   const selectedData = props?.route?.params?.selectedItem;
   const [appointmentData, setAppointmentData] = useState();
   const [document, setDocument] = useState();
   const profile = useSelector((state) => state?.commonReducer);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    initData();
-  }, []);
+    isFocused && initData();
+  }, [isFocused]);
 
   const initData = async () => {
     try {
@@ -114,7 +113,9 @@ const AppointmentProviderDetail = (props) => {
                 <View style={{ marginTop: 20 }}>
                   <Text style={styles.aboutPetText}>Appointment Date</Text>
                   <Text style={styles.petDescription}>
-                    {moment(appointmentData?.appointment_date).format("DD-MM-YYYY")}
+                    {moment(appointmentData?.appointment_date).format(
+                      "DD-MM-YYYY"
+                    )}
                   </Text>
 
                   <View style={{ marginTop: 20, flexDirection: "row" }}>
@@ -152,7 +153,7 @@ const AppointmentProviderDetail = (props) => {
                     </View>
                     {Boolean(+appointmentData?.monthcharges) && (
                       <View style={{ marginLeft: ms(20) }}>
-                        <Text style={styles.chargesText}>Montly Charges </Text>
+                        <Text style={styles.chargesText}>Monthly Charges </Text>
                         <Text style={styles.chargesValue}>
                           {appointmentData?.monthcharges} / Per Month
                         </Text>
@@ -169,10 +170,17 @@ const AppointmentProviderDetail = (props) => {
 
                   <View style={styles.cardView}>
                     <View style={styles.imgView}>
-                      <ProfilePhoto
-                        url={appointmentData?.providerPhoto}
-                        style={styles.img}
-                      />
+                      {Boolean(appointmentData?.providerPhoto) ? (
+                        <ProfilePhoto
+                          url={appointmentData?.providerPhoto}
+                          style={styles.img}
+                        />
+                      ) : (
+                        <ProfileInitial
+                          name={appointmentData?.providername?.trim()}
+                          style={styles.img}
+                        />
+                      )}
                     </View>
                     <View style={styles.parentDetailsView}>
                       <Text style={styles.parentText}>Provider details</Text>
@@ -200,6 +208,23 @@ const AppointmentProviderDetail = (props) => {
                 </View>
               </View>
             </ScrollView>
+            {Boolean(
+              ["pending", "scheduled", "rescheduled"].includes(
+                appointmentData?.status
+              )
+            ) && (
+              <View style={{ width: "100%", marginVertical: ms(15) }}>
+                <Button
+                  title={"Cancel Appointment"}
+                  onPress={() => {
+                    props?.navigation.navigate("cancelAppointment", {
+                      selectedItem: selectedData,
+                      requestedby: "parent",
+                    });
+                  }}
+                />
+              </View>
+            )}
           </View>
         </ImageBackground>
       </View>

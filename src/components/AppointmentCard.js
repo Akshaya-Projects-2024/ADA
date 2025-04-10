@@ -17,6 +17,7 @@ import Check from "../assets/svg/check.svg";
 import { AppointmentStatus } from "../constants/enums";
 import ProfileDummy from "../assets/svg/user.svg";
 import { decryptService } from "../utils/storageFunc";
+import ProfileInitial from "./ProfileInitial";
 
 const AppointmentCard = ({
   item,
@@ -54,6 +55,8 @@ const AppointmentCard = ({
       return "#F4511E";
     } else if (item?.status === AppointmentStatus.scheduled) {
       return "#6DAE43";
+    } else if (item?.status === AppointmentStatus.pending) {
+      return "#FD9F66";
     } else if (item?.status === AppointmentStatus.rescheduled) {
       return "#FD9F00";
     } else if (item?.status === AppointmentStatus.completed) {
@@ -117,20 +120,13 @@ const AppointmentCard = ({
                   source={getBase64Obj(item?.providerPhoto)}
                 />
               ) : (
-                <View
-                  style={{
-                    borderWidth: 1,
-                    alignItems: "center",
-                    borderColor: "gray",
-                    backgroundColor: "#fff",
-                    justifyContent: "center",
-                    width: 48,
-                    height: 48,
-                    borderRadius: 48 / 2,
+                <ProfileInitial
+                  name={item?.providername}
+                  style={styles.profileImage}
+                  textStyle={{
+                    fontSize: 11,
                   }}
-                >
-                  <ProfileDummy width={30} />
-                </View>
+                />
               )}
             </View>
           </View>
@@ -239,48 +235,56 @@ const AppointmentCard = ({
         <>
           {item?.requestedby !== "provider" ? (
             <>
-              {routeFrom &&
-              routeFrom === "parentAccount" ? null : item?.status ===
-                AppointmentStatus.pending ? (
-                <View style={styles.row}>
-                  <Pressable
-                    onPress={() => {
-                      setSelectedItem(item);
-                      setVisible(true);
-                    }}
-                  >
-                    <Cross width={24} height={24} />
-                  </Pressable>
-                  <Pressable
-                    style={{ marginLeft: moderateScale(12) }}
-                    onPress={() => {
-                      setSelectedItem(item);
-                      setAppointmentConfirm(true);
-                    }}
-                  >
-                    <Check width={24} height={24} />
-                  </Pressable>
-                </View>
+              {item?.status === AppointmentStatus.pending ? (
+                routeFrom && routeFrom === "parentAccount" ? (
+                  <Text style={(styles.statusText, { color: itemtextColor })}>
+                    Pending
+                  </Text>
+                ) : (
+                  <View style={styles.row}>
+                    <Pressable
+                      onPress={() => {
+                        setSelectedItem(item);
+                        setVisible(true);
+                      }}
+                    >
+                      <Cross width={24} height={24} />
+                    </Pressable>
+                    <Pressable
+                      style={{ marginLeft: moderateScale(12) }}
+                      onPress={() => {
+                        setSelectedItem(item);
+                        setAppointmentConfirm(true);
+                      }}
+                    >
+                      <Check width={24} height={24} />
+                    </Pressable>
+                  </View>
+                )
               ) : null}
               {item?.status === AppointmentStatus.cancelled ? (
                 <Text style={[styles.statusText, { color: itemtextColor }]}>
                   Cancelled
                 </Text>
               ) : null}
-              {routeFrom &&
-              routeFrom == "parentAccount" ? null : item?.status ===
-                AppointmentStatus.scheduled ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    setSelectedItem(item);
-                    setAttendedModal(true);
-                  }}
-                  style={styles.confirmButton}
-                >
-                  <Text style={(styles.statusText, { color: itemtextColor })}>
-                    Confirm
+              {item?.status === AppointmentStatus.scheduled ? (
+                routeFrom && routeFrom == "parentAccount" ? (
+                  <Text style={[styles.statusText, { color: itemtextColor }]}>
+                    {item?.status}
                   </Text>
-                </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedItem(item);
+                      setAttendedModal(true);
+                    }}
+                    style={styles.confirmButton}
+                  >
+                    <Text style={(styles.statusText, { color: itemtextColor })}>
+                      Confirm
+                    </Text>
+                  </TouchableOpacity>
+                )
               ) : null}
               {item?.status === AppointmentStatus.rescheduled ? (
                 <Text
@@ -428,6 +432,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: THEMES.fonts.font12,
     fontFamily: THEMES.fontFamily.bold,
+    textTransform: "capitalize",
   },
   profileTypeText: {
     fontSize: THEMES.fonts.font10,

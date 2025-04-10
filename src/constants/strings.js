@@ -94,7 +94,7 @@ const Strings = {
   reply: "Reply",
   edit: "Edit",
   appointments: "Appointments",
-  cancelAppointment: "Cancel appointment",
+  cancelAppointment: "Cancel Appointment",
   writeAMessage: "Write message to the client for the cancelation reason.",
   writeAMessageForReschedule:
     "Write message to the client for the rescheduling reason.",

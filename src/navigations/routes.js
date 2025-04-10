@@ -48,6 +48,7 @@ import AlertList from "../pages/Alerts/AlertList";
 import LostAlertdetail from "../pages/Alerts/lostAlertDetail";
 import RescueAlertDetail from "../pages/Alerts/resuceAlertDetail";
 import MedicalAlertDetail from "../pages/Alerts/MedicalAlertDetail";
+import CancelAppointment from "../pages/Appointment/cancelAppointment";
 
 const Stack = createStackNavigator();
 
@@ -334,6 +335,11 @@ const Routes = (props) => {
         <Stack.Screen
           name="addEditActivity"
           component={AddEditActivity}
+          options={navOptionHandler}
+        />
+        <Stack.Screen
+          name="cancelAppointment"
+          component={CancelAppointment}
           options={navOptionHandler}
         />
       </Stack.Navigator>

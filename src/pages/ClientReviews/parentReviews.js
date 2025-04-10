@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
 import Header from "../../components/Header";
-import { moderateScale, s } from "react-native-size-matters";
+import { moderateScale } from "react-native-size-matters";
 import StarRating from "react-native-star-rating";
 import Modal from "react-native-modal";
 import InputField from "../../components/InputField";
@@ -21,12 +21,9 @@ import Button from "../../components/Button";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   addReview,
-  getAllReviews,
-  replyReviewApi,
   reviewGiven,
 } from "../../redux-store/actions/reviews";
 import {
-  findDifferenceByDays,
   findDifferenceByDaysAndTime,
   showToast,
 } from "../../utils/utils";
@@ -35,11 +32,9 @@ import { useSelector } from "react-redux";
 import { contextValue } from "../../components/Loader";
 import { AirbnbRating } from "react-native-ratings";
 import { normalize, vh } from "../../utils/dimensions";
-import ProviderFallback from "../../assets/svg/ProviderFallback";
 import { getBase64Obj } from "../../utils/documentUtils";
 import CrossIcon from "../../assets/svg/CrossIcon";
-import DropDown from "../../components/DropDown";
-import DropDownField from "../../components/DropDown";
+import ProfileInitial from "../../components/ProfileInitial";
 
 const ParentReviews = (props) => {
   const vendorId =
@@ -145,9 +140,17 @@ const ParentReviews = (props) => {
                       source={getBase64Obj(selectedItem?.providerPhoto)}
                     />
                   ) : (
-                    <ProviderFallback
-                      width={moderateScale(52)}
-                      height={moderateScale(55)}
+                    <ProfileInitial
+                      name={
+                        selectedItem?.providername?.trim()
+                          ? selectedItem?.providername?.trim()
+                          : guestUser
+                      }
+                      style={{
+                        width: moderateScale(52),
+                        height: moderateScale(52),
+                        borderRadius: moderateScale(52 / 2),
+                      }}
                     />
                   )}
                 </View>
@@ -394,9 +397,13 @@ const ParentReviews = (props) => {
                       source={getBase64Obj(selectedItem?.providerPhoto)}
                     />
                   ) : (
-                    <ProviderFallback
-                      width={moderateScale(52)}
-                      height={moderateScale(52)}
+                    <ProfileInitial
+                      style={{
+                        width: moderateScale(52),
+                        height: moderateScale(52),
+                        borderRadius: moderateScale(52) / 2,
+                      }}
+                      name={selectedItem?.providername?.trim()}
                     />
                   )}
                 </View>

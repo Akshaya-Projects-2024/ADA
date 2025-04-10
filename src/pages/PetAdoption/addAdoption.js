@@ -241,7 +241,7 @@ const AddAdoption = (props) => {
           if (selectedPlatforms) {
             await shareImageBase64(response?.data?.data, selectedPlatforms);
           }
-          showToast("success", "Data Added Successfully");
+          showToast("success", res.data.data);
           navigation.goBack();
         }
         contextValue?.setLoader(false);
