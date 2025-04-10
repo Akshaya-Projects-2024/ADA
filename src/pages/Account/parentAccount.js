@@ -388,9 +388,19 @@ const ParentAccount = (props) => {
                     : Strings.guest}
                 </Text>
                 <Text style={styles.premiumMemberText}>
-                  {profile?.[
+                  {(profile?.[
+                    isServiceProvider ? "providerProfile" : "parentProfie"
+                  ]?.parentContact?.id !== 0 ||
+                  profile?.[
+                    isServiceProvider ? "providerProfile" : "parentProfie"
+                  ]?.petDetails?.length !== 0 ) &&
+                  profile?.[
                     isServiceProvider ? "providerProfile" : "parentProfie"
                   ]?.subscription?.status == "inactive"
+                    ? "Limited Access User"
+                    : profile?.[
+                        isServiceProvider ? "providerProfile" : "parentProfie"
+                      ]?.subscription?.status == "inactive"
                     ? Strings.guestUser
                     : Strings.premiumMemmber}
                 </Text>

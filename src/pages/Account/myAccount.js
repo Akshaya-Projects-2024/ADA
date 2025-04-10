@@ -64,6 +64,36 @@ const MyAccount = (props) => {
   const [featureList, setFeatureList] = useState([]);
   const [profilePhoto, setProfilePhoto] = useState("");
   const dispatch = useDispatch();
+  const isServiceProvider = loggedInModule === LoginModules.provider;
+
+  const hasAnyProfileData =
+     profile?.[
+    isServiceProvider ? "providerProfile" : "parentProfie"
+  ]?.MediaLinks?.id !== 0 ||
+     profile?.[
+    isServiceProvider ? "providerProfile" : "parentProfie"
+  ]?.ProviderSession?.id !== 0 ||
+     profile?.[
+    isServiceProvider ? "providerProfile" : "parentProfie"
+  ]?.providerBusiness?.id !== 0 ||
+     profile?.[
+    isServiceProvider ? "providerProfile" : "parentProfie"
+  ]?.providerContact?.id !== 0 ||
+     profile?.[
+    isServiceProvider ? "providerProfile" : "parentProfie"
+  ]?.providerDocument?.length !== 0 ||
+     profile?.[
+    isServiceProvider ? "providerProfile" : "parentProfie"
+  ]?.sessionDetails?.length !== 0 ||
+     profile?.[
+    isServiceProvider ? "providerProfile" : "parentProfie"
+  ]?.sessionRateDetails?.length !== 0;
+
+  const isInactive =
+    profile?.[isServiceProvider ? "providerProfile" : "parentProfie"]
+      ?.subscription?.status == "inactive";
+
+  let userType;
 
   useFocusEffect(
     React.useCallback(() => {
@@ -424,6 +454,26 @@ const MyAccount = (props) => {
                     </Text>
                   ) : null}
                 </View>
+                {console.log(
+                  profile?.[
+                    isServiceProvider ? "providerProfile" : "parentProfie"
+                  ]
+                )}
+                <Text
+                  style={{
+                    fontSize: THEMES.fonts.font12,
+                    color: THEMES.colors.outrageousOrange,
+                    fontFamily: THEMES.fontFamily.semiBold,
+                    paddingTop: moderateScale(4),
+                  }}
+                >
+                
+                  {hasAnyProfileData && isInactive
+                    ? "Limited Access User"
+                    : isInactive
+                    ? Strings.guestUser
+                    : Strings?.premiumMemmber}
+                </Text>
               </View>
               <View style={styles.padding14}>
                 <View style={styles.contentView}>
@@ -441,7 +491,8 @@ const MyAccount = (props) => {
                     Strings.paymentSubScription,
                     "",
                     "paymentsSubscription",
-                    profile?.providerProfile?.subscription?.status == "inactive",
+                    profile?.providerProfile?.subscription?.status ==
+                      "inactive",
                     false,
                     profile?.providerProfile?.subscription?.status == "expired"
                   )}
