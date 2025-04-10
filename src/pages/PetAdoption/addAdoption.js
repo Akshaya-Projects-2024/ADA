@@ -65,7 +65,7 @@ const AddAdoption = (props) => {
   const [date, selectedDate] = useState();
   const [selectedCategory, setSelectedCategory] = useState();
   const [facebook, setFacebook] = useState();
-  const [instagram, setInstagram] = useState();
+  // const [instagram, setInstagram] = useState();
   const [whatsup, setWhatsup] = useState();
   const [categoryList, setCategoryList] = useState([]);
   const [petData, setPetData] = useState([]);
@@ -157,14 +157,14 @@ const AddAdoption = (props) => {
           await Share.open(shareData);
         }
 
-        if (platform == "INSTAGRAM") {
-          const shareData = {
-            title: "Share on instagram",
-            message: "Check out this image!",
-            url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
-          };
-          await Share.open(shareData);
-        }
+        // if (platform == "INSTAGRAM") {
+        //   const shareData = {
+        //     title: "Share on instagram",
+        //     message: "Check out this image!",
+        //     url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
+        //   };
+        //   await Share.open(shareData);
+        // }
 
         if (platform == "WHATSUP") {
           const shareData = {
@@ -615,7 +615,7 @@ const AddAdoption = (props) => {
                   }}
                   rightText={"Facebook"}
                 />
-                <CheckBox
+                {/* <CheckBox
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}
                   onClick={() => {
@@ -630,7 +630,7 @@ const AddAdoption = (props) => {
                     fontSize: THEMES.fonts.font12,
                     fontFamily: THEMES.fontFamily.medium,
                   }}
-                />
+                /> */}
                 <CheckBox
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}

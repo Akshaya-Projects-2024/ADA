@@ -41,6 +41,7 @@ import { contextValue } from "../../components/Loader";
 import { validateInput } from "../../utils/validation";
 import { useSelector } from "react-redux";
 import { LoginModules } from "../../constants/enums";
+import Dialog from "../../components/Dialog";
 
 const RescueHelp = (props) => {
   const { profile, parentProfie } = useSelector(
@@ -48,7 +49,7 @@ const RescueHelp = (props) => {
   );
   const selectedData = props.route?.params?.selectedData;
   const { petDetails } = parentProfie;
-  const [selectedGender, setSelectedGender] = useState(null);
+  const [selectedGender, setSelectedGender] = useState(selectedData?.gender);
   const [petImage, setPetImage] = useState([]);
   const [petImagesVisible, setPetImageVisible] = useState(false);
   const [isDateVisible, setDateVisibility] = useState(false);
@@ -57,7 +58,7 @@ const RescueHelp = (props) => {
   const [facebook, setFacebook] = useState();
   const [instagram, setInstagram] = useState();
   const [whatsup, setWhatsup] = useState();
-  const [petName, setPetName] = useState(   selectedData?.name);
+  const [petName, setPetName] = useState(selectedData?.name);
   const [location, setLocation] = useState();
   const [feature, setFeature] = useState();
   const [message, setMessage] = useState();
@@ -66,8 +67,14 @@ const RescueHelp = (props) => {
   const [petId, setPetId] = useState([]);
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
   const { loggedInModule } = useSelector((state) => state?.register);
+  const [modal, setModal] = useState(false);
 
-
+  useEffect(() => {
+    const profilePhoto = selectedData?.documents?.filter(
+      (item) => item.documenttype === "profilePhoto"
+    );
+    setPetImage([profilePhoto?.[0]?.url]);
+  }, []);
 
   const hideDatePickerCancel = () => {
     setDateVisibility(false);
@@ -104,6 +111,8 @@ const RescueHelp = (props) => {
         dataId.push({ id: res?.data?.data?.reqId });
         setPetId(dataId);
         contextValue?.setLoader(false);
+      }else{
+        contextValue?.setLoader(false);
       }
     } catch (error) {
       contextValue?.setLoader(false);
@@ -130,15 +139,6 @@ const RescueHelp = (props) => {
       // await Share.open(shareData);
       for (const platform of platforms) {
         if (platform == "FACEBOOK") {
-          const shareData = {
-            title: "Attention Required !!",
-            message: message,
-            url: `data:image/jpeg;base64,${image}`, // Base64 encoded image
-          };
-          await Share.open(shareData);
-        }
-
-        if (platform == "INSTAGRAM") {
           const shareData = {
             title: "Attention Required !!",
             message: message,
@@ -195,13 +195,13 @@ const RescueHelp = (props) => {
           audience: "Public",
           features: feature,
           contactnum: contactNo,
-          message: message,
+          message: "",
           documents: petId.map((item) => item.id).join(","),
           requesttype: "rescue",
           coordinates: `${currentPosition?.coords.latitude},${currentPosition.coords.longitude}`,
           usertype:
             loggedInModule === LoginModules.provider ? "provider" : "parent",
-            petid: selectedData?.id,
+          petid: selectedData?.id,
         };
         let res = await AddLostPetAlert(obj);
         if (Boolean(res?.image)) {
@@ -209,9 +209,7 @@ const RescueHelp = (props) => {
             await shareImageBase64(res?.image, selectedPlatforms);
           }
           contextValue?.setLoader(false);
-          showToast("success", "Rescue Pet Alert has successfully created");
-          goBack();
-         
+         setModal(true);
         }
       }
     } catch (error) {
@@ -221,14 +219,26 @@ const RescueHelp = (props) => {
   };
 
   const renderItem = (item, index) => {
-    const photo = item?.item.fileData;
+    const type =
+      typeof item?.item === "string" && item?.item.startsWith("https://");
+    const photo = item?.item?.fileData;
+
     return (
       <View style={styles.imgContent}>
-        <Image
-          style={styles.img}
-          resizeMode="contain"
-          source={getBase64Obj(photo)}
-        />
+        {type ? (
+          <Image
+            style={styles.img}
+            resizeMode="contain"
+            source={{ uri: item?.item }}
+          />
+        ) : (
+          <Image
+            style={styles.img}
+            resizeMode="contain"
+            source={getBase64Obj(photo)}
+          />
+        )}
+
         <TouchableOpacity
           onPress={() => {
             onCancel(DOCUMENT_TYPES.image, item?.item);
@@ -284,11 +294,11 @@ const RescueHelp = (props) => {
           >
             <View
               style={{
-                paddingHorizontal:moderateScale(16),
+                paddingHorizontal: moderateScale(16),
                 paddingTop: moderateScale(24),
               }}
             >
-             <InputField
+              <InputField
                 label={"Pet Name*"}
                 placeholderText={"Enter Pet name"}
                 value={petName}
@@ -622,6 +632,19 @@ const RescueHelp = (props) => {
           mode="date"
           onConfirm={handleDateConfirm}
           onCancel={hideDatePickerCancel}
+        />
+        <Dialog
+          flag={modal}
+          title={"✨ Alert Created Successfully!✨"}
+          description={"Congratulations! Your alert has been created!"}
+          rightButtonText="Go back"
+          rightButtonPressed={() => {
+            setModal(false);
+            goBack();
+          }}
+          onClose={() => {
+            setModal(false);
+          }}
         />
       </View>
     </SafeAreaView>

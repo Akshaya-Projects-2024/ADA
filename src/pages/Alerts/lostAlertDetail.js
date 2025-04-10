@@ -217,7 +217,7 @@ const LostAlertdetail = (props) => {
                       justifyContent: "space-between",
                     }}
                   >
-                    <View>
+                    <View style={{width:'45%'}}>
                       <Text style={styles.lastSeenText}>Last Seen Date : </Text>
                       <Text
                         numberOfLines={2}
@@ -233,7 +233,7 @@ const LostAlertdetail = (props) => {
                       </Text>
                     </View>
 
-                    <View>
+                    <View style={{width:'45%'}}>
                       <Text style={styles.lastSeenText}>
                         Last Seen Location :{" "}
                       </Text>
@@ -252,7 +252,7 @@ const LostAlertdetail = (props) => {
                     </View>
                   </View>
 
-                  <View>
+                
                     <View>
                       <Text style={styles.lastSeenText}>Message : </Text>
                       <Text
@@ -268,72 +268,9 @@ const LostAlertdetail = (props) => {
                         {selectedAdotpionData?.message}
                       </Text>
                     </View>
-                  </View>
+       
 
-                  {Boolean(selectedAdotpionData?.documents?.length) && (
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          paddingTop: moderateScale(10),
-                          alignItems: "center",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color: THEMES.colors.darkGrey,
-                            fontFamily: THEMES.fontFamily.semiBold,
-                            fontSize: THEMES.fonts.font12,
-                            paddingRight: moderateScale(8),
-                          }}
-                        >
-                          Documents
-                        </Text>
-                        <RightArrow stroke="#000" />
-                      </View>
-                    )}
-
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      paddingBottom: moderateScale(18),
-                      paddingTop:moderateScale(10)
-                    }}
-                  >
-                 
-                    <ScrollView
-                      horizontal={true}
-                      style={{ flex: 1 }}
-                      bounces={false}
-                      showsHorizontalScrollIndicator={false}
-                      showsVerticalScrollIndicator={false}
-                    >
-                      {selectedAdotpionData?.documents?.map((item, index) => {
-                        return (
-                          <TouchableOpacity
-                            onPress={() => Linking.openURL(item.url)}
-                            style={{
-                              marginLeft: index === 0 ? 0 : moderateScale(10),
-                              paddingHorizontal: moderateScale(10),
-                              paddingVertical: moderateScale(8),
-                              borderWidth: 1,
-                              borderColor: "transparent",
-                              borderRadius: 8,
-                              backgroundColor: "#d6f2f5",
-                            }}
-                          >
-                            <Text
-                              style={{
-                                fontFamily: THEMES.fontFamily.semiBold,
-                                color: THEMES.colors.black,
-                                fontSize: THEMES.fonts.font12,
-                                textTransform: "capitalize",
-                              }}
-                            >{`Certificate ${index + 1}`}</Text>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </ScrollView>
-                  </View>
+            
 
                   <View style={styles.cardView}>
                     <View style={styles.imgView}>
@@ -565,7 +502,7 @@ const styles = StyleSheet.create({
   },
   location: {
     color: THEMES.colors.black,
-    fontFamily: THEMES.fontFamily.regular,
+    fontFamily: THEMES.fontFamily.medium,
     fontSize: THEMES.fonts.font12,
     paddingTop: moderateScale(5),
   },
