@@ -41,6 +41,7 @@ import { validateInput } from "../../utils/validation";
 import { useSelector } from "react-redux";
 import { LoginModules } from "../../constants/enums";
 import Dialog from "../../components/Dialog";
+import { StackActions } from "@react-navigation/native";
 
 const OtherLostPetAlert = (props) => {
   const [selectedGender, setSelectedGender] = useState(null);
@@ -204,6 +205,12 @@ const OtherLostPetAlert = (props) => {
       contextValue?.setLoader(false);
     }
   };
+
+  const handleGoBack = () => {
+    setModal(false);
+    return props.navigation.dispatch(StackActions.pop(2));
+  };
+
 
   const renderItem = (item, index) => {
     const photo = item?.item.fileData;
@@ -576,10 +583,7 @@ const OtherLostPetAlert = (props) => {
           title={"✨ Alert Created Successfully!✨"}
           description={"Congratulations! Your alert has been created!"}
           rightButtonText="Go back"
-          rightButtonPressed={() => {
-            setModal(false);
-            goBack();
-          }}
+          rightButtonPressed={handleGoBack}
           onClose={() => {
             setModal(false);
           }}

@@ -98,7 +98,7 @@ const AlertList = (props) => {
             navigate("resuceAlertDetail", {
               selectedData: item,
             });
-          }else if (item?.requesttype == "medical") {
+          } else if (item?.requesttype == "medical") {
             navigate("medicalAlertDetail", {
               selectedData: item,
             });
@@ -216,11 +216,7 @@ const AlertList = (props) => {
               customMsgForRegistration={
                 "Registered and Subscribed to enjoy all the exciting features of ADA app."
               }
-              onPress={() =>
-                props.navigation.navigate("auth", {
-                  screen: "emergencyAlert",
-                })
-              }
+              onPress={() => props.navigation.navigate("emergencyAlert")}
               style={{
                 marginLeft: moderateScale(13),
                 backgroundColor: THEMES.colors.white,
@@ -250,7 +246,9 @@ const AlertList = (props) => {
             bounces={false}
             renderItem={renderItem}
             keyExtractor={(item, index) => index.toString()}
-            ListEmptyComponent={dataFetched.current == true ? null :EmptyContentView}
+            ListEmptyComponent={
+              dataFetched.current == true ? null : EmptyContentView
+            }
             contentContainerStyle={{ flexGrow: 1 }}
           />
         </View>

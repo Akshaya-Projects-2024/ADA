@@ -41,6 +41,7 @@ import { validateInput } from "../../utils/validation";
 import { useSelector } from "react-redux";
 import { LoginModules } from "../../constants/enums";
 import Dialog from "../../components/Dialog";
+import { StackActions } from "@react-navigation/native";
 
 const OtherRescueHelpAlert = (props) => {
   const [petImage, setPetImage] = useState([]);
@@ -239,6 +240,12 @@ const OtherRescueHelpAlert = (props) => {
       showToast("error", error.message);
     }
   };
+
+  const handleGoBack = () => {
+    setModal(false);
+    return props.navigation.dispatch(StackActions.pop(2));
+  };
+
 
   const handleSelection = (platform, isChecked) => {
     if (isChecked) {
@@ -552,10 +559,7 @@ const OtherRescueHelpAlert = (props) => {
           title={"✨ Alert Created Successfully!✨"}
           description={"Congratulations! Your alert has been created!"}
           rightButtonText="Go back"
-          rightButtonPressed={() => {
-            setModal(false);
-            goBack();
-          }}
+          rightButtonPressed={handleGoBack}
           onClose={() => {
             setModal(false);
           }}
