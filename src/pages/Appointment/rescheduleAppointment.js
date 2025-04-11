@@ -12,7 +12,7 @@ import {
 import { THEMES } from "../../assets/theme/themes";
 import Strings from "../../constants/strings";
 import Header from "../../components/Header";
-import { moderateScale, s } from "react-native-size-matters";
+import { moderateScale } from "react-native-size-matters";
 import InputField from "../../components/InputField";
 import Button from "../../components/Button";
 import Calendars from "../../assets/svg/calendar.svg";
@@ -142,7 +142,8 @@ const RescheduleAppointment = ({ navigation, route }) => {
       };
 
       const res = await getProviderSlots(params);
-      if (res?.status === 200) {
+
+      if (res?.status == 200) {
         const data = res?.data?.data;
         setTimeSlots(data);
       }
@@ -162,7 +163,7 @@ const RescheduleAppointment = ({ navigation, route }) => {
       contextValue?.setLoader(true);
       if (!date) {
         throw new Error("Please select valid date");
-      } else if (!selectedSlot.start_time) {
+      } else if (!selectedSlot?.start_time) {
         throw new Error("Please provide valid time");
       } else if (!reason) {
         throw new Error("Please provide valid reason");
@@ -172,8 +173,8 @@ const RescheduleAppointment = ({ navigation, route }) => {
           parent_id: selectedItem?.parentdetails?.userid,
           provider_id: selectedItem?.provider_id,
           appointment_date: moment(date, "DD/MM/YYYY").format("YYYY-MM-DD"),
-          start_time: selectedSlot.start_time,
-          end_time: selectedSlot.end_time,
+          start_time: selectedSlot?.start_time,
+          end_time: selectedSlot?.end_time,
           status: "rescheduled",
           notes: reason,
           requestedby: "provider",
@@ -181,6 +182,7 @@ const RescheduleAppointment = ({ navigation, route }) => {
         };
         const res = await rescheduleAppointment(params);
         if (res?.status === 200) {
+          showToast("success", res?.data?.data);
           navigation.goBack();
         }
       }
@@ -454,6 +456,21 @@ const RescheduleAppointment = ({ navigation, route }) => {
                 </View>
               </View>
             ) : null}
+            {Boolean(date && !Object.keys(timeSlots)?.length) && (
+              <View
+                style={{ paddingTop: moderateScale(30), alignItems: "center" }}
+              >
+                <Text
+                  style={{
+                    color: THEMES.colors.red,
+                    fontFamily: THEMES.fontFamily.regular,
+                    fontSize: THEMES.fonts.font14,
+                  }}
+                >
+                  No slots available for selected date
+                </Text>
+              </View>
+            )}
           </>
           <View style={{ paddingTop: moderateScale(45) }}>
             <InputField
@@ -467,7 +484,11 @@ const RescheduleAppointment = ({ navigation, route }) => {
         </View>
         {!isKeyboardVisible && (
           <View style={styles.submitButton}>
-            <Button title={Strings.sendRequest} onPress={onSubmit} />
+            <Button
+              title={Strings.sendRequest}
+              onPress={onSubmit}
+              disabled={Boolean(date && !Object.keys(timeSlots)?.length)}
+            />
           </View>
         )}
         <DateTimePicker

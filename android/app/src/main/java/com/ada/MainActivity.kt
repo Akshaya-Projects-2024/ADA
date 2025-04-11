@@ -54,7 +54,7 @@ class MainActivity : ReactActivity() {
 
             val channelTypes = listOf(
                 "meal", "walking", "running", "training",
-                "vaccination", "potty", "custom", "medication","default"
+                "vaccination", "potty", "custom", "medication","defaultnotification"
             )
 
             val manager = getSystemService(NotificationManager::class.java)

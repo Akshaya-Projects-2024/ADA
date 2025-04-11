@@ -65,7 +65,7 @@ const SelectAppointment = ({ navigation, route }) => {
       } else if (!profile?.parentProfie?.petDetails[0]?.id) {
         throw new Error("No pet found in your profile");
       } else if (
-        selectedProvider?.profile?.providerBusiness?.userid == userId
+        selectedProvider?.profile?.providerBusiness?.userid?.toLowerCase() == userId?.toLowerCase()
       ) {
         throw new Error("You can't book an appointment with yourself.");
       } else {
