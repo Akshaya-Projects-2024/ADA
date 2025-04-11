@@ -235,11 +235,11 @@ const AuthStack = () => (
       options={navOptionHandler}
     />
 
-    <AuthStacks.Screen
+    {/* <AuthStacks.Screen
       name="emergencyAlert"
       component={EmergencyAlert}
       options={navOptionHandler}
-    />
+    /> */}
 
     <AuthStacks.Screen
       name="alertList"

@@ -299,12 +299,12 @@ const Routes = (props) => {
           component={EmergencyAlert}
           options={navOptionHandler}
         />
-
+{/* 
         <Stack.Screen
           name="alertList"
           component={AlertList}
           options={navOptionHandler}
-        />
+        /> */}
 
         <Stack.Screen
           name="notification"
