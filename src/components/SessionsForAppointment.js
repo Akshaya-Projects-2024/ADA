@@ -27,6 +27,7 @@ const SessionsForAppointment = ({
   selectedProviderId,
   handleSubmit,
   buttonTitle = "Confirm",
+  isrequestedbyProvider = false,
 }) => {
   const [sessionSelection, setSessionSelection] = useState(
     SESSION_TYPE.oneTime
@@ -211,17 +212,24 @@ const SessionsForAppointment = ({
   }, [startDate]);
 
   return (
-    <View style={styles.flex}>
+    <View style={[styles.flex]}>
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
       >
-        <Pressable onPress={handleSwitch} style={styles.switchStyle}>
+        <Pressable
+          onPress={handleSwitch}
+          style={[
+            styles.switchStyle,
+            isrequestedbyProvider && { marginHorizontal: 0 },
+          ]}
+        >
           <Text
             style={[
               styles.headerTextV2,
               { opacity: sessionSelection === SESSION_TYPE.oneTime ? 1 : 0.16 },
+              isrequestedbyProvider && { marginHorizontal: 0 },
             ]}
           >
             {Strings.oneSession}
@@ -289,11 +297,20 @@ const SessionsForAppointment = ({
             {validArray(weekDates) ? (
               <View
                 style={{
-                  marginHorizontal: moderateScale(14),
+                  marginHorizontal: isrequestedbyProvider
+                    ? 0
+                    : moderateScale(14),
                   paddingTop: moderateScale(20),
                 }}
               >
-                <Text style={styles.headerText}>Date</Text>
+                <Text
+                  style={[
+                    styles.headerText,
+                    isrequestedbyProvider && { marginHorizontal: 0 },
+                  ]}
+                >
+                  Date
+                </Text>
                 <ScrollView
                   horizontal
                   bounces={false}
@@ -311,6 +328,10 @@ const SessionsForAppointment = ({
                           styles.dateContainer,
                           isSelected ? styles.selectedDate : null, // Highlight selected date
                           isToday && !isSelected ? styles.activeDate : null, // Highlight current date if it's not selected
+                          isrequestedbyProvider && {
+                            marginHorizontal: 0,
+                            marginRight: moderateScale(10),
+                          },
                         ]}
                       >
                         <Text
@@ -344,19 +365,25 @@ const SessionsForAppointment = ({
             <>
               {validArray(memorizedSlots?.morning) ? (
                 <View
-                  style={{
-                    paddingTop: moderateScale(20),
-                    paddingHorizontal: moderateScale(16),
-                  }}
+                  style={[
+                    {
+                      paddingTop: moderateScale(20),
+                      paddingHorizontal: moderateScale(16),
+                    },
+                    isrequestedbyProvider && { paddingHorizontal: 0 },
+                  ]}
                 >
                   <Text
-                    style={{
-                      color: THEMES.colors.black,
-                      fontFamily: THEMES.fontFamily.semiBold,
-                      fontSize: THEMES.fonts.font14,
-                      paddingBottom: moderateScale(5),
-                      paddingHorizontal: moderateScale(5),
-                    }}
+                    style={[
+                      {
+                        color: THEMES.colors.black,
+                        fontFamily: THEMES.fontFamily.semiBold,
+                        fontSize: THEMES.fonts.font14,
+                        paddingBottom: moderateScale(5),
+                        paddingHorizontal: moderateScale(5),
+                      },
+                      isrequestedbyProvider && { paddingHorizontal: 0 },
+                    ]}
                   >
                     Morning
                   </Text>
@@ -373,6 +400,7 @@ const SessionsForAppointment = ({
                             !slot?.isbooked &&
                             !slot?.isslotpast &&
                             styles.selectedSlotStyle,
+                          isrequestedbyProvider && { marginHorizontal: 0 },
                         ]}
                         onPress={() => selectTimeSlot(slot)}
                         disabled={slot?.isbooked || slot?.isslotpast} // Disable if the slot is marked as disabled
@@ -401,19 +429,25 @@ const SessionsForAppointment = ({
 
               {validArray(memorizedSlots?.afternoon) ? (
                 <View
-                  style={{
-                    paddingTop: moderateScale(20),
-                    paddingHorizontal: moderateScale(16),
-                  }}
+                  style={[
+                    {
+                      paddingTop: moderateScale(20),
+                      paddingHorizontal: moderateScale(16),
+                    },
+                    isrequestedbyProvider && { paddingHorizontal: 0 },
+                  ]}
                 >
                   <Text
-                    style={{
-                      color: THEMES.colors.black,
-                      fontFamily: THEMES.fontFamily.semiBold,
-                      fontSize: THEMES.fonts.font14,
-                      paddingBottom: moderateScale(5),
-                      paddingHorizontal: moderateScale(5),
-                    }}
+                    style={[
+                      {
+                        color: THEMES.colors.black,
+                        fontFamily: THEMES.fontFamily.semiBold,
+                        fontSize: THEMES.fonts.font14,
+                        paddingBottom: moderateScale(5),
+                        paddingHorizontal: moderateScale(5),
+                      },
+                      isrequestedbyProvider && { paddingHorizontal: 0 },
+                    ]}
                   >
                     Afternoon
                   </Text>
@@ -431,6 +465,10 @@ const SessionsForAppointment = ({
                             !slot?.isbooked &&
                             !slot?.isslotpast &&
                             styles.selectedSlotStyle,
+                          isrequestedbyProvider && {
+                            marginHorizontal: 0,
+                            marginRight: moderateScale(10),
+                          },
                         ]}
                         onPress={() => selectTimeSlot(slot)}
                         disabled={slot?.isbooked || slot?.isslotpast} // Disable if the slot is marked as disabled
@@ -458,19 +496,25 @@ const SessionsForAppointment = ({
               ) : null}
               {validArray(memorizedSlots?.evening) ? (
                 <View
-                  style={{
-                    paddingTop: moderateScale(20),
-                    paddingHorizontal: moderateScale(16),
-                  }}
+                  style={[
+                    {
+                      paddingTop: moderateScale(20),
+                      paddingHorizontal: moderateScale(16),
+                    },
+                    isrequestedbyProvider && { paddingHorizontal: 0 },
+                  ]}
                 >
                   <Text
-                    style={{
-                      color: THEMES.colors.black,
-                      fontFamily: THEMES.fontFamily.semiBold,
-                      fontSize: THEMES.fonts.font14,
-                      paddingBottom: moderateScale(5),
-                      paddingHorizontal: moderateScale(5),
-                    }}
+                    style={[
+                      {
+                        color: THEMES.colors.black,
+                        fontFamily: THEMES.fontFamily.semiBold,
+                        fontSize: THEMES.fonts.font14,
+                        paddingBottom: moderateScale(5),
+                        paddingHorizontal: moderateScale(5),
+                      },
+                      isrequestedbyProvider && { paddingHorizontal: 0 },
+                    ]}
                   >
                     Evening
                   </Text>
@@ -487,6 +531,10 @@ const SessionsForAppointment = ({
                             !slot?.isbooked &&
                             !slot?.isslotpast &&
                             styles.selectedSlotStyle,
+                          isrequestedbyProvider && {
+                            marginHorizontal: 0,
+                            marginRight: moderateScale(10),
+                          },
                         ]}
                         onPress={() => selectTimeSlot(slot)}
                         disabled={slot?.isbooked || slot?.isslotpast} // Disable if the slot is marked as disabled
@@ -533,7 +581,12 @@ const SessionsForAppointment = ({
         date={endDate ? new Date(endDate) : new Date()}
         maximumDate={minmaxDate?.maximumDate}
       />
-      <View style={styles.button}>
+      <View
+        style={[
+          styles.button,
+          isrequestedbyProvider && { marginHorizontal: 0 },
+        ]}
+      >
         <Button title={buttonTitle} onPress={handleButtonPressed} />
       </View>
     </View>

@@ -133,15 +133,25 @@ const AppointmentProviderDetail = (props) => {
                     </View>
                   </View>
 
-                  <View style={{ marginTop: 20 }}>
-                    <Text style={styles.aboutPetText}>Status</Text>
-                    <Text
-                      style={[styles.statusText, { color: itemtextColor() }]}
-                    >
-                      {appointmentData?.status === "completed"
-                        ? "Attended"
-                        : appointmentData?.status}
-                    </Text>
+                  <View style={{ flexDirection: "row",marginTop: ms(10) }}>
+                    <View>
+                      <Text style={styles.aboutPetText}>Status:</Text>
+                      <Text
+                        style={[styles.statusText, { color: itemtextColor() }]}
+                      >
+                        {appointmentData?.status === "completed"
+                          ? "Attended"
+                          : appointmentData?.status}
+                      </Text>
+                    </View>
+                    {Boolean(appointmentData?.status == "cancelled") && (
+                      <View style={{ marginLeft: ms(30) }}>
+                        <Text style={styles.aboutPetText}>Cancelled By:</Text>
+                        <Text style={styles.statusText}>
+                          {appointmentData?.modifiedName}
+                        </Text>
+                      </View>
+                    )}
                   </View>
 
                   <View style={{ flexDirection: "row", marginTop: ms(15) }}>
@@ -162,8 +172,8 @@ const AppointmentProviderDetail = (props) => {
                   </View>
 
                   <View style={{ marginTop: 20 }}>
-                    <Text style={styles.aboutPetText}>Notes</Text>
-                    <Text style={styles.petDescription}>
+                    <Text style={styles.aboutPetText}>Note:</Text>
+                    <Text style={styles.statusText}>
                       {appointmentData?.notes}
                     </Text>
                   </View>
@@ -374,7 +384,7 @@ const styles = StyleSheet.create({
   },
   aboutPetText: {
     color: THEMES.colors.darkGrey,
-    fontFamily: THEMES.fontFamily.semiBold,
+    fontFamily: THEMES.fontFamily.medium,
     fontSize: THEMES.fonts.font12,
   },
   petDescription: {
@@ -482,9 +492,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: moderateScale(15),
   },
   statusText: {
-    fontFamily: THEMES.fontFamily.semiBold,
+    fontFamily: THEMES.fontFamily.medium,
     fontSize: THEMES.fonts.font12,
     textTransform: "capitalize",
+    color: THEMES.colors.black,
   },
   chargesText: {
     fontFamily: THEMES.fontFamily.medium,

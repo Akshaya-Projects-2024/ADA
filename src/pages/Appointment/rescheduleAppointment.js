@@ -177,6 +177,7 @@ const RescheduleAppointment = ({ navigation, route }) => {
           status: "rescheduled",
           notes: reason,
           requestedby: "provider",
+          modifiedName: selectedItem?.providername,
         };
         const res = await rescheduleAppointment(params);
         if (res?.status === 200) {

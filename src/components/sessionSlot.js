@@ -217,10 +217,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   heading: {
-    fontSize: ms(16),
+    fontSize: 16,
     marginBottom: ms(12),
     color: THEMES.colors.black,
-    fontFamily: THEMES.fontFamily.semiBold,
+    fontFamily: THEMES.fontFamily.medium,
   },
   row: {
     flexDirection: "row",

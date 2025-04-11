@@ -81,7 +81,7 @@ const AppointmentModal = React.memo(({ isVisible, onClose, onSuccess }) => {
         };
         const res = await createAppointment(params);
         if (res?.status === 200) {
-          showToast("success", res?.data?.data || Strings.appointmentConfirm);
+          showToast("success", res?.data?.data);
           onSuccess(); //TODO
           contextValue?.setLoader(false);
           onClose(false);
@@ -98,7 +98,13 @@ const AppointmentModal = React.memo(({ isVisible, onClose, onSuccess }) => {
       const isSelected = selectedCategory === item;
       return (
         <TouchableOpacity
-          style={[styles.categoryButton, isSelected && styles.selectedButton]}
+          style={[
+            styles.categoryButton,
+            isSelected && styles.selectedButton,
+            {
+              marginLeft: 0,
+            },
+          ]}
           onPress={() => setSelectedCategory(item)}
         >
           <Text
@@ -211,6 +217,7 @@ const AppointmentModal = React.memo(({ isVisible, onClose, onSuccess }) => {
           selectedProviderId={userId}
           handleSubmit={handleSubmit}
           buttonTitle="Add"
+          isrequestedbyProvider={true}
         />
       </View>
       <Toast />
@@ -227,7 +234,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: "#797979",
     borderEndStartRadius: 0,
-    margin: 4,
+    margin: 6,
   },
   selectedButton: {
     backgroundColor: THEMES.colors.cyan,

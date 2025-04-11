@@ -131,7 +131,7 @@ const AppointmentDetail = (props) => {
       showToast("error", error?.message);
     }
   };
-  
+
   const confirm = async () => {
     try {
       contextValue?.setLoader(true);
@@ -244,16 +244,35 @@ const AppointmentDetail = (props) => {
                   </View>
                 )}
                 <View style={{ marginTop: ms(10) }}>
-                  <View>
-                    <Text style={styles.aboutPetText}>Status:</Text>
-                    <Text
-                      style={[styles.statusText, { color: itemtextColor() }]}
-                    >
-                      {appointmentData?.status === "completed"
-                        ? "Attended"
-                        : appointmentData?.status}
-                    </Text>
+                  <View style={{ flexDirection: "row" }}>
+                    <View>
+                      <Text style={styles.aboutPetText}>Status:</Text>
+                      <Text
+                        style={[styles.statusText, { color: itemtextColor() }]}
+                      >
+                        {appointmentData?.status === "completed"
+                          ? "Attended"
+                          : appointmentData?.status}
+                      </Text>
+                    </View>
+                    {Boolean(appointmentData?.status == "cancelled") && (
+                      <View style={{ marginLeft: ms(30) }}>
+                        <Text style={styles.aboutPetText}>Cancelled By:</Text>
+                        <Text style={styles.statusText}>
+                          {appointmentData?.modifiedName}
+                        </Text>
+                      </View>
+                    )}
                   </View>
+                  <View style={{ marginTop: ms(10) }}>
+                    <View>
+                      <Text style={styles.aboutPetText}>Note:</Text>
+                      <Text style={[styles.statusText]}>
+                        {appointmentData?.notes}
+                      </Text>
+                    </View>
+                  </View>
+
                   <View style={{ flexDirection: "row", marginTop: ms(15) }}>
                     <View>
                       <Text style={styles.chargesText}>Appointment Date</Text>
@@ -820,6 +839,7 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.medium,
     fontSize: THEMES.fonts.font12,
     textTransform: "capitalize",
+    color: THEMES.colors.black,
   },
   chargesText: {
     fontFamily: THEMES.fontFamily.medium,

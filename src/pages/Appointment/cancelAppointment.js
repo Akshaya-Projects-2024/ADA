@@ -56,10 +56,14 @@ const CancelAppointment = ({ navigation, route }) => {
           provider_id: selectedItem?.provider_id,
           notes: reason,
           requestedby,
+          modifiedName:
+            requestedby === "provider"
+              ? selectedItem?.providername
+              : selectedItem?.parentdetails?.name,
         };
         const res = await cancelAppointment(params);
         if (res?.status === 200) {
-            navigation.goBack();
+          navigation.goBack();
         }
       }
       contextValue?.setLoader(false);
@@ -70,8 +74,7 @@ const CancelAppointment = ({ navigation, route }) => {
   };
 
   return (
-
-   <SafeAreaView style={{flex:1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <StatusBar backgroundColor={THEMES.colors.bgColor} />
         <Header
