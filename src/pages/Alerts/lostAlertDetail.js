@@ -31,6 +31,8 @@ const LostAlertdetail = (props) => {
     (doc) => doc.documenttype == "profilePhoto"
   );
 
+
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -274,9 +276,9 @@ const LostAlertdetail = (props) => {
 
                   <View style={styles.cardView}>
                     <View style={styles.imgView}>
-                      {selectedAdotpionData?.parentphoto ? (
+                      {selectedAdotpionData?.photo ? (
                         <Image
-                          source={{ uri: selectedAdotpionData?.parentphoto }}
+                          source={{ uri: selectedAdotpionData?.photo }}
                           style={styles.img}
                         />
                       ) : (
