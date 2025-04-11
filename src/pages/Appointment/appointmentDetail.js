@@ -106,7 +106,7 @@ const AppointmentDetail = (props) => {
       contextValue?.setLoader(true);
       if (!appointmentData) {
         throw new Error("Please select the appointment!");
-      } else if (!otpInput) {
+      } else if (appointmentData?.requestedby === "parent" && !otpInput) {
         throw new Error("Please enter OTP first!");
       } else {
         const params = {
@@ -117,6 +117,7 @@ const AppointmentDetail = (props) => {
         };
         const res = await completeAppointment(params);
         if (res?.status === 200) {
+          showToast("success", res.data.data);
           setVisible(false);
           setAttendedModal(false);
           setAppointmentConfirm(false);
@@ -130,7 +131,7 @@ const AppointmentDetail = (props) => {
       showToast("error", error?.message);
     }
   };
-
+  
   const confirm = async () => {
     try {
       contextValue?.setLoader(true);
@@ -144,6 +145,7 @@ const AppointmentDetail = (props) => {
         };
         const res = await confirmAppointment(params);
         if (res?.status === 200) {
+          showToast("success", res.data.data);
           setVisible(false);
           setAttendedModal(false);
           setAppointmentConfirm(false);
@@ -196,46 +198,51 @@ const AppointmentDetail = (props) => {
               <View style={styles.mainContent}>
                 <View style={styles.flexRow}>
                   <Text numberOfLines={1} style={styles.petName}>
-                    {appointmentData?.petdetails?.name}
+                    {appointmentData?.petdetails?.name
+                      ? appointmentData?.petdetails?.name
+                      : appointmentData?.petname}
                   </Text>
                   <Text numberOfLines={1} style={styles.breedType}>
                     {appointmentData?.petdetails?.breed}
                     {"  "}
                   </Text>
                 </View>
-                <View style={styles.content}>
-                  <View style={styles.boxView}>
-                    <Text style={styles.dogText}>
-                      {appointmentData?.petdetails?.type}
-                    </Text>
-                    <Text style={styles.type}>Type</Text>
+                {Boolean(appointmentData?.petdetails?.age) && (
+                  <View style={styles.content}>
+                    <View style={styles.boxView}>
+                      <Text style={styles.dogText}>
+                        {appointmentData?.petdetails?.type}
+                      </Text>
+                      <Text style={styles.type}>Type</Text>
+                    </View>
+                    <View style={styles.ageContent}>
+                      <Text style={styles.ageText}>
+                        {appointmentData?.petdetails?.age}
+                      </Text>
+                      <Text style={styles.age}>Age</Text>
+                    </View>
+                    <View style={styles.genderContent}>
+                      <Text style={styles.genderText}>
+                        {appointmentData?.petdetails?.gender}
+                      </Text>
+                      <Text style={styles.gender}>Gender</Text>
+                    </View>
+                    <View style={styles.weightContent}>
+                      <Text style={styles.weightText}>
+                        {appointmentData?.petdetails?.weight} kg
+                      </Text>
+                      <Text style={styles.weight}>Weight</Text>
+                    </View>
                   </View>
-                  <View style={styles.ageContent}>
-                    <Text style={styles.ageText}>
-                      {appointmentData?.petdetails?.age}
+                )}
+                {Boolean(appointmentData?.petdetails?.about) && (
+                  <View>
+                    <Text style={styles.aboutPetText}>About Pet:</Text>
+                    <Text style={styles.petDescription}>
+                      {appointmentData?.petdetails?.about}
                     </Text>
-                    <Text style={styles.age}>Age</Text>
                   </View>
-                  <View style={styles.genderContent}>
-                    <Text style={styles.genderText}>
-                      {appointmentData?.petdetails?.gender}
-                    </Text>
-                    <Text style={styles.gender}>Gender</Text>
-                  </View>
-                  <View style={styles.weightContent}>
-                    <Text style={styles.weightText}>
-                      {appointmentData?.petdetails?.weight} kg
-                    </Text>
-                    <Text style={styles.weight}>Weight</Text>
-                  </View>
-                </View>
-
-                <View>
-                  <Text style={styles.aboutPetText}>About Pet:</Text>
-                  <Text style={styles.petDescription}>
-                    {appointmentData?.petdetails?.about}
-                  </Text>
-                </View>
+                )}
                 <View style={{ marginTop: ms(10) }}>
                   <View>
                     <Text style={styles.aboutPetText}>Status:</Text>
@@ -337,18 +344,26 @@ const AppointmentDetail = (props) => {
                   <View style={styles.parentDetailsView}>
                     <Text style={styles.parentText}>Pet parent details</Text>
                     <Text numberOfLines={2} style={styles.location}>
-                      {appointmentData?.parentdetails?.name}
+                      {appointmentData?.parentdetails?.name
+                        ? appointmentData?.parentdetails?.name
+                        : appointmentData?.clientname}
                     </Text>
                     <View style={styles.rowDetail}>
                       <Text style={styles.numberText}>
-                        {appointmentData?.parentdetails?.mobile}
+                        {appointmentData?.parentdetails?.mobile
+                          ? appointmentData?.parentdetails?.mobile
+                          : appointmentData?.contactnum}
                       </Text>
 
                       <TouchableOpacity
                         style={styles.ml20}
                         onPress={() =>
                           Linking.openURL(
-                            `tel:${appointmentData?.parentdetails?.mobile}`
+                            `tel:${
+                              appointmentData?.parentdetails?.mobile
+                                ? appointmentData?.parentdetails?.mobile
+                                : appointmentData?.contactnum
+                            }`
                           )
                         }
                       >
@@ -372,7 +387,11 @@ const AppointmentDetail = (props) => {
                   marginVertical: ms(15),
                 }}
               >
-                <View style={{ width: "48%" }}>
+                <View
+                  style={{
+                    width: "48%",
+                  }}
+                >
                   <Button title="Edit" onPress={() => setVisible(true)} />
                 </View>
                 <View style={{ width: "48%" }}>
@@ -389,7 +408,11 @@ const AppointmentDetail = (props) => {
                       ) {
                         setAppointmentConfirm(true);
                       } else {
-                        setAttendedModal(true);
+                        if (appointmentData?.requestedby === "provider") {
+                          handleAttended();
+                        } else {
+                          setAttendedModal(true);
+                        }
                       }
                     }}
                   />

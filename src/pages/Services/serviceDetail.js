@@ -48,7 +48,6 @@ const ServiceDetail = ({ navigation, route }) => {
   );
   const [bookAppointmentDisabled, setBookAppointmentBtnDisbaled] = useState();
   const [modal, setModal] = useState(false);
-  console.log(JSON.stringify(selectedProvider));
 
   useEffect(() => {
     getDates();

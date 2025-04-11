@@ -44,16 +44,19 @@ const SelectAppointment = ({ navigation, route }) => {
     selectedSlot,
     sessionSelection
   ) => {
+    const userId = await decryptService("userId");
     try {
       if (!selectedProvider?.profile?.providerBusiness?.userid) {
         throw new Error("Invalid Provider! Please select valid provider");
       } else if (!selectedService?.code) {
         throw new Error("Invalid Service! Please select valid service");
-      } else if (!selectedDate) {
+      } else if (!selectedCategory?.length) {
+        throw new Error("Please Select valid category");
+      } else if (sessionSelection === SESSION_TYPE.oneTime && !selectedDate) {
         throw new Error("Please Select valid date");
-      } else if (!startDate) {
+      } else if (sessionSelection === SESSION_TYPE.recursive && !startDate) {
         throw new Error("Please Select valid start date");
-      } else if (!endDate) {
+      } else if (sessionSelection === SESSION_TYPE.recursive && !endDate) {
         throw new Error("Please Select valid end date");
       } else if (!selectedSlot?.start_time) {
         throw new Error("Please Select valid time slot");
@@ -61,8 +64,11 @@ const SelectAppointment = ({ navigation, route }) => {
         throw new Error("Please Select valid time slot");
       } else if (!profile?.parentProfie?.petDetails[0]?.id) {
         throw new Error("No pet found in your profile");
+      } else if (
+        selectedProvider?.profile?.providerBusiness?.userid == userId
+      ) {
+        throw new Error("You can't book an appointment with yourself.");
       } else {
-        const userId = await decryptService("userId");
         const params = {
           parent_id: userId,
           provider_id: selectedProvider?.profile?.providerBusiness?.userid,

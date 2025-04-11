@@ -21,6 +21,7 @@ import { contextValue } from "./Loader";
 import { decryptService } from "../utils/storageFunc";
 import { getProviderSlots } from "../redux-store/actions/auth";
 import Button from "./Button";
+import TimeSlotUI from "./sessionSlot";
 
 const SessionsForAppointment = ({
   selectedProviderId,
@@ -38,6 +39,7 @@ const SessionsForAppointment = ({
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [timeSlots, setTimeSlots] = useState({});
+  const [slotsforSession, setSlotsforSession] = useState({});
 
   const handleDatePress = (date) => {
     setSelectedDate(date);
@@ -59,13 +61,13 @@ const SessionsForAppointment = ({
           if (isToday && start <= currentHour) {
             element.isslotpast = true;
           }
-          if (start >= 0 && start <= 11) {
+          if (start >= 0 && start < 12) {
             morningSlots.push(element);
           }
-          if (start >= 12 && start <= 13) {
+          if (start >= 12 && start < 17) {
             afternoonSlots.push(element);
           }
-          if (start >= 14) {
+          if (start >= 17) {
             eveningSlots.push(element);
           }
         }
@@ -127,16 +129,23 @@ const SessionsForAppointment = ({
         const res = await getProviderSlots(params);
         if (res?.status === 200) {
           const data = res?.data?.data;
-          const datesData = Object.keys(data);
-          if (validArray(datesData)) {
-            const weeksData = [];
-            for (let index = 0; index < datesData.length; index++) {
-              const element = datesData[index];
-              weeksData.push(moment(element));
+          if (sessionSelection === SESSION_TYPE.recursive) {
+            setSlotsforSession(data);
+            setWeekDates([]);
+            setTimeSlots({});
+            setSelectedSlot(null);
+          } else {
+            const datesData = Object.keys(data);
+            if (validArray(datesData)) {
+              const weeksData = [];
+              for (let index = 0; index < datesData.length; index++) {
+                const element = datesData[index];
+                weeksData.push(moment(element));
+              }
+              setWeekDates(weeksData);
             }
-            setWeekDates(weeksData);
+            setTimeSlots(data);
           }
-          setTimeSlots(data);
         }
         contextValue?.setLoader(false);
       } catch (error) {
@@ -146,6 +155,8 @@ const SessionsForAppointment = ({
     } else {
       setWeekDates([]);
       setTimeSlots({});
+      setSlotsforSession({});
+      setSelectedSlot(null);
     }
   }, [endDate, selectedProviderId, startDate]);
 
@@ -188,6 +199,17 @@ const SessionsForAppointment = ({
     setEndDateVisible(false);
   };
 
+  const minmaxDate = useMemo(() => {
+    return {
+      minimumDate: startDate
+        ? moment(startDate).add(1, "days").toDate()
+        : new Date(),
+      maximumDate: startDate
+        ? moment(startDate).add(1, "month").toDate()
+        : new Date(),
+    };
+  }, [startDate]);
+
   return (
     <View style={styles.flex}>
       <ScrollView
@@ -196,273 +218,303 @@ const SessionsForAppointment = ({
         showsVerticalScrollIndicator={false}
       >
         <Pressable onPress={handleSwitch} style={styles.switchStyle}>
-          <Text style={styles.headerTextV2}>{Strings.oneSession}</Text>
+          <Text
+            style={[
+              styles.headerTextV2,
+              { opacity: sessionSelection === SESSION_TYPE.oneTime ? 1 : 0.16 },
+            ]}
+          >
+            {Strings.oneSession}
+          </Text>
           {sessionSelection === SESSION_TYPE.oneTime ? (
             <SwitchOn />
           ) : (
             <SwitchOff />
           )}
-          <Text style={styles.headerTextV2}>{Strings.dailySession}</Text>
+          <Text
+            style={[
+              styles.headerTextV2,
+              { opacity: sessionSelection !== SESSION_TYPE.oneTime ? 1 : 0.2 },
+            ]}
+          >
+            {Strings.dailySession}
+          </Text>
         </Pressable>
         {sessionSelection === SESSION_TYPE.recursive ? (
-          <View style={styles.pickerContainer}>
-            <Pressable
-              style={styles.flex}
-              onPress={() => {
-                setStartDateVisible(true);
-              }}
-            >
-              <InputField
-                label={Strings.startDate}
-                placeholderText={"--"}
-                value={
-                  startDate ? moment(startDate)?.format("YYYY-MM-DD") : null
-                }
-                type="small"
-                inputStyle={styles.startDateInput}
-                editable={false}
+          <>
+            <View style={styles.pickerContainer}>
+              <Pressable
+                style={styles.flex}
+                onPress={() => {
+                  setStartDateVisible(true);
+                }}
+              >
+                <InputField
+                  label={Strings.startDate}
+                  placeholderText={"--"}
+                  value={
+                    startDate ? moment(startDate)?.format("YYYY-MM-DD") : null
+                  }
+                  type="small"
+                  inputStyle={styles.startDateInput}
+                  editable={false}
+                />
+              </Pressable>
+              <Pressable
+                style={styles.flex}
+                onPress={() => {
+                  setEndDateVisible(true);
+                }}
+              >
+                <InputField
+                  label={Strings.endDate}
+                  placeholderText={"--"}
+                  value={endDate ? moment(endDate)?.format("YYYY-MM-DD") : null}
+                  type="small"
+                  inputStyle={styles.endDateInput}
+                  editable={false}
+                />
+              </Pressable>
+            </View>
+            {Boolean(Object.keys(slotsforSession)?.length) && (
+              <TimeSlotUI
+                data={slotsforSession}
+                setSelectedSlot={setSelectedSlot}
+                selectedSlot={selectedSlot}
               />
-            </Pressable>
-            <Pressable
-              style={styles.flex}
-              onPress={() => {
-                setEndDateVisible(true);
-              }}
-            >
-              <InputField
-                label={Strings.endDate}
-                placeholderText={"--"}
-                value={endDate ? moment(endDate)?.format("YYYY-MM-DD") : null}
-                type="small"
-                inputStyle={styles.endDateInput}
-                editable={false}
-              />
-            </Pressable>
-          </View>
-        ) : null}
-        {validArray(weekDates) ? (
-          <View
-            style={{
-              marginHorizontal: moderateScale(14),
-              paddingTop: moderateScale(20),
-            }}
-          >
-            <Text style={styles.headerText}>Date</Text>
-            <ScrollView
-              horizontal
-              bounces={false}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.scrollContainer}
-            >
-              {weekDates.map((date, index) => {
-                const isToday = date.isSame(moment(), "day");
-                const isSelected = date.isSame(selectedDate, "day");
-                return (
-                  <TouchableOpacity
-                    onPress={() => handleDatePress(date)}
-                    key={index}
-                    style={[
-                      styles.dateContainer,
-                      isSelected ? styles.selectedDate : null, // Highlight selected date
-                      isToday && !isSelected ? styles.activeDate : null, // Highlight current date if it's not selected
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.dayText,
-                        isSelected ? styles.selectedDayText : null, // Highlight selected day text
-                        isToday && !isSelected ? styles.activeDayText : null, // Highlight today's text
-                      ]}
-                    >
-                      {date.format("ddd")}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.dateText,
-                        isSelected ? styles.selectedDateText : null, // Highlight selected date text
-                        isToday && !isSelected ? styles.activeDateText : null, // Highlight today's text
-                      ]}
-                    >
-                      {date.format("D")}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          </View>
-        ) : null}
-        <>
-          {validArray(memorizedSlots?.morning) ? (
-            <View
-              style={{
-                paddingTop: moderateScale(20),
-                paddingHorizontal: moderateScale(16),
-              }}
-            >
-              <Text
+            )}
+          </>
+        ) : (
+          <>
+            {validArray(weekDates) ? (
+              <View
                 style={{
-                  color: THEMES.colors.black,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                  fontSize: THEMES.fonts.font14,
-                  paddingBottom: moderateScale(5),
-                  paddingHorizontal: moderateScale(5),
+                  marginHorizontal: moderateScale(14),
+                  paddingTop: moderateScale(20),
                 }}
               >
-                Morning
-              </Text>
-              <View style={styles.timeSlotRow}>
-                {memorizedSlots?.morning?.map((slot, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={[
-                      styles.timeSlot,
-                      !slot?.isavailable && styles.disabledSlot,
-                      slot?.isbooked && styles.bookedSlot,
-                      slot?.isslotpast && styles.pastSlot,
-                      selectedSlot?.start_time === slot?.start_time &&
-                        !slot?.isbooked &&
-                        !slot?.isslotpast &&
-                        styles.selectedSlotStyle,
-                    ]}
-                    onPress={() => selectTimeSlot(slot)}
-                    disabled={slot?.isbooked || slot?.isslotpast} // Disable if the slot is marked as disabled
-                  >
-                    <Text
-                      style={StyleSheet.flatten([
-                        slot?.isbooked ? styles.disabledText : {},
-                        styles.startTimeText,
-                        {
-                          color:
-                            selectedSlot?.start_time === slot?.start_time
-                              ? "#fff"
-                              : slot?.isavailable || slot?.isbooked
-                              ? "#000"
-                              : "#fff",
-                        },
-                      ])}
-                    >
-                      {slot?.start_time}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                <Text style={styles.headerText}>Date</Text>
+                <ScrollView
+                  horizontal
+                  bounces={false}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.scrollContainer}
+                >
+                  {weekDates.map((date, index) => {
+                    const isToday = date.isSame(moment(), "day");
+                    const isSelected = date.isSame(selectedDate, "day");
+                    return (
+                      <TouchableOpacity
+                        onPress={() => handleDatePress(date)}
+                        key={index}
+                        style={[
+                          styles.dateContainer,
+                          isSelected ? styles.selectedDate : null, // Highlight selected date
+                          isToday && !isSelected ? styles.activeDate : null, // Highlight current date if it's not selected
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.dayText,
+                            isSelected ? styles.selectedDayText : null, // Highlight selected day text
+                            isToday && !isSelected
+                              ? styles.activeDayText
+                              : null, // Highlight today's text
+                          ]}
+                        >
+                          {date.format("ddd")}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.dateText,
+                            isSelected ? styles.selectedDateText : null, // Highlight selected date text
+                            isToday && !isSelected
+                              ? styles.activeDateText
+                              : null, // Highlight today's text
+                          ]}
+                        >
+                          {date.format("D")}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
               </View>
-            </View>
-          ) : null}
+            ) : null}
+            <>
+              {validArray(memorizedSlots?.morning) ? (
+                <View
+                  style={{
+                    paddingTop: moderateScale(20),
+                    paddingHorizontal: moderateScale(16),
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: THEMES.colors.black,
+                      fontFamily: THEMES.fontFamily.semiBold,
+                      fontSize: THEMES.fonts.font14,
+                      paddingBottom: moderateScale(5),
+                      paddingHorizontal: moderateScale(5),
+                    }}
+                  >
+                    Morning
+                  </Text>
+                  <View style={styles.timeSlotRow}>
+                    {memorizedSlots?.morning?.map((slot, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={[
+                          styles.timeSlot,
+                          !slot?.isavailable && styles.disabledSlot,
+                          slot?.isbooked && styles.bookedSlot,
+                          slot?.isslotpast && styles.pastSlot,
+                          selectedSlot?.start_time === slot?.start_time &&
+                            !slot?.isbooked &&
+                            !slot?.isslotpast &&
+                            styles.selectedSlotStyle,
+                        ]}
+                        onPress={() => selectTimeSlot(slot)}
+                        disabled={slot?.isbooked || slot?.isslotpast} // Disable if the slot is marked as disabled
+                      >
+                        <Text
+                          style={StyleSheet.flatten([
+                            slot?.isbooked ? styles.disabledText : {},
+                            styles.startTimeText,
+                            {
+                              color:
+                                selectedSlot?.start_time === slot?.start_time
+                                  ? "#fff"
+                                  : slot?.isavailable || slot?.isbooked
+                                  ? "#000"
+                                  : "#fff",
+                            },
+                          ])}
+                        >
+                          {slot?.start_time}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              ) : null}
 
-          {validArray(memorizedSlots?.afternoon) ? (
-            <View
-              style={{
-                paddingTop: moderateScale(20),
-                paddingHorizontal: moderateScale(16),
-              }}
-            >
-              <Text
-                style={{
-                  color: THEMES.colors.black,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                  fontSize: THEMES.fonts.font14,
-                  paddingBottom: moderateScale(5),
-                  paddingHorizontal: moderateScale(5),
-                }}
-              >
-                Afternoon
-              </Text>
+              {validArray(memorizedSlots?.afternoon) ? (
+                <View
+                  style={{
+                    paddingTop: moderateScale(20),
+                    paddingHorizontal: moderateScale(16),
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: THEMES.colors.black,
+                      fontFamily: THEMES.fontFamily.semiBold,
+                      fontSize: THEMES.fonts.font14,
+                      paddingBottom: moderateScale(5),
+                      paddingHorizontal: moderateScale(5),
+                    }}
+                  >
+                    Afternoon
+                  </Text>
 
-              <View style={styles.timeSlotRow}>
-                {memorizedSlots?.afternoon?.map((slot, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={[
-                      styles.timeSlot,
-                      !slot?.isavailable && styles.disabledSlot,
-                      slot?.isbooked && styles.bookedSlot,
-                      slot?.isslotpast && styles.pastSlot,
-                      selectedSlot?.start_time === slot?.start_time &&
-                        !slot?.isbooked &&
-                        !slot?.isslotpast &&
-                        styles.selectedSlotStyle,
-                    ]}
-                    onPress={() => selectTimeSlot(slot)}
-                    disabled={slot?.isbooked || slot?.isslotpast} // Disable if the slot is marked as disabled
+                  <View style={styles.timeSlotRow}>
+                    {memorizedSlots?.afternoon?.map((slot, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={[
+                          styles.timeSlot,
+                          !slot?.isavailable && styles.disabledSlot,
+                          slot?.isbooked && styles.bookedSlot,
+                          slot?.isslotpast && styles.pastSlot,
+                          selectedSlot?.start_time === slot?.start_time &&
+                            !slot?.isbooked &&
+                            !slot?.isslotpast &&
+                            styles.selectedSlotStyle,
+                        ]}
+                        onPress={() => selectTimeSlot(slot)}
+                        disabled={slot?.isbooked || slot?.isslotpast} // Disable if the slot is marked as disabled
+                      >
+                        <Text
+                          style={StyleSheet.flatten([
+                            slot?.isbooked ? styles.disabledText : {},
+                            styles.startTimeText,
+                            {
+                              color:
+                                selectedSlot?.start_time === slot?.start_time
+                                  ? "#fff"
+                                  : slot?.isavailable || slot?.isbooked
+                                  ? "#000"
+                                  : "#fff",
+                            },
+                          ])}
+                        >
+                          {slot?.start_time}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              ) : null}
+              {validArray(memorizedSlots?.evening) ? (
+                <View
+                  style={{
+                    paddingTop: moderateScale(20),
+                    paddingHorizontal: moderateScale(16),
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: THEMES.colors.black,
+                      fontFamily: THEMES.fontFamily.semiBold,
+                      fontSize: THEMES.fonts.font14,
+                      paddingBottom: moderateScale(5),
+                      paddingHorizontal: moderateScale(5),
+                    }}
                   >
-                    <Text
-                      style={StyleSheet.flatten([
-                        slot?.isbooked ? styles.disabledText : {},
-                        styles.startTimeText,
-                        {
-                          color:
-                            selectedSlot?.start_time === slot?.start_time
-                              ? "#fff"
-                              : slot?.isavailable || slot?.isbooked
-                              ? "#000"
-                              : "#fff",
-                        },
-                      ])}
-                    >
-                      {slot?.start_time}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          ) : null}
-          {validArray(memorizedSlots?.evening) ? (
-            <View
-              style={{
-                paddingTop: moderateScale(20),
-                paddingHorizontal: moderateScale(16),
-              }}
-            >
-              <Text
-                style={{
-                  color: THEMES.colors.black,
-                  fontFamily: THEMES.fontFamily.semiBold,
-                  fontSize: THEMES.fonts.font14,
-                  paddingBottom: moderateScale(5),
-                  paddingHorizontal: moderateScale(5),
-                }}
-              >
-                Evening
-              </Text>
-              <View style={styles.timeSlotRow}>
-                {memorizedSlots.evening.map((slot, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={[
-                      styles.timeSlot,
-                      !slot?.isavailable && styles.disabledSlot,
-                      slot?.isbooked && styles.bookedSlot,
-                      slot?.isslotpast && styles.pastSlot,
-                      selectedSlot?.start_time === slot?.start_time &&
-                        !slot?.isbooked &&
-                        !slot?.isslotpast &&
-                        styles.selectedSlotStyle,
-                    ]}
-                    onPress={() => selectTimeSlot(slot)}
-                    disabled={slot?.isbooked || slot?.isslotpast} // Disable if the slot is marked as disabled
-                  >
-                    <Text
-                      style={StyleSheet.flatten([
-                        slot?.isbooked ? styles.disabledText : {},
-                        styles.startTimeText,
-                        {
-                          color:
-                            selectedSlot?.start_time === slot?.start_time
-                              ? "#fff"
-                              : slot?.isavailable || slot?.isbooked
-                              ? "#000"
-                              : "#fff",
-                        },
-                      ])}
-                    >
-                      {slot?.start_time}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          ) : null}
-        </>
+                    Evening
+                  </Text>
+                  <View style={styles.timeSlotRow}>
+                    {memorizedSlots.evening.map((slot, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={[
+                          styles.timeSlot,
+                          !slot?.isavailable && styles.disabledSlot,
+                          slot?.isbooked && styles.bookedSlot,
+                          slot?.isslotpast && styles.pastSlot,
+                          selectedSlot?.start_time === slot?.start_time &&
+                            !slot?.isbooked &&
+                            !slot?.isslotpast &&
+                            styles.selectedSlotStyle,
+                        ]}
+                        onPress={() => selectTimeSlot(slot)}
+                        disabled={slot?.isbooked || slot?.isslotpast} // Disable if the slot is marked as disabled
+                      >
+                        <Text
+                          style={StyleSheet.flatten([
+                            slot?.isbooked ? styles.disabledText : {},
+                            styles.startTimeText,
+                            {
+                              color:
+                                selectedSlot?.start_time === slot?.start_time
+                                  ? "#fff"
+                                  : slot?.isavailable || slot?.isbooked
+                                  ? "#000"
+                                  : "#fff",
+                            },
+                          ])}
+                        >
+                          {slot?.start_time}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              ) : null}
+            </>
+          </>
+        )}
       </ScrollView>
       <DateTimePickerModal
         isVisible={startDateVisible}
@@ -477,8 +529,9 @@ const SessionsForAppointment = ({
         mode="date"
         onConfirm={handleEndDateConfirm}
         onCancel={hideEndDatePicker}
-        minimumDate={startDate ? moment(startDate).add(1, 'days').toDate() : new Date()}
+        minimumDate={minmaxDate?.minimumDate}
         date={endDate ? new Date(endDate) : new Date()}
+        maximumDate={minmaxDate?.maximumDate}
       />
       <View style={styles.button}>
         <Button title={buttonTitle} onPress={handleButtonPressed} />
@@ -612,7 +665,7 @@ const styles = StyleSheet.create({
   pastSlot: {
     backgroundColor: THEMES.colors.lightGrey,
     borderColor: THEMES.colors.lightGrey,
-    opacity: 0.2
+    opacity: 0.2,
   },
   selectedDate: {
     backgroundColor: THEMES.colors.cyan, // Highlight for selected date
@@ -667,6 +720,7 @@ const styles = StyleSheet.create({
   button: {
     marginHorizontal: moderateScale(20),
     bottom: 0,
+    paddingTop: moderateScale(30),
     marginBottom: moderateScale(20),
   },
 });

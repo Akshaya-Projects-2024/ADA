@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
-  FlatList,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
@@ -29,7 +28,6 @@ import Toggle from "../../components/Toggle";
 import { useIsFocused } from "@react-navigation/native";
 import {
   setLoggedInMoodule,
-  validateParentProfile,
   validateParentProfileUsingStatus,
 } from "../../utils/userUtils";
 import {
@@ -43,7 +41,6 @@ import { decryptService, encryptService } from "../../utils/storageFunc";
 import {
   completeAppointment,
   confirmAppointment,
-  createAppointment,
   getUpcomingAppointments,
   providerDashboardSlotsData,
 } from "../../redux-store/actions/auth";
@@ -51,10 +48,9 @@ import { contextValue } from "../../components/Loader";
 import Dialog from "../../components/Dialog";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUser } from "../../api/UserContext";
-import SessionsForAppointment from "../../components/SessionsForAppointment";
-import { SESSION_TYPE } from "../Services/selectAppointment";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 import { navigateToParent } from "../../navigations/rootNavigationRef";
+import AddAppointmentModal from "../../components/AddAppointmentModal";
 
 const Home = (props) => {
   const { top } = useSafeAreaInsets();
@@ -77,77 +73,9 @@ const Home = (props) => {
   const profile = useSelector((state) => state?.commonReducer);
   const [appointmentConfirm, setAppointmentConfirm] = useState(false);
   const [paymentModal, setPaymentModal] = useState(false);
-  const [clientName, setClientName] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
   const { userData, apiInitCall } = useUser();
   const [modal, setModal] = useState(false);
   const [refresh, setRefresh] = useState(true);
-
-  const handleSubmit = async (
-    selectedDate,
-    startDate,
-    endDate,
-    selectedSlot,
-    sessionSelection
-  ) => {
-    try {
-      contextValue?.setLoader(true);
-      if (!selectedCategory?.code) {
-        throw new Error("Invalid Service! Please select valid service");
-      } else if (!selectedDate) {
-        throw new Error("Please Select valid date");
-      } else if (!startDate) {
-        throw new Error("Please Select valid start date");
-      } else if (!endDate) {
-        throw new Error("Please Select valid end date");
-      } else if (!selectedSlot?.start_time) {
-        throw new Error("Please Select valid time slot");
-      } else if (!selectedSlot?.end_time) {
-        throw new Error("Please Select valid time slot");
-      } else if (!clientName) {
-        throw new Error("Please provide client name");
-      } else if (!mobileNumber) {
-        throw new Error("Please provide client mobile number");
-      } else {
-        const userId = await decryptService("userId");
-        const params = {
-          parent_id: "",
-          provider_id: userId,
-          service_code: Number(selectedCategory?.code),
-          start_date:
-            sessionSelection === SESSION_TYPE.oneTime
-              ? moment(selectedDate).format("YYYY-MM-DD")
-              : moment(startDate).format("YYYY-MM-DD"),
-          end_date:
-            sessionSelection === SESSION_TYPE.oneTime
-              ? moment(selectedDate).format("YYYY-MM-DD")
-              : moment(endDate).format("YYYY-MM-DD"),
-          start_time: selectedSlot?.start_time,
-          end_time: selectedSlot?.end_time,
-          status: "scheduled", //HARDCODE
-          notes: "First appointment of the day", //HARDCODE
-          petid: 0,
-          requestedby: "provider", //HARDCODE
-          clientname: clientName,
-          contactnum: mobileNumber,
-        };
-        const res = await createAppointment(params);
-        if (res?.status === 200) {
-          showToast("success", res?.data?.data || String.appointmentConfirm);
-        }
-      }
-      initData(); //TODO
-      contextValue?.setLoader(false);
-    } catch (error) {
-      contextValue?.setLoader(false);
-      showToast("error", error?.message);
-    } finally {
-      setSelectedCategory(null);
-      setClientName("");
-      setMobileNumber("");
-      setAppointmentVisible(false);
-    }
-  };
 
   const paymentCompleted = useMemo(() => {
     if (
@@ -215,7 +143,7 @@ const Home = (props) => {
         output = output.filter((it) => {
           return (
             it?.status === AppointmentStatus.scheduled ||
-            it?.status === AppointmentStatus.rescheduled || 
+            it?.status === AppointmentStatus.rescheduled ||
             it?.status === AppointmentStatus.pending
           );
         });
@@ -247,7 +175,7 @@ const Home = (props) => {
         let canceledAppointments = 0;
         let rescheduledAppointments = 0;
         const response = Object.values(res?.data?.data);
-        
+
         for (let index = 0; index < response.length; index++) {
           const element = response[index];
           for (let index2 = 0; index2 < element.length; index2++) {
@@ -341,8 +269,6 @@ const Home = (props) => {
     const validParentProfile = validateParentProfileUsingStatus(profile);
     modal && setModal(false);
     encryptService("loggedInModule", LoginModules.parent);
-    console.log(profile);
-    
     if (validParentProfile?.flag) {
       navigateToParent(props.navigation);
     } else {
@@ -1017,81 +943,13 @@ const Home = (props) => {
         </View>
       </Modal>
 
-      <Modal
-        onBackButtonPress={() => setAppointmentVisible(false)}
-        onBackdropPress={() => setAppointmentVisible(false)}
-        isVisible={appointmentVisible}
-        backdropOpacity={0.5}
-        style={{
-          margin: 0,
-          marginTop: moderateScale(50),
-          borderTopRightRadius: 49,
-          flex: 1,
-          backgroundColor: THEMES.colors.bgColor,
-          alignItems: "flex-start",
-          paddingHorizontal: moderateScale(16),
-          paddingTop: moderateScale(10),
-        }}
-      >
-        <View
-          style={{
-            paddingTop: moderateScale(20),
-            flex: 1,
-          }}
-        >
-          <Text
-            style={{
-              color: THEMES.colors.black,
-              fontFamily: THEMES.fontFamily.semiBold,
-              fontSize: THEMES.fonts.font14,
-            }}
-          >
-            Add Appointment
-          </Text>
-          <View style={{ paddingTop: moderateScale(15) }}>
-            <InputField
-              label={"Client name *"}
-              placeholderText={"Enter client name"}
-              value={clientName}
-              onChange={setClientName}
-            />
-          </View>
-          <View style={{ paddingTop: moderateScale(15) }}>
-            <InputField
-              maxLength={10}
-              keyboardType="phone-pad"
-              label={"Mobile number *"}
-              placeholderText={"Enter mobile number"}
-              value={mobileNumber}
-              onChange={setMobileNumber}
-            />
-          </View>
-          <View style={{ paddingTop: moderateScale(15), width: "90%" }}>
-            <Text
-              style={{
-                color: THEMES.colors.black,
-                fontFamily: THEMES.fontFamily.semiBold,
-                fontSize: THEMES.fonts.font14,
-                paddingBottom: moderateScale(10),
-              }}
-            >
-              Category
-            </Text>
-            <FlatList
-              data={userData?.providerProfile?.providerBusiness?.services}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={renderCategory}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-            />
-          </View>
-          <SessionsForAppointment
-            selectedProviderId={userData?.logindetails?.userid}
-            handleSubmit={handleSubmit}
-            buttonTitle="Add"
-          />
-        </View>
-      </Modal>
+      {Boolean(appointmentVisible) && (
+        <AddAppointmentModal
+          isVisible={appointmentVisible}
+          onClose={setAppointmentVisible}
+          onSuccess={initData}
+        />
+      )}
       <Dialog
         flag={appointmentConfirm}
         description={Strings.confirmAppointmentMessage}
