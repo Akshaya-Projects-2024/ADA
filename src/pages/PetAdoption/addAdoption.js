@@ -48,6 +48,8 @@ import {
   validateInput,
   validatePetAge,
 } from "../../utils/validation";
+import Dialog from "../../components/Dialog";
+import { goBack } from "../../navigations/rootNavigationRef";
 
 const AddAdoption = (props) => {
   const { navigation } = props;
@@ -75,6 +77,7 @@ const AddAdoption = (props) => {
   const [weight, setWeight] = useState();
   const [description, setDescription] = useState();
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
+  const [modal, setModal] = useState(false);
 
   useEffect(() => {
     initData();
@@ -236,13 +239,11 @@ const AddAdoption = (props) => {
           description: description,
         };
         const response = await addAdoption(params);
-
         if (response?.status === 200) {
           if (selectedPlatforms) {
             await shareImageBase64(response?.data?.data, selectedPlatforms);
           }
-          showToast("success", res.data.data);
-          navigation.goBack();
+          setModal(true);
         }
         contextValue?.setLoader(false);
       }
@@ -314,6 +315,7 @@ const AddAdoption = (props) => {
   //   );
   // };
 
+
   const handleSelectedCategory = (value) => {
     setSelectedCategory(value);
     setSelectedBreed([]);
@@ -325,6 +327,12 @@ const AddAdoption = (props) => {
       label: item,
     }));
     setBreedList(result ? result : []);
+  };
+
+
+  const handleGoBack = () => {
+    setModal(false);
+    return goBack();
   };
 
   return (
@@ -635,7 +643,7 @@ const AddAdoption = (props) => {
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}
                   onClick={() => {
-                    setWhatsup(!instagram);
+                    setWhatsup(!whatsup);
                     handleSelection("WHATSUP", !whatsup);
                   }}
                   isChecked={whatsup}
@@ -708,6 +716,16 @@ const AddAdoption = (props) => {
           mode="date"
           onConfirm={handleDateConfirm}
           onCancel={hideDatePickerCancel}
+        />
+        <Dialog
+          flag={modal}
+          title={"✨ Pet Adoption Created Successfully!✨"}
+          description={"Congratulations! Your pet adoption has been created!"}
+          rightButtonText="Go back"
+          rightButtonPressed={handleGoBack}
+          onClose={() => {
+            setModal(false);
+          }}
         />
       </View>
     </SafeAreaView>

@@ -569,7 +569,7 @@ const LostPetAlert = (props) => {
                   checkedImage={<Checked />}
                   unCheckedImage={<UnChecked />}
                   onClick={() => {
-                    setWhatsup(!instagram);
+                    setWhatsup(!whatsup);
                     handleSelection("WHATSUP", !whatsup);
                   }}
                   isChecked={whatsup}
