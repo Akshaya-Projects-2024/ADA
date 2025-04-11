@@ -194,6 +194,7 @@ const TimeTracker = ({
           temp[indx] = element;
         }
       }
+      setTimes(temp);
     }
     // const temp = [...times];
     // if (selectedForAll) {
@@ -207,7 +208,6 @@ const TimeTracker = ({
     //     temp[index] = element;
     //   }
     // }
-    setTimes(temp);
     setSelectedForAll(!selectedForAll);
   };
 

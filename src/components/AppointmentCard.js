@@ -69,16 +69,12 @@ const AppointmentCard = ({
       onPress={async () => {
         const loggedInModule = await decryptService("loggedInModule");
         setSelectedItem(item);
-        {
-          item.requestedby !== "provider"
-            ? navigation.navigate(
-                loggedInModule === "parent"
-                  ? "appointmentProviderDetail"
-                  : "appointmentDetail",
-                { selectedItem: item }
-              )
-            : null;
-        }
+        navigation.navigate(
+          loggedInModule === "parent"
+            ? "appointmentProviderDetail"
+            : "appointmentDetail",
+          { selectedItem: item }
+        );
       }}
       style={[styles.flatlistView, { backgroundColor: itemBackgroundColor }]}
     >
@@ -304,7 +300,11 @@ const AppointmentCard = ({
                 </Text>
               ) : null}
             </>
-          ) : null}
+          ) : (
+            <Text style={[styles.statusText, { color: itemtextColor }]}>
+              {item?.status === AppointmentStatus.completed ? "Attended" : item?.status}
+            </Text>
+          )}
         </>
       </View>
     </Pressable>

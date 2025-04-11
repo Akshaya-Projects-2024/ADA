@@ -108,6 +108,28 @@ const WorkingHours = (props) => {
     setTimes(output);
   };
 
+  useEffect(() => {
+    times && setSelectedForAll(areShiftsConsistent(times));
+  }, [times]);
+
+  function areShiftsConsistent(days) {
+    const selectedDays = days.filter((day) => day.selected);
+
+    if (selectedDays.length === 0) return false;
+
+    const { start: shift1Start, end: shift1End } = selectedDays[0].shift1;
+    const { start: shift2Start, end: shift2End } = selectedDays[0].shift2;
+
+    return selectedDays.every((day) =>
+      selectedShiftType === SHIFTS.full
+        ? day.shift1.start === shift1Start && day.shift1.end === shift1End
+        : day.shift1.start === shift1Start &&
+          day.shift1.end === shift1End &&
+          day.shift2.start === shift2Start &&
+          day.shift2.end === shift2End
+    );
+  }
+
   const processTime = () => {
     const output = [];
     for (let index = 0; index < times?.length; index++) {
@@ -208,11 +230,7 @@ const WorkingHours = (props) => {
     <SafeAreaView style={styles.flex}>
       <View style={styles.container}>
         <StatusBar backgroundColor={THEMES.colors.bgColor} />
-        <Header
-          title={"Working Days & Time"}
-          showBack
-          bgColor="transparent"
-        />
+        <Header title={"Working Days & Time"} showBack bgColor="transparent" />
 
         {route !== "myprofile" && (
           <View style={styles.stepper}>
