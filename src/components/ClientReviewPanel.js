@@ -71,8 +71,11 @@ const ClientReviewPanel = ({ providerRating }) => {
           rating={rating}
           count={providerRating?.providerRatingCount?.[ratingKey[rating]]}
           percentage={
-            (providerRating?.providerRatingCount?.[ratingKey[rating]] / total) *
-            100
+            total
+              ? (+providerRating?.providerRatingCount?.[ratingKey[rating]] /
+                  total) *
+                100
+              : 0
           }
         />
       )),
@@ -112,7 +115,6 @@ const styles = StyleSheet.create({
     fontFamily: THEMES.fontFamily.semiBold,
     color: THEMES.colors.black,
     paddingTop: ms(10),
-    paddingLeft: ms(10),
   },
   chartContainer: {
     borderWidth: 1,
