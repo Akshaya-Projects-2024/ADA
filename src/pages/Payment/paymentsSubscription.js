@@ -662,25 +662,21 @@ const PaymentsSubscription = (props) => {
                     {Strings.viewBreakup}
                   </Text>
                 )}
-
-                {!userAlreadySubscribed && (
-                  <View
-                    style={[styles.btnView, { paddingTop: moderateScale(30) }]}
-                  >
-                    <TouchableButtonWithPermission
-                      customMsgForRegistration={
-                        "Registered and Subscribed to enjoy all the exciting features of ADA app."
-                      }
-                      useButton={true}
-                      onPress={handlePayment}
-                      title={Strings.payNow}
-                      checkPermission={checkStatus()}
-                    />
-                  </View>
-                )}
               </View>
             </ScrollView>
-
+            {!userAlreadySubscribed && (
+              <View style={[styles.btnView, { paddingTop: moderateScale(30) }]}>
+                <TouchableButtonWithPermission
+                  customMsgForRegistration={
+                    "Registered and Subscribed to enjoy all the exciting features of ADA app."
+                  }
+                  useButton={true}
+                  onPress={handlePayment}
+                  title={Strings.payNow}
+                  checkPermission={checkStatus()}
+                />
+              </View>
+            )}
             <Modal
               onBackButtonPress={toggleModal}
               isVisible={isModalVisible}

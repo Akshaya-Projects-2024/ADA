@@ -554,24 +554,22 @@ const SessionDetail = (props) => {
                     </View>
                   </>
                 ))}
-              {!isSubmit && <View style={{ marginBottom: ms(20) }} />}
-              {!isKeyboardVisible && isSubmit && (
-                <View
-                  style={{
-                    paddingBottom: moderateScale(25),
-                    paddingTop: moderateScale(30),
-                  }}
-                >
-                  <Button
-                    title={
-                      route !== "myprofile" ? Strings.next : Strings.submit
-                    }
-                    onPress={onSubmit}
-                  />
-                </View>
-              )}
             </View>
           </ScrollView>
+          {!isSubmit && <View style={{ marginBottom: ms(20) }} />}
+          {!isKeyboardVisible && isSubmit && (
+            <View
+              style={{
+                paddingBottom: moderateScale(25),
+                paddingTop: moderateScale(30),
+              }}
+            >
+              <Button
+                title={route !== "myprofile" ? Strings.next : Strings.submit}
+                onPress={onSubmit}
+              />
+            </View>
+          )}
         </View>
       </View>
       <Dialog

@@ -287,7 +287,7 @@ const PetDetail = (props) => {
 
   const handleCertificates = async (image) => {
     const extension = image?.fileName?.split(".").pop();
-    
+
     let payload = {
       documenttype: "certificate",
       extention: extension,
@@ -448,7 +448,7 @@ const PetDetail = (props) => {
     if (item?.item?.url && !photo) {
       extension = item?.item?.url?.split(".").pop();
     }
-    
+
     return (
       <View style={styles.imgContent}>
         {["jpg", "png", "jpeg"].includes(extension) ? (
@@ -492,7 +492,11 @@ const PetDetail = (props) => {
           right={
             !addNew && validArray(petDetails) ? (
               <View
-                style={{ flexDirection: "row", justifyContent: "flex-end", alignItems:'center' }}
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                }}
               >
                 <TouchableOpacity
                   style={{
@@ -615,20 +619,20 @@ const PetDetail = (props) => {
                 )}
               </View>
               <View pointerEvents={isSubmit ? "auto" : "none"}>
-              {/* Edit Icon */}
-              <TouchableOpacity
-                onPress={() =>setPetPhotoVisible(true) }
-                style={{
-                  position: "absolute",
-                  bottom: 5,
-                  right: 5,
-                  backgroundColor: "#00ACC1",
-                  borderRadius: 20,
-                  padding: 5,
-                }}
-              >
-                <Pencil />
-              </TouchableOpacity>
+                {/* Edit Icon */}
+                <TouchableOpacity
+                  onPress={() => setPetPhotoVisible(true)}
+                  style={{
+                    position: "absolute",
+                    bottom: 5,
+                    right: 5,
+                    backgroundColor: "#00ACC1",
+                    borderRadius: 20,
+                    padding: 5,
+                  }}
+                >
+                  <Pencil />
+                </TouchableOpacity>
               </View>
             </View>
             <View pointerEvents={isSubmit ? "auto" : "none"}>
@@ -861,18 +865,17 @@ const PetDetail = (props) => {
                 </View>
               </View>
             </View>
+          </ScrollView>
+
+          {(isSubmit || addNew) && (
             <View
               style={{
-                paddingTop: moderateScale(20),
-                paddingBottom: moderateScale(20),
-                paddingHorizontal: moderateScale(16),
+                padding: moderateScale(16),
               }}
             >
-              {(isSubmit || addNew) && (
-                <Button title="Submit" onPress={onSubmit} />
-              )}
+              <Button title="Submit" onPress={onSubmit} />
             </View>
-          </ScrollView>
+          )}
         </View>
         <UploadImageModal
           isVisible={petPhotoVisible}

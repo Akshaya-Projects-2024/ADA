@@ -17,10 +17,11 @@ import { createAppointment } from "../redux-store/actions/auth";
 import { contextValue } from "./Loader";
 import { useUser } from "../api/UserContext";
 import Toast from "react-native-toast-message";
-import Strings from "../constants/strings";
 import moment from "moment";
 import { SESSION_TYPE } from "../pages/Services/selectAppointment";
 import { decryptService } from "../utils/storageFunc";
+import Button from "./Button";
+import useKeyboardVisibility from "../hooks/useKeyboardVisibility";
 
 const AppointmentModal = React.memo(({ isVisible, onClose, onSuccess }) => {
   const [clientName, setClientName] = useState("");
@@ -28,6 +29,8 @@ const AppointmentModal = React.memo(({ isVisible, onClose, onSuccess }) => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const { userData } = useUser();
+  const [isSubmitPress, setIsSubmitPress] = useState(0);
+  const isKeyboardVisible = useKeyboardVisibility();
 
   const handleSubmit = async (
     selectedDate,
@@ -176,7 +179,7 @@ const AppointmentModal = React.memo(({ isVisible, onClose, onSuccess }) => {
       backdropOpacity={0.5}
       style={modalStyle}
     >
-      <ScrollView style={{flexGrow: 1}}>
+      <ScrollView style={{ flexGrow: 1 }}>
         <View style={containerStyle}>
           <Text style={titleStyle}>Add Appointment</Text>
           <View style={{ paddingTop: moderateScale(15) }}>
@@ -220,10 +223,20 @@ const AppointmentModal = React.memo(({ isVisible, onClose, onSuccess }) => {
             handleSubmit={handleSubmit}
             buttonTitle="Add"
             isrequestedbyProvider={true}
+            isSubmitPress={isSubmitPress}
           />
         </View>
-        <Toast />
       </ScrollView>
+      {!isKeyboardVisible && (
+        <View style={[styles.button]}>
+          <Button
+            title={"Add"}
+            onPress={() => setIsSubmitPress(isSubmitPress + 1)}
+          />
+        </View>
+      )}
+
+      <Toast />
     </Modal>
   );
 });
@@ -252,6 +265,12 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontFamily: THEMES.fontFamily.medium,
     fontSize: THEMES.fonts.font13,
+  },
+  button: {
+    bottom: 0,
+    paddingTop: moderateScale(30),
+    marginBottom: moderateScale(20),
+    width: "100%",
   },
 });
 

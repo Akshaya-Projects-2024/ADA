@@ -53,6 +53,7 @@ import { useUser } from "../../api/UserContext";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 import { navigateToParent } from "../../navigations/rootNavigationRef";
 import AddAppointmentModal from "../../components/AddAppointmentModal";
+import ClientReviewPanel from "../../components/ClientReviewPanel";
 
 const Home = (props) => {
   const { top } = useSafeAreaInsets();
@@ -727,123 +728,9 @@ const Home = (props) => {
                 paginationDots()}
             </View>
           </View>
-
-          <View
-            style={{
-              paddingTop: moderateScale(17),
-              paddingBottom: moderateScale(5),
-            }}
-          >
-            <Text
-              style={{
-                color: "#000",
-                fontFamily: THEMES.fontFamily.semiBold,
-                fontSize: THEMES.fonts.font14,
-              }}
-            >
-              Client Reviews
-            </Text>
-          </View>
-          <View>
-            <TouchableButtonWithPermission
-              customMsgForRegistration={
-                "Registered and Subscribed to enjoy all the exciting features of ADA app."
-              }
-              activeOpacity={1}
-              onPress={() => props.navigation.navigate("clientReview")}
-              style={styles.headerView}
-            >
-              <View style={styles.headerRow}>
-                <View style={styles.w25}>
-                  <Text style={styles.reviewCount}>
-                    {profile?.providerProfile?.providerRating?.rating}
-                  </Text>
-                  <Text
-                    style={styles.reviewsText}
-                  >{`${profile?.providerProfile?.providerRating?.totalratingcount} Reviews`}</Text>
-                </View>
-                <View style={styles.line} />
-                <View style={styles.w70}>
-                  <ReviewComponent
-                    reviewData={[
-                      {
-                        stars: 5,
-                        count:
-                          profile?.providerProfile?.providerRating
-                            ?.providerRatingCount?.five || 0,
-                        bgColor: "#FDD835",
-                      },
-                      {
-                        stars: 4,
-                        count:
-                          profile?.providerProfile?.providerRating
-                            ?.providerRatingCount?.four || 0,
-                        bgColor: "#fcc7b7",
-                      },
-                      {
-                        stars: 3,
-                        count:
-                          profile?.providerProfile?.providerRating
-                            ?.providerRatingCount?.three || 0,
-                        bgColor: "#6dae43",
-                      },
-                      {
-                        stars: 2,
-                        count:
-                          profile?.providerProfile?.providerRating
-                            ?.providerRatingCount?.two || 0,
-                        bgColor: "#21c2ce",
-                      },
-                      {
-                        stars: 1,
-                        count:
-                          profile?.providerProfile?.providerRating
-                            ?.providerRatingCount?.one || 0,
-                        bgColor: "#ab47bc",
-                      },
-                    ]}
-                    totalReviews={[
-                      {
-                        stars: 5,
-                        count:
-                          profile?.providerProfile?.providerRating
-                            ?.providerRatingCount?.five || 0,
-                        bgColor: "#FDD835",
-                      },
-                      {
-                        stars: 4,
-                        count:
-                          profile?.providerProfile?.providerRating
-                            ?.providerRatingCount?.four || 0,
-                        bgColor: "#fcc7b7",
-                      },
-                      {
-                        stars: 3,
-                        count:
-                          profile?.providerProfile?.providerRating
-                            ?.providerRatingCount?.three || 0,
-                        bgColor: "#6dae43",
-                      },
-                      {
-                        stars: 2,
-                        count:
-                          profile?.providerProfile?.providerRating
-                            ?.providerRatingCount?.two || 0,
-                        bgColor: "#21c2ce",
-                      },
-                      {
-                        stars: 1,
-                        count:
-                          profile?.providerProfile?.providerRating
-                            ?.providerRatingCount?.one || 0,
-                        bgColor: "#ab47bc",
-                      },
-                    ].reduce((sum, review) => sum + review.count, 0)}
-                  />
-                </View>
-              </View>
-            </TouchableButtonWithPermission>
-          </View>
+          <ClientReviewPanel
+            providerRating={profile?.providerProfile?.providerRating}
+          />
         </ScrollView>
       </View>
       <Modal

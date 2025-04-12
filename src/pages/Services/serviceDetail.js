@@ -539,22 +539,27 @@ const ServiceDetail = ({ navigation, route }) => {
                   })}
                 </ScrollView>
               </View>
-              <View style={{ paddingTop: moderateScale(40) }}>
-                <Button
-                  title="Book Appointment"
-                  onPress={() =>
-                    bookAppointmentDisabled
-                      ? setModal(true)
-                      : navigation.navigate("selectAppointment", {
-                          selectedProvider: selectedProvider,
-                          selectedService: selectedService,
-                        })
-                  }
-                />
-              </View>
             </View>
           </View>
         </ScrollView>
+        <View
+          style={{
+            paddingVertical: moderateScale(20),
+            paddingHorizontal: ms(15),
+          }}
+        >
+          <Button
+            title="Book Appointment"
+            onPress={() =>
+              bookAppointmentDisabled
+                ? setModal(true)
+                : navigation.navigate("selectAppointment", {
+                    selectedProvider: selectedProvider,
+                    selectedService: selectedService,
+                  })
+            }
+          />
+        </View>
       </View>
       <Dialog
         flag={modal}

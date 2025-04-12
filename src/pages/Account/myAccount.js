@@ -124,7 +124,9 @@ const MyAccount = (props) => {
       {
         label: Strings.sessionDetails,
         onPress: () => {
-          navigate("sessionDetail", { route: "myprofile" });
+          userData?.providerProfile?.providerBusiness?.id
+            ? navigate("sessionDetail", { route: "myprofile" })
+            : navigate("businessDetail", { route: "myprofile" });
         },
       },
       {

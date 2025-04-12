@@ -211,10 +211,7 @@ const ClientReview = () => {
         <View style={styles.headerView}>
           <View style={styles.headerRow}>
             <View style={styles.w25}>
-              <Text style={styles.reviewCount}>
-                {console.log(reviewData)}
-                {reviewData?.rating}
-              </Text>
+              <Text style={styles.reviewCount}>{reviewData?.rating}</Text>
               <Text style={styles.reviewsText}>
                 {reviewData?.reviews?.length == 0
                   ? "0"
@@ -258,7 +255,7 @@ const ClientReview = () => {
                 />
               </View>
             )}
-            <View style={{width: 140}}>
+            <View style={{ width: 140 }}>
               <Dropdown
                 onChange={(value) => {
                   setFilterData({
@@ -306,7 +303,7 @@ const ClientReview = () => {
 
   useEffect(() => {
     if (!isModalVisible) {
-      initData(1,true);
+      initData(1, true);
     }
   }, [isModalVisible]);
 
@@ -327,18 +324,15 @@ const ClientReview = () => {
       let res = await getAllReviews(obj);
       if (res) {
         const newReviews = res?.reviews;
-        if (newReviews.length === 0) {
-          setHasMore(false); // No more data to load
-        } else {
-          setGlobalReviews((prevReviews) => {
-            const combined = pageNum == 1 ? [...newReviews] : [...prevReviews, ...newReviews];
-            return Array.from(new Set(combined.map((review) => review.id))) // Remove duplicates
-              .map((id) => combined.find((review) => review.id === id));
-          });
-          setReviewData(res);
-          setHasMore(newReviews.length > 0);
-          setPage((prevPage) => prevPage + 1);
-        }
+        setGlobalReviews((prevReviews) => {
+          const combined =
+            pageNum == 1 ? [...newReviews] : [...prevReviews, ...newReviews];
+          return Array.from(new Set(combined.map((review) => review.id))) // Remove duplicates
+            .map((id) => combined.find((review) => review.id === id));
+        });
+        setReviewData(res);
+        setHasMore(newReviews.length > 0);
+        setPage((prevPage) => prevPage + 1);
       }
     } catch (error) {
     } finally {
@@ -369,7 +363,14 @@ const ClientReview = () => {
 
   const EmptyContentView = () => {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          height: 300,
+        }}
+      >
         <Text
           style={{
             color: "#000",
@@ -421,7 +422,7 @@ const ClientReview = () => {
               source={require("../../assets/images/roundIcon.png")}
             />
           </Pressable>
-        ) : globalReviews?.length > 0 ? (
+        ) : (
           <View style={styles.mainView}>
             <FlatList
               data={globalReviews}
@@ -432,6 +433,7 @@ const ClientReview = () => {
               onEndReached={() => initData(page)}
               onEndReachedThreshold={0.5}
               keyExtractor={(item) => item.id}
+              ListEmptyComponent={EmptyContentView}
               ListFooterComponent={
                 loadingMore ? (
                   <ActivityIndicator size="small" color="gray" />
@@ -439,8 +441,6 @@ const ClientReview = () => {
               }
             />
           </View>
-        ) : (
-          <EmptyContentView />
         )}
 
         <Modal

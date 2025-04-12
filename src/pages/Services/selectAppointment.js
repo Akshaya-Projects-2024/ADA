@@ -20,6 +20,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import SessionsForAppointment from "../../components/SessionsForAppointment";
 import Dialog from "../../components/Dialog";
 import PetSelection from "../../components/PetSelection";
+import { ScrollView } from "react-native-gesture-handler";
+import useKeyboardVisibility from "../../hooks/useKeyboardVisibility";
+import Button from "../../components/Button";
 
 export const SESSION_TYPE = { oneTime: "one_time", recursive: "recursive" };
 
@@ -36,6 +39,8 @@ const SelectAppointment = ({ navigation, route }) => {
   const [selectedPet, setSelectedPet] = useState(
     profile?.parentProfie?.petDetails[0]?.id
   );
+  const [isSubmitPress, setIsSubmitPress] = useState(0);
+  const isKeyboardVisible = useKeyboardVisibility();
 
   const handleSubmit = async (
     selectedDate,
@@ -45,6 +50,8 @@ const SelectAppointment = ({ navigation, route }) => {
     sessionSelection
   ) => {
     const userId = await decryptService("userId");
+    console.log(selectedSlot);
+    
     try {
       if (!selectedProvider?.profile?.providerBusiness?.userid) {
         throw new Error("Invalid Provider! Please select valid provider");
@@ -65,7 +72,8 @@ const SelectAppointment = ({ navigation, route }) => {
       } else if (!profile?.parentProfie?.petDetails[0]?.id) {
         throw new Error("No pet found in your profile");
       } else if (
-        selectedProvider?.profile?.providerBusiness?.userid?.toLowerCase() == userId?.toLowerCase()
+        selectedProvider?.profile?.providerBusiness?.userid?.toLowerCase() ==
+        userId?.toLowerCase()
       ) {
         throw new Error("You can't book an appointment with yourself.");
       } else {
@@ -157,27 +165,41 @@ const SelectAppointment = ({ navigation, route }) => {
           fontColor="#EC559C"
           bgColor="transparent"
         />
-        <View
-          style={{
-            paddingTop: moderateScale(15),
-            paddingHorizontal: moderateScale(16),
-          }}
-        >
-          <Text style={styles.headerText}>Category</Text>
-          <FlatList
-            data={selectedProvider?.profile?.ProviderSession?.availableat ?? []}
-            renderItem={renderCategory}
-            keyExtractor={(item) => item}
-            horizontal={false}
-            contentContainerStyle={styles.categoryList}
+        <ScrollView>
+          <View
+            style={{
+              paddingTop: moderateScale(15),
+              paddingHorizontal: moderateScale(16),
+            }}
+          >
+            <Text style={styles.headerText}>Category</Text>
+            <FlatList
+              data={
+                selectedProvider?.profile?.ProviderSession?.availableat ?? []
+              }
+              renderItem={renderCategory}
+              keyExtractor={(item) => item}
+              horizontal={false}
+              contentContainerStyle={styles.categoryList}
+            />
+          </View>
+          <SessionsForAppointment
+            selectedProviderId={
+              selectedProvider?.profile?.providerBusiness?.userid
+            }
+            handleSubmit={handleSubmit}
+            isSubmitPress={isSubmitPress}
           />
-        </View>
-        <SessionsForAppointment
-          selectedProviderId={
-            selectedProvider?.profile?.providerBusiness?.userid
-          }
-          handleSubmit={handleSubmit}
-        />
+        </ScrollView>
+        {!isKeyboardVisible && (
+          <View style={[styles.button]}>
+            <Button
+              title={"Confirm"}
+              onPress={() => setIsSubmitPress(isSubmitPress + 1)}
+            />
+          </View>
+        )}
+
         <Dialog
           flag={Boolean(appointmentConfirm)}
           title={"Booking Confirmed !"}
@@ -368,6 +390,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: THEMES.colors.cyan,
     borderWidth: 1,
+  },
+  button: {
+    bottom: 0,
+    paddingTop: moderateScale(30),
+    paddingHorizontal: moderateScale(15),
+    marginBottom: moderateScale(15),
+    width: "100%",
   },
 });
 

@@ -383,22 +383,21 @@ const ParentDetails = (props) => {
                     onChange={setPincode}
                   />
                 </View>
-                <View
-                  style={{
-                    paddingTop: moderateScale(16),
-                    paddingBottom: moderateScale(24),
-                  }}
-                >
-                  {isSubmit && (
-                    <Button
-                      title={parentContact?.id == 0 ? "Next" : "Submit"}
-                      onPress={() => onSubmit()}
-                    />
-                  )}
-                </View>
               </View>
             </View>
           </ScrollView>
+          {isSubmit && (
+            <View
+              style={{
+                padding: moderateScale(16),
+              }}
+            >
+              <Button
+                title={parentContact?.id == 0 ? "Next" : "Submit"}
+                onPress={() => onSubmit()}
+              />
+            </View>
+          )}
           <UploadImageModal
             isVisible={visible}
             onClose={() => setVisible(false)}

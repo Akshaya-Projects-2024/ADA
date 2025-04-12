@@ -28,6 +28,7 @@ const SessionsForAppointment = ({
   handleSubmit,
   buttonTitle = "Confirm",
   isrequestedbyProvider = false,
+  isSubmitPress,
 }) => {
   const [sessionSelection, setSessionSelection] = useState(
     SESSION_TYPE.oneTime
@@ -41,6 +42,10 @@ const SessionsForAppointment = ({
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [timeSlots, setTimeSlots] = useState({});
   const [slotsforSession, setSlotsforSession] = useState({});
+
+  useEffect(() => {
+    isSubmitPress && handleButtonPressed();
+  }, [isSubmitPress]);
 
   const handleDatePress = (date) => {
     setSelectedDate(date);
@@ -590,14 +595,6 @@ const SessionsForAppointment = ({
         date={endDate ? new Date(endDate) : new Date()}
         maximumDate={minmaxDate?.maximumDate}
       />
-      <View
-        style={[
-          styles.button,
-          isrequestedbyProvider && { marginHorizontal: 0 },
-        ]}
-      >
-        <Button title={buttonTitle} onPress={handleButtonPressed} />
-      </View>
     </View>
   );
 };
