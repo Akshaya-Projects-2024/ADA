@@ -102,11 +102,6 @@ const MediaLink = (props) => {
       };
       const res = await saveMediaLinks(postData);
       if (res?.status == 200) {
-        console.log(
-          +userData?.providerProfile?.MediaLinks?.id,
-          userData?.providerstatus
-        );
-
         if (
           !Boolean(+userData?.providerProfile?.MediaLinks?.id) &&
           userData?.logindetails?.providerstatus === "AAPPROVALPENDING"
