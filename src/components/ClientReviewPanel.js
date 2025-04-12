@@ -24,7 +24,7 @@ const RATING_COLORS = {
   1: "#AB47BC",
 };
 
-const RatingBar = React.memo(({ rating, percentage = 80 }) => {
+const RatingBar = React.memo(({ rating, percentage = 80, count }) => {
   const animatedWidth = new Animated.Value(0);
 
   useEffect(() => {
@@ -54,6 +54,9 @@ const RatingBar = React.memo(({ rating, percentage = 80 }) => {
           ]}
         />
       </View>
+      <View style={{ paddingHorizontal: ms(10) }}>
+        <Text style={styles.ratingText}>{count || 0}</Text>
+      </View>
     </View>
   );
 });
@@ -66,6 +69,7 @@ const ClientReviewPanel = ({ providerRating }) => {
         <RatingBar
           key={rating}
           rating={rating}
+          count={providerRating?.providerRatingCount?.[ratingKey[rating]]}
           percentage={
             (providerRating?.providerRatingCount?.[ratingKey[rating]] / total) *
             100
@@ -138,12 +142,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: ms(8),
+    elevation: 20,
   },
   ratingText: {
     color: "rgba(0, 0, 0, 0.56)",
+    fontFamily: THEMES.fontFamily.medium,
+    fontSize: ms(12),
   },
   progressBackground: {
-    width: "80%",
+    width: "70%",
     height: ms(8),
     backgroundColor: "rgb(233, 229, 229)",
     borderRadius: ms(8),
