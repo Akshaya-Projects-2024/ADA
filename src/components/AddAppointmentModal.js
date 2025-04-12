@@ -5,6 +5,7 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 import Modal from "react-native-modal";
 import { moderateScale } from "react-native-size-matters";
@@ -175,52 +176,54 @@ const AppointmentModal = React.memo(({ isVisible, onClose, onSuccess }) => {
       backdropOpacity={0.5}
       style={modalStyle}
     >
-      <View style={containerStyle}>
-        <Text style={titleStyle}>Add Appointment</Text>
-        <View style={{ paddingTop: moderateScale(15) }}>
-          <InputField
-            label={"Client name *"}
-            placeholderText={"Enter client name"}
-            value={clientName}
-            onChange={setClientName}
+      <ScrollView style={{flexGrow: 1}}>
+        <View style={containerStyle}>
+          <Text style={titleStyle}>Add Appointment</Text>
+          <View style={{ paddingTop: moderateScale(15) }}>
+            <InputField
+              label={"Client name *"}
+              placeholderText={"Enter client name"}
+              value={clientName}
+              onChange={setClientName}
+            />
+          </View>
+          <View style={{ paddingTop: moderateScale(15) }}>
+            <InputField
+              label={"Pet name *"}
+              placeholderText={"Enter pet name"}
+              value={petName}
+              onChange={setPetName}
+            />
+          </View>
+          <View style={{ paddingTop: moderateScale(15) }}>
+            <InputField
+              maxLength={10}
+              keyboardType="phone-pad"
+              label={"Mobile number *"}
+              placeholderText={"Enter mobile number"}
+              value={mobileNumber}
+              onChange={setMobileNumber}
+            />
+          </View>
+          <View style={categoryContainerStyle}>
+            <Text style={titleStyle}>Category</Text>
+            <FlatList
+              data={services}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={renderCategory}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            />
+          </View>
+          <SessionsForAppointment
+            selectedProviderId={userId}
+            handleSubmit={handleSubmit}
+            buttonTitle="Add"
+            isrequestedbyProvider={true}
           />
         </View>
-        <View style={{ paddingTop: moderateScale(15) }}>
-          <InputField
-            label={"Pet name *"}
-            placeholderText={"Enter pet name"}
-            value={petName}
-            onChange={setPetName}
-          />
-        </View>
-        <View style={{ paddingTop: moderateScale(15) }}>
-          <InputField
-            maxLength={10}
-            keyboardType="phone-pad"
-            label={"Mobile number *"}
-            placeholderText={"Enter mobile number"}
-            value={mobileNumber}
-            onChange={setMobileNumber}
-          />
-        </View>
-        <View style={categoryContainerStyle}>
-          <Text style={titleStyle}>Category</Text>
-          <FlatList
-            data={services}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={renderCategory}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          />
-        </View>
-        <SessionsForAppointment
-          selectedProviderId={userId}
-          handleSubmit={handleSubmit}
-          buttonTitle="Add"
-          isrequestedbyProvider={true}
-        />
-      </View>
-      <Toast />
+        <Toast />
+      </ScrollView>
     </Modal>
   );
 });

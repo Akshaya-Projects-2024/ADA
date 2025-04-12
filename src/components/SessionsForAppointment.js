@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, ms } from "react-native-size-matters";
 import Strings from "../constants/strings";
 import { SESSION_TYPE } from "../pages/Services/selectAppointment";
 import InputField from "./InputField";
@@ -264,7 +264,11 @@ const SessionsForAppointment = ({
                     startDate ? moment(startDate)?.format("YYYY-MM-DD") : null
                   }
                   type="small"
-                  inputStyle={styles.startDateInput}
+                  inputStyle={
+                    isrequestedbyProvider
+                      ? { marginRight: ms(10) }
+                      : styles.startDateInput
+                  }
                   editable={false}
                 />
               </Pressable>
@@ -279,7 +283,11 @@ const SessionsForAppointment = ({
                   placeholderText={"--"}
                   value={endDate ? moment(endDate)?.format("YYYY-MM-DD") : null}
                   type="small"
-                  inputStyle={styles.endDateInput}
+                  inputStyle={
+                    isrequestedbyProvider
+                      ? { marginLeft: ms(10) }
+                      : styles.endDateInput
+                  }
                   editable={false}
                 />
               </Pressable>
@@ -289,6 +297,7 @@ const SessionsForAppointment = ({
                 data={slotsforSession}
                 setSelectedSlot={setSelectedSlot}
                 selectedSlot={selectedSlot}
+                isrequestedbyProvider={isrequestedbyProvider}
               />
             )}
           </>

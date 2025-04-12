@@ -60,7 +60,7 @@ const SessionDetail = (props) => {
 
   useEffect(() => {
     initData();
-    if(!ProviderSession?.id) {
+    if (!ProviderSession?.id) {
       setIsSubmit(true);
     }
     const keyboardDidShowListener = Keyboard.addListener(
@@ -306,11 +306,11 @@ const SessionDetail = (props) => {
           showBack
           bgColor="transparent"
           right={
-            route === "myprofile" ? (
+            route === "myprofile" && ProviderSession?.id ? (
               <TouchableOpacity
                 style={{
                   paddingVertical: 10,
-                  paddingHorizontal: 15,
+                  paddingHorizontal: 5,
                 }}
                 onPress={() => editPopup()}
               >

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import Carousel from "react-native-snap-carousel";
 import { THEMES } from "../../assets/theme/themes";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, ms } from "react-native-size-matters";
 import ArrowRight from "../../assets/svg/arrow-right-white.svg";
 import Calendar from "../../assets/svg/calendar-white.svg";
 import Clock from "../../assets/svg/clock.svg";
@@ -24,7 +24,11 @@ import {
   setLoggedInMoodule,
   validateServiceProfile,
 } from "../../utils/userUtils";
-import { AppointmentStatus, LoginModules } from "../../constants/enums";
+import {
+  AppointmentStatus,
+  LoginModules,
+  ParentBannerList,
+} from "../../constants/enums";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import Strings from "../../constants/strings";
@@ -463,6 +467,14 @@ const ParentHome = (props) => {
     }
   };
 
+  const renderBannerItem = ({ item }) => {
+    return (
+      <View>
+        <Image source={item?.url} />
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
       <StatusBar
@@ -537,18 +549,37 @@ const ParentHome = (props) => {
           </View>
         </View>
 
-        <Carousel
-          data={[...appointmentData, ...eventData]}
-          renderItem={renderItem}
-          sliderWidth={screenWidth}
-          itemWidth={screenWidth * 0.9}
-          onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
-          loop={true}
-          enableSnap={true}
-          autoplay={true}
-        />
-        {(appointmentData?.length > 1 ||
-          eventData?.length > 1) && paginationDots()}
+        {Boolean([...appointmentData, ...eventData].length) ? (
+          <>
+            <Carousel
+              data={[...appointmentData, ...eventData]}
+              renderItem={renderItem}
+              sliderWidth={screenWidth}
+              itemWidth={screenWidth * 0.9}
+              onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
+              loop={true}
+              enableSnap={true}
+              autoplay={true}
+            />
+            {(appointmentData?.length > 1 || eventData?.length > 1) &&
+              paginationDots()}
+          </>
+        ) : (
+          <View
+            style={{ marginTop: ms(20), paddingHorizontal: moderateScale(15) }}
+          >
+            <Carousel
+              data={ParentBannerList}
+              renderItem={renderBannerItem}
+              sliderWidth={screenWidth}
+              itemWidth={screenWidth}
+              onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
+              loop={appointmentData?.length > 1}
+              enableSnap={true}
+              autoplay={true}
+            />
+          </View>
+        )}
 
         <View>
           <View

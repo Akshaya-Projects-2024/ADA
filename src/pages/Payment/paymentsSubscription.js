@@ -125,7 +125,7 @@ const PaymentsSubscription = (props) => {
         const message = "Promo code has been applied successfully";
         setPromoCodeDetails(res);
         setSuccessPromocode(message);
-        setPromoCodeModal(false)
+        setPromoCodeModal(false);
       } else {
         const message = res?.message;
         setValidation(message);
@@ -178,7 +178,7 @@ const PaymentsSubscription = (props) => {
           const acknowledgeResponse = await acknowledgeSubscription(params);
           if (acknowledgeResponse?.status === 200) {
             await fetchUserProfile();
-           await  apiInitCall();
+            await apiInitCall();
             setSubscription(true);
           }
         }
@@ -421,444 +421,454 @@ const PaymentsSubscription = (props) => {
           bgColor="transparent"
           fontColor={THEMES.colors.black}
         />
-        <View style={styles.mainContent}>
-          <ScrollView
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
-            bounces={false}
-          >
-            <View style={styles.paymentDetailsView}>
-              <TouchableButtonWithPermission
-                customMsgForRegistration={
-                  "Registered and Subscribed to enjoy all the exciting features of ADA app."
-                }
-                onPress={() => props.navigation.navigate("paymentDetails")}
-                style={styles.paymentDetailsBtn}
-              >
-                <Text style={styles.paymentDetailsText}>
-                  {Strings.paymentDetails}
-                </Text>
-                <ArrowRight />
-              </TouchableButtonWithPermission>
-            </View>
-            <Text
-              style={[
-                styles.joinTheFunText,
-                {
-                  color: userAlreadySubscribed
-                    ? THEMES.colors.cyan
-                    : THEMES.colors.black,
-                },
-              ]}
+        {Boolean(selectedCard) && (
+          <View style={styles.mainContent}>
+            <ScrollView
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
             >
-              {userAlreadySubscribed
-                ? Strings.youAreAlreadySubscribed
-                : Strings.joinTheFun}
-            </Text>
-
-            <View style={styles.rowContainer}>
-              <ScrollView
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                style={{ flex: 1 }}
-                contentContainerStyle={{
-                  flexGrow: 1,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+              <View style={styles.paymentDetailsView}>
+                <TouchableButtonWithPermission
+                  customMsgForRegistration={
+                    "Registered and Subscribed to enjoy all the exciting features of ADA app."
+                  }
+                  onPress={() => props.navigation.navigate("paymentDetails")}
+                  style={styles.paymentDetailsBtn}
+                >
+                  <Text style={styles.paymentDetailsText}>
+                    {Strings.paymentDetails}
+                  </Text>
+                  <ArrowRight />
+                </TouchableButtonWithPermission>
+              </View>
+              <Text
+                style={[
+                  styles.joinTheFunText,
+                  {
+                    color: userAlreadySubscribed
+                      ? THEMES.colors.cyan
+                      : THEMES.colors.black,
+                  },
+                ]}
               >
-                {validArray(subscriptionData)
-                  ? subscriptionData?.map((plan, index) => {
-                      return (
-                        <View key={plan?.id}>
-                          <TouchableOpacity
-                            disabled={userAlreadySubscribed}
-                            style={[
-                              styles.card,
-                              selectedCard?.id === plan?.id
-                                ? { borderWidth: 0, elevation: 5 }
-                                : { borderWidth: 1, borderColor: "#d3d3d3" },
-                              ,
-                              {
-                                width:
-                                  selectedCard?.id === plan?.id ? 130 : 113,
-                                height:
-                                  selectedCard?.id === plan?.id ? 127 : 107,
-                                backgroundColor: "#f2e2f4",
-                                borderColor: "#ab47bc",
-                                marginRight:
-                                  index !== subscriptionData?.length - 1 &&
-                                  moderateScale(20),
-                              },
-                            ]}
-                            onPress={() => onCardClick(plan)}
-                          >
-                            {selectedCard?.id === plan?.id ? (
-                              <LinearGradient
-                                colors={["#fb427c", "#fd6da2", "#fd98a5"]}
-                                style={[
-                                  styles.gradientBackground,
-                                  {
-                                    width:
-                                      selectedCard?.id === plan?.id ? 130 : 113,
-                                    height:
-                                      selectedCard?.id === plan?.id ? 127 : 107,
-                                  },
-                                ]}
-                              >
-                                {plan?.flatdiscount !== 0 && (
-                                  <Text style={styles.discountText}>
-                                    {plan?.flatdiscount}% Off
-                                  </Text>
-                                )}
+                {userAlreadySubscribed
+                  ? Strings.youAreAlreadySubscribed
+                  : Strings.joinTheFun}
+              </Text>
 
-                                <Text style={styles.monthText}>
-                                  {plan?.name.replace(" MONTH", "")}
-                                </Text>
-                                <Text
-                                  style={{
-                                    color: "#fff",
-                                    fontFamily: THEMES.fontFamily.medium,
-                                    fontSize: THEMES.fonts.font12,
-                                  }}
+              <View style={styles.rowContainer}>
+                <ScrollView
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                  style={{ flex: 1 }}
+                  contentContainerStyle={{
+                    flexGrow: 1,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {validArray(subscriptionData)
+                    ? subscriptionData?.map((plan, index) => {
+                        return (
+                          <View key={plan?.id}>
+                            <TouchableOpacity
+                              disabled={userAlreadySubscribed}
+                              style={[
+                                styles.card,
+                                selectedCard?.id === plan?.id
+                                  ? { borderWidth: 0, elevation: 5 }
+                                  : { borderWidth: 1, borderColor: "#d3d3d3" },
+                                ,
+                                {
+                                  width:
+                                    selectedCard?.id === plan?.id ? 130 : 113,
+                                  height:
+                                    selectedCard?.id === plan?.id ? 127 : 107,
+                                  backgroundColor: "#f2e2f4",
+                                  borderColor: "#ab47bc",
+                                  marginRight:
+                                    index !== subscriptionData?.length - 1 &&
+                                    moderateScale(20),
+                                },
+                              ]}
+                              onPress={() => onCardClick(plan)}
+                            >
+                              {selectedCard?.id === plan?.id ? (
+                                <LinearGradient
+                                  colors={["#fb427c", "#fd6da2", "#fd98a5"]}
+                                  style={[
+                                    styles.gradientBackground,
+                                    {
+                                      width:
+                                        selectedCard?.id === plan?.id
+                                          ? 130
+                                          : 113,
+                                      height:
+                                        selectedCard?.id === plan?.id
+                                          ? 127
+                                          : 107,
+                                    },
+                                  ]}
                                 >
-                                  Months
-                                </Text>
-                                <View style={styles.checkIcon}>
-                                  <Text style={styles.checkText}>✔</Text>
-                                </View>
-                              </LinearGradient>
-                            ) : (
-                              <View
-                                style={[
-                                  styles.cardContent,
-                                  { backgroundColor: "#f2e2f4" },
-                                ]}
-                              >
-                                {plan?.flatdiscount !== 0 && (
+                                  {plan?.flatdiscount !== 0 && (
+                                    <Text style={styles.discountText}>
+                                      {plan?.flatdiscount}% Off
+                                    </Text>
+                                  )}
+
+                                  <Text style={styles.monthText}>
+                                    {plan?.name.replace(" MONTH", "")}
+                                  </Text>
+                                  <Text
+                                    style={{
+                                      color: "#fff",
+                                      fontFamily: THEMES.fontFamily.medium,
+                                      fontSize: THEMES.fonts.font12,
+                                    }}
+                                  >
+                                    Months
+                                  </Text>
+                                  <View style={styles.checkIcon}>
+                                    <Text style={styles.checkText}>✔</Text>
+                                  </View>
+                                </LinearGradient>
+                              ) : (
+                                <View
+                                  style={[
+                                    styles.cardContent,
+                                    { backgroundColor: "#f2e2f4" },
+                                  ]}
+                                >
+                                  {plan?.flatdiscount !== 0 && (
+                                    <Text
+                                      style={[
+                                        styles.discountText,
+                                        { color: "#000" },
+                                      ]}
+                                    >
+                                      {plan?.flatdiscount}% Off
+                                    </Text>
+                                  )}
                                   <Text
                                     style={[
-                                      styles.discountText,
+                                      styles.monthText,
                                       { color: "#000" },
                                     ]}
                                   >
-                                    {plan?.flatdiscount}% Off
+                                    {plan?.name?.replace(" MONTH", "")}
                                   </Text>
-                                )}
-                                <Text
-                                  style={[styles.monthText, { color: "#000" }]}
-                                >
-                                  {plan?.name?.replace(" MONTH", "")}
-                                </Text>
-                                <Text
-                                  style={[styles.monthLabel, { color: "#000" }]}
-                                >
-                                  Months
-                                </Text>
-                              </View>
-                            )}
-                          </TouchableOpacity>
+                                  <Text
+                                    style={[
+                                      styles.monthLabel,
+                                      { color: "#000" },
+                                    ]}
+                                  >
+                                    Months
+                                  </Text>
+                                </View>
+                              )}
+                            </TouchableOpacity>
+                          </View>
+                        );
+                      })
+                    : null}
+                </ScrollView>
+              </View>
+              <View style={styles.unlockView}>
+                <Text style={styles.unlockText}>
+                  {Strings.unlockPremiumFeature}
+                </Text>
+              </View>
+              <View>
+                {selectedCard?.details && (
+                  <View style={{ marginBottom: moderateScale(5) }}>
+                    {selectedCard?.details?.map((item) => (
+                      <View style={styles.listItem}>
+                        {/* Bullet Point */}
+                        <View style={styles.bullet}>
+                          <Text style={styles.bulletText}>{"\u2022"}</Text>
                         </View>
-                      );
-                    })
-                  : null}
-              </ScrollView>
-            </View>
-            <View style={styles.unlockView}>
-              <Text style={styles.unlockText}>
-                {Strings.unlockPremiumFeature}
-              </Text>
-            </View>
-            <View>
-              {selectedCard?.details && (
-                <View style={{ marginBottom: moderateScale(5) }}>
-                  {selectedCard?.details?.map((item) => (
-                    <View style={styles.listItem}>
-                      {/* Bullet Point */}
-                      <View style={styles.bullet}>
-                        <Text style={styles.bulletText}>{"\u2022"}</Text>
+                        {/* List Text */}
+                        <Text style={styles.listText}>{item}</Text>
                       </View>
-                      {/* List Text */}
-                      <Text style={styles.listText}>{item}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </View>
-            <View>
-              {subscriptionDetails?.amount && selectedCard?.flatdiscount ? (
-                <View style={styles.subscriptionView}>
-                  <Text style={styles.subscriptionText}>
-                    {Strings.subscriptionCost}:{" "}
-                    <Text
-                      style={{
-                        fontFamily: "Inter-Medium",
-                        color: "#000",
-                        fontSize: moderateScale(14),
-                        textDecorationLine: "line-through",
-                      }}
-                    >
-                      ₹ {selectedCard?.amount}
-                    </Text>{" "}
-                    <Text
-                      style={[
-                        styles.subscriptionCost,
-                        { color: THEMES.colors.bottomBarGreen },
-                      ]}
-                    >
-                      ₹ {""}
-                      {promocodeDetails?.discount
-                        ? `${calcuateTotal(
-                            `${selectedCard?.amount}`,
-                            `${selectedCard?.flatdiscount}`,
-                            `${promocodeDetails?.discount}`
-                          )}`
-                        : `${calculateDiscount(
-                            `${selectedCard?.amount}`,
-                            `${selectedCard?.flatdiscount}`
-                          )}`}
-                      {/* { +
-                      calculateDiscount(
-                        `${selectedCard?.amount}`,
-                        `${selectedCard?.flatdiscount}`
-                      )} */}
+                    ))}
+                  </View>
+                )}
+              </View>
+              <View>
+                {subscriptionDetails?.amount && selectedCard?.flatdiscount ? (
+                  <View style={styles.subscriptionView}>
+                    <Text style={styles.subscriptionText}>
+                      {Strings.subscriptionCost}:{" "}
+                      <Text
+                        style={{
+                          fontFamily: "Inter-Medium",
+                          color: "#000",
+                          fontSize: moderateScale(14),
+                          textDecorationLine: "line-through",
+                        }}
+                      >
+                        ₹ {selectedCard?.amount}
+                      </Text>{" "}
+                      <Text
+                        style={[
+                          styles.subscriptionCost,
+                          { color: THEMES.colors.bottomBarGreen },
+                        ]}
+                      >
+                        ₹ {""}
+                        {promocodeDetails?.discount
+                          ? `${calcuateTotal(
+                              `${selectedCard?.amount}`,
+                              `${selectedCard?.flatdiscount}`,
+                              `${promocodeDetails?.discount}`
+                            )}`
+                          : `${calculateDiscount(
+                              `${selectedCard?.amount}`,
+                              `${selectedCard?.flatdiscount}`
+                            )}`}
+                        {/* { +
+                     calculateDiscount(
+                       `${selectedCard?.amount}`,
+                       `${selectedCard?.flatdiscount}`
+                     )} */}
+                      </Text>
                     </Text>
-                  </Text>
-                </View>
-              ) : null}
-              {!userAlreadySubscribed ? (
-                <View
-                  style={{
-                    paddingTop: moderateScale(20),
-                    marginHorizontal: moderateScale(50),
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Text
-                    onPress={togglePromoCodeModal}
-                    style={styles.viewBreakupText}
+                  </View>
+                ) : null}
+                {!userAlreadySubscribed ? (
+                  <View
+                    style={{
+                      paddingTop: moderateScale(20),
+                      marginHorizontal: moderateScale(50),
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
                   >
-                    {promocodeDetails ? "View Promocode" : "Apply Promocode"}
-                  </Text>
+                    <Text
+                      onPress={togglePromoCodeModal}
+                      style={styles.viewBreakupText}
+                    >
+                      {promocodeDetails ? "View Promocode" : "Apply Promocode"}
+                    </Text>
+                    <Text onPress={toggleModal} style={styles.viewBreakupText}>
+                      {Strings.viewBreakup}
+                    </Text>
+                  </View>
+                ) : (
                   <Text onPress={toggleModal} style={styles.viewBreakupText}>
                     {Strings.viewBreakup}
                   </Text>
+                )}
+
+                {!userAlreadySubscribed && (
+                  <View
+                    style={[styles.btnView, { paddingTop: moderateScale(30) }]}
+                  >
+                    <TouchableButtonWithPermission
+                      customMsgForRegistration={
+                        "Registered and Subscribed to enjoy all the exciting features of ADA app."
+                      }
+                      useButton={true}
+                      onPress={handlePayment}
+                      title={Strings.payNow}
+                      checkPermission={checkStatus()}
+                    />
+                  </View>
+                )}
+              </View>
+            </ScrollView>
+
+            <Modal
+              onBackButtonPress={toggleModal}
+              isVisible={isModalVisible}
+              onBackdropPress={toggleModal}
+              style={styles.modal}
+              swipeDirection="down"
+            >
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>{Strings.viewBreakup}</Text>
+                <View style={styles.modalSubscription}>
+                  <Text style={styles.modalSubscriptionCost}>
+                    {Strings.subscriptionCost}:
+                  </Text>
+                  <Text numberOfLines={1} style={styles.subscriptionPrice}>
+                    {"₹ " + selectedCard?.amount}
+                  </Text>
                 </View>
-              ) : (
-                <Text onPress={toggleModal} style={styles.viewBreakupText}>
-                  {Strings.viewBreakup}
-                </Text>
-              )}
-
-              {!userAlreadySubscribed && (
-                <View
-                  style={[styles.btnView, { paddingTop: moderateScale(30) }]}
-                >
-                  <TouchableButtonWithPermission
-                    customMsgForRegistration={
-                      "Registered and Subscribed to enjoy all the exciting features of ADA app."
-                    }
-                    useButton={true}
-                    onPress={handlePayment}
-                    title={Strings.payNow}
-                    checkPermission={checkStatus()}
-                  />
-                </View>
-              )}
-            </View>
-          </ScrollView>
-
-          <Modal
-            onBackButtonPress={toggleModal}
-            isVisible={isModalVisible}
-            onBackdropPress={toggleModal}
-            style={styles.modal}
-            swipeDirection="down"
-          >
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{Strings.viewBreakup}</Text>
-              <View style={styles.modalSubscription}>
-                <Text style={styles.modalSubscriptionCost}>
-                  {Strings.subscriptionCost}:
-                </Text>
-                <Text numberOfLines={1} style={styles.subscriptionPrice}>
-                  {"₹ " + selectedCard?.amount}
-                </Text>
-              </View>
-              <View style={styles.TaxView}>
-                <Text style={styles.TaxText}>
-                  Discount ({selectedCard?.flatdiscount + "%"}):
-                </Text>
-                <Text numberOfLines={1} style={styles.TaxPrice}>
-                  -{" "}
-                  {"₹ " +
-                    calculatePercentage(
-                      selectedCard?.amount,
-                      selectedCard?.flatdiscount
-                    )}
-                </Text>
-              </View>
-
-              <View style={styles.TaxView}>
-                <Text style={styles.TaxText}>
-                  Tax:
-                </Text>
-                <Text numberOfLines={1} style={styles.TaxPrice}>
-                  {"₹ " +
-                    calculateTax(
-                      calculateDiscount(
-                        `${selectedCard?.amount}`,
-                        `${selectedCard?.flatdiscount}`
-                      ),
-                      selectedCard?.tax
-                    )}
-                </Text>
-              </View>
-
-              {promocode && (
                 <View style={styles.TaxView}>
                   <Text style={styles.TaxText}>
-                    Promo code: ({promocodeDetails?.discount + "%"})
+                    Discount ({selectedCard?.flatdiscount + "%"}):
                   </Text>
                   <Text numberOfLines={1} style={styles.TaxPrice}>
                     -{" "}
                     {"₹ " +
                       calculatePercentage(
                         selectedCard?.amount,
-                        promocodeDetails?.discount
+                        selectedCard?.flatdiscount
                       )}
                   </Text>
                 </View>
-              )}
 
-              <View
-                style={[styles.dottedLine, { marginTop: moderateScale(21) }]}
-              />
+                <View style={styles.TaxView}>
+                  <Text style={styles.TaxText}>Tax:</Text>
+                  <Text numberOfLines={1} style={styles.TaxPrice}>
+                    {"₹ " +
+                      calculateTax(
+                        calculateDiscount(
+                          `${selectedCard?.amount}`,
+                          `${selectedCard?.flatdiscount}`
+                        ),
+                        selectedCard?.tax
+                      )}
+                  </Text>
+                </View>
 
-              <View style={styles.totalRow}>
-                <Text style={styles.totalText}>{Strings.total}:</Text>
-                <Text numberOfLines={1} style={styles.totalPrice}>
-                  {promocodeDetails?.discount
-                    ? `${calcuateTotal(
-                        `${selectedCard?.amount}`,
-                        `${selectedCard?.flatdiscount}`,
-                        `${promocodeDetails?.discount}`
-                      )}`
-                    : `${calculateDiscount(
+                {promocode && (
+                  <View style={styles.TaxView}>
+                    <Text style={styles.TaxText}>
+                      Promo code: ({promocodeDetails?.discount + "%"})
+                    </Text>
+                    <Text numberOfLines={1} style={styles.TaxPrice}>
+                      -{" "}
+                      {"₹ " +
+                        calculatePercentage(
+                          selectedCard?.amount,
+                          promocodeDetails?.discount
+                        )}
+                    </Text>
+                  </View>
+                )}
+
+                <View
+                  style={[styles.dottedLine, { marginTop: moderateScale(21) }]}
+                />
+
+                <View style={styles.totalRow}>
+                  <Text style={styles.totalText}>{Strings.total}:</Text>
+                  <Text numberOfLines={1} style={styles.totalPrice}>
+                    {promocodeDetails?.discount
+                      ? `${calcuateTotal(
+                          `${selectedCard?.amount}`,
+                          `${selectedCard?.flatdiscount}`,
+                          `${promocodeDetails?.discount}`
+                        )}`
+                      : `${calculateDiscount(
+                          `${selectedCard?.amount}`,
+                          `${selectedCard?.flatdiscount}`
+                        )}`}
+                  </Text>
+                </View>
+                <View
+                  style={[styles.dottedLine, { marginTop: moderateScale(14) }]}
+                />
+              </View>
+            </Modal>
+
+            <Modal
+              isVisible={promocodeModal}
+              onBackdropPress={togglePromoCodeModal}
+              style={styles.modal}
+              onBackButtonPress={togglePromoCodeModal}
+              swipeDirection="down"
+            >
+              <View style={styles.modalContent}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={styles.modalTitle}>Subscription cost</Text>
+                  <Text style={styles.modalTitle}>
+                    {"₹ " +
+                      calculateDiscount(
                         `${selectedCard?.amount}`,
                         `${selectedCard?.flatdiscount}`
-                      )}`}
-                </Text>
-              </View>
-              <View
-                style={[styles.dottedLine, { marginTop: moderateScale(14) }]}
-              />
-            </View>
-          </Modal>
+                      )}
+                  </Text>
+                </View>
+                <View style={{ paddingTop: moderateScale(20) }}>
+                  <InputField
+                    label={"Promo code"}
+                    placeholderText={"Enter promo code"}
+                    value={promocode}
+                    maxLength={20}
+                    onChange={(text) => {
+                      setPromoCode(text);
+                      setValidation("");
+                    }}
+                    rightIcon={successPromocode && <CheckCircle />}
+                  />
+                  {validation && (
+                    <Text
+                      style={{
+                        color: "red",
+                        fontSize: moderateScale(12),
+                        paddingTop: 5,
+                        paddingHorizontal: 5,
+                      }}
+                    >
+                      {validation}
+                    </Text>
+                  )}
+                  {successPromocode && (
+                    <Text
+                      style={{
+                        color: THEMES.colors.green,
+                        fontSize: moderateScale(12),
+                        paddingTop: 5,
+                        paddingHorizontal: 5,
+                      }}
+                    >
+                      {successPromocode}
+                    </Text>
+                  )}
+                </View>
 
-          <Modal
-            isVisible={promocodeModal}
-            onBackdropPress={togglePromoCodeModal}
-            style={styles.modal}
-            onBackButtonPress={togglePromoCodeModal}
-            swipeDirection="down"
-          >
-            <View style={styles.modalContent}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text style={styles.modalTitle}>Subscription cost</Text>
-                <Text style={styles.modalTitle}>
-                  {"₹ " +
-                    calculateDiscount(
-                      `${selectedCard?.amount}`,
-                      `${selectedCard?.flatdiscount}`
-                    )}
-                </Text>
-              </View>
-              <View style={{ paddingTop: moderateScale(20) }}>
-                <InputField
-                  label={"Promo code"}
-                  placeholderText={"Enter promo code"}
-                  value={promocode}
-                  maxLength={20}
-                  onChange={(text) => {
-                    setPromoCode(text);
-                    setValidation("");
+                <View
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    width: "100%",
+                    alignSelf: "center",
                   }}
-                  rightIcon={successPromocode && <CheckCircle />}
-                />
-                {validation && (
-                  <Text
-                    style={{
-                      color: "red",
-                      fontSize: moderateScale(12),
-                      paddingTop: 5,
-                      paddingHorizontal: 5,
-                    }}
-                  >
-                    {validation}
-                  </Text>
-                )}
-                {successPromocode && (
-                  <Text
-                    style={{
-                      color: THEMES.colors.green,
-                      fontSize: moderateScale(12),
-                      paddingTop: 5,
-                      paddingHorizontal: 5,
-                    }}
-                  >
-                    {successPromocode}
-                  </Text>
-                )}
+                >
+                  {promocodeDetails ? (
+                    <Button
+                      title="Remove Promo code"
+                      onPress={handleRemovePromoCode}
+                    ></Button>
+                  ) : (
+                    <Button
+                      title="Apply"
+                      onPress={handlePromoCodeSubmit}
+                    ></Button>
+                  )}
+                </View>
               </View>
+            </Modal>
 
-              <View
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  width: "100%",
-                  alignSelf: "center",
-                }}
-              >
-                {promocodeDetails ? (
-                  <Button
-                    title="Remove Promo code"
-                    onPress={handleRemovePromoCode}
-                  ></Button>
-                ) : (
-                  <Button
-                    title="Apply"
-                    onPress={handlePromoCodeSubmit}
-                  ></Button>
-                )}
-              </View>
-            </View>
-          </Modal>
+            {subscriptionModal && (
+              <SubscriptionSuccess
+                isVisible={subscriptionModal}
+                onClose={handleSubscriptionSuccess}
+                type={month}
+              />
+            )}
 
-          {subscriptionModal && (
-            <SubscriptionSuccess
-              isVisible={subscriptionModal}
-              onClose={handleSubscriptionSuccess}
-              type={month}
-            />
-          )}
-
-          {errorModal && (
-            <SubscriptionError
-              isVisible={errorModal}
-              onClose={handleSubscriptionError}
-              type={month}
-            />
-          )}
-        </View>
+            {errorModal && (
+              <SubscriptionError
+                isVisible={errorModal}
+                onClose={handleSubscriptionError}
+                type={month}
+              />
+            )}
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -1054,7 +1064,7 @@ const styles = StyleSheet.create({
     color: THEMES.colors.cyan,
     fontFamily: THEMES.fontFamily.medium,
     textDecorationLine: "underline",
-    paddingTop:moderateScale(10)
+    paddingTop: moderateScale(10),
   },
   btnView: {
     paddingVertical: moderateScale(10),

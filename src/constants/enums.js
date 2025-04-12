@@ -443,3 +443,15 @@ export const DurationList = [
     id: "yearly",
   },
 ];
+
+export const ProviderBannerList = [
+  {
+    url: require("../assets/images/SPBanner.png"),
+  }
+]
+
+export const ParentBannerList = [
+  {
+    url: require("../assets/images/PPBanner.png"),
+  }
+]

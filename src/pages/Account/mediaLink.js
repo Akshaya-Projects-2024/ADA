@@ -67,7 +67,6 @@ const MediaLink = (props) => {
   }, []);
 
   const initData = () => {
-    const isPresent = false;
     if (MediaLinks?.facebook) {
       isPresent = true;
       setFbLink(MediaLinks?.facebook);
@@ -84,7 +83,7 @@ const MediaLink = (props) => {
       isPresent = true;
       setLink(MediaLinks?.website);
     }
-    if (!isPresent) {
+    if (!userData?.providerProfile?.MediaLinks?.id) {
       setIsSubmit(true);
     }
   };
@@ -103,10 +102,18 @@ const MediaLink = (props) => {
       };
       const res = await saveMediaLinks(postData);
       if (res?.status == 200) {
-        if (userData?.providerProfile?.MediaLinks?.id !== 0) {
-          handleNavigation();
-        } else {
+        console.log(
+          +userData?.providerProfile?.MediaLinks?.id,
+          userData?.providerstatus
+        );
+
+        if (
+          !Boolean(+userData?.providerProfile?.MediaLinks?.id) &&
+          userData?.logindetails?.providerstatus === "AAPPROVALPENDING"
+        ) {
           setModal(true);
+        } else {
+          handleNavigation();
         }
       } else {
         showToast("error", res?.data?.message);
@@ -155,11 +162,12 @@ const MediaLink = (props) => {
           showBack
           bgColor="transparent"
           right={
-            route === "myprofile" ? (
+            route === "myprofile" &&
+            userData?.providerProfile?.MediaLinks?.id ? (
               <TouchableOpacity
                 style={{
                   paddingVertical: 10,
-                  paddingHorizontal: 15,
+                  paddingHorizontal: 5,
                 }}
                 onPress={() => editPopup()}
               >
@@ -311,6 +319,22 @@ const MediaLink = (props) => {
           }}
           onClose={() => setEditModal(false)}
           title="Edit Media Links"
+        />
+        <Dialog
+          flag={modal}
+          title={"Registration Complete! 🎉"}
+          description={
+            "Thank you for registering on ADA. Your profile will be validated and activated within 48 hours. Happy exploring!"
+          }
+          rightButtonText="Close"
+          rightButtonPressed={() => {
+            setModal(false);
+            handleNavigation();
+          }}
+          onClose={() => {
+            setModal(false);
+            handleNavigation();
+          }}
         />
       </View>
     </SafeAreaView>

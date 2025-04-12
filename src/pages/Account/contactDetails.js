@@ -162,11 +162,11 @@ const ContactDetails = (props) => {
           showBack
           bgColor="transparent"
           right={
-            route === "myprofile" ? (
+            route === "myprofile" && providerContact?.id ? (
               <TouchableOpacity
                 style={{
                   paddingVertical: 10,
-                  paddingHorizontal: 15,
+                  paddingHorizontal: 5,
                 }}
                 onPress={() => editPopup()}
               >

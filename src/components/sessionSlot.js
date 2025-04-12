@@ -77,7 +77,7 @@ const formatDates = (dates) => {
   return ranges.join(", ");
 };
 
-const TimeSlotUI = ({ data, setSelectedSlot, selectedSlot }) => {
+const TimeSlotUI = ({ data, setSelectedSlot, selectedSlot,isrequestedbyProvider }) => {
   const [slots, setSlots] = useState({
     morning: [],
     afternoon: [],
@@ -144,7 +144,12 @@ const TimeSlotUI = ({ data, setSelectedSlot, selectedSlot }) => {
   );
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { paddingHorizontal: isrequestedbyProvider ? 0 : 16 },
+      ]}
+    >
       {slots.morning.length !== 0 && (
         <>
           <Text style={styles.heading}>Morning</Text>
@@ -208,7 +213,7 @@ const TimeSlotUI = ({ data, setSelectedSlot, selectedSlot }) => {
           </View>
         </View>
       ))}
-    </ScrollView>
+    </View>
   );
 };
 

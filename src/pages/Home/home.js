@@ -7,6 +7,7 @@ import {
   ScrollView,
   Dimensions,
   StatusBar,
+  Image,
 } from "react-native";
 import { THEMES } from "../../assets/theme/themes";
 import Bell from "../../assets/svg/bell.svg";
@@ -14,7 +15,7 @@ import Event from "../../assets/svg/event.svg";
 import Right from "../../assets/svg/chevronRight.svg";
 import Plus from "../../assets/svg/plus.svg";
 import Button from "../../components/Button";
-import { moderateScale } from "react-native-size-matters";
+import { moderateScale, ms } from "react-native-size-matters";
 import LinearGradient from "react-native-linear-gradient";
 import BlackCross from "../../assets/svg/cross.svg";
 import Carousel from "react-native-snap-carousel";
@@ -34,6 +35,7 @@ import {
   AppointmentStatus,
   ApprovalStatus,
   LoginModules,
+  ProviderBannerList,
 } from "../../constants/enums";
 import { useDispatch, useSelector } from "react-redux";
 import AppointmentCard from "../../components/AppointmentCard";
@@ -384,6 +386,14 @@ const Home = (props) => {
     }
   };
 
+  const renderBannerItem = ({ item }) => {
+    return (
+      <View>
+        <Image source={item?.url} />
+      </View>
+    );
+  };
+
   return (
     <LinearGradient
       locations={[0, 0.5, 0.6]}
@@ -461,75 +471,31 @@ const Home = (props) => {
               </TouchableButtonWithPermission>
             </View>
           </View>
-          <View
-            style={{
-              borderWidth: 1,
-              padding: moderateScale(10),
-              marginTop: moderateScale(14),
-              borderRadius: moderateScale(16),
-              backgroundColor: "#fff",
-              borderColor: "#ddd",
-              shadowColor: THEMES.colors.lightGrey,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.8,
-              shadowRadius: 2,
-              elevation: 5,
-              overflow: "hidden",
-            }}
-          >
+          {userData?.logindetails?.isprovider > 1 ? (
             <View
               style={{
-                backgroundColor: THEMES.colors.white,
-                paddingHorizontal: moderateScale(5),
-                paddingVertical: moderateScale(5),
-                borderRadius: moderateScale(12),
+                borderWidth: 1,
+                padding: moderateScale(10),
+                marginTop: moderateScale(14),
+                borderRadius: moderateScale(16),
+                backgroundColor: "#fff",
+                borderColor: "#ddd",
+                shadowColor: THEMES.colors.lightGrey,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.8,
+                shadowRadius: 2,
+                elevation: 5,
+                overflow: "hidden",
               }}
             >
               <View
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center ",
+                  backgroundColor: THEMES.colors.white,
+                  paddingHorizontal: moderateScale(5),
+                  paddingVertical: moderateScale(5),
+                  borderRadius: moderateScale(12),
                 }}
               >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text
-                    onPress={onTodayPressed}
-                    style={{
-                      color: THEMES.colors.cyan,
-                      fontSize: THEMES.fonts.font12,
-                      fontFamily: THEMES.fontFamily.medium,
-                      paddingRight: moderateScale(10),
-                    }}
-                  >
-                    Today’s Appointments
-                  </Text>
-                  <Right />
-                </View>
-                <TouchableButtonWithPermission
-                  hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-                  customMsgForRegistration={
-                    "Complete your Registration and Subscribe to the app to create new appointments."
-                  }
-                  onPress={() =>
-                    handlePremiumActionPressed(() => {
-                      setAppointmentVisible(true);
-                      Strings.appointmentError;
-                    })
-                  }
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 15,
-                    backgroundColor: THEMES.colors.cyan,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Plus stroke={THEMES.colors.white} />
-                </TouchableButtonWithPermission>
-              </View>
-              <View style={{ paddingTop: moderateScale(23) }}>
                 <View
                   style={{
                     flexDirection: "row",
@@ -537,124 +503,184 @@ const Home = (props) => {
                     alignItems: "center ",
                   }}
                 >
-                  <View style={{ width: "75%" }}>
-                    <View style={styles.chartContainer}>
-                      <View style={styles.timeBar}>
-                        {slotsData.map((block, index) => (
-                          <View
-                            key={index}
-                            style={[
-                              styles.block,
-                              {
-                                backgroundColor:
-                                  block?.status === AppointmentStatus.cancelled
-                                    ? "#F4521F"
-                                    : block?.status ===
-                                      AppointmentStatus.completed
-                                    ? "#00BBC8"
-                                    : block?.status ===
-                                      AppointmentStatus.rescheduled
-                                    ? "#FD9F00"
-                                    : block?.status ===
-                                      AppointmentStatus.scheduled
-                                    ? "#7DB857"
-                                    : "#B8B8B8",
-                              },
-                            ]}
-                          />
-                        ))}
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Text
+                      onPress={onTodayPressed}
+                      style={{
+                        color: THEMES.colors.cyan,
+                        fontSize: THEMES.fonts.font12,
+                        fontFamily: THEMES.fontFamily.medium,
+                        paddingRight: moderateScale(10),
+                      }}
+                    >
+                      Today’s Appointments
+                    </Text>
+                    <Right />
+                  </View>
+                  <TouchableButtonWithPermission
+                    hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
+                    customMsgForRegistration={
+                      "Complete your Registration and Subscribe to the app to create new appointments."
+                    }
+                    onPress={() =>
+                      handlePremiumActionPressed(() => {
+                        setAppointmentVisible(true);
+                        Strings.appointmentError;
+                      })
+                    }
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 15,
+                      backgroundColor: THEMES.colors.cyan,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Plus stroke={THEMES.colors.white} />
+                  </TouchableButtonWithPermission>
+                </View>
+                <View style={{ paddingTop: moderateScale(23) }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center ",
+                    }}
+                  >
+                    <View style={{ width: "75%" }}>
+                      <View style={styles.chartContainer}>
+                        <View style={styles.timeBar}>
+                          {slotsData.map((block, index) => (
+                            <View
+                              key={index}
+                              style={[
+                                styles.block,
+                                {
+                                  backgroundColor:
+                                    block?.status ===
+                                    AppointmentStatus.cancelled
+                                      ? "#F4521F"
+                                      : block?.status ===
+                                        AppointmentStatus.completed
+                                      ? "#00BBC8"
+                                      : block?.status ===
+                                        AppointmentStatus.rescheduled
+                                      ? "#FD9F00"
+                                      : block?.status ===
+                                        AppointmentStatus.scheduled
+                                      ? "#7DB857"
+                                      : "#B8B8B8",
+                                },
+                              ]}
+                            />
+                          ))}
+                        </View>
                       </View>
                     </View>
-                  </View>
 
-                  <View style={{ width: "20%", alignItems: "flex-end" }}>
-                    <Text
-                      style={{
-                        color: THEMES.colors.darkGrey,
-                        fontFamily: THEMES.fontFamily.medium,
-                        fontSize: THEMES.fonts.font14,
-                      }}
-                    >
-                      {`${totalBookedSlots || 0}/${slotsData?.length || 0}`}
-                    </Text>
-                    <Text
-                      style={{
-                        color: THEMES.colors.darkGrey,
-                        fontFamily: THEMES.fontFamily.medium,
-                        fontSize: THEMES.fonts.font8,
-                      }}
-                    >
-                      Booked Slots
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            <View
-              style={{
-                paddingTop: moderateScale(12),
-                borderTopColor: THEMES.colors.lightGrey,
-                borderTopWidth: 1,
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                {countData.map((item, index) => {
-                  return (
-                    <View>
+                    <View style={{ width: "20%", alignItems: "flex-end" }}>
                       <Text
                         style={{
-                          color: item.color,
-                          fontFamily: THEMES.fontFamily.semiBold,
-                          fontSize: THEMES.fonts.font10,
+                          color: THEMES.colors.darkGrey,
+                          fontFamily: THEMES.fontFamily.medium,
+                          fontSize: THEMES.fonts.font14,
                         }}
                       >
-                        {item.count}
+                        {`${totalBookedSlots || 0}/${slotsData?.length || 0}`}
                       </Text>
                       <Text
                         style={{
-                          color: item.color,
-                          fontFamily: THEMES.fontFamily.semiBold,
-                          fontSize: THEMES.fonts.font10,
-                          paddingTop: moderateScale(2),
+                          color: THEMES.colors.darkGrey,
+                          fontFamily: THEMES.fontFamily.medium,
+                          fontSize: THEMES.fonts.font8,
                         }}
                       >
-                        {item.status}
+                        Booked Slots
                       </Text>
                     </View>
-                  );
-                })}
-                <View style={{ alignItems: "flex-end" }}>
-                  <Text
-                    numberOfLines={1}
-                    style={{
-                      color: "#000",
-                      fontFamily: THEMES.fontFamily.semiBold,
-                      fontSize: THEMES.fonts.font10,
-                    }}
-                  >
-                    {totalSlots || 0}
-                  </Text>
-                  <Text
-                    style={{
-                      color: "#000",
-                      fontFamily: THEMES.fontFamily.semiBold,
-                      fontSize: THEMES.fonts.font10,
-                      paddingTop: moderateScale(2),
-                    }}
-                  >
-                    Total
-                  </Text>
+                  </View>
+                </View>
+              </View>
+
+              <View
+                style={{
+                  paddingTop: moderateScale(12),
+                  borderTopColor: THEMES.colors.lightGrey,
+                  borderTopWidth: 1,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  {countData.map((item, index) => {
+                    return (
+                      <View>
+                        <Text
+                          style={{
+                            color: item.color,
+                            fontFamily: THEMES.fontFamily.semiBold,
+                            fontSize: THEMES.fonts.font10,
+                          }}
+                        >
+                          {item.count}
+                        </Text>
+                        <Text
+                          style={{
+                            color: item.color,
+                            fontFamily: THEMES.fontFamily.semiBold,
+                            fontSize: THEMES.fonts.font10,
+                            paddingTop: moderateScale(2),
+                          }}
+                        >
+                          {item.status}
+                        </Text>
+                      </View>
+                    );
+                  })}
+                  <View style={{ alignItems: "flex-end" }}>
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        color: "#000",
+                        fontFamily: THEMES.fontFamily.semiBold,
+                        fontSize: THEMES.fonts.font10,
+                      }}
+                    >
+                      {totalSlots || 0}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "#000",
+                        fontFamily: THEMES.fontFamily.semiBold,
+                        fontSize: THEMES.fonts.font10,
+                        paddingTop: moderateScale(2),
+                      }}
+                    >
+                      Total
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
+          ) : (
+            <View style={{ marginTop: ms(20) }}>
+              <Carousel
+                data={ProviderBannerList}
+                renderItem={renderBannerItem}
+                sliderWidth={screenWidth}
+                itemWidth={screenWidth}
+                onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
+                loop={appointmentData?.length > 1}
+                enableSnap={true}
+                autoplay={true}
+              />
+            </View>
+          )}
           <View
             style={{
               paddingTop: appointmentData?.length !== 0 ? moderateScale(35) : 0,

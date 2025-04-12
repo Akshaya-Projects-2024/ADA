@@ -190,11 +190,11 @@ const BusinessDetail = (props) => {
           showBack
           bgColor="transparent"
           right={
-            route === "myprofile" ? (
+            route === "myprofile" && providerBusiness?.id ? (
               <TouchableOpacity
                 style={{
                   paddingVertical: 10,
-                  paddingHorizontal: 15,
+                  paddingHorizontal: 5,
                 }}
                 onPress={() => editPopup()}
               >

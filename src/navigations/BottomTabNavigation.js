@@ -4,9 +4,9 @@ import TrendingTopics from "../pages/TrendingTopics/trendingTopics";
 import PetAdoption from "../pages/PetAdoption/petAdoption";
 import MyAccount from "../pages/Account/myAccount";
 import BottomTabBarItem from "./BottomTabBarItem";
-import Chat from "../pages/Chat/chat";
-import EmergencyAlert from "../pages/Alerts/EmergencyAlert";
 import AlertList from "../pages/Alerts/AlertList";
+import { useEffect, useState } from "react";
+import { Keyboard } from "react-native";
 
 const Tab = createBottomTabNavigator();
 
@@ -16,13 +16,34 @@ const navOptionHandler = () => ({
 });
 
 export default function BottomTabNavigation() {
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setKeyboardVisible(true); // or some other action
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardVisible(false); // or some other action
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   return (
     <Tab.Navigator
-    tabBarOptions={{
-      keyboardHidesTabBar: false,
-    }}
       initialRouteName="home"
-      tabBar={(props) => <BottomTabBarItem {...props} />}
+      tabBar={(props) =>
+        isKeyboardVisible ? <></> : <BottomTabBarItem {...props} />
+      }
     >
       <Tab.Screen name="home" component={Home} options={navOptionHandler} />
 
