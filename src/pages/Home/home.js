@@ -390,7 +390,7 @@ const Home = (props) => {
   const renderBannerItem = ({ item }) => {
     return (
       <View>
-        <Image source={item?.url} />
+        <Image source={item?.url} style={{ width: screenWidth - ms(32) }} />
       </View>
     );
   };

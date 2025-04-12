@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -65,6 +65,10 @@ const ParentHome = (props) => {
   const [trendingTopics, setTrendingTopics] = useState([]);
   const [eventData, setEventData] = useState([]);
   const [modal, setModal] = useState(false);
+  const carouselDataLoaded = useRef({
+    appointmentData: false,
+    eventData: false,
+  });
 
   useEffect(() => {
     if (isFocused) {
@@ -91,6 +95,7 @@ const ParentHome = (props) => {
         ...event,
         type: "banner",
       }));
+      carouselDataLoaded.current.eventData = true;
       setEventData(updatedEvents);
     }
   };
@@ -149,6 +154,7 @@ const ParentHome = (props) => {
             it?.status === AppointmentStatus.rescheduled
           );
         });
+        carouselDataLoaded.current.appointmentData = true;
         setAppointmentData(validArray(output) ? output : []);
       }
 
@@ -549,36 +555,46 @@ const ParentHome = (props) => {
           </View>
         </View>
 
-        {Boolean([...appointmentData, ...eventData].length) ? (
+        {Boolean(
+          carouselDataLoaded.current.appointmentData &&
+            carouselDataLoaded.current.eventData
+        ) && (
           <>
-            <Carousel
-              data={[...appointmentData, ...eventData]}
-              renderItem={renderItem}
-              sliderWidth={screenWidth}
-              itemWidth={screenWidth * 0.9}
-              onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
-              loop={true}
-              enableSnap={true}
-              autoplay={true}
-            />
-            {(appointmentData?.length > 1 || eventData?.length > 1) &&
-              paginationDots()}
+            {Boolean([...appointmentData, ...eventData].length) ? (
+              <>
+                <Carousel
+                  data={[...appointmentData, ...eventData]}
+                  renderItem={renderItem}
+                  sliderWidth={screenWidth}
+                  itemWidth={screenWidth * 0.9}
+                  onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
+                  loop={true}
+                  enableSnap={true}
+                  autoplay={true}
+                />
+                {(appointmentData?.length > 1 || eventData?.length > 1) &&
+                  paginationDots()}
+              </>
+            ) : (
+              <View
+                style={{
+                  marginTop: ms(20),
+                  paddingHorizontal: moderateScale(15),
+                }}
+              >
+                <Carousel
+                  data={ParentBannerList}
+                  renderItem={renderBannerItem}
+                  sliderWidth={screenWidth}
+                  itemWidth={screenWidth}
+                  onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
+                  loop={appointmentData?.length > 1}
+                  enableSnap={true}
+                  autoplay={true}
+                />
+              </View>
+            )}
           </>
-        ) : (
-          <View
-            style={{ marginTop: ms(20), paddingHorizontal: moderateScale(15) }}
-          >
-            <Carousel
-              data={ParentBannerList}
-              renderItem={renderBannerItem}
-              sliderWidth={screenWidth}
-              itemWidth={screenWidth}
-              onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
-              loop={appointmentData?.length > 1}
-              enableSnap={true}
-              autoplay={true}
-            />
-          </View>
         )}
 
         <View>
