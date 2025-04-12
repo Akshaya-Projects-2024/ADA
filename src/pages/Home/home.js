@@ -97,6 +97,7 @@ const Home = (props) => {
 
   useEffect(() => {
     if (isFocused) {
+      setActiveIndex(0);
       initData();
       dispatch(setLoggedInMoodule(LoginModules.provider));
     } else {
@@ -678,20 +679,26 @@ const Home = (props) => {
                 justifyContent: "center",
               }}
             >
-              {Boolean(refresh) && (
+              {Boolean(appointmentData?.length > 1) ? (
                 <Carousel
                   data={appointmentData}
                   renderItem={renderItem}
                   sliderWidth={screenWidth}
                   itemWidth={screenWidth * 0.9}
                   onSnapToItem={(index) => setActiveIndex(index)} // Track active slide index
-                  loop={true}
+                  loop={appointmentData?.length > 1}
                   enableSnap={true}
                   autoplay={true}
                 />
+              ) : (
+                Boolean(appointmentData?.length === 1) && (
+                  <View style={{ width: "100%" }}>
+                    {renderItem({ item: appointmentData[0] })}
+                  </View>
+                )
               )}
-
-              {paginationDots()}
+              {Boolean(refresh && appointmentData?.length > 1) &&
+                paginationDots()}
             </View>
           </View>
 
@@ -958,6 +965,7 @@ const Home = (props) => {
         leftButtonPressed={onAppointmentClose}
         rightButtonPressed={confirm}
         onClose={onAppointmentClose}
+        title="Scheduling"
       />
       <Dialog
         flag={paymentModal}

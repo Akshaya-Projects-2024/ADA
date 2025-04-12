@@ -112,7 +112,7 @@ const MyBookings = ({ navigation, route }) => {
 
   useEffect(() => {
     contextValue?.setLoader(true);
-  },[])
+  }, []);
 
   const initData = useCallback(async () => {
     try {
@@ -256,7 +256,7 @@ const MyBookings = ({ navigation, route }) => {
           right={
             <View ref={menuRef} onLayout={handleModalLayout}>
               <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
-                <Filter width={ms(24)} height={ms(24)}/>
+                <Filter width={ms(24)} height={ms(24)} />
               </TouchableOpacity>
             </View>
           }
@@ -268,7 +268,7 @@ const MyBookings = ({ navigation, route }) => {
             bounces={false}
             renderItem={renderItem}
             keyExtractor={(item) => item?.appointment_id?.toString()}
-            ListEmptyComponent={!dataFetched.current ? null :EmptyContentView}
+            ListEmptyComponent={!dataFetched.current ? null : EmptyContentView}
             contentContainerStyle={{ flexGrow: 1 }}
           />
         </View>
@@ -294,7 +294,7 @@ const MyBookings = ({ navigation, route }) => {
               </Pressable>
             )}
             keyExtractor={(item, index) => index.toString()}
-            ListEmptyComponent={!dataFetched.current ? null :EmptyView}
+            ListEmptyComponent={!dataFetched.current ? null : EmptyView}
             contentContainerStyle={{ flexGrow: 1 }}
           />
         </FilterModal>
@@ -440,6 +440,7 @@ const MyBookings = ({ navigation, route }) => {
           leftButtonPressed={onAppointmentClose}
           rightButtonPressed={confirm}
           onClose={onAppointmentClose}
+          title="Scheduling"
         />
       </View>
     </SafeAreaView>

@@ -695,7 +695,7 @@ const MarkHoliday = () => {
           flag={confirmModal}
           title={Strings.cancelAppointmentsTitle}
           description={Strings.cancelAppointmentsDescription}
-          rightButtonText="Cancel"
+          rightButtonText="Ok"
           rightButtonPressed={onSubmit}
           onClose={() => {
             setConfirmModal(false);

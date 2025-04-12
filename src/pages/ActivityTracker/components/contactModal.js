@@ -4,16 +4,12 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  Platform,
-  PermissionsAndroid,
-  Linking,
 } from "react-native";
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Modal from "react-native-modal";
 import { THEMES } from "../../../assets/theme/themes";
 import InputField from "../../../components/InputField";
 import CloseSquare from "../../../assets/svg/closeSquare";
-import Contact from "../../../assets/svg/contact";
 import Button from "../../../components/Button";
 import {
   addContacts,
@@ -24,6 +20,7 @@ import ModalLoader from "../../../components/ModalLoader";
 import ContactDropdown from "./ContactDropdownField";
 import { showToast } from "../../../utils/utils";
 import Contacts from "react-native-contacts";
+import Toast from "react-native-toast-message";
 
 const { fontFamily, fonts, colors } = THEMES;
 
@@ -120,7 +117,7 @@ const ContactModal = ({ contactModalVisible, toggleContactModal, petInfo }) => {
     };
     const res = await addContacts(postObj);
     if (res.status === 200) {
-      getContactList();
+      toggleContactModal()
       showToast("success", res.data.message);
     }
   };
@@ -189,6 +186,7 @@ const ContactModal = ({ contactModalVisible, toggleContactModal, petInfo }) => {
           </View>
         )}
       </View>
+      <Toast />
     </Modal>
   );
 };

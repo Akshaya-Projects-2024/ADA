@@ -144,7 +144,7 @@ const AppointmentCard = ({
                 </Text>
               </View>
             </View>
-            {Boolean(item.preappointment_date) && (
+            {Boolean(item?.preappointment_date) && (
               <View style={styles.row}>
                 <Text
                   style={StyleSheet.flatten([

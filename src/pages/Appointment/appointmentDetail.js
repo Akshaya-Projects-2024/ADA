@@ -106,7 +106,7 @@ const AppointmentDetail = (props) => {
       contextValue?.setLoader(true);
       if (!appointmentData) {
         throw new Error("Please select the appointment!");
-      } else if (appointmentData?.requestedby === "parent" && !otpInput) {
+      } else if (!appointmentData?.clientname && !otpInput) {
         throw new Error("Please enter OTP first!");
       } else {
         const params = {
@@ -427,7 +427,7 @@ const AppointmentDetail = (props) => {
                       ) {
                         setAppointmentConfirm(true);
                       } else {
-                        if (appointmentData?.requestedby === "provider") {
+                        if (appointmentData?.clientname) {
                           handleAttended();
                         } else {
                           setAttendedModal(true);
@@ -578,6 +578,7 @@ const AppointmentDetail = (props) => {
           leftButtonPressed={onAppointmentClose}
           rightButtonPressed={confirm}
           onClose={onAppointmentClose}
+          title="Scheduling"
         />
       </View>
     </SafeAreaView>
