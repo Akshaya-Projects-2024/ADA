@@ -61,7 +61,7 @@ const showNotification = ({ notification, data }) => {
     bigText: notification?.body ?? "",
     subText: notification?.title ?? "",
     vibrate: true,
-    vibration: 300,
+    vibration: 1000,
     priority: "high",
     importance: "high",
     data: data,

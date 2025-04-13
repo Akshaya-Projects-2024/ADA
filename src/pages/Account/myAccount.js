@@ -99,8 +99,7 @@ const MyAccount = (props) => {
       {
         label: Strings.myProfile,
         onPress: () => {
-          const validProviderProfile = validateServiceProfile(userData);
-          navigate(validProviderProfile?.navigateTo);
+          navigate("myProfile");
         },
       },
       {
