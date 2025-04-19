@@ -83,7 +83,7 @@ const MediaLink = (props) => {
       isPresent = true;
       setLink(MediaLinks?.website);
     }
-    if (!userData?.providerProfile?.MediaLinks?.id) {
+    if (!userData?.providerProfile?.MediaLinks?.id || route !== "myprofile") {
       setIsSubmit(true);
     }
   };

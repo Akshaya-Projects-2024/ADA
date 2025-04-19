@@ -50,8 +50,6 @@ const SelectAppointment = ({ navigation, route }) => {
     sessionSelection
   ) => {
     const userId = await decryptService("userId");
-    console.log(selectedSlot);
-    
     try {
       if (!selectedProvider?.profile?.providerBusiness?.userid) {
         throw new Error("Invalid Provider! Please select valid provider");

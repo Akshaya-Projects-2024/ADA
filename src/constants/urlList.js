@@ -75,5 +75,8 @@ export const urlList = {
   getContact: 'activity/contact/get',
   deleteContact: 'activity/contact/delete',
   deleteActivity: 'activity/clear',
-  getAlert:'parent/getpetalert'
+  getAlert:'parent/getpetalert',
+  readNotification: 'home/notification/read',
+  getNotificationList: 'home/notification',
+  logout: 'login/logout',
 };

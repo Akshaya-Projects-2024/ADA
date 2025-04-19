@@ -51,7 +51,7 @@ const createNotificationChannel = () => {
   });
 };
 
-const showNotification = ({ notification, data }) => {
+const showLocalNotification = ({ notification, data }) => {
   PushNotification.localNotification({
     channelId: notification?.android?.channelId,
     id: 100,
@@ -80,5 +80,5 @@ export {
   deleteFcmToken,
   getNotificationToken,
   createNotificationChannel,
-  showNotification,
+  showLocalNotification,
 };

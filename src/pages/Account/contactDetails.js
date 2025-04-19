@@ -46,7 +46,7 @@ const ContactDetails = (props) => {
 
   useEffect(() => {
     initData();
-    if (!providerContact?.id) {
+    if (!providerContact?.id || route !== "myprofile") {
       setIsSubmit(true);
     }
     const keyboardDidShowListener = Keyboard.addListener(

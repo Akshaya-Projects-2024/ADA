@@ -87,7 +87,7 @@ const BusinessDetail = (props) => {
         setKeyboardVisible(false); // Keyboard is hidden
       }
     );
-    if (!providerBusiness?.id) {
+    if (!providerBusiness?.id || route !== "myprofile") {
       setIsSubmit(true);
     }
 

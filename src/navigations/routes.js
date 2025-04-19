@@ -49,6 +49,7 @@ import LostAlertdetail from "../pages/Alerts/lostAlertDetail";
 import RescueAlertDetail from "../pages/Alerts/resuceAlertDetail";
 import MedicalAlertDetail from "../pages/Alerts/MedicalAlertDetail";
 import CancelAppointment from "../pages/Appointment/cancelAppointment";
+import NotificationConfig from "../utils/notificationUtils";
 
 const Stack = createStackNavigator();
 
@@ -58,46 +59,8 @@ const navOptionHandler = () => ({
 });
 
 const Routes = (props) => {
-  const onMessage = async (notification) => {
-    try {
-      if (notification && notification?.data) {
-        showNotification(notification);
-      }
-    } catch (error) {
-      console.log("onMessage:notificationAction Error: ", error);
-    }
-  };
-
-  const notificationAction = async (notification) => {
-    try {
-      if (notification?.data) {
-        // TODO DO YOUR WORK HERE
-      }
-    } catch (error) {
-      console.log("notificationAction Error: ", error);
-    }
-  };
-  useEffect(() => {
-    const unsubscribeMessaging = messaging().onMessage(onMessage);
-    const unsubscribeMessagingOpen =
-      messaging().onNotificationOpenedApp(notificationAction);
-    PushNotification.popInitialNotification(notificationAction);
-    PushNotification.configure({
-      onNotification: function (notification) {
-        if (notification.userInteraction) {
-          notificationAction(notification);
-        }
-      },
-      popInitialNotification: true,
-      requestPermissions: true,
-    });
-
-    return () => {
-      unsubscribeMessaging();
-      unsubscribeMessagingOpen();
-    };
-  }, []);
   return (
+    <>
     <NavigationContainer
       ref={navigationRef}
       screenOptions={{
@@ -105,6 +68,7 @@ const Routes = (props) => {
       }}
     >
       <StatusBar backgroundColor={"#fff"} />
+      <NotificationConfig />
       <Stack.Navigator
         initialRouteName="splash"
         screenOptions={{
@@ -344,6 +308,7 @@ const Routes = (props) => {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    </>
   );
 };
 export default Routes;

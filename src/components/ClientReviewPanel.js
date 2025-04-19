@@ -37,9 +37,18 @@ const RatingBar = React.memo(({ rating, percentage = 80, count }) => {
 
   return (
     <View style={styles.ratingContainer}>
-      <Text style={styles.ratingText}>
-        {rating} <FontAwesome name="star" color={RATING_COLORS[rating]} />
-      </Text>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View
+          style={{
+            width: ms(14),
+            justifyContent: "center",
+            flexDirection: "row",
+          }}
+        >
+          <Text style={[styles.ratingText]}>{rating}</Text>
+        </View>
+        <FontAwesome name="star" color={RATING_COLORS[rating]} />
+      </View>
       <View style={styles.progressBackground}>
         <Animated.View
           style={[
@@ -61,7 +70,10 @@ const RatingBar = React.memo(({ rating, percentage = 80, count }) => {
   );
 });
 
-const ClientReviewPanel = ({ providerRating }) => {
+const ClientReviewPanel = ({
+  providerRating,
+  showClientReviewHeading = true,
+}) => {
   const total = providerRating?.totalratingcount || 0;
   const renderRatingBars = useMemo(
     () =>
@@ -84,9 +96,11 @@ const ClientReviewPanel = ({ providerRating }) => {
 
   return (
     <View>
-      <View>
-        <Text style={styles.headerText}>Client Reviews</Text>
-      </View>
+      {Boolean(showClientReviewHeading) && (
+        <View>
+          <Text style={styles.headerText}>Client Reviews</Text>
+        </View>
+      )}
       <TouchableButtonWithPermission
         customMsgForRegistration={
           "Registered and Subscribed to enjoy all the exciting features of ADA app."
@@ -98,7 +112,7 @@ const ClientReviewPanel = ({ providerRating }) => {
         <View style={styles.leftSection}>
           <ClientReviewPieChart providerRating={providerRating} />
         </View>
-        <View style={{ width: "5%", marginTop: ms(30) }}>
+        <View style={{ width: ms(12), marginTop: ms(30) }}>
           <View
             style={{ width: 1, height: ms(58), backgroundColor: "#D9D9D9" }}
           ></View>

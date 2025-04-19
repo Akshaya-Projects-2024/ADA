@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Image,
+  Platform,
   StatusBar,
   StyleSheet,
   Text,
@@ -16,6 +17,7 @@ import { encryptService } from "../../utils/storageFunc";
 import { vh, vw } from "../../utils/dimensions";
 import PaginationDots from "react-native-pagination-dots";
 import SharedPreferences from "react-native-shared-preferences";
+import * as Keychain from "react-native-keychain";
 
 const Intro1 = ({ func }) => {
   const { width } = useWindowDimensions();
@@ -107,7 +109,15 @@ const IntroScreens = (props) => {
         func={async () => {
           func();
           // await encryptService("firstBootCompleted", true);
-          SharedPreferences.setItem("firstBootCompleted", JSON.stringify(true));
+          if (Platform.OS === "android") {
+            SharedPreferences.setItem(
+              "firstBootCompleted",
+              JSON.stringify(true)
+            );
+          } else {
+            const firstBootCompleted = "true"
+            await Keychain.setGenericPassword("firstBootCompleted",firstBootCompleted);
+          }
         }}
       />
     );

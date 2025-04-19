@@ -179,7 +179,11 @@ export const refreshToken = async (params) => {
     }
     throw new Error("Something went wrong!");
   } catch (error) {
-    await AsyncStorage.multiRemove(["accessToken", "tokenId", "refreshTokenTime"])
+    await AsyncStorage.multiRemove([
+      "accessToken",
+      "tokenId",
+      "refreshTokenTime",
+    ]);
     resetNavigation("app");
     throw new Error(error?.message || error || "Opps! Something went wrong!");
   }
@@ -887,7 +891,7 @@ export const getContact = async (params) => {
 export const deleteContact = async (params) => {
   try {
     const res = await Api.POST(urlList.deleteContact, params);
-    
+
     if (!res || res?.data?.error || res?.data?.errorCode) {
       throw new Error(
         res?.data?.message || res?.data?.error || "Something went wrong!"
@@ -911,6 +915,59 @@ export const deleteActivity = async (params) => {
         res?.data?.message || res?.data?.error || "Something went wrong!"
       );
     }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const getNotificationList = async (params) => {
+  try {
+    const res = await Api.POST(urlList.getNotificationList, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const readNotification = async (params) => {
+  try {
+    const res = await Api.POST(urlList.readNotification, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const logout = async (params) => {
+  try {
+    const res = await Api.POST(urlList.logout, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    console.log(res,"wddwdw");
+    
     if (res) {
       return res;
     }

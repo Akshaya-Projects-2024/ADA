@@ -2,6 +2,7 @@ import { useIsFocused } from "@react-navigation/native";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   Image,
+  Platform,
   StatusBar,
   StyleSheet,
   useWindowDimensions,
@@ -24,6 +25,7 @@ import { LoginModules } from "../../constants/enums";
 import DeviceInfo from "react-native-device-info";
 import { getCurrentLocation } from "../../utils/geolocationUtils";
 import SharedPreferences from "react-native-shared-preferences";
+import * as Keychain from "react-native-keychain";
 
 const Splash = (props) => {
   const timeoutRef = useRef();
@@ -39,26 +41,37 @@ const Splash = (props) => {
   const delay = useCallback(
     async (func) => {
       // const firstBootCompleted = await decryptService("firstBootCompleted");
-      SharedPreferences.getItem("firstBootCompleted", (value) => {
-        const firstBootCompleted = JSON.parse(value);
-        if (firstBootCompleted) {
-          if (timeoutRef?.current) {
-            clearTimeout(timeoutRef.current);
-          }
-          timeoutRef.current = setTimeout(func, 1500);
-        } else {
-          timeoutRef.current = setTimeout(
-            () =>
-              props?.navigation.replace("intro", {
-                func: func,
-              }),
-            1500
-          );
-        }
-      });
+      if (Platform.OS === "android") {
+        SharedPreferences.getItem("firstBootCompleted", (value) =>
+          handleCb(value, func)
+        );
+      } else {
+        const preferences = await Keychain.getGenericPassword();
+        handleCb(preferences.password, func);
+      }
     },
     [props?.navigation]
   );
+
+  const handleCb = (value, func) => {
+    console.log(value, "dwwd", func);
+
+    const firstBootCompleted = value ? JSON.parse(value) : false;
+    if (firstBootCompleted) {
+      if (timeoutRef?.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(func, 1500);
+    } else {
+      timeoutRef.current = setTimeout(
+        () =>
+          props?.navigation.replace("intro", {
+            func: func,
+          }),
+        1500
+      );
+    }
+  };
 
   useEffect(() => {
     if (isFocused) {

@@ -34,7 +34,7 @@ import {
 import ProfileDummy from "../../assets/svg/user.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { contextValue } from "../../components/Loader";
-import { deleteAccountApi, getProfile } from "../../redux-store/actions/auth";
+import { deleteAccountApi, getProfile, logout } from "../../redux-store/actions/auth";
 import { navigate, resetNavigation } from "../../navigations/rootNavigationRef";
 import { showToast, validArray } from "../../utils/utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -121,6 +121,8 @@ const ParentAccount = (props) => {
   };
 
   const handleLogout = async () => {
+    const userid = await decryptService("userId");
+    await logout({userid});
     const asyncStorageKeys = await AsyncStorage.getAllKeys();
     let filteredAsyncStorage = asyncStorageKeys;
     if (filteredAsyncStorage?.length > 0) {
@@ -129,6 +131,7 @@ const ParentAccount = (props) => {
     setLogoutModal(false);
     resetNavigation("app");
   };
+
 
   useEffect(() => {
     setFeatureList([

@@ -202,8 +202,8 @@ const ParentDetails = (props) => {
         };
         const res = await saveParentDetails(postData);
         if (res?.data?.status_code == 200) {
+          await encryptService("loggedInModule", LoginModules.parent);
           if (route === "parentAccount") {
-            await encryptService("loggedInModule", LoginModules.parent);
             props.navigation.dispatch(StackActions.pop(1));
           } else {
             props.navigation.navigate(

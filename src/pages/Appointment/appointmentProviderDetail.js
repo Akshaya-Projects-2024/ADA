@@ -133,7 +133,7 @@ const AppointmentProviderDetail = (props) => {
                     </View>
                   </View>
 
-                  <View style={{ flexDirection: "row",marginTop: ms(10) }}>
+                  <View style={{ flexDirection: "row", marginTop: ms(10) }}>
                     <View>
                       <Text style={styles.aboutPetText}>Status:</Text>
                       <Text
@@ -221,7 +221,7 @@ const AppointmentProviderDetail = (props) => {
             {Boolean(
               ["pending", "scheduled", "rescheduled"].includes(
                 appointmentData?.status
-              )
+                )
             ) && (
               <View style={{ width: "100%", marginVertical: ms(15) }}>
                 <Button
@@ -299,6 +299,7 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
     backgroundColor: "#fee6e4",
     paddingVertical: moderateScale(16),
+    maxWidth: "30%",
   },
   dogText: {
     fontFamily: THEMES.fontFamily.medium,

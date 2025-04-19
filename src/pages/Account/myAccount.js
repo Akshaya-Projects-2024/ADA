@@ -37,7 +37,7 @@ import ProfileDummy from "../../assets/svg/user.svg";
 import Toggle from "../../components/Toggle";
 import { LoginModules } from "../../constants/enums";
 import { decryptService, encryptService } from "../../utils/storageFunc";
-import { deleteAccountApi } from "../../redux-store/actions/auth";
+import { deleteAccountApi, logout } from "../../redux-store/actions/auth";
 import {
   navigate,
   navigateToParent,
@@ -273,6 +273,8 @@ const MyAccount = (props) => {
   };
 
   const handleLogout = async () => {
+    const userid = await decryptService("userId");
+    await logout({userid});
     const asyncStorageKeys = await AsyncStorage.getAllKeys();
     let filteredAsyncStorage = asyncStorageKeys;
     if (filteredAsyncStorage?.length > 0) {

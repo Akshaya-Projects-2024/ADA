@@ -33,6 +33,7 @@ import { useSelector } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
 import CrossIcon from "../../assets/svg/CrossIcon";
 import ProfileDummy from "../../assets/svg/user.svg";
+import ClientReviewPanel from "../../components/ClientReviewPanel";
 
 const ClientReview = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -208,29 +209,33 @@ const ClientReview = () => {
     ];
     return (
       <>
-        <View style={styles.headerView}>
-          <View style={styles.headerRow}>
-            <View style={styles.w25}>
-              <Text style={styles.reviewCount}>{reviewData?.rating}</Text>
-              <Text style={styles.reviewsText}>
-                {reviewData?.reviews?.length == 0
-                  ? "0"
-                  : reviewData?.reviews?.length}{" "}
-                Reviews
-              </Text>
-            </View>
-            <View style={styles.line} />
-            <View style={styles.w70}>
-              <ReviewComponent
-                reviewData={ratingData}
-                totalReviews={ratingData.reduce(
-                  (sum, review) => sum + review.count,
-                  0
-                )}
-              />
-            </View>
+        {/* <View style={styles.headerView}>
+        <View style={styles.headerRow}>
+          <View style={styles.w25}>
+            <Text style={styles.reviewCount}>{reviewData?.rating}</Text>
+            <Text style={styles.reviewsText}>
+              {reviewData?.reviews?.length == 0
+                ? "0"
+                : reviewData?.reviews?.length}{" "}
+              Reviews
+            </Text>
+          </View>
+          <View style={styles.line} />
+          <View style={styles.w70}>
+            <ReviewComponent
+              reviewData={ratingData}
+              totalReviews={ratingData.reduce(
+                (sum, review) => sum + review.count,
+                0
+              )}
+            />
           </View>
         </View>
+      </View> */}
+        <ClientReviewPanel
+          providerRating={reviewData}
+          showClientReviewHeading={false}
+        />
         <View style={styles.dropdownMainView}>
           <View style={styles.dropDownRow}>
             {filterData?.sortBy == "rating" && (

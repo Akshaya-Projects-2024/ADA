@@ -60,7 +60,7 @@ const SessionDetail = (props) => {
 
   useEffect(() => {
     initData();
-    if (!ProviderSession?.id) {
+    if (!ProviderSession?.id || route !== "myprofile") {
       setIsSubmit(true);
     }
     const keyboardDidShowListener = Keyboard.addListener(

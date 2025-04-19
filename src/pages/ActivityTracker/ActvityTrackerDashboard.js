@@ -36,6 +36,7 @@ import { contextValue } from "../../components/Loader";
 import { showToast } from "../../utils/utils";
 import { useIsFocused } from "@react-navigation/native";
 import { ActivityType, DefaultActivityList } from "../../constants/enums";
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 export const ActvityTrackerDashboard = (props) => {
   const { parentProfie, logindetails } = useSelector(
@@ -83,34 +84,35 @@ export const ActvityTrackerDashboard = (props) => {
   }, []);
 
   const checkPermission = async () => {
-    const permission = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-      {
-        title: "Contacts",
-        message: "This app would like to view your contacts.",
-        buttonNegative: "Cancel",
-        buttonPositive: "OK",
+    const permissionType =
+      Platform.OS === 'android'
+        ? PERMISSIONS.ANDROID.READ_CONTACTS
+        : PERMISSIONS.IOS.CONTACTS;
+  
+    const result = await check(permissionType);
+    if (result === RESULTS.GRANTED) {
+    } else if (result === RESULTS.DENIED || result === RESULTS.BLOCKED) {
+      const requestResult = await request(permissionType);
+  
+      if (requestResult !== RESULTS.GRANTED) {
+        Alert.alert(
+          'Permission Denied',
+          'This app requires permission to access your contacts.',
+          [
+            {
+              text: 'Cancel',
+              onPress: () => console.log('Cancel Pressed'),
+              style: 'cancel',
+            },
+            {
+              text: 'Open Settings',
+              onPress: () => {
+                Linking.openSettings(); // opens app settings
+              },
+            },
+          ]
+        );
       }
-    );
-    if (permission !== "granted") {
-      Alert.alert(
-        "Permission Denied",
-        "This app requires permission to access your contacts.",
-        [
-          {
-            text: "Cancel",
-            onPress: () => console.log("Cancel Pressed"),
-            style: "cancel",
-          },
-          {
-            text: "OK",
-            onPress: () =>
-              PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.READ_CONTACTS
-              ),
-          },
-        ]
-      );
     }
   };
 

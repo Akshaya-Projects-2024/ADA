@@ -167,7 +167,7 @@ const AppointmentDetail = (props) => {
   const onCancel = () => {
     setVisible(false);
     navigate("cancelAppointment", {
-      selectedItem: selectedData,
+      selectedItem: appointmentData,
       requestedby: "provider",
     });
   };
@@ -175,7 +175,7 @@ const AppointmentDetail = (props) => {
   const onReschedule = () => {
     setVisible(false);
     navigate("rescheduleAppointment", {
-      selectedItem: selectedData,
+      selectedItem: appointmentData,
     });
   };
 
@@ -396,7 +396,7 @@ const AppointmentDetail = (props) => {
             {Boolean(
               ["pending", "rescheduled", "scheduled"].includes(
                 appointmentData?.status
-              )
+                )
             ) && (
               <View
                 style={{
@@ -643,6 +643,7 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
     backgroundColor: "#fee6e4",
     paddingVertical: moderateScale(16),
+    maxWidth: "30%",
   },
   dogText: {
     fontFamily: THEMES.fontFamily.medium,

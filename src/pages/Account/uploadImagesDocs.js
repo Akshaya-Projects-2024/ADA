@@ -78,7 +78,7 @@ const UploadImagesDocs = (props) => {
           break;
       }
     }
-    if (!providerDocument?.some((item) => item.id)) {
+    if (!providerDocument?.some((item) => item.id) || route !== "myprofile") {
       setIsSubmit(true);
     }
     setPhoto(logo);
