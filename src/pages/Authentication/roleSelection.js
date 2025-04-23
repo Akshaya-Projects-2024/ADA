@@ -209,7 +209,7 @@ const RoleSelection = (props) => {
                   borderWidth: 1,
                   borderColor: "#CFD3D4",
                 }}
-                source={require("../../assets/images/profileImg.png")}
+                source={require("../../assets/images/serviceProvider.png")}
               />
 
               {selected == "service" && (

@@ -23,6 +23,8 @@ import { contextValue } from "../../components/Loader";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import BackArrowComponent from "../../components/BackArrowComponent";
 import RightArrow from "../../assets/svg/arrowRight.svg";
+const DummyImage = require('../../assets/images/alertDummyImage.png');
+
 
 const MedicalAlertDetail = (props) => {
   const selectedAdotpionData = props.route.params.selectedData;
@@ -34,7 +36,7 @@ const MedicalAlertDetail = (props) => {
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <ImageBackground
-          source={{ uri: profilePhoto?.url }}
+          source={profilePhoto?.url ? { uri: profilePhoto.url } : DummyImage}
           resizeMode="cover"
           style={styles.imgBackground}
         >

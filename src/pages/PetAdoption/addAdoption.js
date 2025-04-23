@@ -244,6 +244,22 @@ const AddAdoption = (props) => {
             await shareImageBase64(response?.data?.data, selectedPlatforms);
           }
           setModal(true);
+          setAge("");
+          setLocation("");
+          setReason("");
+          setMedicalCondition("");
+          setName("");
+          setContactNumber("");
+          setSelectedGender(null);
+          setPetImage([]);
+          selectedDate("");
+          setFacebook("");
+          setWhatsup("");
+          setSelectedBreed("");
+          setAgree(false);
+          setWeight("");
+          setDescription("");
+          setSelectedPlatforms([]);
         }
         contextValue?.setLoader(false);
       }
@@ -315,7 +331,6 @@ const AddAdoption = (props) => {
   //   );
   // };
 
-
   const handleSelectedCategory = (value) => {
     setSelectedCategory(value);
     setSelectedBreed([]);
@@ -328,7 +343,6 @@ const AddAdoption = (props) => {
     }));
     setBreedList(result ? result : []);
   };
-
 
   const handleGoBack = () => {
     setModal(false);

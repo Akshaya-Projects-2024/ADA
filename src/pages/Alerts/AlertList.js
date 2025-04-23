@@ -23,7 +23,6 @@ import { validArray } from "../../utils/utils";
 import { useIsFocused } from "@react-navigation/native";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 import Plus from "../../assets/svg/plus.svg";
-import ProfileDummy from "../../assets/svg/user.svg";
 import { navigate } from "../../navigations/rootNavigationRef";
 
 const AlertList = (props) => {
@@ -145,7 +144,11 @@ const AlertList = (props) => {
                 borderRadius: 48 / 2,
               }}
             >
-              <ProfileDummy width={30} />
+              <Image
+                resizeMode="contain"
+                style={{ width: 48, height: 48, borderRadius: 48 / 2 }}
+                source={require("../../assets/images/alertDummyImage.png")}
+              />
             </View>
           )
         ) : (
@@ -159,7 +162,11 @@ const AlertList = (props) => {
               borderRadius: 48 / 2,
             }}
           >
-            <ProfileDummy width={30} />
+             <Image
+                resizeMode="contain"
+                style={{ width: 48, height: 48, borderRadius: 48 / 2 }}
+                source={require("../../assets/images/alertDummyImage.png")}
+              />
           </View>
         )}
 
