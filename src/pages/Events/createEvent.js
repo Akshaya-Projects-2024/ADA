@@ -70,7 +70,10 @@ const CreateEvent = () => {
     const now = moment();
     const selectedDate = moment(sDate, "DD/MM/YYYY");
     const formattedTime = moment(date).format("HH:mm:ss");
-    const formattedDateTime = moment(`${selectedDate.format("DD/MM/YYYY")} ${formattedTime}`, "DD/MM/YYYY HH:mm:ss");
+    const formattedDateTime = moment(
+      `${selectedDate.format("DD/MM/YYYY")} ${formattedTime}`,
+      "DD/MM/YYYY HH:mm:ss"
+    );
 
     if (!sDate) {
       Alert.alert("", "Please Select Start Date First");
@@ -85,31 +88,46 @@ const CreateEvent = () => {
     }
 
     setStartTime(formattedTime);
-    setEndTime("")
+    setEndTime("");
     hideStartDatePicker();
   };
 
   const handleEndConfirm = (date) => {
     if (!sDate) {
-      Alert.alert("Select Start Date First", "Please select a start date before selecting an end time.");
+      Alert.alert(
+        "Select Start Date First",
+        "Please select a start date before selecting an end time."
+      );
       hideEndDatePicker();
       return;
     }
 
     if (!startTime) {
-      Alert.alert("Select Start Time First", "Please select a start time before selecting an end time.");
+      Alert.alert(
+        "Select Start Time First",
+        "Please select a start time before selecting an end time."
+      );
       hideEndDatePicker();
       return;
     }
 
     if (!eDate) {
-      Alert.alert("Select End Date", "Please select an end date before selecting an end time.");
+      Alert.alert(
+        "Select End Date",
+        "Please select an end date before selecting an end time."
+      );
       hideEndDatePicker();
       return;
     }
 
-    const startDateTime = moment(`${sDate} ${startTime}`, "YYYY-MM-DD HH:mm:ss");
-    const endDateTime = moment(`${eDate} ${moment(date).format("HH:mm:ss")}`, "YYYY-MM-DD HH:mm:ss");
+    const startDateTime = moment(
+      `${sDate} ${startTime}`,
+      "YYYY-MM-DD HH:mm:ss"
+    );
+    const endDateTime = moment(
+      `${eDate} ${moment(date).format("HH:mm:ss")}`,
+      "YYYY-MM-DD HH:mm:ss"
+    );
 
     if (endDateTime.isSameOrBefore(startDateTime, "minute")) {
       Alert.alert("Invalid End Time", "End time must be after start time.");
@@ -119,7 +137,7 @@ const CreateEvent = () => {
 
     setEndTime(moment(date).format("HH:mm:ss"));
     hideEndDatePicker();
-  }
+  };
 
   const handlePosterImages = async (image) => {
     contextValue?.setLoader(true);
@@ -248,6 +266,17 @@ const CreateEvent = () => {
         if (res?.data?.status_code == 200) {
           contextValue?.setLoader(false);
           setModal(true);
+          setSDate("");
+          setStartTime("");
+          setEndTime("");
+          setEDate("");
+          setPosterImg([]);
+          setEventName("");
+          setDescription("");
+          setContactNo("");
+          setRegistrationlink("");
+          setAudience("Public");
+          setLocation("");
         } else {
           contextValue?.setLoader(false);
           setSuccess(false);
@@ -260,11 +289,11 @@ const CreateEvent = () => {
   };
 
   const selectStartTime = useMemo(() => {
-    return startTime ? new Date(`${sDate} ${startTime}`) : new Date()
-  }, [startTime])
+    return startTime ? new Date(`${sDate} ${startTime}`) : new Date();
+  }, [startTime]);
   const selectEndTime = useMemo(() => {
-    return endTime ? new Date(`${eDate} ${endTime}`) : new Date()
-  }, [endTime])
+    return endTime ? new Date(`${eDate} ${endTime}`) : new Date();
+  }, [endTime]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

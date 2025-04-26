@@ -24,6 +24,8 @@ import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import BackArrowComponent from "../../components/BackArrowComponent";
 import RightArrow from "../../assets/svg/arrowRight.svg";
 
+const DummyImage = require('../../assets/images/alertDummyImage.png');
+
 const LostAlertdetail = (props) => {
   const selectedAdotpionData = props.route.params.selectedData;
   const [image, setImage] = useState();
@@ -31,13 +33,11 @@ const LostAlertdetail = (props) => {
     (doc) => doc.documenttype == "profilePhoto"
   );
 
-
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <ImageBackground
-          source={{ uri: profilePhoto?.url }}
+          source={profilePhoto?.url ? { uri: profilePhoto.url } : DummyImage}
           resizeMode="cover"
           style={styles.imgBackground}
         >
@@ -182,7 +182,9 @@ const LostAlertdetail = (props) => {
                       }}
                     >
                       <Text style={styles.weightText}>
-                        {selectedAdotpionData?.petdetails?.weight ? selectedAdotpionData?.petdetails?.weight : "--"}
+                        {selectedAdotpionData?.petdetails?.weight
+                          ? selectedAdotpionData?.petdetails?.weight
+                          : "--"}
                       </Text>
                       <Text style={styles.weight}>Weight</Text>
                     </View>
@@ -219,7 +221,7 @@ const LostAlertdetail = (props) => {
                       justifyContent: "space-between",
                     }}
                   >
-                    <View style={{width:'45%'}}>
+                    <View style={{ width: "45%" }}>
                       <Text style={styles.lastSeenText}>Last Seen Date : </Text>
                       <Text
                         numberOfLines={2}
@@ -235,7 +237,7 @@ const LostAlertdetail = (props) => {
                       </Text>
                     </View>
 
-                    <View style={{width:'45%'}}>
+                    <View style={{ width: "45%" }}>
                       <Text style={styles.lastSeenText}>
                         Last Seen Location :{" "}
                       </Text>
@@ -254,25 +256,21 @@ const LostAlertdetail = (props) => {
                     </View>
                   </View>
 
-                
-                    <View>
-                      <Text style={styles.lastSeenText}>Message : </Text>
-                      <Text
-                        numberOfLines={2}
-                        style={[
-                          styles.location,
-                          {
-                            paddingTop: moderateScale(5),
-                            marginBottom: moderateScale(20),
-                          },
-                        ]}
-                      >
-                        {selectedAdotpionData?.message}
-                      </Text>
-                    </View>
-       
-
-            
+                  <View>
+                    <Text style={styles.lastSeenText}>Message : </Text>
+                    <Text
+                      numberOfLines={2}
+                      style={[
+                        styles.location,
+                        {
+                          paddingTop: moderateScale(5),
+                          marginBottom: moderateScale(20),
+                        },
+                      ]}
+                    >
+                      {selectedAdotpionData?.message}
+                    </Text>
+                  </View>
 
                   <View style={styles.cardView}>
                     <View style={styles.imgView}>
