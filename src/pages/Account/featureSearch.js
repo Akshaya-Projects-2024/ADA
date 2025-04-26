@@ -19,12 +19,15 @@ import Header from "../../components/Header";
 import Toggle from "../../components/Toggle";
 import Cross from "../../assets/svg/cross.svg";
 import Back from "../../assets/svg/back.svg";
+import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
+import { useIsFocused } from "@react-navigation/native";
 
 const HeaderWithSearch = ({ loggedInModule, handleSwitch, featureList }) => {
   const [searchActive, setSearchActive] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const slideAnim = useRef(new Animated.Value(-50)).current;
+  const isFocused = useIsFocused()
 
   const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -54,6 +57,14 @@ const HeaderWithSearch = ({ loggedInModule, handleSwitch, featureList }) => {
     toggleSearchBar(searchActive);
   }, [searchActive, toggleSearchBar]);
 
+  useEffect(() => {
+    if (!isFocused && searchActive) {
+      setSearchText("");
+      setSearchActive(false);
+      setFilteredData([]);
+    }
+  }, [isFocused]);
+
   const handleSearch = useCallback(
     (text) => {
       setSearchText(text);
@@ -81,8 +92,8 @@ const HeaderWithSearch = ({ loggedInModule, handleSwitch, featureList }) => {
           <Header
             customIcon={
               <Toggle
-              state={loggedInModule === LoginModules.provider}
-              onPress={handleSwitch}
+                state={loggedInModule === LoginModules.provider}
+                onPress={handleSwitch}
               />
             }
             right={
@@ -154,14 +165,17 @@ const HeaderWithSearch = ({ loggedInModule, handleSwitch, featureList }) => {
                           opacity: listOpacity,
                         }}
                       >
-                        <TouchableOpacity
+                        <TouchableButtonWithPermission
+                          checkPermission={item.checkPermission ?? false}
+                          checkPayment={item.checkPayment ?? false}
+                          checkPetExist={item.checkPetExist ?? false}
                           onPress={() => {
                             closeSearch();
                             item.onPress();
                           }}
                         >
                           <Text style={styles.listItem}>{item.label}</Text>
-                        </TouchableOpacity>
+                        </TouchableButtonWithPermission>
                       </Animated.View>
                     );
                   }}

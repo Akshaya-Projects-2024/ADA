@@ -148,6 +148,8 @@ const ParentAccount = (props) => {
         onPress: () => {
           navigate("actvityTrackerDashboard", { route: "parentAccount" });
         },
+        checkPetExist: !validArray(profile?.parentProfie?.petDetails),
+        checkPermission: true
       },
       {
         label: Strings.myBookings,
@@ -291,11 +293,6 @@ const ParentAccount = (props) => {
     }
   };
 
-  const profileStatus = useMemo(() => {
-    const validParentProfile = validateParentProfileUsingStatus(profile);
-    return validParentProfile?.partiallyCompleted;
-  }, [profile]);
-
   const handleSwitch = () => {
     if (profile?.providerProfile?.providerBusiness?.id) {
       switchProfile();
@@ -435,7 +432,8 @@ const ParentAccount = (props) => {
                         route: "parentAccount",
                       });
                     }}
-                    checkPetExist={true}
+                    checkPetExist={!validArray(profile?.parentProfie?.petDetails)}
+                    checkPermission={true}
                   />
                 </View>
               </View>

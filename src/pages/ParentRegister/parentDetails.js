@@ -373,7 +373,7 @@ const ParentDetails = (props) => {
                   onChange={setAddress}
                 />
               </View> */}
-                <View style={{ paddingTop: moderateScale(16) }}>
+                <View style={{ paddingVertical: moderateScale(16) }}>
                   <InputField
                     maxLength={6}
                     keyboardType="phone-pad"
@@ -390,6 +390,7 @@ const ParentDetails = (props) => {
             <View
               style={{
                 padding: moderateScale(16),
+                paddingTop: 0,
               }}
             >
               <Button

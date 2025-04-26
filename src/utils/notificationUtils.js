@@ -103,7 +103,7 @@ const NotificationConfig = () => {
         executePostFrame(() => navigation.navigate("MyProfile"));
         break;
       case "myBookings":
-        executePostFrame(() => navigation.navigate("myBookings"));
+        executePostFrame(() => navigation.navigate("myBookings",{route: mainRoute}));
         break;
       case "petAdoption":
         executePostFrame(() => navigation.navigate("petAdoption"));

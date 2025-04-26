@@ -88,7 +88,7 @@ const PetDetail = (props) => {
   const dispatch = useDispatch();
   const isURL = (str) => /^(https?:\/\/|file:\/\/)/.test(str);
   const [editEnable, setEditEnable] = useState(false);
-  const [isSubmit, setIsSubmit] = useState(false);
+  const [isSubmit, setIsSubmit] = useState(Boolean(addNew));
   const [editModal, setEditModal] = useState(false);
 
   const isBase64 = (str) =>
