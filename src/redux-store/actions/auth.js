@@ -924,22 +924,6 @@ export const deleteActivity = async (params) => {
   }
 };
 
-export const getNotificationList = async (params) => {
-  try {
-    const res = await Api.POST(urlList.getNotificationList, params);
-    if (!res || res?.data?.error || res?.data?.errorCode) {
-      throw new Error(
-        res?.data?.message || res?.data?.error || "Something went wrong!"
-      );
-    }
-    if (res) {
-      return res;
-    }
-    throw new Error("Something went wrong!");
-  } catch (error) {
-    throw new Error(error?.message || error || "Opps! Something went wrong!");
-  }
-};
 
 export const readNotification = async (params) => {
   try {
@@ -966,8 +950,40 @@ export const logout = async (params) => {
         res?.data?.message || res?.data?.error || "Something went wrong!"
       );
     }
-    console.log(res,"wddwdw");
-    
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const getPetAdoptionDetail = async (params) => {
+  try {
+    const res = await Api.POST(urlList.getPetAdoptionDetail, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
+    if (res) {
+      return res;
+    }
+    throw new Error("Something went wrong!");
+  } catch (error) {
+    throw new Error(error?.message || error || "Opps! Something went wrong!");
+  }
+};
+
+export const getAlertDetailById = async (params) => {
+  try {
+    const res = await Api.POST(urlList.getAlertDetail, params);
+    if (!res || res?.data?.error || res?.data?.errorCode) {
+      throw new Error(
+        res?.data?.message || res?.data?.error || "Something went wrong!"
+      );
+    }
     if (res) {
       return res;
     }

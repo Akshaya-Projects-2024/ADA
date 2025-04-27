@@ -54,6 +54,7 @@ import TouchableButtonWithPermission from "../../components/TouchableButtonWithP
 import { navigateToParent } from "../../navigations/rootNavigationRef";
 import AddAppointmentModal from "../../components/AddAppointmentModal";
 import ClientReviewPanel from "../../components/ClientReviewPanel";
+import { getNotificationList } from "../../redux-store/actions/notifications";
 
 const Home = (props) => {
   const { top } = useSafeAreaInsets();
@@ -79,7 +80,9 @@ const Home = (props) => {
   const { userData, apiInitCall } = useUser();
   const [modal, setModal] = useState(false);
   const [refresh, setRefresh] = useState(true);
-
+  const notificationList = useSelector(
+    (state) => state?.notification?.notificationList
+  );
   const paymentCompleted = useMemo(() => {
     if (
       profile?.providerProfile?.subscription?.status === "active" &&
@@ -103,6 +106,7 @@ const Home = (props) => {
       setActiveIndex(0);
       initData();
       dispatch(setLoggedInMoodule(LoginModules.provider));
+      getNotificationListData();
     } else {
       setVisible(false);
       setAttendedModal(false);
@@ -113,6 +117,19 @@ const Home = (props) => {
     }
     apiInitCall();
   }, [isFocused, dispatch, initData, apiInitCall]);
+
+  const getNotificationListData = async () => {
+    try {
+      const userId = await decryptService("userId");
+      const params = {
+        userid: userId,
+        usertype: "parent",
+      };
+      dispatch(getNotificationList(params));
+    } catch (error) {
+      showToast("error", error?.message);
+    }
+  };
 
   const renderCategory = ({ item }) => {
     const isSelected = selectedCategory === item;
@@ -395,6 +412,42 @@ const Home = (props) => {
     );
   };
 
+  const renderNotificationIcon = () => {
+    return (
+      <TouchableOpacity
+        onPress={() => props.navigation.navigate("notification")}
+      >
+        <Bell />
+        {notificationList?.unreadcnt > 0 && (
+          <View
+            style={{
+              position: "absolute",
+              right: -8,
+              top: -8,
+              backgroundColor: THEMES.colors.outrageousPink,
+              borderRadius: 10,
+              minWidth: 20,
+              height: 20,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingHorizontal: 4,
+            }}
+          >
+            <Text
+              style={{
+                color: THEMES.colors.white,
+                fontSize: THEMES.fonts.font10,
+                fontFamily: THEMES.fontFamily.medium,
+              }}
+            >
+              {notificationList?.unreadcnt}
+            </Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <LinearGradient
       locations={[0, 0.5, 0.6]}
@@ -461,7 +514,7 @@ const Home = (props) => {
                 flexDirection: "row",
               }}
             >
-              <Bell onPress={() => props.navigation.navigate("notification")} />
+              {renderNotificationIcon()}
               <TouchableButtonWithPermission
                 customMsgForRegistration={
                   "Complete your Registration and Subscribe to the app to create new events."

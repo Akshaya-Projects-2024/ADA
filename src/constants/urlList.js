@@ -79,4 +79,6 @@ export const urlList = {
   readNotification: 'home/notification/read',
   getNotificationList: 'home/notification',
   logout: 'login/logout',
+  getPetAdoptionDetail: 'parent/getadoptionbyid',
+  getAlertDetail: 'parent/getpetalert',
 };

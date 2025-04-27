@@ -1,27 +1,34 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ImageBackground } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { THEMES } from "../../assets/theme/themes";
 import { moderateScale } from "react-native-size-matters";
 
- const NoInternetScreen = ({ onRetry }) => {
+const NoInternetScreen = ({ onRetry }) => {
   return (
-    <LinearGradient
-    colors={[
-      THEMES.colors.iceBerg,
-      "#e8f1ea",
-      THEMES.colors.panache,
-    ]}
-    style={{ flex: 1 }}
-  >
-    <View style={styles.container}>
-    <Text style={styles.text}>No Internet Connection</Text>
-      <Text style={styles.errorText}>Please check your network and try again.</Text>
-      <TouchableOpacity style={styles.button} onPress={onRetry}>
-        <Text style={styles.buttonText}>Retry</Text>
-      </TouchableOpacity>
+    <View style={{ flex: 1, backgroundColor: "white" }}>
+      <ImageBackground
+        source={require("../../assets/images/noInternet.jpeg")}
+        resizeMode="cover"
+        style={{
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <View
+          style={{
+            alignItems: "center",
+            position: "absolute",
+            bottom: 20,
+            width: "100%",
+          }}
+        >
+          <TouchableOpacity style={styles.button} onPress={onRetry}>
+            <Text style={styles.buttonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
     </View>
-    </LinearGradient>
   );
 };
 
@@ -46,7 +53,7 @@ const styles = StyleSheet.create({
     color: "#721c24",
     marginBottom: 20,
     textAlign: "center",
-    paddingTop:moderateScale(5)
+    paddingTop: moderateScale(5),
   },
   button: {
     backgroundColor: THEMES.colors.cyan,
@@ -61,4 +68,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NoInternetScreen
+export default NoInternetScreen;

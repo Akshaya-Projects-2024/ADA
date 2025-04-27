@@ -91,15 +91,15 @@ const AlertList = (props) => {
         onPress={() => {
           if (item?.requesttype == "lostpet") {
             navigate("lostAlertDetail", {
-              selectedData: item,
+              id: item.id,
             });
           } else if (item?.requesttype == "rescue") {
             navigate("resuceAlertDetail", {
-              selectedData: item,
+              id: item.id,
             });
           } else if (item?.requesttype == "medical") {
             navigate("medicalAlertDetail", {
-              selectedData: item,
+              id: item.id,
             });
           }
         }}
@@ -162,11 +162,11 @@ const AlertList = (props) => {
               borderRadius: 48 / 2,
             }}
           >
-             <Image
-                resizeMode="contain"
-                style={{ width: 48, height: 48, borderRadius: 48 / 2 }}
-                source={require("../../assets/images/alertDummyImage.png")}
-              />
+            <Image
+              resizeMode="contain"
+              style={{ width: 48, height: 48, borderRadius: 48 / 2 }}
+              source={require("../../assets/images/alertDummyImage.png")}
+            />
           </View>
         )}
 

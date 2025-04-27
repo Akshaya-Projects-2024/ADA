@@ -125,7 +125,7 @@ const PetAdoption = (props) => {
     props.navigation.navigate("auth", {
       screen: "adoptionDetail",
       params: {
-        selectedData: item,
+        id: item.id,
       },
     });
   };

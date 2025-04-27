@@ -11,33 +11,58 @@ import {
 import { THEMES } from "../../assets/theme/themes";
 import { moderateScale } from "react-native-size-matters";
 import { ScrollView } from "react-native-gesture-handler";
-import Back from "../../assets/svg/back.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileDummy from "../../assets/svg/user.svg";
 import Call from "../../assets/svg/phoneCall.svg";
-import ShareImg from "../../assets/svg/share.svg";
-import Share from "react-native-share";
-import { shareAdoption } from "../../redux-store/actions/auth";
+import {
+  getAlertDetailById,
+} from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
 import { contextValue } from "../../components/Loader";
-import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import BackArrowComponent from "../../components/BackArrowComponent";
-import RightArrow from "../../assets/svg/arrowRight.svg";
 
-const DummyImage = require('../../assets/images/alertDummyImage.png');
+const DummyImage = require("../../assets/images/alertDummyImage.png");
 
 const LostAlertdetail = (props) => {
-  const selectedAdotpionData = props.route.params.selectedData;
-  const [image, setImage] = useState();
-  const profilePhoto = selectedAdotpionData?.petdetails?.documents?.find(
-    (doc) => doc.documenttype == "profilePhoto"
-  );
+  const id = props.route.params.id;
+  const [selectedAdotpionData, setSelectedAdoptionData] = useState({});
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    try {
+      contextValue?.setLoader(true);
+      const userid = await decryptService("userId");
+      const params = {
+        id,
+        userid,
+      };
+      const res = await getAlertDetailById(params);
+      if (res?.data?.data) {
+        contextValue.setLoader(false);
+        setSelectedAdoptionData({
+          ...res.data.data[0],
+          profilePhoto: res.data.data[0]?.petdetails?.documents?.find(
+            (doc) => doc.documenttype == "profilePhoto"
+          ),
+        });
+      }
+    } catch (error) {
+      contextValue.setLoader(false);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <ImageBackground
-          source={profilePhoto?.url ? { uri: profilePhoto.url } : DummyImage}
+          source={
+            selectedAdotpionData?.profilePhoto?.url
+              ? { uri: selectedAdotpionData?.profilePhoto.url }
+              : DummyImage
+          }
           resizeMode="cover"
           style={styles.imgBackground}
         >

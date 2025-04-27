@@ -11,23 +11,23 @@ import {
 import { THEMES } from "../../assets/theme/themes";
 import { moderateScale } from "react-native-size-matters";
 import { ScrollView } from "react-native-gesture-handler";
-import Back from "../../assets/svg/back.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProfileDummy from "../../assets/svg/user.svg";
 import Call from "../../assets/svg/phoneCall.svg";
 import ShareImg from "../../assets/svg/share.svg";
 import Share from "react-native-share";
-import { shareAdoption } from "../../redux-store/actions/auth";
+import { getPetAdoptionDetail, shareAdoption } from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
 import { contextValue } from "../../components/Loader";
-import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import BackArrowComponent from "../../components/BackArrowComponent";
 const AdoptionDetail = (props) => {
-  const selectedAdotpionData = props.route.params.selectedData;
+  const id = props.route.params.id;
   const [image, setImage] = useState();
+  const [selectedAdotpionData, setSelectedAdoptionData] = useState({});
 
   useEffect(() => {
     initData();
+    getData()
   }, []);
 
   const initData = async () => {
@@ -44,6 +44,20 @@ const AdoptionDetail = (props) => {
       }
     } catch (error) {
       contextValue?.setLoader(false);
+    }
+  };
+
+  const getData = async () => {
+    contextValue.setLoader(true);
+    const userid = await decryptService("userId");
+    const params = {
+      id,
+      userid,
+    };
+    const res = await getPetAdoptionDetail(params);
+    if (res?.data?.data) {
+      contextValue.setLoader(false);
+      setSelectedAdoptionData(res?.data?.data);
     }
   };
 
@@ -264,7 +278,6 @@ const AdoptionDetail = (props) => {
                       {selectedAdotpionData?.medicalcondition}
                     </Text>
                   </View>
-
                   <View style={styles.cardView}>
                     <View style={styles.imgView}>
                       {selectedAdotpionData?.parentphoto ? (

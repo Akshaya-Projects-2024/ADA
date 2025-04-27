@@ -7,14 +7,12 @@ import {
   StatusBar,
   FlatList,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import { moderateScale } from "react-native-size-matters";
 import Header from "../../components/Header";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  getNotificationList,
-  readNotification,
-} from "../../redux-store/actions/auth";
+import { readNotification } from "../../redux-store/actions/auth";
 import { showToast } from "../../utils/utils";
 import { contextValue } from "../../components/Loader";
 import { decryptService } from "../../utils/storageFunc";
@@ -26,7 +24,10 @@ import Activity from "../../assets/svg/activity.svg";
 import Alert from "../../assets/svg/msgSquare.svg";
 import PetAdoption from "../../assets/svg/heart.svg";
 import ProfileImg from "../../assets/svg/profile.svg";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { navigate } from "../../navigations/rootNavigationRef";
+import { screenHeight } from "../../utils/dimensions";
+import { getNotificationList } from "../../redux-store/actions/notifications";
 
 const IconConfig = {
   myBookings: {
@@ -54,6 +55,7 @@ const IconConfig = {
       stroke: THEMES.colors.white,
       strokeWidth: 1,
     },
+    showValue: true,
   },
   lostpet: {
     icon: Alert,
@@ -62,6 +64,7 @@ const IconConfig = {
       stroke: THEMES.colors.white,
       strokeWidth: 1,
     },
+    showValue: true,
   },
   medical: {
     icon: Alert,
@@ -70,6 +73,7 @@ const IconConfig = {
       stroke: THEMES.colors.white,
       strokeWidth: 1,
     },
+    showValue: true,
   },
   petAdoption: {
     icon: PetAdoption,
@@ -86,43 +90,43 @@ const IconConfig = {
 };
 
 const Notification = (props) => {
-  const [notificationList, setNotificationList] = React.useState({
-    today: [],
-    yesterday: [],
-    last7day: [],
-  });
   const { loggedInModule, guestUser, logindetails } = useSelector(
     (state) => state?.register
   );
-  useEffect(() => {
-    getNotificationListData();
-  }, []);
+  const dispatch = useDispatch();
+  const notificationList = useSelector(
+    (state) => state?.notification?.notificationList
+  );
 
   const getNotificationListData = async (showLoader = true) => {
     try {
       showLoader && contextValue?.setLoader(true);
       const userId = await decryptService("userId");
-      const params = { userid: userId };
-      const res = await getNotificationList(params);
-      if (res?.status === 200) {
-        setNotificationList(res?.data?.data);
-      }
-      contextValue?.setLoader(false);
+      const params = { userid: userId, usertype: loggedInModule };
+      dispatch(getNotificationList(params)); // Add await here
     } catch (error) {
+      console.log(error);
       contextValue?.setLoader(false);
       showToast("error", error?.message);
     }
   };
 
+  useEffect(() => {
+    if (notificationList) {
+      contextValue?.setLoader(false);
+    }
+  }, [notificationList]);
+
   const handleOnPress = async (item) => {
     if (!item?.isread) {
       const params = {
         id: item?.id,
-        userid: await decryptService("userId"),
+        userid: await decryptService("userId")
       };
       await readNotification(params);
-      getNotificationListData(false)
+      getNotificationListData(false);
     }
+
     switch (item?.value) {
       case "myBookings":
         props.navigation.navigate(
@@ -147,13 +151,24 @@ const Notification = (props) => {
       case "Activity":
         props.navigation.navigate("actvityTrackerDashboard");
         break;
-       case "home": 
+      case "home":
         props.navigation.navigate("myProfile");
-       case "rescue":
-       case "lostpet":
-        case "medical": 
-        props.navigation.navigate("alertList");
-        break; 
+        break;
+      case "rescue":
+        props.navigation?.navigate("resuceAlertDetail", {
+          id: item.data.id,
+        });
+        break;
+      case "lostpet":
+        props.navigation?.navigate("lostAlertDetail", {
+          id: item.data.id,
+        });
+        break;
+      case "medical":
+        props.navigation?.navigate("medicalAlertDetail", {
+          id: item.data.id,
+        });
+        break;
     }
   };
 
@@ -182,10 +197,10 @@ const Notification = (props) => {
               position: "absolute",
               top: moderateScale(8),
               right: moderateScale(8),
-              width: moderateScale(4),
-              height: moderateScale(4),
+              width: moderateScale(5),
+              height: moderateScale(5),
               borderRadius: moderateScale(8),
-              backgroundColor: THEMES.colors.red,
+              backgroundColor: THEMES.colors.cyan,
               justifyContent: "center",
               alignItems: "center",
             }}
@@ -210,7 +225,10 @@ const Notification = (props) => {
             />
           </View>
           <View style={{ width: "70%" }}>
-            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.title}>
+              {item.title}{" "}
+              {IconConfig[item.value]?.showValue ? "-" + " " + item.value : ""}
+            </Text>
             <Text style={styles.message}>{item.message}</Text>
           </View>
           <Text style={styles.timeText}>{item.createdon}</Text>
@@ -265,9 +283,28 @@ const Notification = (props) => {
         fontColor="#EC559C"
       />
       <ScrollView style={styles.scrollView}>
-        {renderSection("Today", notificationList.today)}
-        {renderSection("Yesterday", notificationList.yesterday)}
-        {renderSection("Last 7 Days", notificationList.last7day)}
+        {renderSection("Today", notificationList?.today)}
+        {renderSection("Yesterday", notificationList?.yesterday)}
+        {renderSection("Last 7 Days", notificationList?.last7day)}
+        {Boolean(notificationList && !notificationList?.totalcnt) && (
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              height: screenHeight * 0.9,
+            }}
+          >
+            <Text
+              style={{
+                color: THEMES.colors.black,
+                fontFamily: THEMES.fontFamily.semiBold,
+                fontSize: moderateScale(14),
+              }}
+            >
+              No Notification Found
+            </Text>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -316,6 +353,7 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(14),
     color: THEMES.colors.black,
     marginBottom: moderateScale(4),
+    textTransform: "capitalize",
   },
   message: {
     fontFamily: THEMES.fontFamily.regular,

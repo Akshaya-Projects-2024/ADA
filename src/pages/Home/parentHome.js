@@ -50,6 +50,7 @@ import Dialog from "../../components/Dialog";
 import TouchableButtonWithPermission from "../../components/TouchableButtonWithPermission";
 import { navigateToServiceProvider } from "../../navigations/rootNavigationRef";
 import { fetchUserProfileData } from "../../redux-store/actions/registerAction";
+import { getNotificationList } from "../../redux-store/actions/notifications";
 const { width: screenWidth } = Dimensions.get("window");
 
 const { width } = Dimensions.get("window");
@@ -69,6 +70,9 @@ const ParentHome = (props) => {
     appointmentData: false,
     eventData: false,
   });
+  const notificationList = useSelector(
+    (state) => state?.notification?.notificationList
+  );
 
   useEffect(() => {
     if (isFocused) {
@@ -77,8 +81,22 @@ const ParentHome = (props) => {
       initData();
       getEvents();
       dispatch(setLoggedInMoodule(LoginModules.parent));
+      getNotificationListData();
     }
   }, [isFocused, dispatch]);
+
+  const getNotificationListData = async () => {
+    try {
+      const userId = await decryptService("userId");
+      const params = {
+        userid: userId,
+        usertype: "parent",
+      };
+      dispatch(getNotificationList(params));
+    } catch (error) {
+      showToast("error", error?.message);
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchUserProfileData());
@@ -481,6 +499,42 @@ const ParentHome = (props) => {
     );
   };
 
+  const renderNotificationIcon = () => {
+    return (
+      <TouchableOpacity
+        onPress={() => props.navigation.navigate("notification")}
+      >
+        <Bell />
+        {notificationList?.unreadcnt > 0 && (
+          <View
+            style={{
+              position: "absolute",
+              right: -8,
+              top: -8,
+              backgroundColor: THEMES.colors.outrageousPink,
+              borderRadius: 10,
+              minWidth: 20,
+              height: 20,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingHorizontal: 4,
+            }}
+          >
+            <Text
+              style={{
+                color: THEMES.colors.white,
+                fontSize: THEMES.fonts.font10,
+                fontFamily: THEMES.fontFamily.medium,
+              }}
+            >
+              {notificationList?.unreadcnt}
+            </Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: THEMES.colors.white }}>
       <StatusBar
@@ -543,7 +597,7 @@ const ParentHome = (props) => {
               flexDirection: "row",
             }}
           >
-            <Bell onPress={() => props.navigation.navigate("notification")} />
+            {renderNotificationIcon()}
             <TouchableButtonWithPermission
               customMsgForRegistration="Please complete parent profille and subscribe to get best services for your lovely pets."
               customMsgForPayment="Please subscribe to get best services for your lovely pets."
