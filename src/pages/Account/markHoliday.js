@@ -227,11 +227,18 @@ const MarkHoliday = () => {
   const handleTimeChange = (day, type, time) => {
     const temp = [...holidayDays];
     const selectedDay = holidayDays.findIndex((it) => it.label === day.label);
-    temp[selectedDay] = {
-      ...day,
-      [type]: time,
-    };
-    setHolidayDays(temp);
+    if (
+      (type === "end" && temp[selectedDay]?.start === time) ||
+      (type === "start" && temp[selectedDay]?.end === time)
+    ) {
+      showToast("error", Strings.holidayTimeError);
+    } else {
+      temp[selectedDay] = {
+        ...day,
+        [type]: time,
+      };
+      setHolidayDays(temp);
+    }
   };
 
   const toggleDay = (day) => {
@@ -441,6 +448,11 @@ const MarkHoliday = () => {
                         <TouchableOpacity
                           style={[
                             styles.timeInput1,
+                            {
+                              backgroundColor: applyForAllDays
+                                ? "transparent"
+                                : THEMES.colors.white,
+                            },
                             // !holidayDays.includes(day) && styles.disabledInput,
                           ]}
                           onPress={() =>
@@ -480,7 +492,14 @@ const MarkHoliday = () => {
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                          style={[styles.timeInput]}
+                          style={[
+                            styles.timeInput,
+                            {
+                              backgroundColor: applyForAllDays
+                                ? "transparent"
+                                : THEMES.colors.white,
+                            },
+                          ]}
                           onPress={() => showDatePicker(day, "end")}
                           disabled={applyForAllDays}
                         >
@@ -658,7 +677,7 @@ const MarkHoliday = () => {
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
           mode="time"
-          display="spinner" 
+          display="spinner"
           onConfirm={handleConfirm}
           onCancel={hideDatePicker}
           minimumDate={new Date()}
@@ -675,19 +694,19 @@ const MarkHoliday = () => {
           mode="date"
           onConfirm={handleEndDate}
           onCancel={hideEndDate}
-          minimumDate={new Date()}
+          minimumDate={startDate ? startDate : new Date()}
         />
         <DateTimePickerModal
           isVisible={startTimeVisible}
           mode="time"
-          display="spinner" 
+          display="spinner"
           onConfirm={handleStartTime}
           onCancel={hideStartTime}
         />
         <DateTimePickerModal
           isVisible={endTimeVisible}
           mode="time"
-          display="spinner" 
+          display="spinner"
           onConfirm={handleEndTime}
           onCancel={hideEndTime}
         />

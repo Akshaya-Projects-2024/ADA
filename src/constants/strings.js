@@ -172,6 +172,7 @@ const Strings = {
     "Complete your Registration and Subscribe to the app to access amazing features.",
   youAreAlreadySubscribed: "You are already subscribed.",
   timeError: "Please select valid time",
+  holidayTimeError: "Start and End time cannot be same.",
 };
 
 export default Strings;
