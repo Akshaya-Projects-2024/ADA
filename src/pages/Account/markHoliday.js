@@ -390,11 +390,11 @@ const MarkHoliday = () => {
                     {
                       borderWidth: 1,
                       backgroundColor: day?.selected
-                        ? THEMES.colors.pearl
-                        : THEMES.colors.outrageousOrange,
+                        ? THEMES.colors.outrageousOrange
+                        : THEMES.colors.pearl,
                       borderColor: day?.selected
-                        ? THEMES.colors.darkGrey
-                        : THEMES.colors.outrageousOrange,
+                        ? THEMES.colors.outrageousOrange
+                        : THEMES.colors.darkGrey,
                     },
                   ]}
                   onPress={() => toggleDay(day)}
@@ -404,8 +404,8 @@ const MarkHoliday = () => {
                       styles.dayText,
                       {
                         color: day?.selected
-                          ? THEMES.colors.darkGrey
-                          : THEMES.colors.white,
+                          ? THEMES.colors.white
+                          : THEMES.colors.darkGrey,
                       },
                     ]}
                   >

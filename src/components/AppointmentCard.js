@@ -93,18 +93,7 @@ const AppointmentCard = ({
                   source={getBase64Obj(petImage?.url)}
                 />
               ) : (
-                <View
-                  style={{
-                    borderWidth: 1,
-                    alignItems: "center",
-                    borderColor: "gray",
-                    backgroundColor: "#fff",
-                    justifyContent: "center",
-                    width: 48,
-                    height: 48,
-                    borderRadius: 48 / 2,
-                  }}
-                >
+                <View style={styles.profileView}>
                   <ProfileDummy width={30} />
                 </View>
               )}
@@ -119,15 +108,13 @@ const AppointmentCard = ({
                 <ProfileInitial
                   name={item?.providername}
                   style={styles.profileImage}
-                  textStyle={{
-                    fontSize: 11,
-                  }}
+                  textStyle={styles.profileInitials}
                 />
               )}
             </View>
           </View>
           <View style={styles.nameText}>
-            <Text style={[styles.name, { textTransform: "capitalize" }]}>
+            <Text style={styles.name}>
               {item?.requestedby !== "provider"
                 ? `${item?.parentdetails?.name} & ${item?.petdetails?.name}`
                 : `${item?.clientname}`}
@@ -264,7 +251,7 @@ const AppointmentCard = ({
                 </Text>
               ) : null}
               {item?.status === AppointmentStatus.scheduled ? (
-                routeFrom && routeFrom == "parentAccount" ? (
+                routeFrom && routeFrom === "parentAccount" ? (
                   <Text style={[styles.statusText, { color: itemtextColor }]}>
                     {item?.status}
                   </Text>
@@ -302,7 +289,9 @@ const AppointmentCard = ({
             </>
           ) : (
             <Text style={[styles.statusText, { color: itemtextColor }]}>
-              {item?.status === AppointmentStatus.completed ? "Attended" : item?.status}
+              {item?.status === AppointmentStatus.completed
+                ? "Attended"
+                : item?.status}
             </Text>
           )}
         </>
@@ -412,6 +401,7 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font14,
     color: THEMES.colors.black,
     fontFamily: THEMES.fontFamily.semiBold,
+    textTransform: "capitalize",
   },
   flatListNameRow: {
     flexDirection: "row",
@@ -438,5 +428,18 @@ const styles = StyleSheet.create({
     fontSize: THEMES.fonts.font10,
     color: THEMES.colors.darkGrey,
     fontFamily: THEMES.fontFamily.medium,
+  },
+  profileView: {
+    borderWidth: 1,
+    alignItems: "center",
+    borderColor: "gray",
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    width: 48,
+    height: 48,
+    borderRadius: 48 / 2,
+  },
+  profileInitials: {
+    fontSize: 11,
   },
 });
