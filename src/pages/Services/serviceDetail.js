@@ -22,7 +22,7 @@ import Button from "../../components/Button";
 import { getBase64Obj } from "../../utils/documentUtils";
 import { showToast, validArray } from "../../utils/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ProviderFallback from "../../assets/svg/ProviderFallback";
+import { WebView } from "react-native-webview";
 import {
   bookmarkApi,
   getProviderSlots,
@@ -34,6 +34,7 @@ import { contextValue } from "../../components/Loader";
 import moment from "moment";
 import Dialog from "../../components/Dialog";
 import ProfileInitial from "../../components/ProfileInitial";
+import ShowFile from "./showFile";
 
 const ServiceDetail = ({ navigation, route }) => {
   const selectedProvider = route?.params?.selectedProvider;
@@ -48,7 +49,8 @@ const ServiceDetail = ({ navigation, route }) => {
   );
   const [bookAppointmentDisabled, setBookAppointmentBtnDisbaled] = useState();
   const [modal, setModal] = useState(false);
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [webUrl, setWebUrl] = useState("");
   useEffect(() => {
     getDates();
   }, []);
@@ -522,10 +524,14 @@ const ServiceDetail = ({ navigation, route }) => {
                   showsHorizontalScrollIndicator={false}
                   showsVerticalScrollIndicator={false}
                 >
+                  {console.log("filteredData", filteredData)}
                   {filteredData?.map((item, index) => {
                     return (
                       <TouchableOpacity
-                        onPress={() => Linking.openURL(item.url)}
+                        onPress={() => {
+                          setWebUrl(item.url);
+                          setModalVisible(true);
+                        }}
                         style={[
                           styles.documents,
                           { marginLeft: index === 0 ? 0 : moderateScale(10) },
@@ -572,6 +578,12 @@ const ServiceDetail = ({ navigation, route }) => {
         onClose={() => {
           setModal(false);
         }}
+      />
+
+      <ShowFile
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        webUrl={webUrl}
       />
     </SafeAreaView>
   );

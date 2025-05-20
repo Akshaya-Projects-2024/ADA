@@ -66,7 +66,6 @@ const TrendDetail = (props) => {
     }
   };
 
-
   const calculateReadTime = (content) => {
     const words = content?.trim()?.split(/\s+/).length; // Count words
     const readingSpeed = 200; // Words per minute
@@ -91,12 +90,28 @@ const TrendDetail = (props) => {
           <TouchableOpacity
             hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
             onPress={() => props.navigation.goBack()}
+            style={{
+              backgroundColor: "#fff",
+              width: moderateScale(30),
+              height: moderateScale(30),
+              borderRadius: moderateScale(30) / 2,
+              alignItems:'center',
+              justifyContent:'center'
+            }}
           >
             <Back />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={()=>shareImageBase64()}
+            onPress={() => shareImageBase64()}
             hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
+            style={{
+              backgroundColor: "#fff",
+              width: moderateScale(30),
+              height: moderateScale(30),
+              borderRadius: moderateScale(30) / 2,
+              alignItems:'center',
+              justifyContent:'center'
+            }}
           >
             <ShareImg />
           </TouchableOpacity>
