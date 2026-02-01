@@ -23,6 +23,7 @@ import { contextValue } from "../../components/Loader";
 import { decryptService } from "../../utils/storageFunc";
 import { showToast } from "../../utils/utils";
 import Share from "react-native-share";
+import BackArrowComponent from "../../components/BackArrowComponent";
 
 const TrendDetail = (props) => {
   const { width } = useWindowDimensions();
@@ -87,9 +88,10 @@ const TrendDetail = (props) => {
           />
         </View>
         <View style={styles.headerView}>
+          <BackArrowComponent />
           <TouchableOpacity
+            onPress={() => shareImageBase64()}
             hitSlop={{ top: 20, bottom: 20, left: 50, right: 50 }}
-            onPress={() => props.navigation.goBack()}
             style={{
               backgroundColor: "#fff",
               width: moderateScale(30),
@@ -226,6 +228,23 @@ const styles = StyleSheet.create({
     color: THEMES.colors.black,
     fontSize: THEMES.fonts.font14,
     lineHeight: 27,
+  },
+  shareButtonStyle: {
+    backgroundColor: "white",
+    width: moderateScale(30),
+    height: moderateScale(30),
+    borderRadius: moderateScale(30) / 2,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: moderateScale(15),
+    right: moderateScale(15),
+    zIndex: 1000,
+    elevation: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    paddingRight: 3,
   },
 });
 

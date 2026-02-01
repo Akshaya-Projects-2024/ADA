@@ -123,7 +123,7 @@ const Home = (props) => {
       const userId = await decryptService("userId");
       const params = {
         userid: userId,
-        usertype: "parent",
+        usertype: "provider",
       };
       dispatch(getNotificationList(params));
     } catch (error) {

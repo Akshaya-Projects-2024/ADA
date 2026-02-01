@@ -1,12 +1,7 @@
 import messaging from "@react-native-firebase/messaging";
 import PushNotification from "react-native-push-notification";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform, PushNotificationIOS } from "react-native";
 import { useEffect } from "react";
-import {
-  navigate,
-  navigateToServiceProvider,
-} from "../navigations/rootNavigationRef";
 import { showLocalNotification } from "./pushNotificationUtils";
 import { useNavigation } from "@react-navigation/native";
 import { getLoggedInMoodule } from "./userUtils";
@@ -70,7 +65,7 @@ const NotificationConfig = () => {
   const handleNotification = async (notification) => {
     console.log("foreground", notification);
     if (!notification) return;
-    handleNavigation(notification.data);
+    handleNavigation(notification);
   };
 
   const handleForegroundMessage = async (remoteMessage) => {
@@ -78,7 +73,7 @@ const NotificationConfig = () => {
   };
 
   const handleInitialNotification = async (remoteMessage) => {
-    console.log("killed",remoteMessage);
+    console.log("killed", remoteMessage);
     if (remoteMessage) {
       handleNavigation(remoteMessage.data);
     }
@@ -95,31 +90,83 @@ const NotificationConfig = () => {
     const loggedInModule = await getLoggedInMoodule();
     const isServiceProvider = loggedInModule === LoginModules.provider;
     const mainRoute = isServiceProvider ? "providerAccount" : "parentAccount";
-
+    console.log("notification", data);
+    const notificationDetails = JSON.parse(data?.data);
+    console.log("notificationDetails", data);
     if (!data?.value) return;
+    // const params = {
+    //   id: item?.id,
+    //   userid: await decryptService("userId")
+    // };
+    // readNotification(params);
 
     switch (data?.value) {
       case "home":
         executePostFrame(() => navigation.navigate("MyProfile"));
         break;
       case "myBookings":
-        executePostFrame(() => navigation.navigate("myBookings",{route: mainRoute}));
+        executePostFrame(() =>
+          navigation.navigate("myBookings", {
+            route: mainRoute,
+          })
+        );
         break;
       case "petAdoption":
-        executePostFrame(() => navigation.navigate("petAdoption"));
+        executePostFrame(() =>
+          navigation.navigate("auth", {
+            screen: "adoptionDetail",
+            params: {
+              id: data.data.id,
+            },
+          })
+        );
         break;
       case "Activity":
-        executePostFrame(() => navigation.navigate("actvityTrackerDashboard"));
+        executePostFrame(() =>
+          isServiceProvider
+            ? navigation.reset({
+                index: 1,
+                routes: [
+                  { name: "petParentAppStack" },
+                  {
+                    name: "actvityTrackerDashboard",
+                    params: {
+                      petId: notificationDetails?.PetId,
+                    },
+                  },
+                ],
+              })
+            : navigation.navigate("actvityTrackerDashboard", {
+                petId: notificationDetails?.PetId,
+              })
+        );
+        break;
+      case "rescue":
+        executePostFrame(() =>
+          props.navigation?.navigate("resuceAlertDetail", {
+            id: item.data.id,
+          })
+        );
         break;
       case "lostpet":
+        executePostFrame(() =>
+          props.navigation?.navigate("lostAlertDetail", {
+            id: item.data.id,
+          })
+        );
+        break;
       case "medical":
-      case "rescue":
-        executePostFrame(() => navigation.navigate("alertList"));
+        executePostFrame(() =>
+          props.navigation?.navigate("medicalAlertDetail", {
+            id: item.data.id,
+          })
+        );
         break;
       case "subscription":
         executePostFrame(() =>
           navigation.navigate("paymentsSubscription", { route: "myprofile" })
         );
+        break;
       default:
         break;
     }

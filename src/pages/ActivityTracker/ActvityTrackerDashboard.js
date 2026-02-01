@@ -36,15 +36,24 @@ import { contextValue } from "../../components/Loader";
 import { showToast } from "../../utils/utils";
 import { useIsFocused } from "@react-navigation/native";
 import { ActivityType, DefaultActivityList } from "../../constants/enums";
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions";
 
 export const ActvityTrackerDashboard = (props) => {
   const { parentProfie, logindetails } = useSelector(
     (state) => state?.commonReducer
   );
   const { petDetails } = parentProfie;
+  const petId = props?.route?.params?.petId;
+  const getPetDetails = () => {
+    if (petId) {
+      const pet = petDetails.find((pet) => pet.id === petId);
+      return pet ? pet : petDetails[0];
+    } else {
+      return petDetails[0];
+    }
+  };
 
-  const [selectedPet, setSelectedPet] = useState(petDetails?.[0]);
+  const [selectedPet, setSelectedPet] = useState(getPetDetails());
   const [petImage, setPetImage] = useState();
   const [weekList, setWeekList] = useState({
     selectedDate: moment().format("YYYY-MM-DD"),
@@ -72,7 +81,7 @@ export const ActvityTrackerDashboard = (props) => {
 
   useEffect(() => {
     if (petDetails?.length && selectedPet?.documents) {
-      const profilePhoto = selectedPet.documents.find(
+      const profilePhoto = selectedPet?.documents.find(
         (item) => item.documenttype === "profilePhoto"
       );
       setPetImage(profilePhoto?.url);
@@ -85,27 +94,27 @@ export const ActvityTrackerDashboard = (props) => {
 
   const checkPermission = async () => {
     const permissionType =
-      Platform.OS === 'android'
+      Platform.OS === "android"
         ? PERMISSIONS.ANDROID.READ_CONTACTS
         : PERMISSIONS.IOS.CONTACTS;
-  
+
     const result = await check(permissionType);
     if (result === RESULTS.GRANTED) {
     } else if (result === RESULTS.DENIED || result === RESULTS.BLOCKED) {
       const requestResult = await request(permissionType);
-  
+
       if (requestResult !== RESULTS.GRANTED) {
         Alert.alert(
-          'Permission Denied',
-          'This app requires permission to access your contacts.',
+          "Permission Denied",
+          "This app requires permission to access your contacts.",
           [
             {
-              text: 'Cancel',
-              onPress: () => console.log('Cancel Pressed'),
-              style: 'cancel',
+              text: "Cancel",
+              onPress: () => console.log("Cancel Pressed"),
+              style: "cancel",
             },
             {
-              text: 'Open Settings',
+              text: "Open Settings",
               onPress: () => {
                 Linking.openSettings(); // opens app settings
               },
@@ -118,7 +127,7 @@ export const ActvityTrackerDashboard = (props) => {
 
   useEffect(() => {
     fetchActivityDashboardData();
-  }, [isFocused,selectedPet]);
+  }, [isFocused, selectedPet]);
 
   useEffect(() => {
     fetchActivity();
@@ -411,26 +420,28 @@ export const ActvityTrackerDashboard = (props) => {
             }}
             keyExtractor={(item, index) => index.toString()}
             ItemSeparatorComponent={<View style={{ marginBottom: 10 }} />}
-            ListEmptyComponent={!dataFetched.current ? null :
-              <View
-                style={[
-                  {
-                    alignItems: "center",
-                    justifyContent: "center",
-                    paddingTop: 100,
-                  },
-                ]}
-              >
-                <Text
-                  style={{
-                    fontSize: THEMES.fonts.font14,
-                    fontFamily: THEMES.fontFamily.medium,
-                    color: THEMES.colors.darkGrey,
-                  }}
+            ListEmptyComponent={
+              !dataFetched.current ? null : (
+                <View
+                  style={[
+                    {
+                      alignItems: "center",
+                      justifyContent: "center",
+                      paddingTop: 100,
+                    },
+                  ]}
                 >
-                  No Activity added
-                </Text>
-              </View>
+                  <Text
+                    style={{
+                      fontSize: THEMES.fonts.font14,
+                      fontFamily: THEMES.fontFamily.medium,
+                      color: THEMES.colors.darkGrey,
+                    }}
+                  >
+                    No Activity added
+                  </Text>
+                </View>
+              )
             }
           />
         </View>

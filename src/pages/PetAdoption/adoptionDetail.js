@@ -16,7 +16,10 @@ import ProfileDummy from "../../assets/svg/user.svg";
 import Call from "../../assets/svg/phoneCall.svg";
 import ShareImg from "../../assets/svg/share.svg";
 import Share from "react-native-share";
-import { getPetAdoptionDetail, shareAdoption } from "../../redux-store/actions/auth";
+import {
+  getPetAdoptionDetail,
+  shareAdoption,
+} from "../../redux-store/actions/auth";
 import { decryptService } from "../../utils/storageFunc";
 import { contextValue } from "../../components/Loader";
 import BackArrowComponent from "../../components/BackArrowComponent";
@@ -27,14 +30,14 @@ const AdoptionDetail = (props) => {
 
   useEffect(() => {
     initData();
-    getData()
+    getData();
   }, []);
 
   const initData = async () => {
     try {
       contextValue?.setLoader(true);
       let obj = {
-        id: selectedAdotpionData?.id,
+        id: id,
         createdby: await decryptService("userId"),
       };
       let response = await shareAdoption(obj);
@@ -73,7 +76,7 @@ const AdoptionDetail = (props) => {
   };
 
   // first image in array to display as per requiremeny
-
+  
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>

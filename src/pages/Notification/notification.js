@@ -98,6 +98,10 @@ const Notification = (props) => {
     (state) => state?.notification?.notificationList
   );
 
+  useEffect(() => {
+    getNotificationListData();
+  }, []);
+
   const getNotificationListData = async (showLoader = true) => {
     try {
       showLoader && contextValue?.setLoader(true);
@@ -121,12 +125,12 @@ const Notification = (props) => {
     if (!item?.isread) {
       const params = {
         id: item?.id,
-        userid: await decryptService("userId")
+        userid: await decryptService("userId"),
       };
       await readNotification(params);
       getNotificationListData(false);
     }
-
+    
     switch (item?.value) {
       case "myBookings":
         props.navigation.navigate(
@@ -149,7 +153,9 @@ const Notification = (props) => {
         props.navigation.navigate("Subscription");
         break;
       case "Activity":
-        props.navigation.navigate("actvityTrackerDashboard");
+        props.navigation.navigate("actvityTrackerDashboard", {
+          petId: item.data.PetId,
+        });
         break;
       case "home":
         props.navigation.navigate("myProfile");
@@ -167,6 +173,14 @@ const Notification = (props) => {
       case "medical":
         props.navigation?.navigate("medicalAlertDetail", {
           id: item.data.id,
+        });
+        break;
+      case "petAdoption":
+        props.navigation.navigate("auth", {
+          screen: "adoptionDetail",
+          params: {
+            id: item.data.id,
+          },
         });
         break;
     }
